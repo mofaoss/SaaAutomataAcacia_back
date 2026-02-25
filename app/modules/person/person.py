@@ -148,6 +148,12 @@ class PersonModule:
         使用记忆嵌片
         :return:
         """
+        valid_characters = [c for c in self.character_list if c != '']
+        char_count = len(valid_characters)
+        if char_count <= 2:
+            self.no_chip = True
+            return False
+
         timeout = Timer(20).start()
         confirm_flag = False
         while True:
@@ -168,8 +174,17 @@ class PersonModule:
                                       is_log=self.is_log):
                 confirm_flag = True
             if confirm_flag:
-                if self.auto.click_element('最大', 'text', crop=(1722 / 2560, 797 / 1440, 1848 / 2560, 867 / 1440),
+                if self.auto.find_element('最大', 'text', crop=(1722 / 2560, 797 / 1440, 1848 / 2560, 867 / 1440),
                                            is_log=self.is_log):
+                    click_times = 0
+                    if char_count == 3:
+                        click_times = 2
+                    elif char_count == 4:
+                        click_times = 4
+                    for _ in range(click_times):
+                        self.auto.click_element_with_pos(pos=(int(1235 / self.auto.scale_x), int(624 / self.auto.scale_y)))
+                        time.sleep(0.2)
+
                     self.auto.click_element('确定', 'text', crop=(1353 / 1920, 729 / 1080, 1528 / 1920, 800 / 1080),
                                             is_log=self.is_log)
                     self.auto.press_key('esc')
