@@ -22,7 +22,7 @@ from app.common.logger import original_stdout, original_stderr, logger
 from app.common.signal_bus import signalBus
 from app.common.style_sheet import StyleSheet
 from app.common.utils import get_all_children, get_date_from_api, get_gitee_text, get_start_arguments, \
-    is_exist_snowbreak, get_cloudflare_data, get_local_version, resolve_game_exe
+    is_exist_snowbreak, get_cloudflare_data, get_local_version, resolve_game_exe, is_remote_version_newer
 from app.modules.base_task.base_task import BaseTask
 from app.modules.chasm.chasm import ChasmModule
 from app.modules.collect_supplies.collect_supplies import CollectSuppliesModule
@@ -405,10 +405,10 @@ class Home(QFrame, Ui_home, BaseInterface):
         online_version = response.data.version
         local_version = get_local_version()
 
-        if local_version != online_version:
+        if is_remote_version_newer(local_version, online_version):
             logger.info(f"出现版本更新{local_version}→{online_version}，可以前往github或者q群下载新版安装包")
         else:
-            pass
+            logger.info(f"当前版本{local_version}为最新版本")
 
         if not local_config_data:
             # 首次获取数据或本地数据格式不正确

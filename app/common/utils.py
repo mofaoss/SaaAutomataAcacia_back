@@ -511,6 +511,37 @@ def get_local_version(file_path="update_data.txt"):
         return None
 
 
+def is_remote_version_newer(local_version: str, remote_version: str) -> bool:
+    """
+    判断线上版本是否高于本地版本。
+
+    规则：
+    - 优先提取数字段进行比较（例如 2.0.9 > 2.0.7）
+    - 若无法提取有效数字，则不触发更新提示，避免误报
+    """
+
+    def _normalize(version: str):
+        if not version:
+            return None
+        numbers = re.findall(r'\d+', str(version))
+        if not numbers:
+            return None
+        return tuple(int(num) for num in numbers)
+
+    local_nums = _normalize(local_version)
+    remote_nums = _normalize(remote_version)
+
+    if not remote_nums:
+        return False
+    if not local_nums:
+        return True
+
+    max_len = max(len(local_nums), len(remote_nums))
+    local_padded = local_nums + (0,) * (max_len - len(local_nums))
+    remote_padded = remote_nums + (0,) * (max_len - len(remote_nums))
+    return remote_padded > local_padded
+
+
 if __name__ == "__main__":
     # get_hsv((124, 174, 235))
     # get_hsv((112, 165, 238))
