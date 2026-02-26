@@ -511,6 +511,45 @@ def get_local_version(file_path="update_data.txt"):
         return None
 
 
+def get_github_latest_release_version(repo_url: str):
+    """
+    根据仓库地址获取 GitHub 最新 release 的版本号。
+
+    参数:
+        repo_url: 仓库地址，如 https://github.com/owner/repo
+
+    返回:
+        成功: 版本号字符串（如 2.0.9）
+        失败: None
+    """
+    if not repo_url:
+        return None
+
+    match = re.search(r"github\.com/([^/]+)/([^/]+)", repo_url)
+    if not match:
+        return None
+
+    owner, repo = match.group(1), match.group(2)
+    repo = repo.replace('.git', '').strip('/')
+
+    api_url = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
+    response = fetch_url(api_url, timeout=5)
+
+    if isinstance(response, dict):
+        return None
+    if response.status_code != 200:
+        return None
+
+    try:
+        data = response.json()
+        tag_name = (data.get("tag_name") or "").strip()
+        if not tag_name:
+            return None
+        return tag_name.lstrip('vV')
+    except Exception:
+        return None
+
+
 def is_remote_version_newer(local_version: str, remote_version: str) -> bool:
     """
     判断线上版本是否高于本地版本。
