@@ -48,6 +48,11 @@ class Automation:
     自动化管理类，用于管理与游戏窗口相关的自动化操作。
     """
 
+    _click_verify_first_delay = 0.06
+    _click_verify_second_delay = 0.2
+    _click_verify_change_threshold = 1.0
+    _click_verify_roi_padding = 12
+
     def __init__(self, window_title, window_class, logger):
         """
         :param window_title: 游戏窗口的标题。
@@ -141,7 +146,8 @@ class Automation:
                 time.sleep(0.5)
                 continue
             elif self.click_element("取消", "text", crop=(463 / 1920, 728 / 1080, 560 / 1920, 790 / 1080)):
-                break
+                time.sleep(0.3)
+                continue
             else:
                 self.press_key('esc')
                 time.sleep(0.5)
@@ -476,10 +482,97 @@ class Automation:
         """
         coordinates = self.find_element(target, find_type, threshold, crop, take_screenshot, include, need_ocr, extract,
                                         match_method, is_log)
-        # print(f"{coordinates=}")
-        if coordinates:
-            return self.click_element_with_pos(coordinates, action, offset, n)
-        return False
+        if not coordinates:
+            return False
+
+        before_click = self.current_screenshot.copy() if self.current_screenshot is not None else None
+        if not self.click_element_with_pos(coordinates, action, offset, n):
+            return False
+
+        if not self._should_verify_click(find_type, action):
+            return True
+
+        if self._verify_click_success(before_click, coordinates, target, find_type, threshold, crop, include,
+                                      need_ocr, extract, match_method, delay=self._click_verify_first_delay):
+            return True
+
+        if is_log:
+            self.logger.debug(f"目标{target}首次验收未确认生效，执行一次补点重试")
+
+        coordinates_retry = self.find_element(target, find_type, threshold, crop, take_screenshot=False,
+                                              include=include, need_ocr=need_ocr, extract=extract,
+                                              match_method=match_method, is_log=False)
+        if not coordinates_retry:
+            return True
+
+        before_retry = self.current_screenshot.copy() if self.current_screenshot is not None else None
+        if not self.click_element_with_pos(coordinates_retry, action, offset, n):
+            return False
+
+        return self._verify_click_success(before_retry, coordinates_retry, target, find_type, threshold, crop, include,
+                                          need_ocr, extract, match_method, delay=self._click_verify_second_delay)
+
+    @staticmethod
+    def _should_verify_click(find_type, action):
+        return find_type in {'text', 'image'} and action in {'move_click', 'mouse_click'}
+
+    @staticmethod
+    def _is_screen_changed(before_image, after_image, threshold=1.0):
+        if before_image is None or after_image is None:
+            return False
+        if before_image.shape != after_image.shape:
+            return True
+        diff = cv2.absdiff(before_image, after_image)
+        mean_change = sum(cv2.mean(diff)[:3]) / 3
+        return mean_change >= threshold
+
+    def _is_roi_changed(self, before_image, after_image, coordinates):
+        if before_image is None or after_image is None or coordinates is None:
+            return False
+        if before_image.shape != after_image.shape:
+            return True
+
+        if not isinstance(coordinates, tuple) or len(coordinates) != 2:
+            return self._is_screen_changed(before_image, after_image, self._click_verify_change_threshold)
+
+        if self.relative_pos is None:
+            return self._is_screen_changed(before_image, after_image, self._click_verify_change_threshold)
+
+        (x1, y1), (x2, y2) = coordinates
+        offset_x, offset_y = self.relative_pos[0], self.relative_pos[1]
+
+        lx1 = int(x1 - offset_x) - self._click_verify_roi_padding
+        ly1 = int(y1 - offset_y) - self._click_verify_roi_padding
+        lx2 = int(x2 - offset_x) + self._click_verify_roi_padding
+        ly2 = int(y2 - offset_y) + self._click_verify_roi_padding
+
+        h, w = before_image.shape[:2]
+        lx1 = max(0, min(w, lx1))
+        lx2 = max(0, min(w, lx2))
+        ly1 = max(0, min(h, ly1))
+        ly2 = max(0, min(h, ly2))
+
+        if lx2 <= lx1 or ly2 <= ly1:
+            return self._is_screen_changed(before_image, after_image, self._click_verify_change_threshold)
+
+        before_roi = before_image[ly1:ly2, lx1:lx2]
+        after_roi = after_image[ly1:ly2, lx1:lx2]
+        return self._is_screen_changed(before_roi, after_roi, self._click_verify_change_threshold)
+
+    def _verify_click_success(self, before_click, coordinates, target, find_type, threshold, crop, include,
+                              need_ocr, extract, match_method, delay):
+        time.sleep(delay)
+        screenshot_result = self.take_screenshot(crop)
+        if not screenshot_result:
+            return False
+
+        still_exists = self.find_element(target, find_type, threshold, crop, take_screenshot=False,
+                                         include=include, need_ocr=need_ocr, extract=extract,
+                                         match_method=match_method, is_log=False)
+        if not still_exists:
+            return True
+
+        return self._is_roi_changed(before_click, self.current_screenshot, coordinates)
 
     @atoms
     def find_target_near_source(self, target, source_pos, need_update_ocr: bool = True, crop=(0, 0, 1, 1), include=True,
