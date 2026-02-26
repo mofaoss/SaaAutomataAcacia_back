@@ -10,6 +10,13 @@
 简体中文 | <a href="docs/README_en.md">English</a>
 </div>
 
+## 🌏语言兼容说明
+
+- UI 已支持简体/繁体切换（`zh_CN` / `zh_HK`）
+- 自动化文本匹配已增加繁体到简体归一化，繁体游戏界面可复用现有简体关键词流程
+- 若本地环境未更新依赖，请执行：`pip install -r requirements.txt`（包含 `opencc-python-reimplemented`）
+- 可在 `AppData/config.json` 中设置 `MainWindow.Language` 为 `zh_HK` 后重启验证
+
 ## ✨功能介绍
 > [!Tip]
 > **Update**
