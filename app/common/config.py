@@ -21,15 +21,45 @@ class Language(Enum):
 class LanguageSerializer(ConfigSerializer):
     """ Language serializer """
 
+    _traditional_aliases = {
+        "zh_HK", "zh_TW", "zh_MO", "zh_Hant", "zh_Hant_TW", "zh_Hant_HK", "zh_Hant_MO"
+    }
+
     def serialize(self, language):
         return language.value.name() if language != Language.AUTO else "Auto"
 
     def deserialize(self, value: str):
-        return Language(QLocale(value)) if value != "Auto" else Language.AUTO
+        if value == "Auto":
+            return Language.AUTO
+
+        locale_name = value.replace('-', '_')
+        if locale_name in self._traditional_aliases or locale_name.startswith("zh_Hant"):
+            return Language.CHINESE_TRADITIONAL
+
+        # 兼容 en_* 配置
+        if locale_name.startswith("en"):
+            return Language.ENGLISH
+
+        if locale_name.startswith("zh"):
+            return Language.CHINESE_SIMPLIFIED
+
+        return Language.CHINESE_SIMPLIFIED
 
 
 def isWin11():
     return sys.platform == 'win32' and sys.getwindowsversion().build >= 22000
+
+
+def is_non_chinese_ui_language() -> bool:
+    """Whether current UI language context should be treated as non-Chinese."""
+    language = config.language.value
+
+    if language == Language.AUTO:
+        system_locale_name = QLocale.system().name().replace('-', '_')
+        return not system_locale_name.startswith("zh")
+
+    locale_name = language.value.name().replace('-', '_')
+    return not locale_name.startswith("zh")
 
 
 class Config(QConfig):
@@ -136,6 +166,7 @@ class Config(QConfig):
 
     # 自动化相关
     game_title_name = ConfigItem("automation", "game_title_name", "尘白禁区")
+    game_language = OptionsConfigItem("automation", "game_language", 0, OptionsValidator([0, 1]))
     # 钓鱼相关
     CheckBox_is_save_fish = ConfigItem("add_fish", "CheckBox_is_save_fish", False, BoolValidator())
     CheckBox_is_limit_time = ConfigItem("add_fish", "CheckBox_is_limit_time", False, BoolValidator())
