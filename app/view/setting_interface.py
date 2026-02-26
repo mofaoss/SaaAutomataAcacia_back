@@ -14,7 +14,7 @@ from qfluentwidgets import (SwitchSettingCard, PrimaryPushSettingCard, ScrollAre
                             ComboBoxSettingCard, ExpandLayout, setTheme, setFont, MessageBox, ProgressBar)
 
 from ..common.config import config, isWin11
-from ..common.setting import FEEDBACK_URL, QQ
+from ..common.setting import FEEDBACK_URL, QQ, REPO_URL
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
 from ..common.utils import get_local_version
@@ -420,7 +420,7 @@ class SettingInterface(ScrollArea):
         else:
             InfoBar.error(
                 '更新下载失败',
-                f'请前往github/gitee自行下载release，或者去群{QQ}找最新文件下载',
+                f'请前往 {REPO_URL}/releases或者{QQ} 群下载更新包',
                 isClosable=True,
                 duration=-1,
                 parent=self
