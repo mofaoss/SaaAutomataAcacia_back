@@ -1,5 +1,6 @@
 import ctypes
 import string
+import threading
 import time
 from ctypes import windll
 
@@ -100,6 +101,7 @@ class Input:
             "x1": 0x0001<<16,  # 侧键后退按钮
             "x2": 0x0002<<16,  # 侧键前进按钮
         }
+        self._mouse_action_lock = threading.Lock()
         # 排除缩放干扰
         ctypes.windll.user32.SetProcessDPIAware()
 
@@ -175,29 +177,68 @@ class Input:
         if isinstance(y, float):
             y = int(y)
 
-        last_position = win32api.GetCursorPos()  # 获取初始鼠标位置
         start_time = time.time()
+        lock_timeout = max(0.1, min(time_out, 1.0))
+        if not self._mouse_action_lock.acquire(timeout=lock_timeout):
+            self.logger.error(f"鼠标移动点击({x}, {y})出错：获取鼠标操作锁超时")
+            return
+
         try:
             while time.time() - start_time < time_out:
-                if not self.is_mouse_in_use(last_position):
-                    current_pos = win32api.GetCursorPos()
+                # 稳定空闲判定：连续一小段时间不移动才执行，减少与用户抢鼠标
+                idle_start = None
+                sample_last = win32api.GetCursorPos()
+                while time.time() - start_time < time_out:
+                    time.sleep(0.02)
+                    sample_now = win32api.GetCursorPos()
+                    moved = abs(sample_now[0] - sample_last[0]) > 1 or abs(sample_now[1] - sample_last[1]) > 1
+                    if moved:
+                        idle_start = None
+                    else:
+                        if idle_start is None:
+                            idle_start = time.time()
+                        elif time.time() - idle_start >= 0.08:
+                            break
+                    sample_last = sample_now
+
+                if time.time() - start_time >= time_out:
+                    break
+
+                current_pos = win32api.GetCursorPos()
+                try:
                     self.activate()
                     win32api.SetCursorPos((x, y))
+                    if win32api.GetCursorPos() != (x, y):
+                        time.sleep(0.01)
+                        win32api.SetCursorPos((x, y))
+
+                    lparam = y << 16 | x
+                    win32gui.PostMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
+
+                    # 点击过程中若被抢鼠标，做一次轻量校正，保证有效性
                     self.mouse_down(x, y, mouse_key)
                     time.sleep(press_time)
+                    cur = win32api.GetCursorPos()
+                    if abs(cur[0] - x) > 3 or abs(cur[1] - y) > 3:
+                        win32api.SetCursorPos((x, y))
                     self.mouse_up(x, y, mouse_key)
-                    time.sleep(0.05)
-                    win32api.SetCursorPos(current_pos)
+
+                    time.sleep(0.02)
                     self.logger.debug(f"鼠标移动后点击({x}, {y})")
-                    break
-                else:
-                    # self.logger.debug("鼠标正在使用，等待...")
-                    last_position = win32api.GetCursorPos()
+                    return
+                finally:
+                    try:
+                        win32api.SetCursorPos(current_pos)
+                    except Exception:
+                        pass
+
             if time.time() - start_time > time_out:
                 raise RuntimeError("等待点击超时")
         except Exception as e:
             # print(traceback.format_exc())
             self.logger.error(f"鼠标移动点击({x}, {y})出错：{repr(e)}")
+        finally:
+            self._mouse_action_lock.release()
 
     def mouse_click(self, x: int, y: int, mouse_key='left', press_time: float = 0.002):
         """真后台：不抢鼠标，后台按键点击，主要用于无光标时，默认左键"""
@@ -241,6 +282,11 @@ class Input:
         :param time_out: 超时时间
         :return:
         """
+        if isinstance(x, float):
+            x = int(x)
+        if isinstance(y, float):
+            y = int(y)
+
         wparam = delta << 16
         message = self.WmCode['mouse_wheel']
         lparam = y << 16 | x
@@ -251,21 +297,39 @@ class Input:
             while time.time() - start_time < time_out:
                 if not self.is_mouse_in_use(last_position):
                     current_pos = win32api.GetCursorPos()
-                    self.activate()
-                    win32api.SetCursorPos((x, y))
-                    # 滚一次
-                    win32gui.PostMessage(self.hwnd, message, wparam, lparam)
-                    win32api.SetCursorPos(current_pos)
-                    self.logger.debug(f"鼠标移动至({x},{y})滚动滚轮 {delta}")
-                    break
-                else:
-                    # self.logger.debug("鼠标正在使用，等待...")
-                    last_position = win32api.GetCursorPos()
-            if time.time() - start_time > time_out:
-                raise RuntimeError("等待滚动滚轮超时")
+                    try:
+                        self.activate()
+                        win32api.SetCursorPos((x, y))
+                        # 极少数情况下 SetCursorPos 会被系统或用户输入打断，补一次快速校正
+                        if win32api.GetCursorPos() != (x, y):
+                            time.sleep(0.01)
+                            win32api.SetCursorPos((x, y))
+
+                        # 先发送一次 move，提升滚轮消息命中目标窗口的稳定性
+                        win32gui.PostMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
+
+                        # PostMessage 失败时，进行一次轻量重试
+                        if not win32gui.PostMessage(self.hwnd, message, wparam, lparam):
+                            time.sleep(0.01)
+                            if not win32gui.PostMessage(self.hwnd, message, wparam, lparam):
+                                raise RuntimeError("发送滚轮消息失败")
+
+                        self.logger.debug(f"鼠标移动至({x},{y})滚动滚轮 {delta}")
+                        return True
+                    finally:
+                        # 无论成功失败都尽力恢复用户鼠标位置，避免留下“抢鼠标”体感
+                        try:
+                            win32api.SetCursorPos(current_pos)
+                        except Exception:
+                            pass
+                last_position = win32api.GetCursorPos()
+                time.sleep(0.02)
+
+            self.logger.warning(f"等待滚动滚轮超时，放弃本次滚轮输入: ({x}, {y}, {delta})")
+            return False
         except Exception as e:
-            # print(traceback.format_exc())
             self.logger.error(f"鼠标移动({x}, {y})后滚动出错：{repr(e)}")
+            return False
 
     def press_key(self, key, press_time=0.2):
         """
