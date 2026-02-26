@@ -53,8 +53,10 @@ class OcrReplacementTable(QFrame, Ui_ocrtable):
 
     def get_json_path(self):
         """获取JSON文件的绝对路径"""
-        # 获取可执行文件所在目录
-        base_dir = os.path.dirname(sys.executable)
+        if getattr(sys, 'frozen', False):
+            base_dir = os.path.dirname(sys.executable)
+        else:
+            base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
         # 组合完整路径
         json_path = os.path.join(base_dir, "AppData", "ocr_replacements.json")
 
