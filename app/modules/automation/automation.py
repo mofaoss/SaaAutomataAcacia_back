@@ -13,6 +13,7 @@ from app.common.config import config
 from app.common.image_utils import ImageUtils
 from app.common.matcher import matcher
 from app.common.signal_bus import signalBus
+from app.common.text_normalizer import normalize_chinese_text
 from app.common.utils import random_rectangle_point, get_hwnd
 from app.modules.automation.input import Input
 from app.modules.automation.screenshot import Screenshot
@@ -337,13 +338,18 @@ class Automation:
         :param include: 是否包含目标字符串。
         :return: (是否匹配, 匹配的目标文本)
         """
+        if config.game_language.value == 1:
+            text = normalize_chinese_text(text)
+            normalized_targets = [normalize_chinese_text(target) for target in targets]
+        else:
+            normalized_targets = targets
         if include:
-            for target in targets:
+            for target in normalized_targets:
                 if target in text:
                     return True, target  # 直接返回匹配成功及匹配的目标文本
             return False, None  # 如果没有匹配，返回False和None
         else:
-            return text in targets, text if text in targets else None
+            return text in normalized_targets, text if text in normalized_targets else None
 
     def search_text_in_ocr_results(self, targets, include):
         """从ocr识别结果中找目标文字"""

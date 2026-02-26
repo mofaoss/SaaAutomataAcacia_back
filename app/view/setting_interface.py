@@ -11,9 +11,10 @@ from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import InfoBar
 from qfluentwidgets import SettingCardGroup as CardGroup
 from qfluentwidgets import (SwitchSettingCard, PrimaryPushSettingCard, ScrollArea,
-                            ComboBoxSettingCard, ExpandLayout, setTheme, setFont, MessageBox, ProgressBar)
+                            ComboBoxSettingCard, ExpandLayout, setTheme, setFont, MessageBox, ProgressBar,
+                            )
 
-from ..common.config import config, isWin11
+from ..common.config import config, isWin11, is_non_chinese_ui_language
 from ..common.setting import FEEDBACK_URL, QQ, REPO_URL
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
@@ -105,14 +106,14 @@ class SettingInterface(ScrollArea):
             ],
             parent=self.personalGroup
         )
-        # self.languageCard = ComboBoxSettingCard(
-        #     config.language,
-        #     FIF.LANGUAGE,
-        #     self.tr('Language'),
-        #     self.tr('Set your preferred language for UI'),
-        #     texts=['简体中文', '繁體中文', 'English', self.tr('Use system setting')],
-        #     parent=self.personalGroup
-        # )
+        self.languageCard = ComboBoxSettingCard(
+            config.language,
+            FIF.LANGUAGE,
+            self.tr('Language'),
+            self.tr('Set your preferred language for UI'),
+            texts=['简体中文', '繁體中文', 'English', self.tr('Use system setting')],
+            parent=self.personalGroup
+        )
 
         # update software
         self.aboutSoftwareGroup = SettingCardGroup(
@@ -130,6 +131,15 @@ class SettingInterface(ScrollArea):
             '游戏渠道选择',
             self.tr("请选择你所在的区服"),
             texts=[self.tr('官服'), self.tr('b服'), self.tr('国际服')],
+            parent=self.aboutSoftwareGroup
+        )
+        self.gameLanguageCard = ComboBoxSettingCard(
+            config.game_language,
+            FIF.LANGUAGE,
+            '游戏语言 / Game Language',
+            'Used for automation OCR matching, supports only Simplified/Traditional Chinese'
+            if is_non_chinese_ui_language() else '用于自动化OCR匹配，仅支持简体/繁体中文',
+            texts=['简体中文 / Simplified Chinese', '繁體中文 / Traditional Chinese'],
             parent=self.aboutSoftwareGroup
         )
         self.isLogCard = SwitchSettingCard(
@@ -239,10 +249,11 @@ class SettingInterface(ScrollArea):
         self.personalGroup.addSettingCard(self.themeCard)
         self.personalGroup.addSettingCard(self.enterCard)
         self.personalGroup.addSettingCard(self.zoomCard)
-        # self.personalGroup.addSettingCard(self.languageCard)
+        self.personalGroup.addSettingCard(self.languageCard)
 
         self.aboutSoftwareGroup.addSettingCard(self.updateOnStartUpCard)
         self.aboutSoftwareGroup.addSettingCard(self.serverCard)
+        self.aboutSoftwareGroup.addSettingCard(self.gameLanguageCard)
         self.aboutSoftwareGroup.addSettingCard(self.isLogCard)
         self.aboutSoftwareGroup.addSettingCard(self.showScreenshotCard)
         self.aboutSoftwareGroup.addSettingCard(self.saveScaleCacheCard)

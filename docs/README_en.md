@@ -10,6 +10,16 @@
 <a href="../README.md">简体中文</a> | English
 </div>
 
+## 🌏 Language Compatibility
+
+- Supported game languages: Simplified Chinese, Traditional Chinese
+- Supported UI languages: Simplified Chinese, Traditional Chinese (Traditional uses `zh_HK` resources)
+- Language settings are separated into independent options: `UI language` and `Game language`
+- Automation text matching now normalizes Traditional Chinese to Simplified Chinese to reuse existing task keywords
+- AUTO language behavior: follow system locale on Chinese systems; default to Simplified Chinese on non-Chinese systems
+- Ensure dependencies are updated with `pip install -r requirements.txt` (includes `opencc-python-reimplemented`)
+- You can set `MainWindow.Language` to `zh_HK` in `AppData/config.json` and restart for verification
+
 ## ✨Feature Introduction
 
 > [!Tip]

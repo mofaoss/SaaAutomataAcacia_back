@@ -10,9 +10,9 @@ from PyQt5.QtWidgets import (
     QGraphicsDropShadowEffect,
     QHBoxLayout,
 )
-from qfluentwidgets import ScrollArea, FluentIcon
+from qfluentwidgets import ScrollArea, FluentIcon, CardWidget
 
-from app.common.config import config
+from app.common.config import config, is_non_chinese_ui_language
 from app.common.setting import REPO_URL, GITHUB_FEEDBACK_URL
 from app.common.style_sheet import StyleSheet
 from app.common.utils import get_local_version
@@ -121,6 +121,10 @@ class DisplayInterface(ScrollArea):
         self.banner = BannerWidget(self)
         self.view = QWidget(self)
         self.vBoxLayout = QVBoxLayout(self.view)
+        self.gameLanguageNoticeCard = CardWidget(self.view)
+        self.gameLanguageNoticeLayout = QVBoxLayout(self.gameLanguageNoticeCard)
+        self.gameLanguageNoticeTitle = QLabel("Language Notice", self.gameLanguageNoticeCard)
+        self.gameLanguageNoticeLabel = QLabel(self.gameLanguageNoticeCard)
         self.basedir = "app/resource/images/display"
 
         self.__initWidget()
@@ -138,6 +142,19 @@ class DisplayInterface(ScrollArea):
         self.vBoxLayout.setContentsMargins(0, 0, 0, 36)
         self.vBoxLayout.setSpacing(40)
         self.vBoxLayout.addWidget(self.banner)
+        self.gameLanguageNoticeCard.setFixedHeight(90)
+        self.gameLanguageNoticeLayout.setContentsMargins(24, 14, 24, 14)
+        self.gameLanguageNoticeLayout.setSpacing(4)
+        self.gameLanguageNoticeTitle.setStyleSheet("font-size: 16px; font-weight: 500;")
+        self.gameLanguageNoticeLabel.setText(
+            "Note: Game language for automation supports only Simplified/Traditional Chinese."
+        )
+        self.gameLanguageNoticeLabel.setStyleSheet("color: red;")
+        self.gameLanguageNoticeLabel.setWordWrap(True)
+        self.gameLanguageNoticeLayout.addWidget(self.gameLanguageNoticeTitle)
+        self.gameLanguageNoticeLayout.addWidget(self.gameLanguageNoticeLabel)
+        self.gameLanguageNoticeCard.setVisible(is_non_chinese_ui_language())
+        self.vBoxLayout.addWidget(self.gameLanguageNoticeCard)
         self.vBoxLayout.setAlignment(Qt.AlignTop)
 
     def loadSamples(self):

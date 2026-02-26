@@ -10,6 +10,16 @@
 简体中文 | <a href="docs/README_en.md">English</a>
 </div>
 
+## 🌏语言兼容说明
+
+- 支持的游戏语言：简体中文、繁体中文
+- 支持的界面语言：简体中文、繁体中文（统一使用 `zh_HK` 作为繁体资源）
+- 语言选项已拆分：`UI语言` 与 `游戏语言` 独立配置
+- 自动化文本匹配已增加繁体到简体归一化，繁体游戏界面可复用现有简体关键词流程
+- 默认语言策略：选择“跟随系统”时，中文系统跟随系统；非中文系统默认使用简体中文
+- 若本地环境未更新依赖，请执行：`pip install -r requirements.txt`（包含 `opencc-python-reimplemented`）
+- 可在 `AppData/config.json` 中设置 `MainWindow.Language` 为 `zh_HK` 后重启验证
+
 ## ✨功能介绍
 > [!Tip]
 > **Update**

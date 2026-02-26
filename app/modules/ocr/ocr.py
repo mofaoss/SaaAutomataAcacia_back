@@ -4,6 +4,7 @@ import cv2
 
 from app.common.config import config
 from app.common.image_utils import ImageUtils
+from app.common.text_normalizer import normalize_chinese_text
 from app.common.utils import cpu_support_avx2
 from app.modules.onnxocr.onnx_paddleocr import ONNXPaddleOcr
 
@@ -69,6 +70,10 @@ class OCR:
             for old_text, new_text in self.replacements['conditional'].items():
                 if new_text not in text:
                     text = text.replace(old_text, new_text)
+
+            # 游戏语言为繁体时，统一转简体以复用现有简体关键词逻辑
+            if config.game_language.value == 1:
+                text = normalize_chinese_text(text)
 
             # 格式化输出: [文本, 置信度, 左上和右下坐标]
             formatted_result.append([text, round(conf, 2), [[left, top], [right, bottom]]])
