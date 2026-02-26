@@ -47,6 +47,10 @@ class Automation:
     自动化管理类，用于管理与游戏窗口相关的自动化操作。
     """
 
+    _animation_sensitive_buttons = {
+        '取消', '关闭', '確定', '确定', '确认', '退出', '返回', '继续'
+    }
+
     def __init__(self, window_title, window_class, logger):
         """
         :param window_title: 游戏窗口的标题。
@@ -140,7 +144,8 @@ class Automation:
                 time.sleep(0.5)
                 continue
             elif self.click_element("取消", "text", crop=(463 / 1920, 728 / 1080, 560 / 1920, 790 / 1080)):
-                break
+                time.sleep(0.3)
+                continue
             else:
                 self.press_key('esc')
                 time.sleep(0.5)
@@ -475,7 +480,29 @@ class Automation:
                                         match_method, is_log)
         # print(f"{coordinates=}")
         if coordinates:
-            return self.click_element_with_pos(coordinates, action, offset, n)
+            clicked = self.click_element_with_pos(coordinates, action, offset, n)
+            if not clicked:
+                return False
+
+            if self._should_retry_click(target, find_type, action):
+                time.sleep(0.2)
+                if self.find_element(target, find_type, threshold, crop, take_screenshot=True, include=include,
+                                     need_ocr=need_ocr, extract=extract, match_method=match_method, is_log=False):
+                    if is_log:
+                        self.logger.debug(f"目标{target}点击后仍可见，执行防吞点击重试")
+                    coordinates_retry = self.find_element(target, find_type, threshold, crop, take_screenshot=False,
+                                                          include=include, need_ocr=need_ocr, extract=extract,
+                                                          match_method=match_method, is_log=False)
+                    if coordinates_retry:
+                        self.click_element_with_pos(coordinates_retry, action, offset, n)
+            return True
+        return False
+
+    def _should_retry_click(self, target, find_type, action):
+        if find_type != 'text' or action not in {'move_click', 'mouse_click'}:
+            return False
+        if isinstance(target, str):
+            return target in self._animation_sensitive_buttons
         return False
 
     @atoms
