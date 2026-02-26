@@ -5,7 +5,7 @@ from pathlib import Path
 DEBUG = "__compiled__" not in globals()
 
 YEAR = 2025
-AUTHOR = "LaoZhu"
+AUTHOR = "mofaoss"
 
 APP_NAME = "SnowbreakAutoAssistant"
 HELP_URL = "https://github.com/mofaoss/SnowbreakAutoAssistant"

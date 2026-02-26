@@ -127,4 +127,4 @@
 > [!Note]
 >
 > GPLv3 License
-[LICENSE](https://github.com/LaoZhuJackson/SnowbreakAutoAssistant/blob/main/LICENSE)
+[LICENSE](https://github.com/mofaoss/SnowbreakAutoAssistant/blob/main/LICENSE)
