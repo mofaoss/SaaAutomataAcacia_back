@@ -22,7 +22,7 @@ from .ocr_replacement_table import OcrReplacementTable
 from .setting_interface import SettingInterface
 from .trigger import Trigger
 from ..common.config import config
-from ..common.config import is_non_chinese_ui_language
+from ..common.config import is_non_chinese_ui_language, is_traditional_ui_language
 from ..common.icon import Icon
 from ..common.logger import logger
 from ..common.matcher import matcher
@@ -221,11 +221,14 @@ class MainWindow(MSFluentWindow):
         self.close()
 
     def onSupport(self):
+        support_image = "asset/support.jpg"
+        if self._is_non_chinese_ui or is_traditional_ui_language():
+            support_image = "asset/support_kofi.png"
         view = FlyoutView(
             title=self._ui_text("赞助作者", "Support Author"),
             content=self._ui_text("如果这个助手帮助到你，可以考虑赞助作者一杯奶茶(>ω･* )ﾉ",
                                   "If this assistant helps you, consider buying the author a coffee (>ω･* )ﾉ"),
-            image="asset/support.jpg",
+            image=support_image,
             isClosable=True,
         )
         view.widgetLayout.insertSpacing(1, 5)
