@@ -44,6 +44,7 @@ class SettingInterface(ScrollArea):
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
+        self._is_non_chinese_ui = is_non_chinese_ui_language()
         self.parent = parent
         self.scrollWidget = QWidget()
         self.expandLayout = ExpandLayout(self.scrollWidget)
@@ -52,6 +53,7 @@ class SettingInterface(ScrollArea):
         self.progressBar.setVisible(False)
 
         self.app_name = "SAA"
+        self.startup_task_name = f"{self.app_name} {self._ui_text('开机自启', 'Startup')}"
         # 获取当前应用路径
         if getattr(sys, 'frozen', False):
             # 打包后的可执行文件
@@ -87,11 +89,11 @@ class SettingInterface(ScrollArea):
         self.enterCard = ComboBoxSettingCard(
             config.enter_interface,
             FIF.HOME,
-            '启动时进入',
-            self.tr("选择启动软件时直接进入哪个页面"),
+            self._ui_text('启动时进入', 'Startup page'),
+            self._ui_text("选择启动软件时直接进入哪个页面", "Choose which page to open on startup"),
             texts=[
-                self.tr('展示页'), self.tr('主页'),
-                self.tr('小工具')
+                self._ui_text('展示页', 'Display'), self._ui_text('主页', 'Home'),
+                self._ui_text('小工具', 'Tools')
             ],
             parent=self.personalGroup
         )
@@ -117,20 +119,21 @@ class SettingInterface(ScrollArea):
 
         # update software
         self.aboutSoftwareGroup = SettingCardGroup(
-            self.tr("软件相关"), self.scrollWidget)
+            self._ui_text("软件相关", "Software"), self.scrollWidget)
         self.updateOnStartUpCard = SwitchSettingCard(
             FIF.UPDATE,
             self.tr('Check for updates when the application starts'),
-            '如果开启，每次游戏版本更新会自动更新对应活动刷体力的坐标和SAA提醒的链接',
+            self._ui_text('如果开启，每次游戏版本更新会自动更新对应活动刷体力的坐标和SAA提醒的链接',
+                          'If enabled, coordinates and schedule reminder links update automatically after each game version update'),
             configItem=config.checkUpdateAtStartUp,
             parent=self.aboutSoftwareGroup
         )
         self.serverCard = ComboBoxSettingCard(
             config.server_interface,
             FIF.GAME,
-            '游戏渠道选择',
-            self.tr("请选择你所在的区服"),
-            texts=[self.tr('官服'), self.tr('b服'), self.tr('国际服')],
+            self._ui_text('游戏渠道选择', 'Server channel'),
+            self._ui_text("请选择你所在的区服", "Choose your server channel"),
+            texts=[self._ui_text('官服', 'Official'), self._ui_text('b服', 'Bilibili'), self._ui_text('国际服', 'Global')],
             parent=self.aboutSoftwareGroup
         )
         self.gameLanguageCard = ComboBoxSettingCard(
@@ -144,50 +147,55 @@ class SettingInterface(ScrollArea):
         )
         self.isLogCard = SwitchSettingCard(
             FIF.DEVELOPER_TOOLS,
-            self.tr('展示OCR识别结果'),
-            '打开将在日志中显示ocr识别结果，获得更详细的日志信息',
+            self._ui_text('展示OCR识别结果', 'Show OCR results'),
+            self._ui_text('打开将在日志中显示ocr识别结果，获得更详细的日志信息',
+                          'Show OCR recognition results in logs for more detailed diagnostics'),
             configItem=config.isLog,
             parent=self.aboutSoftwareGroup
         )
         self.showScreenshotCard = SwitchSettingCard(
             FIF.PHOTO,
-            self.tr('展示运行时的窗口截图'),
-            '用于在查错时查看是否正确截取了游戏对应位置的画面，截取的所有画面会保存在SAA/temp下，需要手动删除',
+            self._ui_text('展示运行时的窗口截图', 'Show runtime screenshots'),
+            self._ui_text('用于在查错时查看是否正确截取了游戏对应位置的画面，截取的所有画面会保存在SAA/temp下，需要手动删除',
+                          'Used for troubleshooting capture regions. Screenshots are saved in SAA/temp and should be deleted manually'),
             configItem=config.showScreenshot,
             parent=self.aboutSoftwareGroup
         )
         self.saveScaleCacheCard = SwitchSettingCard(
             FIF.SAVE,
-            self.tr('保存缩放比例数据'),
-            '如果你的游戏窗口固定使用，可以选择保存，这样运行会匹配得更快，如果窗口大小经常变化则取消勾选',
+            self._ui_text('保存缩放比例数据', 'Save scaling cache'),
+            self._ui_text('如果你的游戏窗口固定使用，可以选择保存，这样运行会匹配得更快，如果窗口大小经常变化则取消勾选',
+                          'Enable if your game window size is stable for faster matching; disable if window size changes often'),
             configItem=config.saveScaleCache,
             parent=self.aboutSoftwareGroup
         )
         self.autoScaling = SwitchSettingCard(
             FIF.BACK_TO_WINDOW,
-            self.tr('自动缩放比例'),
-            '默认开启，在启动SAA时如果发现游戏窗口比例不是16:9会自动缩放成1920*1080并贴在左上角',
+            self._ui_text('自动缩放比例', 'Auto scaling'),
+            self._ui_text('默认开启，在启动SAA时如果发现游戏窗口比例不是16:9会自动缩放成1920*1080并贴在左上角',
+                          'Enabled by default. If the game is not 16:9, it auto-resizes to 1920*1080 and snaps to top-left on startup'),
             configItem=config.autoScaling,
             parent=self.aboutSoftwareGroup
         )
         self.autoStartTask = SwitchSettingCard(
             FIF.PLAY,
-            self.tr('自动开始任务'),
-            '打开SAA自动开始运行日常，必须先勾选并配置好自动打开游戏',
+            self._ui_text('自动开始任务', 'Auto start tasks'),
+            self._ui_text('打开SAA自动开始运行日常，必须先勾选并配置好自动打开游戏',
+                          'Automatically starts daily tasks when SAA launches. Requires auto-open game to be enabled and configured first'),
             configItem=config.auto_start_task,
             parent=self.aboutSoftwareGroup
         )
         self.autoBootStartup = SwitchSettingCard(
             FIF.POWER_BUTTON,
-            self.tr('开机自启'),
-            '开机时自动打开SAA',
+            self._ui_text('开机自启', 'Start on boot'),
+            self._ui_text('开机时自动打开SAA', 'Launch SAA automatically when Windows starts'),
             configItem=config.auto_boot_startup,
             parent=self.aboutSoftwareGroup
         )
         self.informMessage = SwitchSettingCard(
             FIF.HISTORY,
-            self.tr('消息通知'),
-            '是否打开体力恢复通知',
+            self._ui_text('消息通知', 'Notifications'),
+            self._ui_text('是否打开体力恢复通知', 'Enable stamina recovery notifications'),
             configItem=config.inform_message,
             parent=self.aboutSoftwareGroup
         )
@@ -197,23 +205,24 @@ class SettingInterface(ScrollArea):
         self.proxyCard = TextEditCard(
             config.update_proxies,
             FIF.GLOBE,
-            '代理端口',
-            "如‘7890’",
-            '如果选择开代理则需要填入代理端口，不开代理则置空',
+            self._ui_text('代理端口', 'Proxy port'),
+            self._ui_text("如‘7890’", "e.g. '7890'"),
+            self._ui_text('如果选择开代理则需要填入代理端口，不开代理则置空',
+                          'Fill proxy port when using proxy; leave empty when not using proxy'),
             self.aboutGroup
         )
         self.feedbackCard = PrimaryPushSettingCard(
-            '前往GitHub',
+            self._ui_text('前往GitHub', 'Open GitHub'),
             FIF.FEEDBACK,
-            '提供反馈',
-            'GitHub作者：mofaoss，QQ群：' + QQ,
+            self._ui_text('提供反馈', 'Feedback'),
+            self._ui_text('GitHub作者：mofaoss，QQ群：', 'GitHub author: mofaoss, QQ group: ') + QQ,
             self.aboutGroup
         )
         self.aboutCard = PrimaryPushSettingCard(
             self.tr('Check update'),
             "app/resource/images/logo.png",
             self.tr('About'),
-            "本助手免费开源，当前版本：" + get_local_version(),
+            self._ui_text("本助手免费开源，当前版本：", "This assistant is free and open source. Current version: ") + get_local_version(),
             self.aboutGroup
         )
 
@@ -276,11 +285,14 @@ class SettingInterface(ScrollArea):
     def _showRestartTooltip(self):
         """ show restart tooltip """
         InfoBar.success(
-            self.tr('Updated successfully'),
-            self.tr('Configuration takes effect after restart'),
+            self._ui_text('更新成功', 'Updated successfully'),
+            self._ui_text('重启后配置生效', 'Configuration takes effect after restart'),
             duration=2000,
             parent=self
         )
+
+    def _ui_text(self, zh_text: str, en_text: str) -> str:
+        return en_text if self._is_non_chinese_ui else zh_text
 
     def _connectSignalToSlot(self):
         """ connect signal to slot """
@@ -322,7 +334,7 @@ class SettingInterface(ScrollArea):
             # 创建计划任务
             task_command = [
                 'schtasks', '/create',
-                '/tn', f"{self.app_name} 开机自启",  # 任务名称
+                '/tn', self.startup_task_name,
                 '/tr', f'cmd.exe /c "{cmd_file_path}"',  # 要执行的命令
                 '/sc', 'onlogon',  # 触发条件：用户登录时
                 '/rl', 'highest',  # 使用最高权限
@@ -333,24 +345,24 @@ class SettingInterface(ScrollArea):
                                   capture_output=True, text=True)
 
             InfoBar.success(
-                '添加自启成功',
-                f'已通过计划任务创建开机自启',
+                self._ui_text('添加自启成功', 'Startup task added'),
+                self._ui_text('已通过计划任务创建开机自启', 'Startup task has been created via Windows Task Scheduler'),
                 isClosable=True,
                 duration=2000,
                 parent=self
             )
         except subprocess.CalledProcessError as e:
             InfoBar.error(
-                '添加自启失败',
-                f"创建计划任务失败：{e.stderr}",
+                self._ui_text('添加自启失败', 'Failed to add startup task'),
+                self._ui_text("创建计划任务失败：", "Failed to create scheduled task: ") + f"{e.stderr}",
                 isClosable=True,
                 duration=2000,
                 parent=self
             )
         except Exception as e:
             InfoBar.error(
-                '添加自启失败',
-                f"创建启动文件失败：{e}",
+                self._ui_text('添加自启失败', 'Failed to add startup task'),
+                self._ui_text("创建启动文件失败：", "Failed to create startup script: ") + f"{e}",
                 isClosable=True,
                 duration=2000,
                 parent=self
@@ -360,7 +372,7 @@ class SettingInterface(ScrollArea):
         """Windows 禁用自启"""
         try:
             # 删除计划任务
-            result = subprocess.run(['schtasks', '/delete', '/tn', f"{self.app_name} 开机自启", '/f'],
+            result = subprocess.run(['schtasks', '/delete', '/tn', self.startup_task_name, '/f'],
                                   shell=True, check=True, capture_output=True, text=True)
 
             # 删除 cmd 文件
@@ -370,8 +382,8 @@ class SettingInterface(ScrollArea):
                 os.remove(cmd_file_path)
 
             InfoBar.success(
-                '删除自启成功',
-                f'已关闭开机自启',
+                self._ui_text('删除自启成功', 'Startup task removed'),
+                self._ui_text('已关闭开机自启', 'Start on boot has been disabled'),
                 isClosable=True,
                 duration=2000,
                 parent=self
@@ -379,23 +391,23 @@ class SettingInterface(ScrollArea):
         except subprocess.CalledProcessError as e:
             if "找不到系统指定的" in e.stderr or "cannot find" in e.stderr.lower():
                 InfoBar.warning(
-                    '任务不存在',
-                    f'计划任务可能已被删除',
+                    self._ui_text('任务不存在', 'Task not found'),
+                    self._ui_text('计划任务可能已被删除', 'Scheduled task may have already been removed'),
                     isClosable=True,
                     duration=2000,
                     parent=self
                 )
             else:
                 InfoBar.error(
-                    '删除自启失败',
-                    f"删除计划任务失败：{e.stderr}",
+                    self._ui_text('删除自启失败', 'Failed to remove startup task'),
+                    self._ui_text("删除计划任务失败：", "Failed to delete scheduled task: ") + f"{e.stderr}",
                     isClosable=True,
                     duration=2000,
                     parent=self
                 )
         except Exception as e:
             InfoBar.error(
-                '删除自启失败',
+                self._ui_text('删除自启失败', 'Failed to remove startup task'),
                 f"{e}",
                 isClosable=True,
                 duration=2000,
@@ -421,8 +433,9 @@ class SettingInterface(ScrollArea):
         """ Hide progress bar and show completion message """
         self.progressBar.setVisible(False)
         if os.path.exists(zip_path):
-            title = '更新完成'
-            content = f'压缩包已下载至{zip_path}，即将重启更新'
+            title = self._ui_text('更新完成', 'Update ready')
+            content = self._ui_text(f'压缩包已下载至{zip_path}，即将重启更新',
+                                    f'Package downloaded to {zip_path}. Restarting to update')
             message_box = MessageBox(title, content, self.parent.window())
             message_box.cancelButton.setVisible(False)
             if message_box.exec():
@@ -430,8 +443,9 @@ class SettingInterface(ScrollArea):
                 self.parent.close()
         else:
             InfoBar.error(
-                '更新下载失败',
-                f'请前往 {REPO_URL}/releases或者{QQ} 群下载更新包',
+                self._ui_text('更新下载失败', 'Update download failed'),
+                self._ui_text(f'请前往 {REPO_URL}/releases或者{QQ} 群下载更新包',
+                              f'Please download update package from {REPO_URL}/releases or QQ group {QQ}'),
                 isClosable=True,
                 duration=-1,
                 parent=self

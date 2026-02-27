@@ -58,51 +58,51 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
         self._connect_to_slot()
 
     def _initWidget(self):
-        def ui_text(zh_text, en_text):
-            return en_text if self._is_non_chinese_ui else zh_text
-
         # 正向链接
         self.SegmentedWidget.addItem(self.page_fishing.objectName(),
-                                     ui_text('钓鱼', 'Fishing'),
+                                     self._ui_text('钓鱼', 'Fishing'),
                                      onClick=lambda: self.stackedWidget.
                                      setCurrentWidget(self.page_fishing))
         self.SegmentedWidget.addItem(self.page_action.objectName(),
-                                     ui_text('常规行动', 'Operation'),
+                                     self._ui_text('常规行动', 'Operation'),
                                      onClick=lambda: self.stackedWidget.
                                      setCurrentWidget(self.page_action))
         self.SegmentedWidget.addItem(self.page_jigsaw.objectName(),
-                                     ui_text('信源解析', 'Jigsaw Solver'),
+                                     self._ui_text('信源解析', 'Jigsaw Solver'),
                                      onClick=lambda: self.stackedWidget.
                                      setCurrentWidget(self.page_jigsaw))
         self.SegmentedWidget.addItem(self.page_water_bomb.objectName(),
-                                     ui_text('心动水弹', 'Water Bomb'),
+                                     self._ui_text('心动水弹', 'Water Bomb'),
                                      onClick=lambda: self.stackedWidget.
                                      setCurrentWidget(self.page_water_bomb))
         self.SegmentedWidget.addItem(
             self.page_alien_guardian.objectName(),
-            ui_text('异星守护', 'Alien Guardian'),
+            self._ui_text('异星守护', 'Alien Guardian'),
             onClick=lambda: self.stackedWidget.setCurrentWidget(
                 self.page_alien_guardian))
         self.SegmentedWidget.addItem(self.page_maze.objectName(),
-                                     ui_text('验证战场', 'Maze'),
+                                     self._ui_text('验证战场', 'Maze'),
                                      onClick=lambda: self.stackedWidget.
                                      setCurrentWidget(self.page_maze))
         self.SegmentedWidget.addItem(self.page_massaging.objectName(),
-                                     ui_text('按摩', 'Massage'),
+                                     self._ui_text('按摩', 'Massage'),
                                      onClick=lambda: self.stackedWidget.
                                      setCurrentWidget(self.page_massaging))
         self.SegmentedWidget.addItem(self.page_card.objectName(),
-                                     ui_text('猜心对局', 'Card Match'),
+                                     self._ui_text('猜心对局', 'Card Match'),
                                      onClick=lambda: self.stackedWidget.
                                      setCurrentWidget(self.page_card))
         self.SegmentedWidget.addItem(self.page_capture_pals.objectName(),
-                                     ui_text('抓帕鲁', 'Capture Pals'),
+                                     self._ui_text('抓帕鲁', 'Capture Pals'),
                                      onClick=lambda: self.stackedWidget.
                                      setCurrentWidget(self.page_capture_pals))
         self.SegmentedWidget.setCurrentItem(self.page_fishing.objectName())
         self.stackedWidget.setCurrentIndex(0)
         self.ComboBox_fishing_mode.addItems(
-            ["高性能（消耗性能高速判断，准确率高）", "低性能（超时自动拉杆，准确率较低）"])
+            [
+                self._ui_text("高性能（消耗性能高速判断，准确率高）", "High Performance (faster and more accurate, higher CPU usage)"),
+                self._ui_text("低性能（超时自动拉杆，准确率较低）", "Low Performance (timeout-based auto reel, lower accuracy)")
+            ])
         self.BodyLabel_tip_fish.setText(
             "### Tips\n* Side mouse buttons are not supported in background mode\n* Use analyst for fishing character, otherwise it may fail\n* Configure cast key, fishing times and lure type in game first\n* Daily limit: rare spot 25, epic spot 50, normal spot unlimited\n* Move to next fishing spot manually after one spot is exhausted\n* If yellow block detection is abnormal, recalibrate HSV color\n"
             if self._is_non_chinese_ui else
@@ -119,17 +119,32 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
             "### 提示\n* 本功能只提供解决方案，不自动拼\n* 需要手动输入当前拥有的各个拼图数量\n* 指定最大方案数越大，耗时越长，但可能会得到一个更优的方案,建议范围10~100\n* 设置过大方案数会产生卡顿\n* 生成的方案不是全局最优，而是目前方案数中的最优\n* 可以尝试降低9,10,11号碎片数量可能得到更优解\n* 当方案数量较少时，则应增加9,10,11号碎片数量"
         )
         self.BodyLabel_tip_water.setText(
-            "### 提示\n* 站在水弹入口位置后再点开始\n* 当无法识别道具或者生命时，适当调低上面两个置信度参数")
+            self._ui_text(
+                "### 提示\n* 站在水弹入口位置后再点开始\n* 当无法识别道具或者生命时，适当调低上面两个置信度参数",
+                "### Tips\n* Stand at the Water Bomb entrance before starting\n* If items or HP are not recognized, lower the two confidence values above"
+            ))
         self.BodyLabel_tip_alien.setText(
-            "### 提示\n* 开始战斗后再点击开始\n* 常驻伙伴推荐带钢珠和炽热投手\n* 闯关模式为半自动一关一关打。需要手动开枪，手动选择下一关"
+            self._ui_text(
+                "### 提示\n* 开始战斗后再点击开始\n* 常驻伙伴推荐带钢珠和炽热投手\n* 闯关模式为半自动一关一关打。需要手动开枪，手动选择下一关",
+                "### Tips\n* Click Start after battle begins\n* Recommended support pals: Steel Shot and Blazing Pitcher\n* Stage mode is semi-automatic: manual shooting and manual next-stage selection are required"
+            )
         )
         self.BodyLabel_tip_maze.setText(
-            "### 提示\n* 本功能只适用于增益迷宫（新迷宫），而非老迷宫\n* 运行模式中单次运行适合打前3关，重复运行则是一直刷最后一关\n* 进配队界面选好增益后再点击SAA的开始迷宫\n* 增益推荐配技能-爆电和护盾-夺取\n* 配队必须要有辰星-琼弦，且把角色放在中间位\n* 辅助有豹豹上豹豹防止暴毙"
+            self._ui_text(
+                "### 提示\n* 本功能只适用于增益迷宫（新迷宫），而非老迷宫\n* 运行模式中单次运行适合打前3关，重复运行则是一直刷最后一关\n* 进配队界面选好增益后再点击SAA的开始迷宫\n* 增益推荐配技能-爆电和护盾-夺取\n* 配队必须要有辰星-琼弦，且把角色放在中间位\n* 辅助有豹豹上豹豹防止暴毙",
+                "### Tips\n* This feature only supports the new Buff Maze, not the old maze\n* Single Run is suitable for first 3 stages; Repeat Run keeps farming the last stage\n* Select buffs in team setup first, then click Start Maze in SAA\n* Recommended buffs: Skill-Chain Lightning and Shield-Steal\n* Team must include Chenxing - Qiongxian in the middle slot\n* Bring a strong support unit to reduce sudden deaths"
+            )
         )
         self.BodyLabel_tip_massaging.setText(
-            "### 提示\n* 此功能还没开发完，不要使用\n* 使用本功能建议按摩等级大于等于4级")
+            self._ui_text(
+                "### 提示\n* 此功能还没开发完，不要使用\n* 使用本功能建议按摩等级大于等于4级",
+                "### Tips\n* This feature is not fully implemented yet\n* Recommended massage level: 4 or higher"
+            ))
         self.BodyLabel_tip_card.setText(
-            "### 提示\n* 站在猜心对局入口位置后再点开始\n* 两种模式均无策略，目的均是为了快速结束对局刷下一把\n* 逻辑：有质疑直接质疑，轮到自己出牌时出中间的那一张\n* 实测有赢有输，挂着刷经验就行"
+            self._ui_text(
+                "### 提示\n* 站在猜心对局入口位置后再点开始\n* 两种模式均无策略，目的均是为了快速结束对局刷下一把\n* 逻辑：有质疑直接质疑，轮到自己出牌时出中间的那一张\n* 实测有赢有输，挂着刷经验就行",
+                "### Tips\n* Stand at the Card Match entrance before starting\n* Both modes prioritize ending matches quickly for fast farming\n* Logic: always challenge when possible; play the middle card on your turn\n* Win/loss may vary; it is designed for passive EXP farming"
+            )
         )
         self.BodyLabel_tip_capture_pals.setText(
             "### Tips\n"
@@ -163,6 +178,16 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
         mode_maze_items = ["单次运行", "重复运行"]
         wife_items = ["凯茜娅", "肴", "芬妮", "里芙", "安卡希雅"]
         mode_card_items = ['标准模式（速刷经验）', '秘盒奇袭（刷经验成就）']
+        if self._is_non_chinese_ui:
+            lure_type_items = [
+                'Universal Bait', 'Normal Bait', 'Deluxe Bait', 'Supreme Bait',
+                'Heavy Insect Bait', 'Giant Insect Bait', 'Heavy Night Insect Bait', 'Giant Night Insect Bait'
+            ]
+            run_items = ["Toggle Sprint", "Hold Sprint"]
+            mode_items = ["Endless Mode", "Stage Mode"]
+            mode_maze_items = ["Single Run", "Repeat Run"]
+            wife_items = ["Katya", "Yao", "Fenny", "Lyfe", "Acacia"]
+            mode_card_items = ['Standard (fast EXP)', 'Mystery Box Raid (EXP/Achievements)']
         self.ComboBox_run.addItems(run_items)
         self.ComboBox_lure_type.addItems(lure_type_items)
         self.ComboBox_mode.addItems(mode_items)
@@ -170,8 +195,21 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
         self.ComboBox_wife.addItems(wife_items)
         self.ComboBox_card_mode.addItems(mode_card_items)
         capture_pals_mode_items = ["定点抓帕鲁", "巡逻抓帕鲁"]
+        if self._is_non_chinese_ui:
+            capture_pals_mode_items = ["Fixed Point Capture", "Patrol Capture"]
         self.ComboBox_capture_pals_partner_mode.addItems(capture_pals_mode_items)
         self.ComboBox_capture_pals_adventure_mode.addItems(capture_pals_mode_items)
+
+        self.PushButton_start_fishing.setText(self._ui_text('开始钓鱼', 'Start Fishing'))
+        self.PushButton_start_action.setText(self._ui_text('开始行动', 'Start Operation'))
+        self.PushButton_start_jigsaw.setText(self._ui_text('开始拼图', 'Start Jigsaw'))
+        self.PushButton_start_water_bomb.setText(self._ui_text('开始心动水弹', 'Start Water Bomb'))
+        self.PushButton_start_alien_guardian.setText(self._ui_text('开始异星守护', 'Start Alien Guardian'))
+        self.PushButton_start_maze.setText(self._ui_text('开始迷宫', 'Start Maze'))
+        self.PushButton_start_massaging.setText(self._ui_text('开始按摩', 'Start Massage'))
+        self.PushButton_start_drink.setText(self._ui_text('开始喝酒', 'Start Drink'))
+        self.PushButton_start_capture_pals.setText(self._ui_text('开始抓帕鲁', 'Start Capture Pals'))
+        self._apply_static_i18n()
 
         self.update_label_color()
         # self.color_pixmap = self.generate_pixmap_from_hsv(hsv_value)
@@ -234,9 +272,10 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
                     widget.setCurrentIndex(config_item.value)
                 elif isinstance(widget, LineEdit):
                     if widget.objectName().split('_')[2] == 'key':
-                        widget.setPlaceholderText("例如空格输入‘space’，置空则自动识别")
+                        widget.setPlaceholderText(self._ui_text("例如空格输入‘space’，置空则自动识别",
+                                                                "Example: input 'space' for Space key, leave empty for auto-detect"))
                     elif widget.objectName().split('_')[1] == 'fish':
-                        widget.setPlaceholderText("“int,int,int”")
+                        widget.setPlaceholderText(self._ui_text("“int,int,int”", "int,int,int"))
                     widget.setText(config_item.value)
                 elif isinstance(widget, SpinBox):
                     widget.setValue(config_item.value)
@@ -324,10 +363,81 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
             if all(0 <= value <= 255 for value in int_values):
                 return True
             else:
-                self.logger.error("保存失败，int范围不在0~255之间")
+                self.logger.error(self._ui_text("保存失败，int范围不在0~255之间", "Save failed: int values must be in 0~255"))
         else:
-            self.logger.error("保存失败，输入不符合“int,int,int”的格式")
+            self.logger.error(self._ui_text("保存失败，输入不符合“int,int,int”的格式", "Save failed: input format must be int,int,int"))
         return False
+
+    def _ui_text(self, zh_text: str, en_text: str) -> str:
+        return en_text if self._is_non_chinese_ui else zh_text
+
+    def _apply_static_i18n(self):
+        self.TitleLabel.setText(self._ui_text("日志", "Log"))
+        self.CheckBox_is_save_fish.setText(self._ui_text("是否保存新纪录截图", "Save screenshots for new records"))
+        self.BodyLabel_7.setText(self._ui_text("颜色查找下限", "Color lower bound"))
+        self.PrimaryPushButton_get_color.setText(self._ui_text("校准颜色", "Calibrate Color"))
+        self.BodyLabel.setText(self._ui_text("钓鱼次数：", "Fishing attempts:"))
+        self.CheckBox_is_limit_time.setText(self._ui_text("是否限制单次收杆时间间隔上限", "Limit max reeling interval per attempt"))
+        self.BodyLabel_21.setText(self._ui_text("自定义钓鱼键", "Custom fishing key"))
+        self.StrongBodyLabel.setText(self._ui_text("校准完美收杆区域HSV（当收杆出错，日志说黄色块大于2时用）", "Calibrate perfect reeling HSV (use when logs report yellow block count > 2)"))
+        self.LineEdit_fish_key.setPlaceholderText(self._ui_text("钓鱼键与尘白闪避键绑定", "Fishing key is bound to in-game dodge key"))
+        self.BodyLabel_6.setText(self._ui_text("颜色查找上限", "Color upper bound"))
+        self.BodyLabel_5.setText(self._ui_text("基准HSV值", "Base HSV"))
+        self.BodyLabel_2.setText(self._ui_text("钓鱼模式", "Fishing mode"))
+        self.PushButton_reset.setText(self._ui_text("重置", "Reset"))
+        self.BodyLabel_23.setText(self._ui_text("鱼饵类型：", "Bait type:"))
+
+        self.BodyLabel_4.setText(self._ui_text("刷取次数", "Run count"))
+        self.BodyLabel_22.setText(self._ui_text("疾跑方式", "Sprint mode"))
+        self.TitleLabel_2.setText(self._ui_text("日志", "Log"))
+
+        self.BodyLabel_11.setText(self._ui_text("2号碎片", "Piece 2"))
+        self.BodyLabel_14.setText(self._ui_text("5号碎片", "Piece 5"))
+        self.BodyLabel_19.setText(self._ui_text("10号碎片", "Piece 10"))
+        self.BodyLabel_15.setText(self._ui_text("6号碎片", "Piece 6"))
+        self.BodyLabel_13.setText(self._ui_text("4号碎片", "Piece 4"))
+        self.BodyLabel_20.setText(self._ui_text("11号碎片", "Piece 11"))
+        self.BodyLabel_18.setText(self._ui_text("9号碎片", "Piece 9"))
+        self.BodyLabel_16.setText(self._ui_text("7号碎片", "Piece 7"))
+        self.BodyLabel_12.setText(self._ui_text("3号碎片", "Piece 3"))
+        self.BodyLabel_17.setText(self._ui_text("8号碎片", "Piece 8"))
+        self.BodyLabel_9.setText(self._ui_text("当前用户碎片数量：", "Current piece counts:"))
+        self.BodyLabel_8.setText(self._ui_text("当前寻找到的最优方案：", "Best solution found:"))
+        self.BodyLabel_3.setText(self._ui_text("寻找最大方案数：", "Max solutions to search:"))
+        self.BodyLabel_10.setText(self._ui_text("1号碎片", "Piece 1"))
+        self.TitleLabel_log_jigsaw.setText(self._ui_text("日志", "Log"))
+
+        self.BodyLabel_28.setText(self._ui_text("模版图置信度", "Template confidence"))
+        self.BodyLabel_29.setText(self._ui_text("计数置信度", "Count confidence"))
+        self.BodyLabel_24.setText(self._ui_text("连胜", "Win streak"))
+        self.BodyLabel_26.setText(self._ui_text("次后停止", "stop after wins"))
+        self.TitleLabel_3.setText(self._ui_text("日志", "Log"))
+
+        self.BodyLabel_25.setText(self._ui_text("运行模式", "Run mode"))
+        self.TitleLabel_4.setText(self._ui_text("日志", "Log"))
+        self.BodyLabel_27.setText(self._ui_text("运行模式", "Run mode"))
+        self.TitleLabel_5.setText(self._ui_text("日志", "Log"))
+
+        self.BodyLabel_30.setText(self._ui_text("按摩对象", "Massage target"))
+        self.TitleLabel_6.setText(self._ui_text("日志", "Log"))
+        self.BodyLabel_32.setText(self._ui_text("刷取次数(-1代表无限刷)", "Run count (-1 means infinite)"))
+        self.BodyLabel_31.setText(self._ui_text("模式", "Mode"))
+        self.CheckBox_is_speed_up.setText(self._ui_text("是否已手动开启倍速", "I have enabled speed-up manually"))
+        self.TitleLabel_7.setText(self._ui_text("日志", "Log"))
+
+        self.BodyLabel_capture_pals_partner_mode.setText(self._ui_text("伙伴岛模式", "Partner Island mode"))
+        self.BodyLabel_capture_pals_adventure_mode.setText(self._ui_text("探险岛模式", "Adventure Island mode"))
+        self.StrongBodyLabel_capture_pals_island.setText(self._ui_text("选择岛屿", "Select islands"))
+        self.CheckBox_capture_pals_partner.setText(self._ui_text("伙伴岛", "Partner Island"))
+        self.CheckBox_capture_pals_adventure.setText(self._ui_text("探险岛", "Adventure Island"))
+        self.CheckBox_capture_pals_sync.setText(self._ui_text("同步抓帕鲁", "Sync capture"))
+        self.StrongBodyLabel_capture_pals_partner.setText(self._ui_text("伙伴岛参数", "Partner Island settings"))
+        self.BodyLabel_capture_pals_partner_fixed.setText(self._ui_text("定点间隔(秒)", "Fixed interval (s)"))
+        self.BodyLabel_capture_pals_partner_patrol.setText(self._ui_text("巡逻间隔(秒)", "Patrol interval (s)"))
+        self.StrongBodyLabel_capture_pals_adventure.setText(self._ui_text("探险岛参数", "Adventure Island settings"))
+        self.BodyLabel_capture_pals_adventure_fixed.setText(self._ui_text("定点间隔(秒)", "Fixed interval (s)"))
+        self.BodyLabel_capture_pals_adventure_patrol.setText(self._ui_text("巡逻间隔(秒)", "Patrol interval (s)"))
+        self.TitleLabel_log_capture_pals.setText(self._ui_text("日志", "Log"))
 
     def update_label_color(self):
         """
@@ -486,7 +596,7 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
         """钓鱼线程开始与结束的信号处理"""
         if is_running:
             self.set_simple_card_enable(self.SimpleCardWidget_fish, False)
-            self.PushButton_start_fishing.setText('停止钓鱼')
+            self.PushButton_start_fishing.setText(self._ui_text('停止钓鱼', 'Stop Fishing'))
             self.is_running_fish = True
         else:
             children = get_all_children(self.SimpleCardWidget_fish)
@@ -496,7 +606,7 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
                 elif isinstance(child, LineEdit):
                     if not child.objectName() == 'LineEdit_fish_base':
                         child.setEnabled(True)
-            self.PushButton_start_fishing.setText('开始钓鱼')
+            self.PushButton_start_fishing.setText(self._ui_text('开始钓鱼', 'Start Fishing'))
             self.is_running_fish = False
 
     def on_action_button_click(self):
@@ -513,7 +623,7 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
         """周常行动线程开始与结束的信号处理"""
         if is_running:
             self.set_simple_card_enable(self.SimpleCardWidget_action, False)
-            self.PushButton_start_action.setText("停止行动")
+            self.PushButton_start_action.setText(self._ui_text("停止行动", "Stop Operation"))
             self.is_running_action = True
         else:
             children = get_all_children(self.SimpleCardWidget_action)
@@ -522,7 +632,7 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
                     child.setEnabled(True)
                 elif isinstance(child, LineEdit):
                     pass
-            self.PushButton_start_action.setText("开始行动")
+            self.PushButton_start_action.setText(self._ui_text("开始行动", "Start Operation"))
             self.is_running_action = False
 
     def on_jigsaw_button_click(self):
@@ -537,11 +647,11 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
     def handle_jigsaw(self, is_running):
         if is_running:
             self.set_simple_card_enable(self.SimpleCardWidget_jigsaw, False)
-            self.PushButton_start_jigsaw.setText("停止拼图")
+            self.PushButton_start_jigsaw.setText(self._ui_text("停止拼图", "Stop Jigsaw"))
             self.is_running_jigsaw = True
         else:
             self.set_simple_card_enable(self.SimpleCardWidget_jigsaw, True)
-            self.PushButton_start_jigsaw.setText("开始拼图")
+            self.PushButton_start_jigsaw.setText(self._ui_text("开始拼图", "Start Jigsaw"))
             self.is_running_jigsaw = False
 
     def on_water_bomb_button_click(self):
@@ -557,11 +667,11 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
         if is_running:
             self.set_simple_card_enable(self.SimpleCardWidget_water_bomb,
                                         False)
-            self.PushButton_start_water_bomb.setText('停止心动水弹')
+            self.PushButton_start_water_bomb.setText(self._ui_text('停止心动水弹', 'Stop Water Bomb'))
             self.is_running_water_bomb = True
         else:
             self.set_simple_card_enable(self.SimpleCardWidget_water_bomb, True)
-            self.PushButton_start_water_bomb.setText('开始心动水弹')
+            self.PushButton_start_water_bomb.setText(self._ui_text('开始心动水弹', 'Start Water Bomb'))
             self.is_running_water_bomb = False
 
     def on_alien_guardian_button_click(self):
@@ -578,12 +688,12 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
         if is_running:
             self.set_simple_card_enable(self.SimpleCardWidget_alien_guardian,
                                         False)
-            self.PushButton_start_alien_guardian.setText('停止异星守护')
+            self.PushButton_start_alien_guardian.setText(self._ui_text('停止异星守护', 'Stop Alien Guardian'))
             self.is_running_alien_guardian = True
         else:
             self.set_simple_card_enable(self.SimpleCardWidget_alien_guardian,
                                         True)
-            self.PushButton_start_alien_guardian.setText('开始异星守护')
+            self.PushButton_start_alien_guardian.setText(self._ui_text('开始异星守护', 'Start Alien Guardian'))
             self.is_running_alien_guardian = False
 
     def on_maze_button_click(self):
@@ -598,11 +708,11 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
     def handle_maze(self, is_running):
         if is_running:
             self.set_simple_card_enable(self.SimpleCardWidget_maze, False)
-            self.PushButton_start_maze.setText('停止迷宫')
+            self.PushButton_start_maze.setText(self._ui_text('停止迷宫', 'Stop Maze'))
             self.is_running_maze = True
         else:
             self.set_simple_card_enable(self.SimpleCardWidget_maze, True)
-            self.PushButton_start_maze.setText('开始迷宫')
+            self.PushButton_start_maze.setText(self._ui_text('开始迷宫', 'Start Maze'))
             self.is_running_maze = False
 
     def on_massaging_button_click(self):
@@ -619,11 +729,11 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
         """按摩线程开始与结束的信号处理"""
         if is_running:
             self.set_simple_card_enable(self.SimpleCardWidget_massaging, False)
-            self.PushButton_start_massaging.setText('停止按摩')
+            self.PushButton_start_massaging.setText(self._ui_text('停止按摩', 'Stop Massage'))
             self.is_running_massaging = True
         else:
             self.set_simple_card_enable(self.SimpleCardWidget_massaging, True)
-            self.PushButton_start_massaging.setText('开始按摩')
+            self.PushButton_start_massaging.setText(self._ui_text('开始按摩', 'Start Massage'))
             self.is_running_massaging = False
 
     def on_drink_button_click(self):
@@ -640,11 +750,11 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
         """钓鱼线程开始与结束的信号处理"""
         if is_running:
             self.set_simple_card_enable(self.SimpleCardWidget_card, False)
-            self.PushButton_start_drink.setText('停止喝酒')
+            self.PushButton_start_drink.setText(self._ui_text('停止喝酒', 'Stop Drink'))
             self.is_running_drink = True
         else:
             self.set_simple_card_enable(self.SimpleCardWidget_card, True)
-            self.PushButton_start_drink.setText('开始喝酒')
+            self.PushButton_start_drink.setText(self._ui_text('开始喝酒', 'Start Drink'))
             self.is_running_drink = False
 
     def on_capture_pals_button_click(self):
@@ -661,9 +771,9 @@ class Additional(QFrame, Ui_additional_features, BaseInterface):
         """抓帕鲁线程开始与结束的信号处理"""
         if is_running:
             self.set_simple_card_enable(self.SimpleCardWidget_capture_pals, False)
-            self.PushButton_start_capture_pals.setText('停止抓帕鲁')
+            self.PushButton_start_capture_pals.setText(self._ui_text('停止抓帕鲁', 'Stop Capture Pals'))
             self.is_running_capture_pals = True
         else:
             self.set_simple_card_enable(self.SimpleCardWidget_capture_pals, True)
-            self.PushButton_start_capture_pals.setText('开始抓帕鲁')
+            self.PushButton_start_capture_pals.setText(self._ui_text('开始抓帕鲁', 'Start Capture Pals'))
             self.is_running_capture_pals = False

@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QFrame
 from qfluentwidgets import InfoBar
 
+from app.common.config import is_non_chinese_ui_language
 from app.modules.trigger.auto_f import AutoFModule
 from app.modules.trigger.nita_auto_e import NitaAutoEModule
 from app.ui.trigger_interface import Ui_trigger
@@ -12,6 +13,7 @@ class Trigger(QFrame, Ui_trigger, BaseInterface):
     def __init__(self, text: str, parent=None):
         super().__init__()
         self.setupUi(self)
+        self._is_non_chinese_ui = is_non_chinese_ui_language()
         self.setObjectName(text.replace(' ', '-'))
         self.parent = parent
 
@@ -22,8 +24,19 @@ class Trigger(QFrame, Ui_trigger, BaseInterface):
         self._connect_to_slot()
 
     def _initWidget(self):
+        self.TitleLabel_trigger.setText(self._ui_text("触发列表", "Trigger List"))
+        self.StrongBodyLabel.setText(self._ui_text("自动采集", "Auto Collect"))
+        self.BodyLabel.setText(self._ui_text("自动在采集按钮出现时按下F键", "Automatically press F when collect prompt appears"))
+        self.StrongBodyLabel_2.setText(self._ui_text("妮塔E技能自动qte", "Nita E Auto QTE"))
+        self.BodyLabel_2.setText(self._ui_text("自动在qte阶段按下E键", "Automatically press E during QTE stage"))
         self.BodyLabel_trigger_tip.setText(
-            "### 提示\n* 先启动游戏再开启本功能\n* 这里的功能相当于开关，开了就会一直检测，遇到符合的情况就自动触发\n* 不影响手动游玩，更像是辅助半自动")
+            self._ui_text(
+                "### 提示\n* 先启动游戏再开启本功能\n* 这里的功能相当于开关，开了就会一直检测，遇到符合的情况就自动触发\n* 不影响手动游玩，更像是辅助半自动",
+                "### Tips\n* Launch the game before enabling this feature\n* These are toggle switches. Once enabled, detection keeps running and triggers automatically when conditions match\n* It does not block manual gameplay, acting as semi-automation assistance"
+            ))
+
+    def _ui_text(self, zh_text: str, en_text: str) -> str:
+        return en_text if self._is_non_chinese_ui else zh_text
 
     def _connect_to_slot(self):
         self.SwitchButton_f.checkedChanged.connect(self.on_f_toggled)
@@ -51,16 +64,16 @@ class Trigger(QFrame, Ui_trigger, BaseInterface):
             if self.f_thread.run:
                 self.f_thread.stop()
                 InfoBar.success(
-                    '自动按F',
-                    '已关闭',
+                    self._ui_text('自动按F', 'Auto F'),
+                    self._ui_text('已关闭', 'Disabled'),
                     isClosable=True,
                     duration=2000,
                     parent=self
                 )
             else:
                 InfoBar.error(
-                    '错误',
-                    '游戏未打开',
+                    self._ui_text('错误', 'Error'),
+                    self._ui_text('游戏未打开', 'Game is not running'),
                     isClosable=True,
                     duration=2000,
                     parent=self
@@ -80,16 +93,16 @@ class Trigger(QFrame, Ui_trigger, BaseInterface):
             if self.nita_e_thread.run:
                 self.nita_e_thread.stop()
                 InfoBar.success(
-                    '妮塔自动E',
-                    '已关闭',
+                    self._ui_text('妮塔自动E', 'Nita Auto E'),
+                    self._ui_text('已关闭', 'Disabled'),
                     isClosable=True,
                     duration=2000,
                     parent=self
                 )
             else:
                 InfoBar.error(
-                    '错误',
-                    '游戏未打开',
+                    self._ui_text('错误', 'Error'),
+                    self._ui_text('游戏未打开', 'Game is not running'),
                     isClosable=True,
                     duration=2000,
                     parent=self
