@@ -1,3 +1,4 @@
+import re
 import time
 
 import win32gui
@@ -67,6 +68,35 @@ class UsePowerModule:
                 1598 / 1920, 678 / 1080, 1661 / 1920, 736 / 1080), is_log=self.is_log) and self.auto.find_element(
                 '任务', 'text', crop=(1452 / 1920, 327 / 1080, 1529 / 1920, 376 / 1080), is_log=self.is_log)
 
+    @staticmethod
+    def _extract_day_value(text: str):
+        """从 OCR 文本中提取“X天”里的天数，未提取到则返回 None。"""
+        if not text:
+            return None
+        match = re.search(r"(\d+)\s*天", text)
+        if not match:
+            return None
+        try:
+            return int(match.group(1))
+        except ValueError:
+            return None
+
+    def _collect_day_option_positions(self):
+        """收集当前 OCR 结果中各“X天”选项对应的可点击区域。"""
+        day_options = {}
+        if not self.auto.ocr_result:
+            return day_options
+        for result in self.auto.ocr_result:
+            text = result[0] if result else ""
+            day_value = self._extract_day_value(text)
+            if day_value is None:
+                continue
+            pos = self.auto.calculate_text_position(result)
+            if day_value not in day_options:
+                day_options[day_value] = []
+            day_options[day_value].append(pos)
+        return day_options
+
     def check_power(self):
         timeout = Timer(50).start()
         current_check = 1  # 当前检查的体力剩余天数
@@ -105,7 +135,8 @@ class UsePowerModule:
                 # 更新colon
                 has_colon = any(':' in item[0] for item in self.auto.ocr_result)
                 # print(f"{has_colon=}")
-                has_day = any('天' in item[0] for item in self.auto.ocr_result)
+                day_option_positions = self._collect_day_option_positions()
+                has_day = bool(day_option_positions)
                 # 没有能使用的体力
                 if not has_day and not has_colon:
                     break
@@ -118,8 +149,8 @@ class UsePowerModule:
                     confirm_flag = False
                 # 存在大于一天但是小于day_num的体力药,并且进入了选择体力界面
                 if current_check <= self.day_num:
-                    if self.auto.click_element(f"{current_check}天", "text",
-                                               crop=(387 / 2560, 409 / 1440, 1023 / 2560, 495 / 1440)):
+                    target_positions = day_option_positions.get(current_check, [])
+                    if target_positions and self.auto.click_element_with_pos(target_positions[0]):
                         confirm_flag = True
                         continue
                     # 低于day_num，没colon，没点击选择x_day.png->加一进行下一天的判断
