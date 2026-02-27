@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QApplication
 from qfluentwidgets import FluentTranslator
 
 from app.common.config import config
+from app.common.ui_localizer import patch_infobar_for_traditional, localize_widget_tree_for_traditional
 from app.view.main_window import MainWindow
 
 
@@ -58,8 +59,11 @@ galleryTranslator.load(locale, "app", ".", ":/app/resource/i18n")
 app.installTranslator(translator)
 app.installTranslator(galleryTranslator)
 
+patch_infobar_for_traditional()
+
 # create main window
 w = MainWindow()
+localize_widget_tree_for_traditional(w)
 w.show()
 
 app.exec()

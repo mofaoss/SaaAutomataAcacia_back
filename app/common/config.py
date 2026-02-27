@@ -62,6 +62,21 @@ def is_non_chinese_ui_language() -> bool:
     return not locale_name.startswith("zh")
 
 
+def is_traditional_ui_language() -> bool:
+    """Whether current UI language context should be treated as Traditional Chinese."""
+    language = config.language.value
+
+    if language == Language.CHINESE_TRADITIONAL:
+        return True
+    if language == Language.CHINESE_SIMPLIFIED or language == Language.ENGLISH:
+        return False
+
+    locale_name = QLocale.system().name().replace('-', '_')
+    if locale_name in {"zh_HK", "zh_TW", "zh_MO", "zh_Hant", "zh_Hant_TW", "zh_Hant_HK", "zh_Hant_MO"}:
+        return True
+    return locale_name.startswith("zh_Hant")
+
+
 class Config(QConfig):
     """ Config of application """
 
