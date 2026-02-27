@@ -1,7 +1,7 @@
 import os
 import random
 
-from PyQt5.QtCore import Qt, QRectF, QLocale
+from PyQt5.QtCore import Qt, QRectF
 from PyQt5.QtGui import QPixmap, QPainter, QPainterPath, QBrush
 from PyQt5.QtWidgets import (
     QWidget,
@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
 )
 from qfluentwidgets import ScrollArea, FluentIcon, CardWidget, FlyoutView, Flyout
 
-from app.common.config import config, is_non_chinese_ui_language, Language
+from app.common.config import config, is_non_chinese_ui_language, Language, resolve_configured_locale
 from app.common.setting import REPO_URL
 from app.common.style_sheet import StyleSheet
 from app.common.utils import get_local_version
@@ -94,7 +94,7 @@ class BannerWidget(QWidget):
         if language != Language.AUTO:
             return False
 
-        locale_name = QLocale.system().name().replace('-', '_')
+        locale_name = resolve_configured_locale(language).name().replace('-', '_')
         return locale_name in {"zh_CN", "zh_SG"} or locale_name.startswith("zh_Hans")
 
     def _show_support_qr(self, source_widget):

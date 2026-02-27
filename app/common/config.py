@@ -1,5 +1,7 @@
 # coding:utf-8
 import sys
+import locale as pylocale
+import ctypes
 from enum import Enum
 
 from PyQt5.QtCore import QLocale
@@ -50,28 +52,63 @@ def isWin11():
     return sys.platform == 'win32' and sys.getwindowsversion().build >= 22000
 
 
+def normalize_app_locale(locale: QLocale) -> QLocale:
+    if not isinstance(locale, QLocale):
+        locale = QLocale(str(locale))
+
+    locale_name = locale.name().replace('-', '_')
+    if locale_name in {"zh_HK", "zh_TW", "zh_MO", "zh_Hant", "zh_Hant_TW", "zh_Hant_HK", "zh_Hant_MO"} \
+            or locale_name.startswith("zh_Hant"):
+        return QLocale(QLocale.Chinese, QLocale.HongKong)
+    if locale_name.startswith("zh"):
+        return QLocale(QLocale.Chinese, QLocale.China)
+    return locale
+
+
+def get_system_ui_locale() -> QLocale:
+    if sys.platform == 'win32':
+        try:
+            language_id = ctypes.windll.kernel32.GetUserDefaultUILanguage()
+            locale_name = pylocale.windows_locale.get(language_id)
+            if locale_name:
+                return QLocale(locale_name)
+        except Exception:
+            pass
+
+    return QLocale.system()
+
+
+def resolve_configured_locale(language_config=None) -> QLocale:
+    if language_config is None:
+        language_config = config.get(config.language)
+
+    if language_config == config.language.defaultValue:
+        return normalize_app_locale(get_system_ui_locale())
+
+    if isinstance(language_config, Language):
+        if language_config == Language.AUTO:
+            return normalize_app_locale(get_system_ui_locale())
+        return normalize_app_locale(language_config.value)
+
+    if isinstance(language_config, QLocale):
+        return normalize_app_locale(language_config)
+
+    if isinstance(language_config, str):
+        language = LanguageSerializer().deserialize(language_config)
+        return resolve_configured_locale(language)
+
+    return normalize_app_locale(get_system_ui_locale())
+
+
 def is_non_chinese_ui_language() -> bool:
     """Whether current UI language context should be treated as non-Chinese."""
-    language = config.language.value
-
-    if language == Language.AUTO:
-        system_locale_name = QLocale.system().name().replace('-', '_')
-        return not system_locale_name.startswith("zh")
-
-    locale_name = language.value.name().replace('-', '_')
+    locale_name = resolve_configured_locale().name().replace('-', '_')
     return not locale_name.startswith("zh")
 
 
 def is_traditional_ui_language() -> bool:
     """Whether current UI language context should be treated as Traditional Chinese."""
-    language = config.language.value
-
-    if language == Language.CHINESE_TRADITIONAL:
-        return True
-    if language == Language.CHINESE_SIMPLIFIED or language == Language.ENGLISH:
-        return False
-
-    locale_name = QLocale.system().name().replace('-', '_')
+    locale_name = resolve_configured_locale().name().replace('-', '_')
     if locale_name in {"zh_HK", "zh_TW", "zh_MO", "zh_Hant", "zh_Hant_TW", "zh_Hant_HK", "zh_Hant_MO"}:
         return True
     return locale_name.startswith("zh_Hant")
