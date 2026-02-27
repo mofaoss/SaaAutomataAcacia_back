@@ -550,35 +550,152 @@ def get_github_latest_release_version(repo_url: str):
         return None
 
 
+def _parse_github_repo(repo_url: str):
+    if not repo_url:
+        return None, None
+
+    match = re.search(r"github\.com/([^/]+)/([^/]+)", repo_url)
+    if not match:
+        return None, None
+
+    owner, repo = match.group(1), match.group(2)
+    return owner, repo.replace('.git', '').strip('/')
+
+
+def is_prerelease_version(version: str) -> bool:
+    if not version:
+        return False
+    raw = str(version).strip().lower()
+    return bool(re.search(r'(?:-|_|\.)?(alpha|a|beta|b|rc|pre|preview)(?:-|_|\.)?\d*', raw))
+
+
+def get_github_release_channels(repo_url: str):
+    """
+    获取 GitHub 的稳定版与预发布版版本信息。
+
+    返回示例：
+    {
+        "latest": {"version": "2.1.0", "url": "..."} | None,
+        "prerelease": {"version": "2.2.0-beta", "url": "..."} | None
+    }
+    """
+    result = {
+        "latest": None,
+        "prerelease": None
+    }
+
+    owner, repo = _parse_github_repo(repo_url)
+    if not owner or not repo:
+        return result
+
+    # 优先使用 releases 列表，一次请求拿到 stable + prerelease
+    list_api = f"https://api.github.com/repos/{owner}/{repo}/releases?per_page=30"
+    response = fetch_url(list_api, timeout=6)
+
+    if not isinstance(response, dict) and response.status_code == 200:
+        try:
+            releases = response.json()
+            if isinstance(releases, list):
+                for release in releases:
+                    if not isinstance(release, dict):
+                        continue
+                    if release.get("draft"):
+                        continue
+
+                    tag_name = (release.get("tag_name") or "").strip().lstrip('vV')
+                    if not tag_name:
+                        continue
+
+                    release_item = {
+                        "version": tag_name,
+                        "url": (release.get("html_url") or "").strip() or f"{repo_url.rstrip('/')}/releases"
+                    }
+
+                    if release.get("prerelease"):
+                        current = result["prerelease"]
+                        if current is None or is_remote_version_newer(current["version"], tag_name):
+                            result["prerelease"] = release_item
+                    else:
+                        current = result["latest"]
+                        if current is None or is_remote_version_newer(current["version"], tag_name):
+                            result["latest"] = release_item
+        except Exception:
+            pass
+
+    # 兜底：若列表解析失败，至少保证 latest 可用
+    if result["latest"] is None:
+        latest_api = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
+        latest_response = fetch_url(latest_api, timeout=5)
+        if not isinstance(latest_response, dict) and latest_response.status_code == 200:
+            try:
+                data = latest_response.json()
+                tag_name = (data.get("tag_name") or "").strip().lstrip('vV')
+                if tag_name:
+                    result["latest"] = {
+                        "version": tag_name,
+                        "url": (data.get("html_url") or "").strip() or f"{repo_url.rstrip('/')}/releases"
+                    }
+            except Exception:
+                pass
+
+    return result
+
+
 def is_remote_version_newer(local_version: str, remote_version: str) -> bool:
     """
     判断线上版本是否高于本地版本。
 
     规则：
-    - 优先提取数字段进行比较（例如 2.0.9 > 2.0.7）
-    - 若无法提取有效数字，则不触发更新提示，避免误报
+    - 支持 alpha/beta/rc 等预发布标识（例如 2.1.0 > 2.1.0-beta）
+    - 若无法识别预发布标识，则回退为纯数字段比较，避免误报
     """
 
-    def _normalize(version: str):
+    stage_rank = {
+        'alpha': 0,
+        'a': 0,
+        'beta': 1,
+        'b': 1,
+        'rc': 2,
+        'pre': 2,
+        'preview': 2,
+    }
+
+    def _parse(version: str):
         if not version:
             return None
-        numbers = re.findall(r'\d+', str(version))
+
+        raw = str(version).strip().lstrip('vV').lower()
+        if not raw:
+            return None
+
+        numbers = tuple(int(num) for num in re.findall(r'\d+', raw))
         if not numbers:
             return None
-        return tuple(int(num) for num in numbers)
 
-    local_nums = _normalize(local_version)
-    remote_nums = _normalize(remote_version)
+        core = numbers[:3]
+        if len(core) < 3:
+            core = core + (0,) * (3 - len(core))
 
-    if not remote_nums:
+        # 识别常见预发布标识：2.1.0-beta / 2.1.0rc1 / 2.1.0-alpha.2
+        # 未识别到则按正式版处理（兼容 2.1.0-n 这类渠道后缀）
+        match = re.search(r'(?:-|_|\.)?(alpha|a|beta|b|rc|pre|preview)(?:-|_|\.)?(\d*)', raw)
+        if not match:
+            return core, 3, 0
+
+        stage = match.group(1)
+        stage_num_text = match.group(2)
+        stage_num = int(stage_num_text) if stage_num_text else 0
+        return core, stage_rank.get(stage, 3), stage_num
+
+    local_parsed = _parse(local_version)
+    remote_parsed = _parse(remote_version)
+
+    if not remote_parsed:
         return False
-    if not local_nums:
+    if not local_parsed:
         return True
 
-    max_len = max(len(local_nums), len(remote_nums))
-    local_padded = local_nums + (0,) * (max_len - len(local_nums))
-    remote_padded = remote_nums + (0,) * (max_len - len(remote_nums))
-    return remote_padded > local_padded
+    return remote_parsed > local_parsed
 
 
 if __name__ == "__main__":

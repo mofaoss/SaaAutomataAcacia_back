@@ -24,7 +24,7 @@ from app.common.setting import REPO_URL
 from app.common.style_sheet import StyleSheet
 from app.common.utils import get_all_children, get_date_from_api, get_gitee_text, get_start_arguments, \
     is_exist_snowbreak, get_cloudflare_data, get_local_version, resolve_game_exe, is_remote_version_newer, \
-    get_github_latest_release_version
+    get_github_release_channels, is_prerelease_version
 from app.modules.base_task.base_task import BaseTask
 from app.modules.chasm.chasm import ChasmModule
 from app.modules.collect_supplies.collect_supplies import CollectSuppliesModule
@@ -471,21 +471,110 @@ class Home(QFrame, Ui_home, BaseInterface):
         # 获取本地保存的信息
         self.get_tips()
 
+    def _select_update_candidate(self, local_version: str, release_channels: Dict[str, Any]):
+        stable = release_channels.get("latest") if isinstance(release_channels, dict) else None
+        prerelease = release_channels.get("prerelease") if isinstance(release_channels, dict) else None
+
+        candidates = []
+        for channel_name, release_data in (("latest", stable), ("prerelease", prerelease)):
+            if not release_data:
+                continue
+            remote_version = release_data.get("version")
+            if not remote_version:
+                continue
+            if is_remote_version_newer(local_version, remote_version):
+                candidates.append({
+                    "channel": channel_name,
+                    "version": remote_version,
+                    "url": release_data.get("url") or f"{REPO_URL}/releases",
+                    "is_prerelease": channel_name == "prerelease"
+                })
+
+        if not candidates:
+            return None, stable, prerelease
+
+        best = candidates[0]
+        for candidate in candidates[1:]:
+            if is_remote_version_newer(best["version"], candidate["version"]):
+                best = candidate
+
+        return best, stable, prerelease
+
+    def _notify_version_update(self, local_version: str, release_channels: Dict[str, Any]):
+        best, stable, prerelease = self._select_update_candidate(local_version, release_channels)
+
+        stable_ver = stable.get("version") if stable else None
+        prerelease_ver = prerelease.get("version") if prerelease else None
+
+        if best is None:
+            if stable_ver or prerelease_ver:
+                logger.info(self._ui_text(
+                    f"当前版本{local_version}已是最新可用版本（stable={stable_ver or 'N/A'}, prerelease={prerelease_ver or 'N/A'}）",
+                    f"Current version {local_version} is up to date (stable={stable_ver or 'N/A'}, prerelease={prerelease_ver or 'N/A'})"
+                ))
+            else:
+                logger.warning(self._ui_text(
+                    "未获取到仓库 release 版本（latest/prerelease），已跳过版本更新检查",
+                    "No repository release versions found (latest/prerelease), skipped update check"
+                ))
+            return
+
+        logger.info(self._ui_text(
+            f"发现版本更新 {local_version}→{best['version']}（channel={best['channel']}），下载地址：{best['url']}",
+            f"Update found {local_version} -> {best['version']} (channel={best['channel']}), download: {best['url']}"
+        ))
+
+        local_is_prerelease = is_prerelease_version(local_version)
+        if best["is_prerelease"] and not local_is_prerelease:
+            content = self._ui_text(
+                f"发现测试版更新：{best['version']}（当前 {local_version}）。这是预发布版本，包含新功能测试，建议按需体验。",
+                f"Pre-release update found: {best['version']} (current {local_version}). This build includes feature testing; install only if you want early access."
+            )
+            InfoBar.warning(
+                title=self._ui_text("发现测试版更新", "Pre-release Available"),
+                content=content,
+                orient=Qt.Horizontal,
+                isClosable=True,
+                position=InfoBarPosition.TOP_RIGHT,
+                duration=12000,
+                parent=self
+            )
+            return
+
+        if best["is_prerelease"] and local_is_prerelease:
+            content = self._ui_text(
+                f"发现新的测试版：{best['version']}（当前 {local_version}）。",
+                f"New pre-release available: {best['version']} (current {local_version})."
+            )
+        elif (not best["is_prerelease"]) and local_is_prerelease:
+            content = self._ui_text(
+                f"发现稳定版更新：{best['version']}（当前 {local_version}）。可从测试版切换到稳定版。",
+                f"Stable release available: {best['version']} (current {local_version}). You can switch from pre-release to stable now."
+            )
+        else:
+            content = self._ui_text(
+                f"发现新版本：{best['version']}（当前 {local_version}）。",
+                f"New version available: {best['version']} (current {local_version})."
+            )
+
+        InfoBar.info(
+            title=self._ui_text("发现版本更新", "Update Available"),
+            content=content,
+            orient=Qt.Horizontal,
+            isClosable=True,
+            position=InfoBarPosition.TOP_RIGHT,
+            duration=10000,
+            parent=self
+        )
+
     def _handle_update_logic(self, raw_data: Dict[str, Any], online_data: Dict[str, Any], response: ApiResponse):
         """处理更新数据的业务逻辑"""
         local_config_data = parse_config_update_data(config.update_data.value)
 
-        # 版本更新检查仅使用仓库 release 版本
-        online_version = get_github_latest_release_version(REPO_URL)
+        # 版本更新检查：同时识别 latest 与 prerelease
+        release_channels = get_github_release_channels(REPO_URL)
         local_version = get_local_version()
-
-        if online_version:
-            if is_remote_version_newer(local_version, online_version):
-                logger.info(f"出现版本更新{local_version}→{online_version}，可前往 {REPO_URL}/releases 下载新版安装包")
-            else:
-                logger.info(f"当前版本{local_version}为最新版本")
-        else:
-            logger.warning("未获取到仓库最新 release 版本，已跳过版本更新检查")
+        self._notify_version_update(local_version, release_channels)
 
         if not local_config_data:
             # 首次获取数据或本地数据格式不正确
