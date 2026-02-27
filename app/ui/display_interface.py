@@ -1,7 +1,7 @@
 import os
 import random
 
-from PyQt5.QtCore import Qt, QRectF
+from PyQt5.QtCore import Qt, QRectF, QLocale
 from PyQt5.QtGui import QPixmap, QPainter, QPainterPath, QBrush
 from PyQt5.QtWidgets import (
     QWidget,
@@ -10,10 +10,10 @@ from PyQt5.QtWidgets import (
     QGraphicsDropShadowEffect,
     QHBoxLayout,
 )
-from qfluentwidgets import ScrollArea, FluentIcon, CardWidget
+from qfluentwidgets import ScrollArea, FluentIcon, CardWidget, FlyoutView, Flyout
 
-from app.common.config import config, is_non_chinese_ui_language
-from app.common.setting import REPO_URL, GITHUB_FEEDBACK_URL
+from app.common.config import config, is_non_chinese_ui_language, Language
+from app.common.setting import REPO_URL
 from app.common.style_sheet import StyleSheet
 from app.common.utils import get_local_version
 
@@ -27,6 +27,7 @@ class BannerWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.setFixedHeight(350)
+        self._is_simplified_ui = self._is_simplified_ui_language()
 
         self.vBoxLayout = QVBoxLayout(self)
         # 大标题
@@ -75,10 +76,35 @@ class BannerWidget(QWidget):
         )
         self.linkCardView.addCard(
             FluentIcon.INFO,
-            self.tr("提出建议"),
-            self.tr("前往github\n在issue中提建议(´▽`)ﾉ "),
-            GITHUB_FEEDBACK_URL,
+            self.tr("支持作者"),
+            self.tr("点击查看\n赞助二维码") if self._is_simplified_ui else self.tr("前往 Ko-fi\n支持作者"),
+            "" if self._is_simplified_ui else "https://ko-fi.com/mofa",
+            on_click=self._show_support_qr if self._is_simplified_ui else None,
         )
+
+    @staticmethod
+    def _is_simplified_ui_language():
+        language = config.language.value
+        if language == Language.CHINESE_SIMPLIFIED:
+            return True
+        if language != Language.AUTO:
+            return False
+
+        locale_name = QLocale.system().name().replace('-', '_')
+        return locale_name in {"zh_CN", "zh_SG"} or locale_name.startswith("zh_Hans")
+
+    def _show_support_qr(self, source_widget):
+        view = FlyoutView(
+            title=self.tr("赞助作者"),
+            content=self.tr("如果这个助手帮助到你，可以考虑赞助作者一杯奶茶(>ω･* )ﾉ"),
+            image="asset/support.jpg",
+            isClosable=True,
+        )
+        view.widgetLayout.insertSpacing(1, 5)
+        view.widgetLayout.addSpacing(5)
+
+        flyout = Flyout.make(view, source_widget, self)
+        view.closed.connect(flyout.close)
 
     def paintEvent(self, e):
         super().paintEvent(e)

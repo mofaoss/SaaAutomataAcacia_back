@@ -15,7 +15,7 @@ from qfluentwidgets import (SwitchSettingCard, PrimaryPushSettingCard, ScrollAre
                             )
 
 from ..common.config import config, isWin11, is_non_chinese_ui_language
-from ..common.setting import FEEDBACK_URL, QQ, REPO_URL
+from ..common.setting import QQ, REPO_URL
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
 from ..common.utils import get_local_version
@@ -203,10 +203,10 @@ class SettingInterface(ScrollArea):
             self.aboutGroup
         )
         self.feedbackCard = PrimaryPushSettingCard(
-            '前往B站',
+            '前往GitHub',
             FIF.FEEDBACK,
             '提供反馈',
-            '唯一平台b站：芬妮舞狮，QQ群：' + QQ,
+            'GitHub作者：mofaoss，QQ群：' + QQ,
             self.aboutGroup
         )
         self.aboutCard = PrimaryPushSettingCard(
@@ -297,7 +297,7 @@ class SettingInterface(ScrollArea):
 
         # about
         self.feedbackCard.clicked.connect(
-            lambda: QDesktopServices.openUrl(QUrl(FEEDBACK_URL)))
+            lambda: QDesktopServices.openUrl(QUrl(REPO_URL)))
 
     def set_windows_start(self, is_checked):
         if is_checked:

@@ -9,9 +9,10 @@ from ..common.style_sheet import StyleSheet
 
 class LinkCard(QFrame):
 
-    def __init__(self, icon, title, content, url, parent=None):
+    def __init__(self, icon, title, content, url, parent=None, on_click=None):
         super().__init__(parent=parent)
-        self.url = QUrl(url)
+        self.url = QUrl(url) if url else QUrl()
+        self.on_click = on_click
         self.setFixedSize(188, 190)
         self.iconWidget = IconWidget(icon, self)
         self.titleLabel = QLabel(title, self)
@@ -43,6 +44,9 @@ class LinkCard(QFrame):
 
     def mouseReleaseEvent(self, e):
         super().mouseReleaseEvent(e)
+        if self.on_click:
+            self.on_click(self)
+            return
         QDesktopServices.openUrl(self.url)
 
 
@@ -66,7 +70,7 @@ class LinkCardView(SingleDirectionScrollArea):
         self.view.setObjectName('view')
         StyleSheet.LINK_CARD.apply(self)
 
-    def addCard(self, icon, title, content, url):
+    def addCard(self, icon, title, content, url, on_click=None):
         """ add link card """
-        card = LinkCard(icon, title, content, url, self.view)
+        card = LinkCard(icon, title, content, url, self.view, on_click=on_click)
         self.hBoxLayout.addWidget(card, 0, Qt.AlignLeft)
