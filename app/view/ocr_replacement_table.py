@@ -28,6 +28,12 @@ class OcrReplacementTable(QFrame, Ui_ocrtable):
         self._connect_to_slot()
 
     def _initWidget(self):
+        self.BodyLabel.setText(self._ui_text("替换类型", "Replacement Type"))
+        self.BodyLabel_2.setText(self._ui_text("替换前", "Before"))
+        self.BodyLabel_3.setText(self._ui_text("替换后", "After"))
+        self.PushButton_delete.setText(self._ui_text("删除选中行", "Delete Selected Row"))
+        self.PrimaryPushButton_add.setText(self._ui_text("新增", "Add"))
+
         self.BodyLabel_tips.setText(
             self._ui_text(
                 "### 提示\n* 双击单元格可修改\n* 填好上面对应的内容后点击“新增”按钮可以添加新的替换规则\n* 错误文本：ocr识别出来的错误内容，如果看不到去设置那开启显示ocr识别结果。正确文本：游戏中对应的正确文字\n* 删除需要先选中你需要删除的行，然后再点删除按钮",
