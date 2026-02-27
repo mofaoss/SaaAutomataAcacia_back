@@ -14,7 +14,7 @@ def app_dir():
 
 
 class Config:
-    app_ver = "2.0.9"
+    app_ver = "2.1.0-beta"
     app_name = "SAA"
     app_exec = "SAA"
     app_publisher = "mofaoss"
