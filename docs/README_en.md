@@ -30,7 +30,8 @@
 > 8. Optimized shop purchase flow: fewer accidental clicks and more stable scrolling.
 > 9. Fixed stamina potion day matching errors (e.g., 1/3 no longer mismatches to 11/13).
 > 10. The UI now mostly supports English in core areas (Display/Home/Additional features).
-> 11. More features to be updated...
+> 11. The configured startup entry page will be pinned to the top.
+> 12. More features to be updated...
 
 > [!Warning]
 >
