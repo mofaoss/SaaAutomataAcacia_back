@@ -2,7 +2,7 @@
     <h1>
         <img src="./asset/logo.png" width="200"/>
         <br/>
-        尘白禁区自动化助手
+        自律型安卡希雅
     </h1>
     <h2>SaaAutomataAcacia</h2>
 <br/>

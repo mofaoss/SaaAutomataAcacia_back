@@ -4,7 +4,6 @@
         <br/>
         SaaAutomataAcacia
     </h1>
-    <h2>SaaAutomataAcacia</h2>
     <br/>
 
 <a href="../README.md">简体中文</a> | English
