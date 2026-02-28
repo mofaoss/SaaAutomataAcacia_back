@@ -3,7 +3,7 @@ import os
 import sys
 from pathlib import Path
 
-from PyQt5.QtCore import Qt, QTranslator, QSize, QObject, QThread, QTimer, pyqtSignal
+from PyQt5.QtCore import Qt, QTranslator, QSize, QObject, QThread, QTimer, pyqtSignal, QPoint
 from PyQt5.QtGui import QMovie, QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
 
@@ -86,7 +86,14 @@ class EarlySplash(QWidget):
             self.label.setFixedSize(display.size())
 
     def show_centered(self, app: QApplication):
-        screen = app.primaryScreen().availableGeometry()
+        target_screen = app.primaryScreen()
+        position = config.position.value
+        if position and len(position) >= 2:
+            screen = app.screenAt(QPoint(int(position[0]), int(position[1])))
+            if screen is not None:
+                target_screen = screen
+
+        screen = target_screen.availableGeometry()
         self.move(
             screen.center().x() - self.width() // 2,
             screen.center().y() - self.height() // 2,

@@ -3,6 +3,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 import traceback
 from datetime import datetime
 from functools import partial
@@ -63,16 +64,32 @@ class StartThread(QThread, BaseTask):
     def __init__(self, checkbox_dic):
         super().__init__()
         self.checkbox_dic = checkbox_dic
+        self.logger = logger
         self._is_running = True
+        self._interrupted_reason = None
         self.name_list_zh = ['自动登录', '领取物资', '商店购买', '刷体力', '人物碎片', '精神拟境', '领取奖励']
         self.name_list_en = ['Auto Login', 'Collect Supplies', 'Shop', 'Use Stamina', 'Character Shards',
                              'Neural Simulation', 'Claim Rewards']
+
+    def stop(self, reason=None):
+        self._is_running = False
+        if reason:
+            self._interrupted_reason = reason
+            self.logger.warn(f"检测到中断，停止自动任务：{reason}")
+        if self.auto is not None:
+            try:
+                self.auto.stop()
+            except Exception as e:
+                self.logger.warn(f"停止自动任务时发生异常，已忽略：{e}")
 
     def run(self):
         self.is_running_signal.emit('start')
         normal_stop_flag = True
         try:
             for key, value in self.checkbox_dic.items():
+                if not self._is_running:
+                    normal_stop_flag = False
+                    break
                 if value:
                     index = int(re.search(r'\d+', key).group()) - 1
                     task_name = self.name_list_en[index] if is_non_chinese_ui_language() else self.name_list_zh[index]
@@ -102,6 +119,10 @@ class StartThread(QThread, BaseTask):
                     elif index == 6:
                         module = GetRewardModule(self.auto, self.logger)
                         module.run()
+
+                    if not self._is_running:
+                        normal_stop_flag = False
+                        break
                 else:
                     # 如果value为false则进行下一个任务的判断
                     continue
@@ -121,15 +142,19 @@ class StartThread(QThread, BaseTask):
                 )
         except Exception as e:
             ocr.stop_ocr()
-            self.logger.warn(e)
+            if str(e) != '已停止':
+                self.logger.warn(e)
             # traceback.print_exc()
         finally:
             # 运行完成
-            if normal_stop_flag:
+            if normal_stop_flag and self._is_running:
                 self.is_running_signal.emit('end')
             else:
-                # 未成功创建auto，没开游戏或屏幕比例不对
-                self.is_running_signal.emit('no_auto')
+                if self._interrupted_reason:
+                    self.is_running_signal.emit('interrupted')
+                else:
+                    # 未成功创建auto，没开游戏或屏幕比例不对
+                    self.is_running_signal.emit('no_auto')
 
 
 def select_all(widget):
@@ -205,6 +230,7 @@ class Home(QFrame, Ui_home, BaseInterface):
         self.setupUi(self)
         self.setObjectName(text.replace(' ', '-'))
         self.parent = parent
+        self.logger = logger
 
         self.is_running = False
         self.select_person = TreeFrame_person(
@@ -219,6 +245,9 @@ class Home(QFrame, Ui_home, BaseInterface):
         )
 
         self.game_hwnd = None
+        self.start_thread = None
+        self.launch_process = None
+        self.launch_deadline = 0.0
 
         self._initWidget()
         self._connect_to_slot()
@@ -226,6 +255,8 @@ class Home(QFrame, Ui_home, BaseInterface):
 
         self.check_game_window_timer = QTimer()
         self.check_game_window_timer.timeout.connect(self.check_game_open)
+        self.running_game_guard_timer = QTimer()
+        self.running_game_guard_timer.timeout.connect(self._guard_running_game_window)
         self.checkbox_dic = None
 
         # self.get_tips()
@@ -802,10 +833,13 @@ class Home(QFrame, Ui_home, BaseInterface):
 
             if not is_exist_snowbreak():
                 # 尝试以管理员权限运行
-                subprocess.Popen([exe_path] + launch_args)
+                self.launch_process = subprocess.Popen([exe_path] + launch_args)
                 logger.debug(f"正在启动 {exe_path} {launch_args}")
             else:
                 logger.info("游戏窗口已存在")
+                self.launch_process = None
+
+            self.launch_deadline = time.time() + 90
             self.check_game_window_timer.start(500)
         except FileNotFoundError:
             logger.error(f'没有找到对应文件: {exe_path}')
@@ -813,11 +847,51 @@ class Home(QFrame, Ui_home, BaseInterface):
             logger.error(f'出现报错: {e}')
 
     def check_game_open(self):
-        hwnd = is_exist_snowbreak()
-        if hwnd:
+        try:
+            hwnd = is_exist_snowbreak()
+            if hwnd:
+                self.check_game_window_timer.stop()
+                self.launch_deadline = 0.0
+                self.launch_process = None
+                logger.info(f'已检测到游戏窗口：{hwnd}')
+                self.after_start_button_click(self.checkbox_dic)
+                return
+
+            if self.launch_process is not None and self.launch_process.poll() is not None:
+                self.check_game_window_timer.stop()
+                self.launch_deadline = 0.0
+                self.launch_process = None
+                logger.warn('启动流程已中断：检测到游戏进程退出，已取消本次自动任务')
+                InfoBar.warning(
+                    title=self._ui_text('启动已中断', 'Launch interrupted'),
+                    content=self._ui_text('检测到游戏被关闭或启动失败，已停止后续任务。',
+                                          'Game was closed or failed to launch. Pending tasks were cancelled.'),
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.TOP_RIGHT,
+                    duration=4000,
+                    parent=self
+                )
+                return
+
+            if self.launch_deadline and time.time() > self.launch_deadline:
+                self.check_game_window_timer.stop()
+                self.launch_deadline = 0.0
+                self.launch_process = None
+                logger.warn('等待游戏窗口超时，已取消本次自动任务')
+                InfoBar.warning(
+                    title=self._ui_text('等待超时', 'Launch timeout'),
+                    content=self._ui_text('长时间未检测到游戏窗口，已停止后续任务。',
+                                          'Game window not detected in time. Pending tasks were cancelled.'),
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.TOP_RIGHT,
+                    duration=4000,
+                    parent=self
+                )
+        except Exception as e:
+            logger.error(f'检测游戏启动状态时出现异常：{e}')
             self.check_game_window_timer.stop()
-            logger.info(f'已检测到游戏窗口：{hwnd}')
-            self.after_start_button_click(self.checkbox_dic)
 
     def on_start_button_click(self):
         """点击开始按钮后的逻辑"""
@@ -844,8 +918,8 @@ class Home(QFrame, Ui_home, BaseInterface):
                 # logger.debug(sorted_dict)
                 self.redirectOutput(self.textBrowser_log)
                 self.start_thread = StartThread(sorted_dict)
-                self.start_thread.start()
                 self.start_thread.is_running_signal.connect(self.handle_start)
+                self.start_thread.start()
             else:
                 self.start_thread.stop()
         else:
@@ -862,48 +936,99 @@ class Home(QFrame, Ui_home, BaseInterface):
 
     def handle_start(self, str_flag):
         """设置按钮"""
-        if str_flag == 'start':
-            self.is_running = True
-            self.set_checkbox_enable(False)
-            self.PushButton_start.setText(self._ui_text("停止", "Stop"))
-        elif str_flag == 'end':
+        try:
+            if str_flag == 'start':
+                self.is_running = True
+                self.set_checkbox_enable(False)
+                self.PushButton_start.setText(self._ui_text("停止", "Stop"))
+                if not self.running_game_guard_timer.isActive():
+                    self.running_game_guard_timer.start(1000)
+            elif str_flag == 'end':
+                self.is_running = False
+                self.running_game_guard_timer.stop()
+                self.set_checkbox_enable(True)
+                self.PushButton_start.setText(self._ui_text("开始", "Start"))
+                # 后处理
+                self.after_finish()
+                self.resize_window()  # 把窗口还原成原本位置
+            elif str_flag == 'no_auto':
+                self.is_running = False
+                self.running_game_guard_timer.stop()
+                self.set_checkbox_enable(True)
+                self.PushButton_start.setText(self._ui_text("开始", "Start"))
+                text = self._ui_text("助手会自动缩放窗口至1920*1080", "the assistant will auto-resize to 1920*1080") \
+                    if config.autoScaling.value else self._ui_text("然后手动缩放窗口到16:9并贴在屏幕左上角",
+                                                                   "then manually resize to 16:9 and place it at top-left")
+                InfoBar.error(
+                    title=self._ui_text('未成功初始化auto', 'Auto init failed'),
+                    content=self._ui_text(f"未打开游戏，{text}，然后再点击开始", f"Game is not opened, {text}, then click Start again"),
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.TOP_RIGHT,
+                    duration=5000,
+                    parent=self
+                )
+            elif str_flag == 'interrupted':
+                self.is_running = False
+                self.running_game_guard_timer.stop()
+                self.set_checkbox_enable(True)
+                self.PushButton_start.setText(self._ui_text("开始", "Start"))
+                InfoBar.warning(
+                    title=self._ui_text('任务已停止', 'Task stopped'),
+                    content=self._ui_text('检测到游戏窗口关闭，任务终止。',
+                                          'Game window was closed. Current task stopped gracefully.'),
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.TOP_RIGHT,
+                    duration=4000,
+                    parent=self
+                )
+                self.resize_window()
+        except Exception as e:
+            logger.error(f'处理任务状态变更时出现异常：{e}')
             self.is_running = False
+            self.running_game_guard_timer.stop()
             self.set_checkbox_enable(True)
             self.PushButton_start.setText(self._ui_text("开始", "Start"))
-            # 后处理
-            self.after_finish()
-            self.resize_window()  # 把窗口还原成原本位置
-        elif str_flag == 'no_auto':
-            self.is_running = False
-            self.set_checkbox_enable(True)
-            self.PushButton_start.setText(self._ui_text("开始", "Start"))
-            text = self._ui_text("助手会自动缩放窗口至1920*1080", "the assistant will auto-resize to 1920*1080") \
-                if config.autoScaling.value else self._ui_text("然后手动缩放窗口到16:9并贴在屏幕左上角",
-                                                               "then manually resize to 16:9 and place it at top-left")
-            InfoBar.error(
-                title=self._ui_text('未成功初始化auto', 'Auto init failed'),
-                content=self._ui_text(f"未打开游戏，{text}，然后再点击开始", f"Game is not opened, {text}, then click Start again"),
-                orient=Qt.Horizontal,
-                isClosable=True,
-                position=InfoBarPosition.TOP_RIGHT,
-                duration=5000,
-                parent=self
-            )
+
+    def _guard_running_game_window(self):
+        try:
+            if not self.is_running:
+                self.running_game_guard_timer.stop()
+                return
+
+            if is_exist_snowbreak():
+                return
+
+            self.running_game_guard_timer.stop()
+            logger.warn('检测到游戏窗口已关闭，正在停止当前自动任务')
+            if self.start_thread is not None and self.start_thread.isRunning():
+                self.start_thread.stop(reason=self._ui_text('用户中断：游戏窗口已关闭',
+                                                            'Interrupted by user: game window closed'))
+        except Exception as e:
+            logger.error(f'运行中窗口守护检测异常：{e}')
+            self.running_game_guard_timer.stop()
 
     def resize_window(self):
         # 恢复窗口
         if config.is_resize.value is not None:
             state = config.is_resize.value
             config.set(config.is_resize, None)
-            win32gui.SetWindowPos(
-                self.game_hwnd,
-                win32con.HWND_TOP,
-                state[0],  # 原始左边界
-                state[1],  # 原始上边界
-                state[2] - state[0],  # 宽度
-                state[3] - state[1],  # 高度
-                win32con.SWP_NOZORDER | win32con.SWP_NOACTIVATE
-            )
+            try:
+                if self.game_hwnd and win32gui.IsWindow(self.game_hwnd):
+                    win32gui.SetWindowPos(
+                        self.game_hwnd,
+                        win32con.HWND_TOP,
+                        state[0],  # 原始左边界
+                        state[1],  # 原始上边界
+                        state[2] - state[0],  # 宽度
+                        state[3] - state[1],  # 高度
+                        win32con.SWP_NOZORDER | win32con.SWP_NOACTIVATE
+                    )
+                else:
+                    self.logger.warn('游戏窗口已关闭或句柄无效，跳过窗口还原')
+            except Exception as e:
+                self.logger.warn(f'窗口还原失败，已忽略：{e}')
 
     def after_finish(self):
         # 任务结束后的后处理
