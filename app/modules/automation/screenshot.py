@@ -113,7 +113,7 @@ class Screenshot:
                 self._log_error_throttled('invalid_hwnd', "截图失败：无效的窗口句柄，窗口可能已关闭")
                 return None
 
-            # 获取带标题的窗口尺寸
+            # 获取窗口尺寸与客户区尺寸
             left, top, right, bottom = win32gui.GetWindowRect(hwnd)
 
             w = right - left
@@ -122,6 +122,9 @@ class Screenshot:
             client_rect = win32gui.GetClientRect(hwnd)
             client_width = client_rect[2] - client_rect[0]
             client_height = client_rect[3] - client_rect[1]
+            client_screen_x, client_screen_y = win32gui.ClientToScreen(hwnd, (0, 0))
+            client_offset_x = client_screen_x - left
+            client_offset_y = client_screen_y - top
 
             # 获取设备上下文
             hwnd_dc = win32gui.GetWindowDC(hwnd)
@@ -151,11 +154,12 @@ class Screenshot:
 
             # OpenCV 处理
             img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-            if not is_fullscreen(hwnd):
-                # ImageUtils.show_ndarray(img)
-                img = img[40:-9, 9:-9, :]
-                # ImageUtils.show_ndarray(img)
-                # img = auto_crop_image(img)
+            # 始终依据真实客户区偏移裁切，避免固定边框裁切在不同分辨率/主题下失准
+            x1 = max(0, min(w, client_offset_x))
+            y1 = max(0, min(h, client_offset_y))
+            x2 = max(x1, min(w, x1 + client_width))
+            y2 = max(y1, min(h, y1 + client_height))
+            img = img[y1:y2, x1:x2, :]
             img_crop, relative_pos = ImageUtils.crop_image(img, crop, hwnd)
 
             # 缩放图像以自适应分辨率图像识别
