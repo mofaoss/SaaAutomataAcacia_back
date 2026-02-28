@@ -31,14 +31,17 @@
 > 9. Fixed stamina potion day matching errors (e.g., 1/3 no longer mismatches to 11/13).
 > 10. The UI now mostly supports English in core areas (Display/Home/Additional features).
 > 11. The configured startup entry page will be pinned to the top.
-> 12. More features to be updated...
+> 12. Added window-tracking mouse input to minimize mouse takeover during background click/scroll actions.
+> 13. Improved OCR recognition stability for low resolutions: 1600×900 and 1280×720.
+> 14. Removed the requirement that windowed auto-scaling must keep the game window fixed at the top-left corner.
+> 15. More features to be updated...
 
 > [!Warning]
 >
 > After version 2.0, all tasks support running while the window is obscured. Mouse clicks use an optimized method to
 > minimize user disruption, enabling pure background operation for tasks not requiring mouse interaction. Only supports 16:
 > 9 screen ratios. Works in both fullscreen and windowed modes. For other ratios, enable auto-scaling in settings to
-> automatically resize and position the game window in the top-left corner (must be flush with the corner).
+> automatically resize the game window, and it no longer needs to be fixed in the top-left corner.
 
 ### ✨Feature List
 
