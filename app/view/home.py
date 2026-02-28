@@ -146,6 +146,11 @@ class StartThread(QThread, BaseTask):
                 self.logger.warn(e)
             # traceback.print_exc()
         finally:
+            if self.auto is not None:
+                try:
+                    self.auto.stop()
+                except Exception as e:
+                    self.logger.warn(f"任务结束时恢复窗口位置失败：{e}")
             # 运行完成
             if normal_stop_flag and self._is_running:
                 self.is_running_signal.emit('end')

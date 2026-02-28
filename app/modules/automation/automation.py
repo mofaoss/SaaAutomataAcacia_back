@@ -648,6 +648,10 @@ class Automation:
 
     def stop(self):
         self.running = False
+        try:
+            self.input_handler.restore_window_position()
+        except Exception as e:
+            self._log_error_throttled('restore_window_failed', f"恢复窗口位置失败：{e}")
 
     def reset(self):
         self.running = True

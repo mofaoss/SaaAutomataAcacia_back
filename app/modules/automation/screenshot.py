@@ -118,10 +118,16 @@ class Screenshot:
 
             w = right - left
             h = bottom - top
+            if w <= 0 or h <= 0:
+                self._log_error_throttled('invalid_window_size', "截图失败：窗口尺寸无效")
+                return None
 
             client_rect = win32gui.GetClientRect(hwnd)
             client_width = client_rect[2] - client_rect[0]
             client_height = client_rect[3] - client_rect[1]
+            if client_width <= 0 or client_height <= 0:
+                self._log_error_throttled('invalid_client_size', "截图失败：客户区尺寸无效，等待下一帧重试")
+                return None
             client_screen_x, client_screen_y = win32gui.ClientToScreen(hwnd, (0, 0))
             client_offset_x = client_screen_x - left
             client_offset_y = client_screen_y - top
@@ -168,8 +174,8 @@ class Screenshot:
                 scale_y = 1
             else:
                 # 需要除以用户区域（无标题）才是正确的比例
-                scale_x = self.base_width / client_width
-                scale_y = self.base_height / client_height
+                scale_x = self.base_width / max(1, client_width)
+                scale_y = self.base_height / max(1, client_height)
 
             return img_crop, scale_x, scale_y, relative_pos
         except Exception as e:

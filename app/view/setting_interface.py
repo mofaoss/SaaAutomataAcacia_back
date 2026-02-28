@@ -161,6 +161,14 @@ class SettingInterface(ScrollArea):
             configItem=config.showScreenshot,
             parent=self.aboutSoftwareGroup
         )
+        self.windowTrackingInputCard = SwitchSettingCard(
+            FIF.MOVE,
+            self._ui_text('开启窗口追踪鼠标输入', 'Enable window-tracking mouse input'),
+            self._ui_text('开启后 move_click/滚轮会通过移动游戏窗口追踪当前鼠标，减少抢鼠标；任务完成或强制停止后自动归位窗口',
+                          'When enabled, move_click/scroll follows current cursor by moving game window to reduce mouse stealing; window is restored after task completion or forced stop'),
+            configItem=config.windowTrackingInput,
+            parent=self.aboutSoftwareGroup
+        )
         self.saveScaleCacheCard = SwitchSettingCard(
             FIF.SAVE,
             self._ui_text('保存缩放比例数据', 'Save scaling cache'),
@@ -265,6 +273,7 @@ class SettingInterface(ScrollArea):
         self.aboutSoftwareGroup.addSettingCard(self.gameLanguageCard)
         self.aboutSoftwareGroup.addSettingCard(self.isLogCard)
         self.aboutSoftwareGroup.addSettingCard(self.showScreenshotCard)
+        self.aboutSoftwareGroup.addSettingCard(self.windowTrackingInputCard)
         self.aboutSoftwareGroup.addSettingCard(self.saveScaleCacheCard)
         self.aboutSoftwareGroup.addSettingCard(self.autoScaling)
         self.aboutSoftwareGroup.addSettingCard(self.autoStartTask)
