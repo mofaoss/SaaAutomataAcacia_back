@@ -14,7 +14,7 @@ def app_dir():
 
 
 class Config:
-    app_ver = "2.1.0-beta"
+    app_ver = "2.1.0"
     app_name = "SaaAutomataAcacia"
     app_exec = "SaaAutomataAcacia"
     app_publisher = "mofaoss"
