@@ -123,7 +123,7 @@ class SettingInterface(ScrollArea):
         self.updateOnStartUpCard = SwitchSettingCard(
             FIF.UPDATE,
             self.tr('Check for updates when the application starts'),
-            self._ui_text('如果开启，每次游戏版本更新会自动更新对应活动刷体力的坐标和自律型安卡希雅提醒的链接',
+            self._ui_text('如果开启，每次游戏版本更新会自动更新对应活动刷体力的坐标和安卡希雅·自律型提醒的链接',
                           'If enabled, coordinates and schedule reminder links update automatically after each game version update'),
             configItem=config.checkUpdateAtStartUp,
             parent=self.aboutSoftwareGroup
@@ -172,7 +172,7 @@ class SettingInterface(ScrollArea):
         self.autoScaling = SwitchSettingCard(
             FIF.BACK_TO_WINDOW,
             self._ui_text('自动缩放比例', 'Auto scaling'),
-            self._ui_text('默认开启，在启动自律型安卡希雅时如果发现游戏窗口比例不是16:9会自动缩放成1920*1080并贴在左上角',
+            self._ui_text('默认开启，在启动安卡希雅·自律型时如果发现游戏窗口比例不是16:9会自动缩放成1920*1080并贴在左上角',
                           'Enabled by default. If the game is not 16:9, it auto-resizes to 1920*1080 and snaps to top-left on startup'),
             configItem=config.autoScaling,
             parent=self.aboutSoftwareGroup
@@ -180,7 +180,7 @@ class SettingInterface(ScrollArea):
         self.autoStartTask = SwitchSettingCard(
             FIF.PLAY,
             self._ui_text('自动开始任务', 'Auto start tasks'),
-            self._ui_text('打开自律型安卡希雅自动开始运行日常，必须先勾选并配置好自动打开游戏',
+            self._ui_text('打开安卡希雅·自律型自动开始运行日常，必须先勾选并配置好自动打开游戏',
                           'Automatically starts daily tasks when SaaAutomataAcacia launches. Requires auto-open game to be enabled and configured first'),
             configItem=config.auto_start_task,
             parent=self.aboutSoftwareGroup
@@ -188,7 +188,7 @@ class SettingInterface(ScrollArea):
         self.autoBootStartup = SwitchSettingCard(
             FIF.POWER_BUTTON,
             self._ui_text('开机自启', 'Start on boot'),
-            self._ui_text('开机时自动打开自律型安卡希雅', 'Launch SaaAutomataAcacia automatically when Windows starts'),
+            self._ui_text('开机时自动打开安卡希雅·自律型', 'Launch SaaAutomataAcacia automatically when Windows starts'),
             configItem=config.auto_boot_startup,
             parent=self.aboutSoftwareGroup
         )
