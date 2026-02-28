@@ -2,7 +2,6 @@
 import datetime
 import os.path
 import re
-import subprocess
 import sys
 import threading
 import time
@@ -20,7 +19,7 @@ from ..common.icon import Icon
 from ..common.logger import logger
 from ..common.matcher import matcher
 from ..common.signal_bus import signalBus
-from ..common.utils import get_start_arguments, get_gitee_text, get_local_version, get_cloudflare_data, resolve_game_exe
+from ..common.utils import get_gitee_text, get_local_version, get_cloudflare_data, launch_game_with_guard
 from ..repackage.custom_message_box import CustomMessageBox
 from ..common import resource  # don't delete
 
@@ -282,22 +281,10 @@ class MainWindow(MSFluentWindow):
 
     def open_game_directly(self):
         """直接启动游戏（兼容 Steam/Epic 与国服等不同目录结构）"""
-        start_path = os.path.normpath(config.LineEdit_game_directory.value)
-        game_channel = config.server_interface.value
-
-        exe_path = resolve_game_exe(start_path)
-        if not exe_path or not os.path.exists(exe_path):
-            logger.error(f"没有找到对应文件: {exe_path or '(empty)'}，请检查游戏路径: {start_path}")
-            return
-
         try:
-            launch_args = get_start_arguments(start_path, game_channel, exe_path=exe_path)
-            if not launch_args:
-                logger.error(f"游戏启动失败未找到对应参数，start_path：{start_path}，game_channel:{game_channel}")
-                return
-
-            subprocess.Popen([exe_path] + launch_args)
-            logger.debug(f"正在启动 {exe_path} {launch_args}")
+            result = launch_game_with_guard(logger=logger)
+            if not result.get("ok"):
+                logger.error(result.get("error", "启动游戏失败"))
 
         except Exception as e:
             logger.error(f"出现报错: {e}")

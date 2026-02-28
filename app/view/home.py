@@ -1,7 +1,6 @@
 import copy
 import os
 import re
-import subprocess
 import sys
 import time
 import traceback
@@ -23,8 +22,9 @@ from app.common.logger import original_stdout, original_stderr, logger
 from app.common.signal_bus import signalBus
 from app.common.setting import REPO_URL
 from app.common.style_sheet import StyleSheet
-from app.common.utils import get_all_children, get_date_from_api, get_gitee_text, get_start_arguments, \
-    is_exist_snowbreak, get_cloudflare_data, get_local_version, resolve_game_exe, is_remote_version_newer, \
+from app.common.utils import get_all_children, get_date_from_api, get_gitee_text, \
+    is_exist_snowbreak, get_cloudflare_data, get_local_version, is_remote_version_newer, \
+    launch_game_with_guard, \
     get_github_release_channels, is_prerelease_version
 from app.modules.base_task.base_task import BaseTask
 from app.modules.chasm.chasm import ChasmModule
@@ -821,33 +821,16 @@ class Home(QFrame, Ui_home, BaseInterface):
 
     def open_game_directly(self):
         """直接启动游戏"""
-        start_path = os.path.normpath(config.LineEdit_game_directory.value)
-        game_channel = config.server_interface.value
-
-        exe_path = resolve_game_exe(start_path)
         try:
-            # 检查游戏主程序是否存在
-            if not exe_path:
-                logger.error(f"未找到游戏主程序 Game.exe，请检查路径: {start_path}")
+            result = launch_game_with_guard(logger=logger)
+            if not result.get("ok"):
+                logger.error(result.get("error", "启动游戏失败"))
                 return
 
-            launch_args = get_start_arguments(start_path, game_channel, exe_path=exe_path)
-            if not launch_args:
-                logger.error(f"游戏启动失败未找到对应参数，start_path：{start_path}，game_channel:{game_channel}")
-                return
-
-            if not is_exist_snowbreak():
-                # 尝试以管理员权限运行
-                self.launch_process = subprocess.Popen([exe_path] + launch_args)
-                logger.debug(f"正在启动 {exe_path} {launch_args}")
-            else:
-                logger.info("游戏窗口已存在")
-                self.launch_process = None
+            self.launch_process = result.get("process")
 
             self.launch_deadline = time.time() + 90
             self.check_game_window_timer.start(500)
-        except FileNotFoundError:
-            logger.error(f'没有找到对应文件: {exe_path}')
         except Exception as e:
             logger.error(f'出现报错: {e}')
 
