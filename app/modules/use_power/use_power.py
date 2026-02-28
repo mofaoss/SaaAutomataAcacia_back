@@ -439,117 +439,180 @@ class UsePowerModule:
 
     def by_routine_logistics(self):
         """通过常规后勤使用体力"""
-        timeout = Timer(50).start()
-        enter_routine = False
-        enter_battle = False
-        enter_chasm = False
-        finish_flag = False
+        timeout = Timer(90).start()
+        stage_enter_action = 0
+        stage_find_battle = 1
+        stage_find_chasm = 2
+        stage_fight = 3
+        stage_done = 4
+
+        stage = stage_enter_action
+        no_progress_count = 0
         scroll_no_progress_count = 0
 
         while True:
             self.auto.take_screenshot()
 
-            if not enter_routine:
-                # 进入常规行动
+            progressed = False
+            finished = False
+            # 战斗内动作只在进入浴火链路后处理，避免在其它页面误判
+            if stage == stage_fight:
+                progressed, finished = self._handle_routine_common_actions()
+                if finished:
+                    stage = stage_done
+                if progressed:
+                    no_progress_count = 0
+                    scroll_no_progress_count = 0
+                    if not finished:
+                        continue
+
+            if stage == stage_enter_action:
                 if self.auto.find_element('行动', 'text', crop=(480 / 2560, 1340 / 1440, 625 / 2560, 1400 / 1440),
                                           is_log=self.is_log):
-                    enter_routine = True
+                    stage = stage_find_battle
+                    no_progress_count = 0
                     continue
-                else:
-                    if self.auto.click_element("战斗", "text", crop=(1510 / 1920, 450 / 1080, 1650 / 1920, 530 / 1080),
-                                               is_log=self.is_log, extract=[(39, 39, 56), 128]):
-                        time.sleep(1)
-                        continue
-                    if self.auto.click_element('行动', 'text', crop=(2085 / 2560, 716 / 1440, 2542 / 2560, 853 / 1440),
-                                               is_log=self.is_log):
-                        time.sleep(0.5)
-                        continue
-            elif not enter_battle:
-                # 找浴火之战
-                if self.auto.click_element('浴火之战', 'text', is_log=self.is_log):
-                    time.sleep(1)
-                    enter_battle = True
-                    scroll_no_progress_count = 0
+
+                if self.auto.click_element("战斗", "text", crop=(1510 / 1920, 450 / 1080, 1650 / 1920, 530 / 1080),
+                                           is_log=self.is_log, extract=[(39, 39, 56), 128]):
+                    no_progress_count = 0
+                    time.sleep(0.6)
                     continue
-                else:
-                    # 左滑
-                    self.auto.mouse_scroll(int(1280 / self.auto.scale_x), int(720 / self.auto.scale_y), -8500,
-                                           time_out=1.2)
-                    scroll_no_progress_count += 1
-                    if scroll_no_progress_count >= 6:
-                        self.logger.error("查找“浴火之战”连续滚轮无进展，已停止以避免后台卡死")
-                        break
+
+                if self.auto.click_element('行动', 'text', crop=(2085 / 2560, 716 / 1440, 2542 / 2560, 853 / 1440),
+                                           is_log=self.is_log):
+                    no_progress_count = 0
                     time.sleep(0.5)
-            elif not enter_chasm:
-                # 找深渊
+                    continue
+
+            elif stage == stage_find_battle:
+                if self.auto.click_element('浴火之战', 'text',
+                                           crop=(0, 792 / 1080, 1, 862 / 1080),
+                                           take_screenshot=True,
+                                           is_log=self.is_log):
+                    stage = stage_find_chasm
+                    no_progress_count = 0
+                    scroll_no_progress_count = 0
+                    time.sleep(0.8)
+                    continue
+
+                if self._routine_scroll_to_find():
+                    scroll_no_progress_count += 1
+                    no_progress_count = 0
+                    if scroll_no_progress_count >= 10:
+                        self.logger.warn("查找“浴火之战”连续滚动无进展，尝试重置页面")
+                        stage = stage_enter_action
+                        scroll_no_progress_count = 0
+                    continue
+
+            elif stage == stage_find_chasm:
                 if self.auto.click_element(['深渊', '深', '渊'], 'text', is_log=self.is_log):
-                    time.sleep(1)
-                    enter_chasm = True
+                    stage = stage_fight
+                    no_progress_count = 0
                     scroll_no_progress_count = 0
+                    time.sleep(0.8)
                     continue
-                else:
-                    # 左滑屏幕到顶
-                    self.auto.mouse_scroll(int(1280 / self.auto.scale_x), int(720 / self.auto.scale_y), -8500,
-                                           time_out=1.2)
+
+                # 仅在已进入浴火链路（当前阶段）时，才允许通过战斗特征切到战斗阶段
+                if self.auto.find_element('速战', 'text', crop=(1368 / 1920, 963 / 1080, 1592 / 1920, 1),
+                                          is_log=self.is_log) or self.auto.find_element(
+                        ["快速", "作战"], 'text', crop=(854 / 1920, 214 / 1080, 1054 / 1920, 286 / 1080),
+                        is_log=self.is_log) or self.auto.find_element(
+                        "恢复感知", "text", crop=(1044 / 1920, 295 / 1080, 1487 / 1920, 402 / 1080), is_log=self.is_log):
+                    stage = stage_fight
+                    no_progress_count = 0
+                    continue
+
+                if self._routine_scroll_to_find():
                     scroll_no_progress_count += 1
-                    if scroll_no_progress_count >= 6:
-                        self.logger.error("查找“深渊”连续滚轮无进展，已停止以避免后台卡死")
-                        break
-                    time.sleep(0.5)
-            elif not finish_flag:
-                # 找速战
-                if self.auto.find_element("恢复感知", "text",
-                                          crop=(1044 / 1920, 295 / 1080, 1487 / 1920, 402 / 1080),
-                                          is_log=self.is_log):
-                    self.auto.press_key('esc')
-                    time.sleep(0.5)
-                    for _ in range(3):
-                        self.auto.take_screenshot()
-                        if self.auto.click_element('接收', 'text', crop=(982 / 1920, 964 / 1080, 1038 / 1920, 998 / 1080),
-                                                is_log=self.is_log):
-                            time.sleep(0.5)
-                            self.auto.press_key('esc')
-                            time.sleep(0.3)
-                    finish_flag = True
-                    time.sleep(0.3)
-                    self.auto.press_key('esc')
-                    time.sleep(0.5)
+                    no_progress_count = 0
+                    if scroll_no_progress_count >= 10:
+                        self.logger.warn("查找“深渊”连续滚动无进展，尝试重置页面")
+                        stage = stage_enter_action
+                        scroll_no_progress_count = 0
                     continue
 
-                if self.auto.find_element(["快速", "作战"], 'text',
-                                          crop=(854 / 1920, 214 / 1080, 1054 / 1920, 286 / 1080)):
-                    time.sleep(0.3)
-                    self.auto.click_element_with_pos((int(1289 / self.auto.scale_x), int(732 / self.auto.scale_y)))
-                    time.sleep(0.2)
-                    self.auto.click_element_with_pos((int(980 / self.auto.scale_x), int(851 / self.auto.scale_y)))
-                    time.sleep(0.5)
+            elif stage == stage_fight:
+                if finished:
+                    stage = stage_done
                     continue
 
-                if self.auto.click_element('速战', 'text', crop=(1368 / 1920, 963 / 1080, 1592 / 1920, 1),
-                                           is_log=self.is_log):
-                    time.sleep(1)
-                    continue
-                if self.auto.click_element('完成', 'text', crop=(880 / 1920, 968 / 1080, 1033 / 1920, 1024 / 1080),
-                                           is_log=self.is_log):
-                    time.sleep(0.5)
-                    for _ in range(3):
-                        self.auto.take_screenshot()
-                        if self.auto.click_element('接收', 'text', crop=(982 / 1920, 964 / 1080, 1038 / 1920, 998 / 1080),
-                                                is_log=self.is_log):
-                            time.sleep(0.5)
-                            self.auto.press_key('esc')
-                            time.sleep(0.5)
-                    finish_flag = True
-                    continue
-                if self.auto.click_element('等级提升', 'text', crop=(824 / 1920, 0, 1089 / 1920, 129 / 1080),
-                                           is_log=self.is_log):
-                    continue
-            else:
+            elif stage == stage_done:
                 break
+
+            no_progress_count += 1
+            if no_progress_count >= 8:
+                self.logger.warn("常规后勤当前页面无进展，执行ESC回退并重试")
+                self.auto.press_key('esc')
+                time.sleep(0.4)
+                no_progress_count = 0
+
+                # 回退后若回到主页，则重走流程，可从任意位置恢复
+                self.auto.take_screenshot()
+                if self.is_in_home():
+                    stage = stage_enter_action
 
             if timeout.reached():
                 self.logger.error("刷常规后勤超时")
                 break
+
         self.auto.take_screenshot()
         if not self.is_in_home():
             self.auto.back_to_home()
+
+    def _routine_scroll_to_find(self):
+        """用于查找浴火之战/深渊时的统一滚动。"""
+        return self.auto.mouse_scroll(int(1280 / self.auto.scale_x), int(720 / self.auto.scale_y), -8500,
+                                      time_out=1.2)
+
+    def _routine_collect_receive_rewards(self):
+        """在完成后领取接收奖励。"""
+        for _ in range(3):
+            self.auto.take_screenshot()
+            if self.auto.click_element('接收', 'text', crop=(982 / 1920, 964 / 1080, 1038 / 1920, 998 / 1080),
+                                       is_log=self.is_log):
+                time.sleep(0.4)
+                self.auto.press_key('esc')
+                time.sleep(0.4)
+
+    def _handle_routine_common_actions(self):
+        """处理常规后勤全局动作。返回 (是否有进展, 是否完成)。"""
+        # 体力不足，结束刷取
+        if self.auto.find_element("恢复感知", "text", crop=(1044 / 1920, 295 / 1080, 1487 / 1920, 402 / 1080),
+                                  is_log=self.is_log):
+            self.auto.press_key('esc')
+            time.sleep(0.5)
+            self._routine_collect_receive_rewards()
+            self.auto.press_key('esc')
+            time.sleep(0.5)
+            return True, True
+
+        # 快速作战确认面板
+        if self.auto.find_element(["快速", "作战"], 'text', crop=(854 / 1920, 214 / 1080, 1054 / 1920, 286 / 1080),
+                                  is_log=self.is_log):
+            time.sleep(0.2)
+            self.auto.click_element_with_pos((int(1289 / self.auto.scale_x), int(732 / self.auto.scale_y)))
+            time.sleep(0.2)
+            self.auto.click_element_with_pos((int(980 / self.auto.scale_x), int(851 / self.auto.scale_y)))
+            time.sleep(0.5)
+            return True, False
+
+        # 发起速战
+        if self.auto.click_element('速战', 'text', crop=(1368 / 1920, 963 / 1080, 1592 / 1920, 1),
+                                   is_log=self.is_log):
+            time.sleep(0.8)
+            return True, False
+
+        # 战斗完成，收奖励后结束
+        if self.auto.click_element('完成', 'text', crop=(880 / 1920, 968 / 1080, 1033 / 1920, 1024 / 1080),
+                                   is_log=self.is_log):
+            time.sleep(0.4)
+            self._routine_collect_receive_rewards()
+            return True, True
+
+        # 干扰弹窗
+        if self.auto.click_element('等级提升', 'text', crop=(824 / 1920, 0, 1089 / 1920, 129 / 1080),
+                                   is_log=self.is_log):
+            return True, False
+
+        return False, False
