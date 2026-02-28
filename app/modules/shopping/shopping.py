@@ -114,10 +114,8 @@ class ShoppingModule:
         while True:
             self.auto.take_screenshot()
 
-            if self.auto.find_element("常规物资", "text", crop=(89 / 1920, 140 / 1080, 220 / 1920, 191 / 1080),
-                                      is_log=self.is_log):
-                self.auto.click_element("常规物资", "text", crop=(89 / 1920, 140 / 1080, 220 / 1920, 191 / 1080),
-                                        is_log=self.is_log)
+            if self.auto.click_element("常规", "text", crop=(89 / 1920, 140 / 1080, 220 / 1920, 191 / 1080),
+                                        is_log=self.is_log):
                 time.sleep(0.5)
                 break
             if self.auto.click_element("商店", "text", crop=(1759 / 1920, 1002 / 1080, 1843 / 1920, 1050 / 1080),

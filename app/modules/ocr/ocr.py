@@ -17,6 +17,33 @@ class OCR:
         self.replacements = replacements
         self._last_error_message = None
         self._last_error_time = 0.0
+        self._last_input_scale = (1.0, 1.0)
+
+    @staticmethod
+    def _enhance_low_res_text(image):
+        """低分辨率文本增强：轻度锐化，尽量不破坏颜色特征。"""
+        blur = cv2.GaussianBlur(image, (0, 0), 1.0)
+        return cv2.addWeighted(image, 1.35, blur, -0.35, 0)
+
+    def _prepare_ocr_image(self, image, is_log=False):
+        """对低分辨率图像做自适应放大和增强，并返回缩放信息用于坐标回映射。"""
+        h, w = image.shape[:2]
+        target_w, target_h = 1600, 900
+        scale = max(target_w / max(w, 1), target_h / max(h, 1), 1.0)
+
+        # 限制放大倍率，避免极小图像过度插值导致伪影与性能抖动
+        scale = min(scale, 2.2)
+
+        if scale > 1.0:
+            new_w = max(1, int(round(w * scale)))
+            new_h = max(1, int(round(h * scale)))
+            image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
+            image = self._enhance_low_res_text(image)
+            if is_log:
+                self.logger.debug(f"OCR低分辨率增强：{w}x{h} -> {new_w}x{new_h} (x{scale:.2f})")
+            return image, (scale, scale)
+
+        return image, (1.0, 1.0)
 
     def run(self, image, extract: list = None, is_log=False):
         self.instance_ocr()
@@ -39,6 +66,7 @@ class OCR:
                 letter = extract[0]
                 threshold = extract[1]
                 image = ImageUtils.extract_letters(image, letter, threshold)
+            image, self._last_input_scale = self._prepare_ocr_image(image, is_log=is_log)
             # ImageUtils.show_ndarray(image)
             # 调用 easyocr 进行 OCR
             original_result = self.ocr.ocr(image)[0]
@@ -72,11 +100,17 @@ class OCR:
             conf = item[1][1]  # 识别置信度
             box = item[0]  # 识别框的坐标
 
+            scale_x, scale_y = self._last_input_scale
+            if scale_x <= 0:
+                scale_x = 1.0
+            if scale_y <= 0:
+                scale_y = 1.0
+
             # 获取坐标
-            left = box[0][0]
-            top = box[0][1]
-            right = box[2][0]
-            bottom = box[2][1]
+            left = box[0][0] / scale_x
+            top = box[0][1] / scale_y
+            right = box[2][0] / scale_x
+            bottom = box[2][1] / scale_y
 
             # 进行错误文本替换
             for old_text, new_text in self.replacements['direct'].items():
