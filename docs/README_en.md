@@ -25,16 +25,17 @@
 
 > [!Tip]
 > **Update**
-> 1. Added Traditional Chinese support.
-> 2. Fixed the issue where Steam could not log in automatically.
-> 3. Added support for farming operation logistics when using stamina.
-> 4. Optimized memory chip usage logic and auto-applies by selected character count.
-> 5. Added Star Exploration Pal Capture.
-> 6. Improved background stability: better fault tolerance and quieter background operations.
-> 7. Optimized shop purchase flow: fewer accidental clicks and more stable scrolling.
-> 8. Fixed stamina potion day matching errors (e.g., 1/3 no longer mismatches to 11/13).
-> 9. The UI now mostly supports English in core areas (Display/Home/Additional features).
-> 10. More features to be updated...
+> 1. Renamed the project to SaaAutomataAcacia and optimized the loading animation.
+> 2. Added Traditional Chinese support.
+> 3. Fixed the issue where Steam could not log in automatically.
+> 4. Added support for farming operation logistics when using stamina.
+> 5. Optimized memory chip usage logic and auto-applies by selected character count.
+> 6. Added Star Exploration Pal Capture.
+> 7. Improved background stability: better fault tolerance and quieter background operations.
+> 8. Optimized shop purchase flow: fewer accidental clicks and more stable scrolling.
+> 9. Fixed stamina potion day matching errors (e.g., 1/3 no longer mismatches to 11/13).
+> 10. The UI now mostly supports English in core areas (Display/Home/Additional features).
+> 11. More features to be updated...
 
 > [!Warning]
 >
