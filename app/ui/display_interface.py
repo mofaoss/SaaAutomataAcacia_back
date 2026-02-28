@@ -153,6 +153,7 @@ class DisplayInterface(ScrollArea):
         self.banner = BannerWidget(self)
         self.view = QWidget(self)
         self.vBoxLayout = QVBoxLayout(self.view)
+        self.windowTrackingQuickSwitchCard = None
         self.gameLanguageNoticeCard = CardWidget(self.view)
         self.gameLanguageNoticeLayout = QVBoxLayout(self.gameLanguageNoticeCard)
         self.gameLanguageNoticeTitle = QLabel("Language Notice", self.gameLanguageNoticeCard)
@@ -194,6 +195,17 @@ class DisplayInterface(ScrollArea):
         self.vBoxLayout.addWidget(self.gameLanguageNoticeCard)
         self.vBoxLayout.setAlignment(Qt.AlignTop)
 
+    def _ui_text(self, zh_text: str, en_text: str) -> str:
+        return en_text if self._is_non_chinese_ui else self.tr(zh_text)
+
+    def _sync_window_tracking_quick_switch(self):
+        if self.windowTrackingQuickSwitchCard is not None:
+            self.windowTrackingQuickSwitchCard.setChecked(bool(config.windowTrackingInput.value), emit=False)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        self._sync_window_tracking_quick_switch()
+
     def loadSamples(self):
         """load samples"""
 
@@ -221,11 +233,12 @@ class DisplayInterface(ScrollArea):
             routeKey="Help-Interface",
             index=0,
         )
-        quick_jump.addSampleCard_URL(
+        self.windowTrackingQuickSwitchCard = quick_jump.addSampleCard_Switch(
             icon=os.path.join(self.basedir, "electronics.svg"),
-            title="Background Mode" if self._is_non_chinese_ui else "实现后台操作",
-            content="Let the game run without fighting for mouse/keyboard" if self._is_non_chinese_ui else self.tr("让电脑不再跟你抢键鼠"),
-            url="https://www.bilibili.com/read/cv24286313/",
+            title="Background Mode" if self._is_non_chinese_ui else "后台不抢鼠标",
+            content="Window-tracking mouse; turn OFF if it feels uncomfortable" if self._is_non_chinese_ui else self.tr("窗口追踪鼠标；如不适应可关闭"),
+            checked=bool(config.windowTrackingInput.value),
+            on_toggle=lambda checked: config.set(config.windowTrackingInput, checked),
         )
-
+        self._sync_window_tracking_quick_switch()
         self.vBoxLayout.addWidget(quick_jump)

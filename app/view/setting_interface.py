@@ -161,6 +161,14 @@ class SettingInterface(ScrollArea):
             configItem=config.showScreenshot,
             parent=self.aboutSoftwareGroup
         )
+        self.windowTrackingInputCard = SwitchSettingCard(
+            FIF.MOVE,
+            self._ui_text('后台不抢鼠标', 'Don\'t take mouse control'),
+            self._ui_text('开启后后台点击和滚轮尽量不影响你当前鼠标操作',
+                          'Enable background input that minimizes interference with your current mouse actions'),
+            configItem=config.windowTrackingInput,
+            parent=self.aboutSoftwareGroup
+        )
         self.saveScaleCacheCard = SwitchSettingCard(
             FIF.SAVE,
             self._ui_text('保存缩放比例数据', 'Save scaling cache'),
@@ -260,6 +268,7 @@ class SettingInterface(ScrollArea):
         self.personalGroup.addSettingCard(self.zoomCard)
         self.personalGroup.addSettingCard(self.languageCard)
 
+        self.aboutSoftwareGroup.addSettingCard(self.windowTrackingInputCard)
         self.aboutSoftwareGroup.addSettingCard(self.updateOnStartUpCard)
         self.aboutSoftwareGroup.addSettingCard(self.serverCard)
         self.aboutSoftwareGroup.addSettingCard(self.gameLanguageCard)

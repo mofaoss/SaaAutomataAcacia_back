@@ -8,7 +8,9 @@ import win32api
 import win32con
 import win32gui  # 不能删
 
+from app.common.config import config
 from app.common.logger import logger
+from app.modules.automation.window_tracker import WindowTracker
 
 
 # from pynput import mouse
@@ -102,8 +104,21 @@ class Input:
             "x2": 0x0002<<16,  # 侧键前进按钮
         }
         self._mouse_action_lock = threading.Lock()
+        self.window_tracker = WindowTracker(self.hwnd, self.logger)
         # 排除缩放干扰
         ctypes.windll.user32.SetProcessDPIAware()
+
+    @property
+    def _window_tracking_enabled(self):
+        return bool(config.windowTrackingInput.value)
+
+    def _sync_tracker_hwnd(self):
+        if self.window_tracker.hwnd != self.hwnd:
+            self.window_tracker.update_hwnd(self.hwnd)
+
+    def restore_window_position(self):
+        self._sync_tracker_hwnd()
+        self.window_tracker.restore_window_position()
 
     def get_virtual_keycode(self, key: str):
         """根据按键名获取虚拟按键码
@@ -126,23 +141,30 @@ class Input:
     def _client_to_screen(self, x: int, y: int):
         return win32gui.ClientToScreen(self.hwnd, (x, y))
 
-    def mouse_down(self, x: int, y: int, mouse_key: str = 'left'):
-        """鼠标按下，可以指定按键, 默认左键"""
+    def _send_mouse_button(self, x: int, y: int, mouse_key: str, is_down: bool, sync: bool = False):
         wparam = 0
         if mouse_key in ["x1", "x2"]:
             wparam = self.MwParam[mouse_key]
         lparam = y << 16 | x
-        message = self.WmCode[f"{mouse_key}_down"]
-        win32gui.PostMessage(self.hwnd, message, wparam, lparam)
+        suffix = "down" if is_down else "up"
+        message = self.WmCode[f"{mouse_key}_{suffix}"]
+        if sync:
+            win32gui.SendMessage(self.hwnd, message, wparam, lparam)
+        else:
+            win32gui.PostMessage(self.hwnd, message, wparam, lparam)
+
+    def _tracking_alignment_error(self, x: int, y: int):
+        target = self._client_to_screen(x, y)
+        cursor = win32api.GetCursorPos()
+        return abs(cursor[0] - target[0]), abs(cursor[1] - target[1])
+
+    def mouse_down(self, x: int, y: int, mouse_key: str = 'left'):
+        """鼠标按下，可以指定按键, 默认左键"""
+        self._send_mouse_button(x, y, mouse_key, is_down=True, sync=False)
 
     def mouse_up(self, x: int, y: int, mouse_key: str = 'left'):
         """鼠标抬起，可以指定按键, 默认左键"""
-        wparam = 0
-        if mouse_key in ["x1", "x2"]:
-            wparam = self.MwParam[mouse_key]
-        lparam = y << 16 | x
-        message = self.WmCode[f"{mouse_key}_up"]
-        win32gui.PostMessage(self.hwnd, message, wparam, lparam)
+        self._send_mouse_button(x, y, mouse_key, is_down=False, sync=False)
 
     # 检测鼠标是否有活动
     @staticmethod
@@ -187,54 +209,101 @@ class Input:
             return
 
         try:
+            self._sync_tracker_hwnd()
+            if not self._window_tracking_enabled:
+                self.window_tracker.restore_window_position()
+
             while time.time() - start_time < time_out:
-                # 稳定空闲判定：连续一小段时间不移动才执行，减少与用户抢鼠标
-                idle_start = None
-                sample_last = win32api.GetCursorPos()
-                while time.time() - start_time < time_out:
-                    time.sleep(0.02)
-                    sample_now = win32api.GetCursorPos()
-                    moved = abs(sample_now[0] - sample_last[0]) > 1 or abs(sample_now[1] - sample_last[1]) > 1
-                    if moved:
-                        idle_start = None
-                    else:
-                        if idle_start is None:
-                            idle_start = time.time()
-                        elif time.time() - idle_start >= 0.08:
-                            break
-                    sample_last = sample_now
+                if not self._window_tracking_enabled:
+                    # 旧模式：稳定空闲判定，减少与用户抢鼠标
+                    idle_start = None
+                    sample_last = win32api.GetCursorPos()
+                    while time.time() - start_time < time_out:
+                        time.sleep(0.02)
+                        sample_now = win32api.GetCursorPos()
+                        moved = abs(sample_now[0] - sample_last[0]) > 1 or abs(sample_now[1] - sample_last[1]) > 1
+                        if moved:
+                            idle_start = None
+                        else:
+                            if idle_start is None:
+                                idle_start = time.time()
+                            elif time.time() - idle_start >= 0.08:
+                                break
+                        sample_last = sample_now
 
                 if time.time() - start_time >= time_out:
                     break
 
-                current_pos = win32api.GetCursorPos()
+                current_pos = None
+                target_screen_pos = None
                 try:
                     self.activate()
-                    target_screen_pos = self._client_to_screen(x, y)
-                    win32api.SetCursorPos(target_screen_pos)
-                    if win32api.GetCursorPos() != target_screen_pos:
-                        time.sleep(0.01)
-                        win32api.SetCursorPos(target_screen_pos)
+                    if self._window_tracking_enabled:
+                        click_done = False
+                        max_attempts = 3
+                        for _ in range(max_attempts):
+                            if time.time() - start_time >= time_out:
+                                break
 
-                    lparam = y << 16 | x
-                    win32gui.PostMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
+                            aligned = False
+                            for _ in range(4):
+                                if self.window_tracker.align_target_to_cursor(x, y):
+                                    aligned = True
+                                    break
+                                time.sleep(0.001)
 
-                    # 点击过程中若被抢鼠标，做一次轻量校正，保证有效性
-                    self.mouse_down(x, y, mouse_key)
-                    time.sleep(press_time)
-                    cur = win32api.GetCursorPos()
-                    if abs(cur[0] - target_screen_pos[0]) > 3 or abs(cur[1] - target_screen_pos[1]) > 3:
+                            if not aligned:
+                                continue
+
+                            dx, dy = self._tracking_alignment_error(x, y)
+                            if dx > 2 or dy > 2:
+                                self.window_tracker.align_target_to_cursor(x, y)
+
+                            lparam = y << 16 | x
+                            win32gui.SendMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
+                            self._send_mouse_button(x, y, mouse_key, is_down=True, sync=True)
+                            time.sleep(max(0.01, press_time))
+                            self._send_mouse_button(x, y, mouse_key, is_down=False, sync=True)
+
+                            # 点击后快速复检对齐状态；若漂移太大则重试一次
+                            dx_after, dy_after = self._tracking_alignment_error(x, y)
+                            if dx_after <= 4 and dy_after <= 4:
+                                click_done = True
+                                break
+
+                        if click_done:
+                            self.logger.debug(f"窗口追踪点击完成({x}, {y})")
+                            return
+                        time.sleep(0.003)
+                        continue
+                    else:
+                        target_screen_pos = self._client_to_screen(x, y)
+                        current_pos = win32api.GetCursorPos()
                         win32api.SetCursorPos(target_screen_pos)
-                    self.mouse_up(x, y, mouse_key)
+                        if win32api.GetCursorPos() != target_screen_pos:
+                            time.sleep(0.01)
+                            win32api.SetCursorPos(target_screen_pos)
+
+                        lparam = y << 16 | x
+                        win32gui.PostMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
+
+                        # 点击过程中若被抢鼠标，做一次轻量校正，保证有效性
+                        self.mouse_down(x, y, mouse_key)
+                        time.sleep(press_time)
+                        cur = win32api.GetCursorPos()
+                        if abs(cur[0] - target_screen_pos[0]) > 3 or abs(cur[1] - target_screen_pos[1]) > 3:
+                            win32api.SetCursorPos(target_screen_pos)
+                        self.mouse_up(x, y, mouse_key)
 
                     time.sleep(0.02)
                     self.logger.debug(f"鼠标移动后点击({x}, {y})")
                     return
                 finally:
-                    try:
-                        win32api.SetCursorPos(current_pos)
-                    except Exception:
-                        pass
+                    if current_pos is not None:
+                        try:
+                            win32api.SetCursorPos(current_pos)
+                        except Exception:
+                            pass
 
             if time.time() - start_time > time_out:
                 raise RuntimeError("等待点击超时")
@@ -277,6 +346,84 @@ class Input:
         """鼠标移动到（x,y）后松开key键,默认左键"""
         pass
 
+    def _send_scroll_tracking(self, x: int, y: int, delta: int, time_out: float, start_time: float) -> bool:
+        if delta == 0:
+            return True
+
+        lparam = y << 16 | x
+        direction = 1 if delta > 0 else -1
+        abs_delta = abs(int(delta))
+        notch_count = abs_delta // 120
+        remainder = abs_delta % 120
+
+        # 保持每次滚轮消息为标准 120 单位，按批次执行以兼顾稳定与速度
+        batch_notches = 16
+        total_batches = (notch_count + batch_notches - 1) // batch_notches if notch_count > 0 else 0
+        if remainder > 0:
+            total_batches += 1
+
+        min_timeout = min(60.0, 1.2 + total_batches * 0.12)
+        effective_timeout = max(time_out, min_timeout)
+
+        finished_batches = 0
+        sent_notches = 0
+
+        while sent_notches < notch_count:
+            if time.time() - start_time >= effective_timeout:
+                self.logger.warning(
+                    f"窗口追踪滚轮超时，放弃本次滚轮输入: ({x}, {y}, {delta}), "
+                    f"batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s"
+                )
+                return False
+
+            aligned = False
+            for _ in range(5):
+                if self.window_tracker.align_target_to_cursor(x, y):
+                    aligned = True
+                    break
+                time.sleep(0.001)
+
+            if not aligned:
+                self.logger.warning(f"窗口追踪滚轮对齐失败，放弃本次滚轮输入: ({x}, {y}, {delta})")
+                return False
+
+            self.activate()
+            win32gui.SendMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
+            current_batch = min(batch_notches, notch_count - sent_notches)
+            for _ in range(current_batch):
+                wparam_step = (direction * 120) << 16
+                win32gui.SendMessage(self.hwnd, self.WmCode['mouse_wheel'], wparam_step, lparam)
+
+            sent_notches += current_batch
+            finished_batches += 1
+            time.sleep(0.0015)
+
+        if remainder > 0:
+            if time.time() - start_time >= effective_timeout:
+                self.logger.warning(
+                    f"窗口追踪滚轮超时(尾量)，放弃本次滚轮输入: ({x}, {y}, {delta}), "
+                    f"batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s"
+                )
+                return False
+
+            aligned = False
+            for _ in range(5):
+                if self.window_tracker.align_target_to_cursor(x, y):
+                    aligned = True
+                    break
+                time.sleep(0.001)
+
+            if not aligned:
+                self.logger.warning(f"窗口追踪滚轮尾量对齐失败，放弃本次滚轮输入: ({x}, {y}, {delta})")
+                return False
+
+            self.activate()
+            win32gui.SendMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
+            win32gui.SendMessage(self.hwnd, self.WmCode['mouse_wheel'], (direction * remainder) << 16, lparam)
+
+        self.logger.debug(f"窗口追踪模式滚动完成 ({x},{y}) delta={delta}")
+        return True
+
     def mouse_scroll(self, x: int, y: int, delta: int = 120, time_out: float = 10.):
         """
         假后台：在坐标(x, y)滚动鼠标滚轮一次
@@ -298,17 +445,31 @@ class Input:
         last_position = win32api.GetCursorPos()  # 获取初始鼠标位置
         start_time = time.time()
         try:
+            self._sync_tracker_hwnd()
+            if not self._window_tracking_enabled:
+                self.window_tracker.restore_window_position()
+            else:
+                return self._send_scroll_tracking(x, y, delta, time_out, start_time)
+
             while time.time() - start_time < time_out:
                 if not self.is_mouse_in_use(last_position):
-                    current_pos = win32api.GetCursorPos()
+                    current_pos = None
                     try:
+                        if self._window_tracking_enabled and not self.window_tracker.align_target_to_cursor(x, y):
+                            time.sleep(0.02)
+                            continue
+
                         self.activate()
-                        target_screen_pos = self._client_to_screen(x, y)
-                        win32api.SetCursorPos(target_screen_pos)
-                        # 极少数情况下 SetCursorPos 会被系统或用户输入打断，补一次快速校正
-                        if win32api.GetCursorPos() != target_screen_pos:
-                            time.sleep(0.01)
+                        if not self._window_tracking_enabled:
+                            current_pos = win32api.GetCursorPos()
+                            target_screen_pos = self._client_to_screen(x, y)
                             win32api.SetCursorPos(target_screen_pos)
+                            # 极少数情况下 SetCursorPos 会被系统或用户输入打断，补一次快速校正
+                            if win32api.GetCursorPos() != target_screen_pos:
+                                time.sleep(0.01)
+                                win32api.SetCursorPos(target_screen_pos)
+                        else:
+                            current_pos = None
 
                         # 先发送一次 move，提升滚轮消息命中目标窗口的稳定性
                         win32gui.PostMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
@@ -323,10 +484,11 @@ class Input:
                         return True
                     finally:
                         # 无论成功失败都尽力恢复用户鼠标位置，避免留下“抢鼠标”体感
-                        try:
-                            win32api.SetCursorPos(current_pos)
-                        except Exception:
-                            pass
+                        if current_pos is not None:
+                            try:
+                                win32api.SetCursorPos(current_pos)
+                            except Exception:
+                                pass
                 last_position = win32api.GetCursorPos()
                 time.sleep(0.02)
 

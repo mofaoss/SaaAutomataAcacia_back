@@ -31,6 +31,11 @@ class SubTask(QThread, BaseTask):
                 # 停止时清除ocr缓存
                 ocr.stop_ocr()
                 self.logger.warn(f"SubTask：{e}")
+            finally:
+                try:
+                    self.auto.stop()
+                except Exception as stop_error:
+                    self.logger.warn(f"SubTask结束时恢复窗口位置失败：{stop_error}")
             self.is_running.emit(False)
         else:
             # 传输信号关闭开关
