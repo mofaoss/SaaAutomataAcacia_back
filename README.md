@@ -2,7 +2,7 @@
     <h1>
         <img src="./asset/logo_head.png" width="200"/>
         <br/>
-        自律型安卡希雅
+        安卡希雅·自律型
     </h1>
     <h2>SaaAutomataAcacia</h2>
 <br/>
