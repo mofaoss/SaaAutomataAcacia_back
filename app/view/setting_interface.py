@@ -163,9 +163,9 @@ class SettingInterface(ScrollArea):
         )
         self.windowTrackingInputCard = SwitchSettingCard(
             FIF.MOVE,
-            self._ui_text('开启窗口追踪鼠标输入', 'Enable window-tracking mouse input'),
-            self._ui_text('开启后 move_click/滚轮会通过移动游戏窗口追踪当前鼠标，减少抢鼠标；任务完成或强制停止后自动归位窗口',
-                          'When enabled, move_click/scroll follows current cursor by moving game window to reduce mouse stealing; window is restored after task completion or forced stop'),
+            self._ui_text('后台不抢鼠标', 'Don\'t take mouse control'),
+            self._ui_text('开启后后台点击和滚轮尽量不影响你当前鼠标操作',
+                          'Enable background input that minimizes interference with your current mouse actions'),
             configItem=config.windowTrackingInput,
             parent=self.aboutSoftwareGroup
         )
@@ -268,12 +268,12 @@ class SettingInterface(ScrollArea):
         self.personalGroup.addSettingCard(self.zoomCard)
         self.personalGroup.addSettingCard(self.languageCard)
 
+        self.aboutSoftwareGroup.addSettingCard(self.windowTrackingInputCard)
         self.aboutSoftwareGroup.addSettingCard(self.updateOnStartUpCard)
         self.aboutSoftwareGroup.addSettingCard(self.serverCard)
         self.aboutSoftwareGroup.addSettingCard(self.gameLanguageCard)
         self.aboutSoftwareGroup.addSettingCard(self.isLogCard)
         self.aboutSoftwareGroup.addSettingCard(self.showScreenshotCard)
-        self.aboutSoftwareGroup.addSettingCard(self.windowTrackingInputCard)
         self.aboutSoftwareGroup.addSettingCard(self.saveScaleCacheCard)
         self.aboutSoftwareGroup.addSettingCard(self.autoScaling)
         self.aboutSoftwareGroup.addSettingCard(self.autoStartTask)
