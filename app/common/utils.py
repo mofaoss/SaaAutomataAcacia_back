@@ -1,6 +1,10 @@
 import os
 import re
+import subprocess
+import threading
+import time
 from pathlib import Path
+from typing import Dict, Any, Optional
 
 import cpufeature
 import cv2
@@ -13,6 +17,11 @@ from bs4 import BeautifulSoup
 from requests import Timeout, RequestException
 
 from app.common.config import config
+
+
+_launch_lock = threading.Lock()
+_last_game_process = None
+_last_launch_ts = 0.0
 
 
 def random_normal_distribution_int(a, b, n=15):
@@ -401,6 +410,76 @@ def get_start_arguments(start_path, start_model, exe_path: str = None):
         ]
 
     return arg
+
+
+def launch_game_with_guard(start_path: Optional[str] = None,
+                           game_channel: Optional[int] = None,
+                           logger=None,
+                           cooldown_seconds: int = 15) -> Dict[str, Any]:
+    """统一游戏启动入口：包含重复启动保护与冷却防抖。"""
+    global _last_game_process
+    global _last_launch_ts
+
+    if start_path is None:
+        start_path = config.LineEdit_game_directory.value
+    if game_channel is None:
+        game_channel = config.server_interface.value
+
+    start_path = os.path.normpath(str(start_path or ""))
+    if not start_path or start_path == "./":
+        return {"ok": False, "error": "game directory is empty"}
+
+    with _launch_lock:
+        if _last_game_process is not None and _last_game_process.poll() is None:
+            if logger:
+                logger.info("检测到已由程序启动的游戏进程仍在运行，跳过重复启动")
+            return {
+                "ok": True,
+                "already_running": True,
+                "message": "game process already running",
+                "pid": _last_game_process.pid,
+                "process": _last_game_process,
+            }
+
+        now = time.time()
+        if cooldown_seconds > 0 and now - _last_launch_ts < cooldown_seconds:
+            remain = round(cooldown_seconds - (now - _last_launch_ts), 1)
+            return {
+                "ok": False,
+                "error": f"launch cooldown in effect, retry after {remain}s",
+            }
+
+        if is_exist_snowbreak():
+            if logger:
+                logger.info("游戏窗口已存在")
+            return {"ok": True, "already_running": True, "message": "game window already exists", "process": None}
+
+        exe_path = resolve_game_exe(start_path)
+        if not exe_path or not os.path.exists(exe_path):
+            if logger:
+                logger.error(f"未找到游戏主程序 Game.exe，请检查路径: {start_path}")
+            return {"ok": False, "error": f"game exe not found under: {start_path}"}
+
+        launch_args = get_start_arguments(start_path, game_channel, exe_path=exe_path)
+        if launch_args is None:
+            if logger:
+                logger.error(f"游戏启动失败未找到对应参数，start_path：{start_path}，game_channel:{game_channel}")
+            return {"ok": False, "error": "failed to resolve launch arguments"}
+
+        if logger:
+            logger.debug(f"正在启动 {exe_path} {launch_args}")
+
+        process = subprocess.Popen([exe_path] + launch_args)
+        _last_game_process = process
+        _last_launch_ts = time.time()
+        return {
+            "ok": True,
+            "already_running": False,
+            "pid": process.pid,
+            "exe_path": exe_path,
+            "args": launch_args,
+            "process": process,
+        }
 
 
 def resolve_game_exe(start_path: str) -> str:
