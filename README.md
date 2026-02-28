@@ -4,7 +4,7 @@
         <br/>
         尘白禁区自动化助手
     </h1>
-    <h2>Snowbreak Auto Assistant</h2>
+    <h2>SaaAutomataAcacia</h2>
 <br/>
 
 简体中文 | <a href="docs/README_en.md">English</a>
@@ -118,7 +118,7 @@
 
 ### 📌下载
 
-- [Github Release](https://github.com/mofaoss/SnowbreakAutoAssistant/releases)
+- [Github Release](https://github.com/mofaoss/SaaAutomataAcacia/releases)
 
 ## ❤️相关项目
 
@@ -132,4 +132,4 @@
 > [!Note]
 >
 > GPLv3 License
-[LICENSE](https://github.com/mofaoss/SnowbreakAutoAssistant/blob/main/LICENSE)
+[LICENSE](https://github.com/mofaoss/SaaAutomataAcacia/blob/main/LICENSE)

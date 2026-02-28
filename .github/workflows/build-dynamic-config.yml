@@ -1,4 +1,4 @@
-name: 创建 SAA Release
+name: 创建 SaaAutomataAcacia Release
 
 on:
   workflow_dispatch:
@@ -71,10 +71,10 @@ jobs:
             # 使用默认值
             defaults = {
                 'app_ver': '2.0.5-official',
-                'app_name': 'SAA',
-                'app_exec': 'SAA',
+              'app_name': 'SaaAutomataAcacia',
+              'app_exec': 'SaaAutomataAcacia',
                 'app_publisher': 'mofaoss',
-                'app_url': 'https://github.com/mofaoss/SnowbreakAutoAssistant',
+              'app_url': 'https://github.com/mofaoss/SaaAutomataAcacia',
                 'app_icon': 'app/resource/images/logo.ico'
             }
 
@@ -468,7 +468,7 @@ jobs:
           ### 🚀 使用方法
           1. 下载 Portable 便携版压缩包
           2. 解压到任意目录
-          3. 右键 `SAA.exe` "以管理员身份运行"
+          3. 右键 `${{ needs.get-config.outputs.app_exec }}.exe` "以管理员身份运行"
           4. 无需安装，可直接运行
 
           ### ⚙️ 构建信息

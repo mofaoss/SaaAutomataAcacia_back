@@ -1,7 +1,7 @@
 # 项目结构
 
 ```bash
-SnowbreakAutoAssistant/
+SaaAutomataAcacia/
 ├── 📁 AppData/                     # 一些需要存下来的数据目录
 │   ├── 📄 activity_date.json       # 展示在“提醒”上的活动起止时间
 │   ├── 📄 config.json              # 用户配置
@@ -69,13 +69,13 @@ SnowbreakAutoAssistant/
 │   │   ├── 📄 additional_features_interface.py       # .ui生成的对应.py文件
 │   │   ├── 📄 additional_features_interface.ui       # 可用qt designer手动编辑的文件
 │   │   ├── 📄 ...                                    # 其他gui对应的文件
-│   │   └── 📄 ...       
+│   │   └── 📄 ...
 │   │
 │   └── 📁 view/                                      # 继承调用ui/下的文件，实现页面响应逻辑
 │       ├── 📄 additional_features.py                 # .ui生成的对应.py文件
 │       ├── 📄 additional_features_interface.ui       # 可用qt designer手动编辑的文件
 │       ├── 📄 ...                                    # 其他gui对应的文件
-│       └── 📄 ... 
+│       └── 📄 ...
 │
 ├── 📁 asset/                   # github上README以及saa内需要展示的资源图
 │

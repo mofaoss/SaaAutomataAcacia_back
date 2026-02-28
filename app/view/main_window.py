@@ -88,6 +88,24 @@ class MainWindow(MSFluentWindow):
         ]
         QTimer.singleShot(0, self._run_next_init_task)
 
+    def _to_traditional_if_needed(self, text):
+        if not isinstance(text, str) or not is_traditional_ui_language():
+            return text
+        try:
+            from ..common.ui_localizer import _to_traditional
+            return _to_traditional(text)
+        except Exception:
+            return text
+
+    def _localize_widget_if_needed(self, widget):
+        if widget is None or not is_traditional_ui_language():
+            return
+        try:
+            from ..common.ui_localizer import localize_widget_tree_for_traditional
+            localize_widget_tree_for_traditional(widget)
+        except Exception:
+            pass
+
     def _build_initial_init_tasks(self):
         task_map = {
             0: self._create_display_interface,
@@ -114,35 +132,42 @@ class MainWindow(MSFluentWindow):
     def _create_display_interface(self):
         from ..ui.display_interface import DisplayInterface
         self.displayInterface = DisplayInterface(self)
+        self._localize_widget_if_needed(self.displayInterface)
 
     def _create_home_interface(self):
         from .home import Home
         self.homeInterface = Home('Home Interface', self)
+        self._localize_widget_if_needed(self.homeInterface)
 
     def _create_additional_interface(self):
         from .additional_features import Additional
         self.additionalInterface = Additional('Additional Interface', self)
+        self._localize_widget_if_needed(self.additionalInterface)
 
     def _create_trigger_interface(self):
         from .trigger import Trigger
         self.triggerInterface = Trigger('Trigger Interface', self)
+        self._localize_widget_if_needed(self.triggerInterface)
 
     def _create_help_interface(self):
         from .help import Help
         self.helpInterface = Help('Help Interface', self)
+        self._localize_widget_if_needed(self.helpInterface)
 
     def _create_table_interface(self):
         from .ocr_replacement_table import OcrReplacementTable
         self.tableInterface = OcrReplacementTable('Table Interface', self)
+        self._localize_widget_if_needed(self.tableInterface)
 
     def _create_setting_interface(self):
         from .setting_interface import SettingInterface
         self.settingInterface = SettingInterface(self)
+        self._localize_widget_if_needed(self.settingInterface)
 
     def _create_support_button(self):
         self.support_button = NavigationBarPushButton(
             FIF.HEART,
-            self._ui_text('赞赏', 'Support'),
+            self._to_traditional_if_needed(self._ui_text('赞赏', 'Support')),
             isSelectable=False
         )
 
@@ -180,7 +205,8 @@ class MainWindow(MSFluentWindow):
     def _register_nav_item(self, key, interface, *args, **kwargs):
         if interface is None or self._nav_registered.get(key, False):
             return
-        self.addSubInterface(interface, *args, **kwargs)
+        transformed_args = tuple(self._to_traditional_if_needed(arg) if isinstance(arg, str) else arg for arg in args)
+        self.addSubInterface(interface, *transformed_args, **kwargs)
         self._nav_registered[key] = True
 
     def _create_display_and_add_nav(self):
@@ -342,8 +368,10 @@ class MainWindow(MSFluentWindow):
     def initWindow(self):
         self.resize(960, 860)
         self.setMinimumWidth(760)
-        self.setWindowIcon(QIcon(':app/resource/images/logo.png'))
-        self.setWindowTitle(self._ui_text('SAA尘白助手', 'SAA Snowbreak Assistant'))
+        base_dir = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parents[2]))
+        head_icon_path = base_dir / 'app/resource/images/logo_head.png'
+        self.setWindowIcon(QIcon(str(head_icon_path)))
+        self.setWindowTitle(self._ui_text('自律型安卡希雅', 'SaaAutomataAcacia'))
 
         setThemeColor("#009FAA")
 

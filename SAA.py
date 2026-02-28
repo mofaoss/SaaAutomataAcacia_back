@@ -1,46 +1,218 @@
 # coding:utf-8
 import os
 import sys
-import time
+from pathlib import Path
 
-from win11toast import toast
-
-from PyQt5.QtCore import Qt, QTranslator
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QApplication
-from qfluentwidgets import FluentTranslator
+from PyQt5.QtCore import Qt, QTranslator, QSize, QObject, QThread, QTimer, pyqtSignal
+from PyQt5.QtGui import QMovie, QPixmap
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
 
 from app.common.config import config, resolve_configured_locale
-from app.common.ui_localizer import patch_infobar_for_traditional, localize_widget_tree_for_traditional
-from app.view.main_window import MainWindow
 
-# enable dpi scale
-if config.get(config.dpiScale) != "Auto":
-    os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "0"
-    os.environ["QT_SCALE_FACTOR"] = str(config.get(config.dpiScale))
-else:
-    QApplication.setHighDpiScaleFactorRoundingPolicy(
-        Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
-    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
 
-# create application
-app = QApplication(sys.argv)
-app.setAttribute(Qt.AA_DontCreateNativeWidgetSiblings)
+class EarlySplash(QWidget):
+    MAX_ANIMATION_SIZE = 220
 
-# internationalization
-locale = resolve_configured_locale(config.get(config.language))
-translator = FluentTranslator(locale)
-galleryTranslator = QTranslator()
-galleryTranslator.load(locale, "app", ".", ":/app/resource/i18n")
+    def __init__(self):
+        super().__init__(None, Qt.FramelessWindowHint | Qt.SplashScreen | Qt.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.setAttribute(Qt.WA_AlwaysStackOnTop, True)
+        self.setAttribute(Qt.WA_ShowWithoutActivating, True)
 
-app.installTranslator(translator)
-app.installTranslator(galleryTranslator)
+        self.movie = None
+        self.label = QLabel(self)
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setAttribute(Qt.WA_TranslucentBackground, True)
 
-patch_infobar_for_traditional()
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.label)
 
-# create main window
-w = MainWindow()
-localize_widget_tree_for_traditional(w)
-w.show()
+        self.resize(220, 220)
+        self._setup_media()
 
-app.exec()
+    @staticmethod
+    def _fit_size(size: QSize, max_edge: int) -> QSize:
+        if size.width() <= 0 or size.height() <= 0:
+            return QSize(max_edge, max_edge)
+
+        if size.width() >= size.height():
+            w = max_edge
+            h = max(1, int(size.height() * max_edge / size.width()))
+        else:
+            h = max_edge
+            w = max(1, int(size.width() * max_edge / size.height()))
+        return QSize(w, h)
+
+    def _setup_media(self):
+        base_dir = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parent))
+        gif_candidates = [
+            base_dir / 'app/resource/images/logo_loading.gif',
+            base_dir / 'app/resource/images/loading.gif',
+            Path('app/resource/images/logo_loading.gif'),
+            Path('app/resource/images/loading.gif'),
+        ]
+
+        gif_path = next((str(path) for path in gif_candidates if path.exists()), None)
+        if gif_path:
+            movie = QMovie(gif_path)
+            if movie.isValid():
+                movie.setCacheMode(QMovie.CacheNone)
+                first_frame = movie.currentPixmap()
+                if not first_frame.isNull():
+                    display_size = self._fit_size(first_frame.size(), self.MAX_ANIMATION_SIZE)
+                    movie.setScaledSize(display_size)
+                    self.resize(display_size)
+                    self.label.setFixedSize(display_size)
+                else:
+                    fallback_size = QSize(self.MAX_ANIMATION_SIZE, self.MAX_ANIMATION_SIZE)
+                    movie.setScaledSize(fallback_size)
+                    self.label.setFixedSize(fallback_size)
+                self.movie = movie
+                self.label.setMovie(self.movie)
+                self.movie.start()
+                return
+
+        logo_candidates = [
+            base_dir / 'app/resource/images/logo.png',
+            Path('app/resource/images/logo.png'),
+        ]
+        logo_path = next((str(path) for path in logo_candidates if path.exists()), None)
+        if logo_path:
+            pixmap = QPixmap(logo_path)
+            display = pixmap.scaled(180, 180, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.label.setPixmap(display)
+            self.resize(display.size())
+            self.label.setFixedSize(display.size())
+
+    def show_centered(self, app: QApplication):
+        screen = app.primaryScreen().availableGeometry()
+        self.move(
+            screen.center().x() - self.width() // 2,
+            screen.center().y() - self.height() // 2,
+        )
+        self.show()
+        self.raise_()
+        app.processEvents()
+
+    def close_with_cleanup(self):
+        if self.movie is not None:
+            self.movie.stop()
+            self.movie = None
+        self.close()
+
+
+class StartupController(QObject):
+    def __init__(self, app: QApplication, splash: EarlySplash):
+        super().__init__()
+        self.app = app
+        self.splash = splash
+        self.window = None
+        self.translator = None
+        self.galleryTranslator = None
+        self.importWorker = None
+
+        self._tasks = [
+            self._install_translators,
+            self._patch_localization,
+            self._create_main_window,
+            self._show_main_window,
+            self._finish,
+        ]
+
+    def start(self):
+        self.importWorker = RuntimeImportWorker()
+        self.importWorker.ready.connect(self._on_import_ready)
+        self.importWorker.failed.connect(self._on_import_failed)
+        self.importWorker.start()
+
+    def _run_next_task(self):
+        if not self._tasks:
+            return
+
+        task = self._tasks.pop(0)
+        try:
+            task()
+        except Exception:
+            self.splash.close_with_cleanup()
+            raise
+
+        self.app.processEvents()
+        QTimer.singleShot(0, self._run_next_task)
+
+    def _on_import_ready(self, imported: dict):
+        self.FluentTranslator = imported['FluentTranslator']
+        self.patch_infobar_for_traditional = imported['patch_infobar_for_traditional']
+        self.localize_widget_tree_for_traditional = imported['localize_widget_tree_for_traditional']
+        self.MainWindow = imported['MainWindow']
+        QTimer.singleShot(0, self._run_next_task)
+
+    def _on_import_failed(self, message: str):
+        self.splash.close_with_cleanup()
+        raise RuntimeError(message)
+
+    def _install_translators(self):
+        locale = resolve_configured_locale(config.get(config.language))
+        self.translator = self.FluentTranslator(locale)
+        self.galleryTranslator = QTranslator()
+        self.galleryTranslator.load(locale, "app", ".", ":/app/resource/i18n")
+
+        self.app.installTranslator(self.translator)
+        self.app.installTranslator(self.galleryTranslator)
+
+    def _patch_localization(self):
+        self.patch_infobar_for_traditional()
+
+    def _create_main_window(self):
+        self.window = self.MainWindow()
+        self.localize_widget_tree_for_traditional(self.window)
+
+    def _show_main_window(self):
+        self.window.show()
+
+    def _finish(self):
+        self.splash.close_with_cleanup()
+
+
+class RuntimeImportWorker(QThread):
+    ready = pyqtSignal(dict)
+    failed = pyqtSignal(str)
+
+    def run(self):
+        try:
+            from qfluentwidgets import FluentTranslator
+            from app.common.ui_localizer import patch_infobar_for_traditional, localize_widget_tree_for_traditional
+            from app.view.main_window import MainWindow
+
+            self.ready.emit({
+                'FluentTranslator': FluentTranslator,
+                'patch_infobar_for_traditional': patch_infobar_for_traditional,
+                'localize_widget_tree_for_traditional': localize_widget_tree_for_traditional,
+                'MainWindow': MainWindow,
+            })
+        except Exception as e:
+            self.failed.emit(str(e))
+
+
+def main():
+    if config.get(config.dpiScale) != "Auto":
+        os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "0"
+        os.environ["QT_SCALE_FACTOR"] = str(config.get(config.dpiScale))
+    else:
+        QApplication.setHighDpiScaleFactorRoundingPolicy(
+            Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+
+    app = QApplication(sys.argv)
+    app.setAttribute(Qt.AA_DontCreateNativeWidgetSiblings)
+
+    early_splash = EarlySplash()
+    early_splash.show_centered(app)
+
+    startup = StartupController(app, early_splash)
+    startup.start()
+    sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()

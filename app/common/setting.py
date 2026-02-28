@@ -7,11 +7,11 @@ DEBUG = "__compiled__" not in globals()
 YEAR = 2025
 AUTHOR = "mofaoss"
 
-APP_NAME = "SnowbreakAutoAssistant"
-HELP_URL = "https://github.com/mofaoss/SnowbreakAutoAssistant"
-REPO_URL = "https://github.com/mofaoss/SnowbreakAutoAssistant"
+APP_NAME = "SaaAutomataAcacia"
+HELP_URL = "https://github.com/mofaoss/SaaAutomataAcacia"
+REPO_URL = "https://github.com/mofaoss/SaaAutomataAcacia"
 FEEDBACK_URL = "https://space.bilibili.com/3546763489184642?spm_id_from=333.1007.0.0"
-GITHUB_FEEDBACK_URL = "https://github.com/mofaoss/SnowbreakAutoAssistant/issues"
+GITHUB_FEEDBACK_URL = "https://github.com/mofaoss/SaaAutomataAcacia/issues"
 DOC_URL = "https://qfluentwidgets.com/"
 QQ = "996710620"
 

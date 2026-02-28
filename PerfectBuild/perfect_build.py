@@ -15,12 +15,12 @@ def app_dir():
 
 class Config:
     app_ver = "2.1.0-beta"
-    app_name = "SAA"
-    app_exec = "SAA"
+    app_name = "SaaAutomataAcacia"
+    app_exec = "SaaAutomataAcacia"
     app_publisher = "mofaoss"
-    app_url = "https://github.com/mofaoss/SnowbreakAutoAssistant"
+    app_url = "https://github.com/mofaoss/SaaAutomataAcacia"
     app_icon = "app/resource/images/logo.ico"
-    app_dir = "D:/Workspace/SnowbreakAutoAssistant"
+    app_dir = "D:/Workspace/SaaAutomataAcacia"
     # app_dir = app_dir()
 
 # class MainWindow(QDialog):
