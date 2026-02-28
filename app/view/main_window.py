@@ -371,7 +371,7 @@ class MainWindow(MSFluentWindow):
         base_dir = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parents[2]))
         head_icon_path = base_dir / 'app/resource/images/logo.png'
         self.setWindowIcon(QIcon(str(head_icon_path)))
-        self.setWindowTitle(self._ui_text('安卡希雅·自律型', 'SaaAutomataAcacia'))
+        self.setWindowTitle(self._ui_text('安卡希雅·自律姬', 'SaaAutomataAcacia'))
 
         setThemeColor("#009FAA")
 
