@@ -105,6 +105,19 @@ class Automation:
         self.key_down = self.input_handler.key_down
         self.key_up = self.input_handler.key_up
 
+    def _ensure_input_hwnd(self):
+        if self.hwnd and win32gui.IsWindow(self.hwnd):
+            if self.input_handler.hwnd != self.hwnd:
+                self.input_handler.hwnd = self.hwnd
+            return True
+        hwnd = get_hwnd(self.window_title, self.window_class)
+        if not hwnd:
+            self._log_error_throttled('refresh_hwnd_failed', f"未找到窗口 {self.window_title} 的句柄")
+            return False
+        self.hwnd = hwnd
+        self.input_handler.hwnd = hwnd
+        return True
+
     def type_string(self, text):
         """
         向句柄窗口粘贴文本内容
@@ -454,6 +467,8 @@ class Automation:
         :return: None
         """
         if not pos:
+            return False
+        if not self._ensure_input_hwnd():
             return False
         if isinstance(pos[0], int):
             x, y = pos

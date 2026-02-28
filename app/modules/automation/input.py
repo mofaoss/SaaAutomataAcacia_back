@@ -123,6 +123,9 @@ class Input:
     def activate(self):
         win32gui.PostMessage(self.hwnd, win32con.WM_ACTIVATE, win32con.WA_ACTIVE, 0)
 
+    def _client_to_screen(self, x: int, y: int):
+        return win32gui.ClientToScreen(self.hwnd, (x, y))
+
     def mouse_down(self, x: int, y: int, mouse_key: str = 'left'):
         """鼠标按下，可以指定按键, 默认左键"""
         wparam = 0
@@ -207,10 +210,11 @@ class Input:
                 current_pos = win32api.GetCursorPos()
                 try:
                     self.activate()
-                    win32api.SetCursorPos((x, y))
-                    if win32api.GetCursorPos() != (x, y):
+                    target_screen_pos = self._client_to_screen(x, y)
+                    win32api.SetCursorPos(target_screen_pos)
+                    if win32api.GetCursorPos() != target_screen_pos:
                         time.sleep(0.01)
-                        win32api.SetCursorPos((x, y))
+                        win32api.SetCursorPos(target_screen_pos)
 
                     lparam = y << 16 | x
                     win32gui.PostMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
@@ -219,8 +223,8 @@ class Input:
                     self.mouse_down(x, y, mouse_key)
                     time.sleep(press_time)
                     cur = win32api.GetCursorPos()
-                    if abs(cur[0] - x) > 3 or abs(cur[1] - y) > 3:
-                        win32api.SetCursorPos((x, y))
+                    if abs(cur[0] - target_screen_pos[0]) > 3 or abs(cur[1] - target_screen_pos[1]) > 3:
+                        win32api.SetCursorPos(target_screen_pos)
                     self.mouse_up(x, y, mouse_key)
 
                     time.sleep(0.02)
@@ -299,11 +303,12 @@ class Input:
                     current_pos = win32api.GetCursorPos()
                     try:
                         self.activate()
-                        win32api.SetCursorPos((x, y))
+                        target_screen_pos = self._client_to_screen(x, y)
+                        win32api.SetCursorPos(target_screen_pos)
                         # 极少数情况下 SetCursorPos 会被系统或用户输入打断，补一次快速校正
-                        if win32api.GetCursorPos() != (x, y):
+                        if win32api.GetCursorPos() != target_screen_pos:
                             time.sleep(0.01)
-                            win32api.SetCursorPos((x, y))
+                            win32api.SetCursorPos(target_screen_pos)
 
                         # 先发送一次 move，提升滚轮消息命中目标窗口的稳定性
                         win32gui.PostMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
