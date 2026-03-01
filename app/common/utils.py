@@ -655,7 +655,7 @@ def get_github_release_channels(repo_url: str):
     返回示例：
     {
         "latest": {"version": "2.1.0", "url": "..."} | None,
-        "prerelease": {"version": "2.2.0-beta", "url": "..."} | None
+        "prerelease": {"version": "2.3.0-beta", "url": "..."} | None
     }
     """
     result = {

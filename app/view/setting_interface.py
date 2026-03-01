@@ -318,6 +318,7 @@ class SettingInterface(ScrollArea):
     def _connectSignalToSlot(self):
         """ connect signal to slot """
         config.appRestartSig.connect(self._showRestartTooltip)
+        signalBus.windowTrackingStealthChanged.connect(self._sync_stealth_controls)
 
         # personalization
         config.themeChanged.connect(setTheme)
@@ -331,6 +332,17 @@ class SettingInterface(ScrollArea):
         # about
         self.feedbackCard.clicked.connect(
             lambda: QDesktopServices.openUrl(QUrl(REPO_URL)))
+
+    def _sync_stealth_controls(self, checked: bool, alpha: int):
+        try:
+            self.windowTrackingInputCard.setChecked(bool(checked), emit=False)
+        except Exception:
+            pass
+        try:
+            if hasattr(self, "windowTrackingAlphaCard") and self.windowTrackingAlphaCard is not None:
+                self.windowTrackingAlphaCard.sync_from_config()
+        except Exception:
+            pass
 
     def set_windows_start(self, is_checked):
         if is_checked:

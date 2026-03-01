@@ -14,6 +14,7 @@ class SignalBus(QObject):
     updateFishKey = pyqtSignal(str)
     showScreenshot = pyqtSignal(object)
     sendHwnd = pyqtSignal(int)
+    windowTrackingStealthChanged = pyqtSignal(bool, int)
 
     # check_ocr_progress = pyqtSignal(int, str)
 

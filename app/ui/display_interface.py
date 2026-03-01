@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import (
 from qfluentwidgets import ScrollArea, FluentIcon, CardWidget, FlyoutView, Flyout
 
 from app.common.config import config, is_non_chinese_ui_language, Language, resolve_configured_locale
+from app.common.signal_bus import signalBus
 from app.common.setting import REPO_URL
 from app.common.style_sheet import StyleSheet
 from app.common.utils import get_local_version
@@ -200,7 +201,14 @@ class DisplayInterface(ScrollArea):
 
     def _sync_window_tracking_quick_switch(self):
         if self.windowTrackingQuickSwitchCard is not None:
-            self.windowTrackingQuickSwitchCard.setChecked(bool(config.windowTrackingInput.value), emit=False)
+            stealth_on = bool(config.windowTrackingInput.value) and int(config.windowTrackingAlpha.value) == 1
+            self.windowTrackingQuickSwitchCard.setChecked(stealth_on, emit=False)
+
+    def _toggle_stealth_mode(self, checked: bool):
+        alpha = 1 if checked else 255
+        config.set(config.windowTrackingInput, checked)
+        config.set(config.windowTrackingAlpha, alpha)
+        signalBus.windowTrackingStealthChanged.emit(bool(checked), int(alpha))
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -235,10 +243,11 @@ class DisplayInterface(ScrollArea):
         )
         self.windowTrackingQuickSwitchCard = quick_jump.addSampleCard_Switch(
             icon=os.path.join(self.basedir, "electronics.svg"),
-            title="Background Mode" if self._is_non_chinese_ui else "后台不抢鼠标",
-            content="Window-tracking mouse; turn OFF if it feels uncomfortable" if self._is_non_chinese_ui else self.tr("窗口追踪鼠标；如不适应可关闭"),
-            checked=bool(config.windowTrackingInput.value),
-            on_toggle=lambda checked: config.set(config.windowTrackingInput, checked),
+            title="Stealth Mode" if self._is_non_chinese_ui else "隐身模式",
+            content="ON: no-mouse-steal + opacity=1; OFF: normal display + disable no-mouse-steal"
+            if self._is_non_chinese_ui else self.tr("完全后台隐身运行游戏"),
+            checked=bool(config.windowTrackingInput.value) and int(config.windowTrackingAlpha.value) == 1,
+            on_toggle=self._toggle_stealth_mode,
         )
         self._sync_window_tracking_quick_switch()
         self.vBoxLayout.addWidget(quick_jump)
