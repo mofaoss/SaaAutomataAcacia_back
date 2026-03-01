@@ -207,6 +207,7 @@ class Config(QConfig):
     isLog = ConfigItem("setting_personal", "isLog", False, BoolValidator())
     showScreenshot = ConfigItem("setting_personal", "showScreenshot", False, BoolValidator())
     windowTrackingInput = ConfigItem("setting_personal", "windowTrackingInput", True, BoolValidator())
+    windowTrackingAlpha = ConfigItem("setting_personal", "windowTrackingAlpha", 1)
     saveScaleCache = ConfigItem("setting_personal", "saveScaleCache", False, BoolValidator(), restart=True)
     autoScaling = ConfigItem("setting_personal", "autoScaling", True, BoolValidator())
     update_proxies = ConfigItem("Update", "update_proxies", '')

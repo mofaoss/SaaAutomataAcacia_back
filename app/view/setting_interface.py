@@ -19,6 +19,7 @@ from ..common.setting import QQ, REPO_URL
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
 from ..common.utils import get_local_version
+from ..repackage.slider_setting_card import SliderSettingCard
 from ..repackage.text_edit_card import TextEditCard
 
 
@@ -169,6 +170,16 @@ class SettingInterface(ScrollArea):
             configItem=config.windowTrackingInput,
             parent=self.aboutSoftwareGroup
         )
+        self.windowTrackingAlphaCard = SliderSettingCard(
+            configItem=config.windowTrackingAlpha,
+            icon=FIF.HIDE,
+            title=self._ui_text('窗口追踪透明度', 'Tracking window opacity'),
+            content=self._ui_text('数值越低越隐形：1=极度隐藏，255=正常显示',
+                                  'Lower value means more invisible: 1 = highly hidden, 255 = normal visibility'),
+            parent=self.aboutSoftwareGroup,
+            min_value=1,
+            max_value=255,
+        )
         self.saveScaleCacheCard = SwitchSettingCard(
             FIF.SAVE,
             self._ui_text('保存缩放比例数据', 'Save scaling cache'),
@@ -268,6 +279,7 @@ class SettingInterface(ScrollArea):
         self.personalGroup.addSettingCard(self.zoomCard)
         self.personalGroup.addSettingCard(self.languageCard)
 
+        self.aboutSoftwareGroup.addSettingCard(self.windowTrackingAlphaCard)
         self.aboutSoftwareGroup.addSettingCard(self.windowTrackingInputCard)
         self.aboutSoftwareGroup.addSettingCard(self.updateOnStartUpCard)
         self.aboutSoftwareGroup.addSettingCard(self.serverCard)

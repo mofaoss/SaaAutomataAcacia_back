@@ -6,6 +6,8 @@ import win32api
 import win32con
 import win32gui
 
+from app.common.config import config
+
 
 class WindowTracker:
     def __init__(self, hwnd, logger):
@@ -20,6 +22,9 @@ class WindowTracker:
         self._locked_height = None
         self._offscreen_margin = 80
         self._is_offscreen_hidden = False
+        self._tracking_alpha = 1
+        self._tracking_visual_applied = False
+        self._saved_exstyle = None
         self._align_deadzone_px = 1
 
     @contextmanager
@@ -114,6 +119,53 @@ class WindowTracker:
         except Exception:
             return False
         return False
+
+    def apply_tracking_visual_mode(self) -> bool:
+        if not self._is_hwnd_valid():
+            return False
+        try:
+            with self._per_monitor_dpi_context():
+                alpha = int(getattr(config, 'windowTrackingAlpha').value)
+                self._tracking_alpha = max(1, min(255, alpha))
+
+                root_hwnd = self._resolve_root_hwnd()
+                if not root_hwnd or not win32gui.IsWindow(root_hwnd):
+                    return False
+
+                exstyle = win32gui.GetWindowLong(root_hwnd, win32con.GWL_EXSTYLE)
+                if self._saved_exstyle is None:
+                    self._saved_exstyle = exstyle
+
+                target_exstyle = exstyle | win32con.WS_EX_LAYERED | win32con.WS_EX_TRANSPARENT
+                if target_exstyle != exstyle:
+                    win32gui.SetWindowLong(root_hwnd, win32con.GWL_EXSTYLE, target_exstyle)
+
+                win32gui.SetLayeredWindowAttributes(root_hwnd, 0, self._tracking_alpha, win32con.LWA_ALPHA)
+                self._tracking_visual_applied = True
+                return True
+        except Exception:
+            return False
+
+    def restore_tracking_visual_mode(self):
+        if not self._tracking_visual_applied:
+            return
+        try:
+            with self._per_monitor_dpi_context():
+                root_hwnd = self._resolve_root_hwnd()
+                if not root_hwnd or not win32gui.IsWindow(root_hwnd):
+                    return
+
+                if self._saved_exstyle is not None:
+                    win32gui.SetWindowLong(root_hwnd, win32con.GWL_EXSTYLE, self._saved_exstyle)
+                else:
+                    exstyle = win32gui.GetWindowLong(root_hwnd, win32con.GWL_EXSTYLE)
+                    if exstyle & win32con.WS_EX_LAYERED:
+                        win32gui.SetWindowLong(root_hwnd, win32con.GWL_EXSTYLE, exstyle & ~win32con.WS_EX_LAYERED)
+        except Exception:
+            pass
+        finally:
+            self._tracking_visual_applied = False
+            self._saved_exstyle = None
 
     def align_target_to_cursor(self, x: int, y: int) -> bool:
         if not self._is_hwnd_valid():
@@ -272,6 +324,7 @@ class WindowTracker:
 
     def restore_window_position(self):
         if not self._session_started:
+            self.restore_tracking_visual_mode()
             return
         try:
             with self._per_monitor_dpi_context():
@@ -290,6 +343,7 @@ class WindowTracker:
                         origin_height,
                         win32con.SWP_NOZORDER | win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER,
                     )
+                self.restore_tracking_visual_mode()
         except Exception as e:
             self.logger.warning(f"窗口归位失败：{repr(e)}")
         finally:

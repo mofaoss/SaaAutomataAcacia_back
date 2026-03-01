@@ -330,6 +330,8 @@ class Input:
             self._sync_tracker_hwnd()
             if not self._window_tracking_enabled:
                 self.window_tracker.restore_window_position()
+            else:
+                self.window_tracker.apply_tracking_visual_mode()
 
             while time.time() - start_time < time_out:
                 if not self._window_tracking_enabled:
@@ -593,6 +595,7 @@ class Input:
             if not self._window_tracking_enabled:
                 self.window_tracker.restore_window_position()
             else:
+                self.window_tracker.apply_tracking_visual_mode()
                 result = self._send_scroll_tracking(x, y, delta, time_out, start_time)
                 self.window_tracker.hide_window_offscreen()
                 return result
