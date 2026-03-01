@@ -2,12 +2,7 @@ import argparse
 import logging
 from pathlib import Path
 
-from app.backend.application import BackendApplication
-from app.backend.http_server import LogHub, create_server
-from app.backend.command_bus import build_default_registry
-from app.backend.feature_runner import FeatureTaskRunner
 from app.backend.runtime_shims import install_runtime_shims
-from app.backend.task_runner import DailyTaskRunner
 
 
 def parse_args():
@@ -21,7 +16,18 @@ def parse_args():
 def main():
     args = parse_args()
 
-    install_runtime_shims(config_path=Path(args.config))
+    script_dir = Path(__file__).resolve().parent
+    config_path = Path(args.config)
+    if not config_path.is_absolute():
+        config_path = (script_dir / config_path).resolve()
+
+    install_runtime_shims(config_path=config_path)
+
+    from app.backend.application import BackendApplication
+    from app.backend.command_bus import build_default_registry
+    from app.backend.feature_runner import FeatureTaskRunner
+    from app.backend.http_server import LogHub, create_server
+    from app.backend.task_runner import DailyTaskRunner
 
     from app.common.logger import logger
 

@@ -1,4 +1,5 @@
 import ctypes
+import time
 
 import win32api
 import win32con
@@ -7,6 +8,7 @@ import win32gui
 from app.common.config import config
 from app.common.logger import logger
 from app.common.signal_bus import signalBus
+from app.common.utils import get_hwnd, launch_game_with_guard
 from app.modules.automation.automation import Automation
 
 
@@ -20,6 +22,24 @@ class BaseTask:
 
     def stop(self):
         self.auto.stop()
+
+    @staticmethod
+    def _cfg_value(name, default=None):
+        item = getattr(config, name, None)
+        if item is not None:
+            try:
+                value = config.get(item)
+            except Exception:
+                value = getattr(item, 'value', None)
+            if value is not None:
+                return value
+        try:
+            value = config.get(name)
+            if value is not None:
+                return value
+        except Exception:
+            pass
+        return default
 
     def determine_screen_ratio(self, hwnd):
         """判断句柄对应窗口是否为16:9"""
@@ -91,28 +111,74 @@ class BaseTask:
             return is_16_9
 
     def init_auto(self, name):
-        if config.server_interface.value != 2:
-            game_name = '尘白禁区'
-            game_class = 'UnrealWindow'
+        server_interface = int(self._cfg_value('server_interface', 0) or 0)
+        configured_title = self._cfg_value('game_title_name', None)
+        game_class = 'UnrealWindow'
+
+        title_candidates = []
+        if configured_title and str(configured_title).strip():
+            title_candidates.append(str(configured_title).strip())
+
+        if server_interface == 2:
+            title_candidates.append('Snowbreak: Containment Zone')
         else:
-            game_name = 'Snowbreak: Containment Zone'  # 国际服
-            game_class = 'UnrealWindow'
+            title_candidates.append('尘白禁区')
+
+        title_candidates.extend(['尘白禁区', 'Snowbreak: Containment Zone'])
+        dedup_titles = []
+        for title in title_candidates:
+            if title and title not in dedup_titles:
+                dedup_titles.append(title)
+
+        game_name = dedup_titles[0]
         auto_dict = {
             'game': [game_name, game_class],
             # 'starter': [config.LineEdit_starter_name.value, config.LineEdit_starter_class.value]
         }
         if self.auto is None:
-            try:
-                self.auto = Automation(auto_dict[name][0], auto_dict[name][1], self.logger)
-                if self.determine_screen_ratio(self.auto.hwnd):
-                    signalBus.sendHwnd.emit(self.auto.hwnd)
-                    return True
-                else:
-                    self.logger.error(f'游戏窗口比例不是16:9')
+            last_error = None
+
+            for title in dedup_titles:
+                try:
+                    self.auto = Automation(title, game_class, self.logger)
+                    if self.determine_screen_ratio(self.auto.hwnd):
+                        signalBus.sendHwnd.emit(self.auto.hwnd)
+                        return True
+                    self.logger.error('游戏窗口比例不是16:9')
                     return False
-            except Exception as e:
-                self.logger.error(f'初始化auto失败：{e}')
+                except Exception as e:
+                    last_error = e
+
+            if name != 'game':
+                self.logger.error(f'初始化auto失败：{last_error}')
                 return False
+
+            self.logger.warning(f'未检测到游戏窗口，尝试自动启动游戏：{last_error}')
+            launch_result = launch_game_with_guard(logger=self.logger)
+            if not launch_result.get('ok', False):
+                self.logger.error(f"初始化auto失败：{launch_result.get('error', last_error)}")
+                return False
+
+            wait_seconds = 45
+            start_ts = time.time()
+            while time.time() - start_ts < wait_seconds:
+                for title in dedup_titles:
+                    hwnd = get_hwnd(title, game_class)
+                    if not hwnd:
+                        continue
+                    try:
+                        self.auto = Automation(title, game_class, self.logger)
+                        if self.determine_screen_ratio(self.auto.hwnd):
+                            signalBus.sendHwnd.emit(self.auto.hwnd)
+                            return True
+                        self.logger.error('游戏窗口比例不是16:9')
+                        return False
+                    except Exception as e:
+                        last_error = e
+                time.sleep(1)
+
+            self.logger.error(f'初始化auto失败：启动游戏后仍未获取到窗口句柄，最后错误：{last_error}')
+            return False
         else:
             self.logger.debug(f'延用auto：{self.auto.hwnd}')
             return True
