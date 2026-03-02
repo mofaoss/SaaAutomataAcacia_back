@@ -140,13 +140,18 @@ jobs:
 
           Write-Host "Updated version in PerfectBuild/perfect_build.py and update_data.txt"
 
-      - name: Build with retry (Nuitka mode)
+      - name: Build (Nuitka mode)
         shell: powershell
         env:
           SAA_APP_DIR: ${{ github.workspace }}
           INNO_SETUP_COMPILER: C:\Program Files (x86)\Inno Setup 6\ISCC.exe
         run: |
-          .\PerfectBuild\ci_build_retry.ps1 -CondaEnvName $env:CONDA_ENV_NAME
+          Write-Host "Starting Nuitka build..."
+          conda run -n $env:CONDA_ENV_NAME python .\PerfectBuild\build.py --n
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Build failed"
+            exit 1
+          }
 
       - name: Verify release output
         id: verify
