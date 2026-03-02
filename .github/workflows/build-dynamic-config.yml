@@ -99,12 +99,14 @@ jobs:
 
       - name: Update version in files
         shell: powershell
+        env:
+          TARGET_VERSION: ${{ steps.version.outputs.version }}
         run: |
-          $version = "${{ steps.version.outputs.version }}"
+          $version = $env:TARGET_VERSION
 
-          conda run -n $env:CONDA_ENV_NAME python -c "from pathlib import Path; import re; p=Path('PerfectBuild/perfect_build.py'); t=p.read_text(encoding='utf-8'); t_new=re.sub(r'app_ver\s*=\s*\"[^\"]+\"', f'app_ver = \"{version}\"', t, count=1); p.write_text(t_new, encoding='utf-8')"
+          conda run -n $env:CONDA_ENV_NAME python -c "from pathlib import Path; import os, re; v=os.environ['TARGET_VERSION']; p=Path('PerfectBuild/perfect_build.py'); t=p.read_text(encoding='utf-8'); t_new=re.sub(r'app_ver\s*=\s*\"[^\"]+\"', f'app_ver = \"{v}\"', t, count=1); p.write_text(t_new, encoding='utf-8')"
 
-          conda run -n $env:CONDA_ENV_NAME python -c "from pathlib import Path; p=Path('update_data.txt'); lines=p.read_text(encoding='utf-8').splitlines(); lines = lines if lines else ['']; lines[-1]='${{ steps.version.outputs.version }}'; p.write_text('\\n'.join(lines)+'\\n', encoding='utf-8')"
+          conda run -n $env:CONDA_ENV_NAME python -c "from pathlib import Path; import os; v=os.environ['TARGET_VERSION']; p=Path('update_data.txt'); lines=p.read_text(encoding='utf-8').splitlines(); lines = lines if lines else ['']; lines[-1]=v; p.write_text('\\n'.join(lines)+'\\n', encoding='utf-8')"
 
           Write-Host "已更新版本号到 PerfectBuild/perfect_build.py 和 update_data.txt"
 
