@@ -20,7 +20,7 @@ from ..common.logger import logger
 from ..common.setting import QQ, REPO_URL
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
-from ..common.utils import get_local_version, get_github_release_channels, is_remote_version_newer
+from ..common.utils import get_local_version, get_github_release_channels, is_remote_version_newer, is_prerelease_version
 from ..repackage.slider_setting_card import SliderSettingCard
 from ..repackage.text_edit_card import TextEditCard
 
@@ -129,6 +129,14 @@ class SettingInterface(ScrollArea):
             self._ui_text('如果开启，每次游戏版本更新会自动更新对应活动刷体力的坐标和安卡希雅·自律姬提醒的链接',
                           'If enabled, coordinates and schedule reminder links update automatically after each game version update'),
             configItem=config.checkUpdateAtStartUp,
+            parent=self.aboutSoftwareGroup
+        )
+        self.checkPrereleaseForStableCard = SwitchSettingCard(
+            FIF.TAG,
+            self._ui_text('检测测试版更新（正式版用户）', 'Check pre-release updates (stable users)'),
+            self._ui_text('默认关闭。正式版用户开启后会同时检测正式版和测试版；测试版用户始终会同时检测两者',
+                          'Disabled by default. When enabled, stable users will check both stable and pre-release; pre-release users always check both'),
+            configItem=config.checkPrereleaseForStable,
             parent=self.aboutSoftwareGroup
         )
         self.serverCard = ComboBoxSettingCard(
@@ -284,6 +292,7 @@ class SettingInterface(ScrollArea):
         self.aboutSoftwareGroup.addSettingCard(self.windowTrackingAlphaCard)
         self.aboutSoftwareGroup.addSettingCard(self.windowTrackingInputCard)
         self.aboutSoftwareGroup.addSettingCard(self.updateOnStartUpCard)
+        self.aboutSoftwareGroup.addSettingCard(self.checkPrereleaseForStableCard)
         self.aboutSoftwareGroup.addSettingCard(self.serverCard)
         self.aboutSoftwareGroup.addSettingCard(self.gameLanguageCard)
         self.aboutSoftwareGroup.addSettingCard(self.isLogCard)
@@ -349,9 +358,12 @@ class SettingInterface(ScrollArea):
     def _select_update_candidate(self, local_version: str, release_channels: dict):
         stable = release_channels.get("latest") if isinstance(release_channels, dict) else None
         prerelease = release_channels.get("prerelease") if isinstance(release_channels, dict) else None
+        should_check_prerelease = is_prerelease_version(local_version) or bool(config.checkPrereleaseForStable.value)
 
         candidates = []
         for channel_name, release_data in (("latest", stable), ("prerelease", prerelease)):
+            if channel_name == "prerelease" and not should_check_prerelease:
+                continue
             if not release_data:
                 continue
             remote_version = release_data.get("version")

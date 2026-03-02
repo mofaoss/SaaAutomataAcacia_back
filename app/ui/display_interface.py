@@ -16,7 +16,7 @@ from app.common.config import config, is_non_chinese_ui_language, Language, reso
 from app.common.signal_bus import signalBus
 from app.common.setting import REPO_URL
 from app.common.style_sheet import StyleSheet
-from app.common.utils import get_local_version, get_github_release_channels, is_remote_version_newer
+from app.common.utils import get_local_version, get_github_release_channels, is_remote_version_newer, is_prerelease_version
 
 from app.repackage.link_card import LinkCardView
 from app.repackage.samplecardview import SampleCardView
@@ -88,9 +88,12 @@ class BannerWidget(QWidget):
     def _select_update_candidate(self, local_version: str, release_channels: dict):
         stable = release_channels.get("latest") if isinstance(release_channels, dict) else None
         prerelease = release_channels.get("prerelease") if isinstance(release_channels, dict) else None
+        should_check_prerelease = is_prerelease_version(local_version) or bool(config.checkPrereleaseForStable.value)
 
         candidates = []
         for channel_name, release_data in (("latest", stable), ("prerelease", prerelease)):
+            if channel_name == "prerelease" and not should_check_prerelease:
+                continue
             if not release_data:
                 continue
             remote_version = release_data.get("version")

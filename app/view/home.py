@@ -511,9 +511,12 @@ class Home(QFrame, Ui_home, BaseInterface):
     def _select_update_candidate(self, local_version: str, release_channels: Dict[str, Any]):
         stable = release_channels.get("latest") if isinstance(release_channels, dict) else None
         prerelease = release_channels.get("prerelease") if isinstance(release_channels, dict) else None
+        should_check_prerelease = is_prerelease_version(local_version) or bool(config.checkPrereleaseForStable.value)
 
         candidates = []
         for channel_name, release_data in (("latest", stable), ("prerelease", prerelease)):
+            if channel_name == "prerelease" and not should_check_prerelease:
+                continue
             if not release_data:
                 continue
             remote_version = release_data.get("version")
