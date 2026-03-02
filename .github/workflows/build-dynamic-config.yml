@@ -231,11 +231,18 @@ jobs:
 
           "release_files_dir=$outDir" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-      - name: Upload release artifacts
+      - name: Upload portable zip artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SaaAutomataAcacia-${{ steps.version.outputs.version }}-windows
-          path: ${{ steps.collect.outputs.release_files_dir }}/*
+          name: SaaAutomataAcacia-${{ steps.version.outputs.version }}-portable
+          path: ${{ steps.collect.outputs.release_files_dir }}/*.zip
+          if-no-files-found: error
+
+      - name: Upload installer exe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SaaAutomataAcacia-${{ steps.version.outputs.version }}-installer
+          path: ${{ steps.collect.outputs.release_files_dir }}/*.exe
           if-no-files-found: error
 
       - name: Create draft GitHub Release
@@ -246,7 +253,7 @@ jobs:
           name: SaaAutomataAcacia ${{ steps.version.outputs.version }}
           draft: true
           prerelease: ${{ contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'rc') }}
-          files: ${{ steps.collect.outputs.release_files_dir }}/*
+          files: ${{ steps.collect.outputs.release_files_dir }}/*.exe
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
