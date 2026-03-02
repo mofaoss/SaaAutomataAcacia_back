@@ -104,30 +104,24 @@ jobs:
         run: |
           $version = $env:TARGET_VERSION
 
-          $script = @'
-          from pathlib import Path
-          import os
-          import re
+          $perfectBuildPath = "PerfectBuild/perfect_build.py"
+          $perfectBuildContent = Get-Content -Path $perfectBuildPath -Raw -Encoding UTF8
+          $perfectBuildUpdated = [regex]::Replace(
+            $perfectBuildContent,
+            'app_ver\s*=\s*"[^"]+"',
+            "app_ver = `"$version`"",
+            1
+          )
+          Set-Content -Path $perfectBuildPath -Value $perfectBuildUpdated -Encoding UTF8
 
-          version = os.environ["TARGET_VERSION"]
-
-          p = Path("PerfectBuild/perfect_build.py")
-          t = p.read_text(encoding="utf-8")
-          t_new = re.sub(r'app_ver\s*=\s*"[^"]+"', f'app_ver = "{version}"', t, count=1)
-          p.write_text(t_new, encoding="utf-8")
-
-          u = Path("update_data.txt")
-          lines = u.read_text(encoding="utf-8").splitlines()
-          if not lines:
-              lines = [""]
-          lines[-1] = version
-          u.write_text("\n".join(lines) + "\n", encoding="utf-8")
-          '@
-
-          $tmpPy = Join-Path $env:RUNNER_TEMP "update_version.py"
-          Set-Content -Path $tmpPy -Value $script -Encoding UTF8
-
-          conda run -n $env:CONDA_ENV_NAME python $tmpPy
+          $updateDataPath = "update_data.txt"
+          $lines = @(Get-Content -Path $updateDataPath -Encoding UTF8)
+          if ($lines.Count -eq 0) {
+            $lines = @("")
+          }
+          $lines[$lines.Count - 1] = $version
+          $updateDataContent = ($lines -join "`n") + "`n"
+          Set-Content -Path $updateDataPath -Value $updateDataContent -Encoding UTF8
 
           Write-Host "Updated version in PerfectBuild/perfect_build.py and update_data.txt"
 
