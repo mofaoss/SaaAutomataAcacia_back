@@ -50,6 +50,30 @@ jobs:
           channels: conda-forge
           channel-priority: strict
 
+      - name: Cache conda packages
+        uses: actions/cache@v4
+        with:
+          path: C:\Miniconda\pkgs
+          key: ${{ runner.os }}-conda-pkgs-py${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-conda-pkgs-py${{ env.PYTHON_VERSION }}-
+
+      - name: Cache pip downloads
+        uses: actions/cache@v4
+        with:
+          path: C:\Users\runneradmin\AppData\Local\pip\Cache
+          key: ${{ runner.os }}-pip-py${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-py${{ env.PYTHON_VERSION }}-
+
+      - name: Cache Nuitka artifacts
+        uses: actions/cache@v4
+        with:
+          path: C:\Users\runneradmin\AppData\Local\Nuitka\Nuitka\Cache
+          key: ${{ runner.os }}-nuitka-py${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements.txt', 'PerfectBuild/build.py', 'PerfectBuild/nuitka-setup-template.iss') }}
+          restore-keys: |
+            ${{ runner.os }}-nuitka-py${{ env.PYTHON_VERSION }}-
+
       - name: Install Inno Setup
         shell: powershell
         run: |
