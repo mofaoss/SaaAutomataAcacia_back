@@ -18,6 +18,8 @@ jobs:
     env:
       PYTHON_VERSION: '3.10'
       CONDA_ENV_NAME: saa-build
+      CONDA_ALWAYS_YES: 'true'
+      PIP_NO_INPUT: '1'
 
     steps:
       - name: Checkout repository
