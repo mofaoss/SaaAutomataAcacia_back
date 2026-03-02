@@ -1,4 +1,5 @@
 import sys
+import os
 # from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QTextBrowser
 # from PySide6.QtGui import QIcon
 
@@ -10,7 +11,7 @@ def app_dir():
     if hasattr(sys, "frozen"):
         # Handles PyInstaller
         return Path(sys.executable).parent  # 使用pyinstaller打包后的exe目录
-    return Path(__file__).parent  # 没打包前的py目录
+    return Path(__file__).resolve().parent.parent  # 没打包前的项目根目录
 
 
 class Config:
@@ -20,8 +21,7 @@ class Config:
     app_publisher = "mofaoss"
     app_url = "https://github.com/mofaoss/SaaAutomataAcacia"
     app_icon = "app/resource/images/logo.ico"
-    app_dir = "D:/Workspace/SaaAutomataAcacia"
-    # app_dir = app_dir()
+    app_dir = os.getenv("SAA_APP_DIR", str(app_dir()))
 
 # class MainWindow(QDialog):
 #     def __init__(self, parent=None):
