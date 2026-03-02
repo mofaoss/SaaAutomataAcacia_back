@@ -36,7 +36,7 @@ jobs:
             Write-Error "未找到 cl.exe（MSVC C 编译器），Nuitka 无法继续"
             exit 1
           }
-          cl.exe 2>&1 | Select-Object -First 5
+          Write-Host "MSVC compiler found: $($cl.Source)"
 
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
