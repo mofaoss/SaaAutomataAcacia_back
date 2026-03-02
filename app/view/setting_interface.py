@@ -2,6 +2,7 @@
 import os.path
 import subprocess
 import sys
+import html
 from functools import partial
 
 from PyQt5.QtCore import Qt, QUrl, QThread
@@ -15,10 +16,11 @@ from qfluentwidgets import (SwitchSettingCard, PrimaryPushSettingCard, ScrollAre
                             )
 
 from ..common.config import config, isWin11, is_non_chinese_ui_language
+from ..common.logger import logger
 from ..common.setting import QQ, REPO_URL
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
-from ..common.utils import get_local_version
+from ..common.utils import get_local_version, get_github_release_channels, is_remote_version_newer
 from ..repackage.slider_setting_card import SliderSettingCard
 from ..repackage.text_edit_card import TextEditCard
 
@@ -344,6 +346,57 @@ class SettingInterface(ScrollArea):
         except Exception:
             pass
 
+    def _select_update_candidate(self, local_version: str, release_channels: dict):
+        stable = release_channels.get("latest") if isinstance(release_channels, dict) else None
+        prerelease = release_channels.get("prerelease") if isinstance(release_channels, dict) else None
+
+        candidates = []
+        for channel_name, release_data in (("latest", stable), ("prerelease", prerelease)):
+            if not release_data:
+                continue
+            remote_version = release_data.get("version")
+            if not remote_version:
+                continue
+            if is_remote_version_newer(local_version, remote_version):
+                candidates.append({
+                    "channel": channel_name,
+                    "version": remote_version,
+                    "download_url": release_data.get("download_url"),
+                    "is_prerelease": channel_name == "prerelease"
+                })
+
+        if not candidates:
+            return None
+
+        best = candidates[0]
+        for candidate in candidates[1:]:
+            if is_remote_version_newer(best["version"], candidate["version"]):
+                best = candidate
+
+        return best
+
+    def _log_clickable_update_links(self, best: dict, local_version: str):
+        download_url = str(best.get("download_url") or "").strip()
+        update_tag_zh = "测试版" if best.get("is_prerelease") else "新版本"
+        update_tag_en = "pre-release" if best.get("is_prerelease") else "update"
+
+        if download_url:
+            download_anchor = f"<a href=\"{html.escape(download_url, quote=True)}\">{self._ui_text('点击下载最新', 'Click to download latest')}</a>"
+            logger.warning(self._ui_text(
+                f"【检查更新】发现{update_tag_zh} {local_version} → {best['version']}\n"
+                f"{download_anchor}",
+                f"[Check Update] New {update_tag_en} found {local_version} -> {best['version']}\n"
+                f"{download_anchor}"
+            ))
+            return
+
+        logger.warning(self._ui_text(
+            f"【检查更新】发现{update_tag_zh} {local_version} → {best['version']}\n"
+            f"暂未找到可直接下载的安装包链接",
+            f"[Check Update] New {update_tag_en} found {local_version} -> {best['version']}\n"
+            f"No direct downloadable installer URL found"
+        ))
+
     def set_windows_start(self, is_checked):
         if is_checked:
             self._enable_windows()
@@ -448,7 +501,34 @@ class SettingInterface(ScrollArea):
             )
 
     def check_update(self):
-        pass
+        local_version = get_local_version()
+        release_channels = get_github_release_channels(REPO_URL)
+        best = self._select_update_candidate(local_version, release_channels)
+
+        if best is None:
+            InfoBar.success(
+                self._ui_text('当前已是最新版本', 'You are on the latest version'),
+                self._ui_text(f'当前版本：{local_version}', f'Current version: {local_version}'),
+                isClosable=True,
+                duration=3000,
+                parent=self
+            )
+            logger.info(self._ui_text(
+                f"【检查更新】当前版本 {local_version} 已是最新版本",
+                f"[Check Update] Current version {local_version} is up to date"
+            ))
+            return
+
+        self._log_clickable_update_links(best, local_version)
+        InfoBar.warning(
+            self._ui_text('发现测试版' if best.get("is_prerelease") else '发现新版本',
+                          'Pre-release available' if best.get("is_prerelease") else 'Update available'),
+            self._ui_text('请在日志中点击“点击下载最新”以下载安装包',
+                          'Click "Click to download latest" in log to download installer'),
+            isClosable=True,
+            duration=8000,
+            parent=self
+        )
 
     def start_download(self, updater):
         self.progressBar.setValue(0)

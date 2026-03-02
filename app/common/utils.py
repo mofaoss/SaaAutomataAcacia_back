@@ -648,6 +648,33 @@ def is_prerelease_version(version: str) -> bool:
     return bool(re.search(r'(?:-|_|\.)?(alpha|a|beta|b|rc|pre|preview)(?:-|_|\.)?\d*', raw))
 
 
+def _pick_release_download_url(release: dict):
+    if not isinstance(release, dict):
+        return None
+
+    assets = release.get("assets")
+    if not isinstance(assets, list) or not assets:
+        return None
+
+    preferred_ext = (".exe", ".msi", ".zip", ".7z", ".rar")
+    best_url = None
+
+    for asset in assets:
+        if not isinstance(asset, dict):
+            continue
+        url = (asset.get("browser_download_url") or "").strip()
+        if not url:
+            continue
+
+        name = (asset.get("name") or "").strip().lower()
+        if name.endswith(preferred_ext):
+            return url
+        if best_url is None:
+            best_url = url
+
+    return best_url
+
+
 def get_github_release_channels(repo_url: str):
     """
     获取 GitHub 的稳定版与预发布版版本信息。
@@ -687,7 +714,8 @@ def get_github_release_channels(repo_url: str):
 
                     release_item = {
                         "version": tag_name,
-                        "url": (release.get("html_url") or "").strip() or f"{repo_url.rstrip('/')}/releases"
+                        "url": (release.get("html_url") or "").strip() or f"{repo_url.rstrip('/')}/releases",
+                        "download_url": _pick_release_download_url(release)
                     }
 
                     if release.get("prerelease"):
@@ -712,7 +740,8 @@ def get_github_release_channels(repo_url: str):
                 if tag_name:
                     result["latest"] = {
                         "version": tag_name,
-                        "url": (data.get("html_url") or "").strip() or f"{repo_url.rstrip('/')}/releases"
+                        "url": (data.get("html_url") or "").strip() or f"{repo_url.rstrip('/')}/releases",
+                        "download_url": _pick_release_download_url(data)
                     }
             except Exception:
                 pass

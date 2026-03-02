@@ -16,7 +16,7 @@ from app.common.config import config, is_non_chinese_ui_language, Language, reso
 from app.common.signal_bus import signalBus
 from app.common.setting import REPO_URL
 from app.common.style_sheet import StyleSheet
-from app.common.utils import get_local_version
+from app.common.utils import get_local_version, get_github_release_channels, is_remote_version_newer
 
 from app.repackage.link_card import LinkCardView
 from app.repackage.samplecardview import SampleCardView
@@ -82,6 +82,70 @@ class BannerWidget(QWidget):
             self._ui_text("点击查看\n赞助二维码", "Click to view\nsupport QR") if self._is_simplified_ui else self._ui_text("前往 Ko-fi\n支持作者", "Visit Ko-fi\nto support"),
             "" if self._is_simplified_ui else "https://ko-fi.com/mofa",
             on_click=self._show_support_qr if self._is_simplified_ui else None,
+        )
+        self._add_update_card()
+
+    def _select_update_candidate(self, local_version: str, release_channels: dict):
+        stable = release_channels.get("latest") if isinstance(release_channels, dict) else None
+        prerelease = release_channels.get("prerelease") if isinstance(release_channels, dict) else None
+
+        candidates = []
+        for channel_name, release_data in (("latest", stable), ("prerelease", prerelease)):
+            if not release_data:
+                continue
+            remote_version = release_data.get("version")
+            if not remote_version:
+                continue
+            if is_remote_version_newer(local_version, remote_version):
+                candidates.append({
+                    "channel": channel_name,
+                    "version": remote_version,
+                    "download_url": release_data.get("download_url"),
+                    "is_prerelease": channel_name == "prerelease"
+                })
+
+        if not candidates:
+            return None
+
+        best = candidates[0]
+        for candidate in candidates[1:]:
+            if is_remote_version_newer(best["version"], candidate["version"]):
+                best = candidate
+        return best
+
+    def _add_update_card(self):
+        local_version = get_local_version() or "N/A"
+        release_channels = get_github_release_channels(REPO_URL)
+        best = self._select_update_candidate(local_version, release_channels)
+        is_prerelease = bool(best and best.get("is_prerelease"))
+
+        if best and best.get("download_url"):
+            title = self._ui_text("更新提示", "Update")
+            content = self._ui_text(
+                f"{'测试版 ' if is_prerelease else ''}{local_version} → {best['version']}\n点击下载最新",
+                f"{'Pre-release ' if is_prerelease else ''}{local_version} -> {best['version']}\nClick to download latest"
+            )
+            url = best.get("download_url")
+        elif best:
+            title = self._ui_text("更新提示", "Update")
+            content = self._ui_text(
+                f"{'测试版 ' if is_prerelease else ''}{local_version} → {best['version']}\n暂未找到直链",
+                f"{'Pre-release ' if is_prerelease else ''}{local_version} -> {best['version']}\nDirect download unavailable"
+            )
+            url = ""
+        else:
+            title = self._ui_text("更新提示", "Update")
+            content = self._ui_text(
+                f"当前已是最新\n版本 {local_version}",
+                f"You're up to date\nVersion {local_version}"
+            )
+            url = ""
+
+        self.linkCardView.addCard(
+            FluentIcon.DOWNLOAD,
+            title,
+            content,
+            url,
         )
 
     def _ui_text(self, zh_text: str, en_text: str) -> str:

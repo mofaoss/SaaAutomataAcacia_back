@@ -1,4 +1,5 @@
 import copy
+import html
 import os
 import re
 import sys
@@ -522,7 +523,7 @@ class Home(QFrame, Ui_home, BaseInterface):
                 candidates.append({
                     "channel": channel_name,
                     "version": remote_version,
-                    "url": release_data.get("url") or f"{REPO_URL}/releases",
+                    "download_url": release_data.get("download_url"),
                     "is_prerelease": channel_name == "prerelease"
                 })
 
@@ -535,6 +536,28 @@ class Home(QFrame, Ui_home, BaseInterface):
                 best = candidate
 
         return best, stable, prerelease
+
+    def _emit_update_clickable_log(self, best: Dict[str, Any], local_version: str):
+        download_url = str(best.get("download_url") or "").strip()
+        update_tag_zh = "测试版" if best.get("is_prerelease") else "新版本"
+        update_tag_en = "pre-release" if best.get("is_prerelease") else "update"
+
+        if download_url:
+            download_anchor = f"<a href=\"{html.escape(download_url, quote=True)}\">{self._ui_text('点击下载最新', 'Click to download latest')}</a>"
+            logger.warning(self._ui_text(
+                f"【发现{update_tag_zh}】{local_version} → {best['version']}\n"
+                f"{download_anchor}",
+                f"[{update_tag_en.title()} Available] {local_version} -> {best['version']}\n"
+                f"{download_anchor}"
+            ))
+            return
+
+        logger.warning(self._ui_text(
+            f"【发现{update_tag_zh}】{local_version} → {best['version']}\n"
+            f"暂未找到可直接下载的安装包链接",
+            f"[{update_tag_en.title()} Available] {local_version} -> {best['version']}\n"
+            f"No direct downloadable installer URL found"
+        ))
 
     def _notify_version_update(self, local_version: str, release_channels: Dict[str, Any]):
         best, stable, prerelease = self._select_update_candidate(local_version, release_channels)
@@ -555,10 +578,7 @@ class Home(QFrame, Ui_home, BaseInterface):
                 ))
             return
 
-        logger.info(self._ui_text(
-            f"发现版本更新 {local_version}→{best['version']}（channel={best['channel']}），下载地址：{best['url']}",
-            f"Update found {local_version} -> {best['version']} (channel={best['channel']}), download: {best['url']}"
-        ))
+        self._emit_update_clickable_log(best, local_version)
 
         local_is_prerelease = is_prerelease_version(local_version)
         if best["is_prerelease"] and not local_is_prerelease:
@@ -595,7 +615,7 @@ class Home(QFrame, Ui_home, BaseInterface):
 
         InfoBar.info(
             title=self._ui_text("发现版本更新", "Update Available"),
-            content=content,
+            content=content + self._ui_text("（请在日志中点击“点击下载最新”）", " (Click \"Click to download latest\" in log)"),
             orient=Qt.Horizontal,
             isClosable=True,
             position=InfoBarPosition.TOP_RIGHT,
