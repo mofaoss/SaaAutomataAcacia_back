@@ -321,6 +321,7 @@ class Input:
             y = int(y)
 
         start_time = time.time()
+        deferred_time = 0.0
         lock_timeout = max(0.1, min(time_out, 1.0))
         if not self._mouse_action_lock.acquire(timeout=lock_timeout):
             self.logger.error(f"鼠标移动点击({x}, {y})出错：获取鼠标操作锁超时")
@@ -333,12 +334,20 @@ class Input:
             else:
                 self.window_tracker.apply_tracking_visual_mode()
 
-            while time.time() - start_time < time_out:
+            while True:
+                active_elapsed = time.time() - start_time - (deferred_time if self._window_tracking_enabled else 0.0)
+                if active_elapsed >= time_out:
+                    break
+
                 if not self._window_tracking_enabled:
                     # 旧模式：稳定空闲判定，减少与用户抢鼠标
                     idle_start = None
                     sample_last = win32api.GetCursorPos()
-                    while time.time() - start_time < time_out:
+                    while True:
+                        active_elapsed = time.time() - start_time
+                        if active_elapsed >= time_out:
+                            break
+
                         time.sleep(0.02)
                         sample_now = win32api.GetCursorPos()
                         moved = abs(sample_now[0] - sample_last[0]) > 1 or abs(sample_now[1] - sample_last[1]) > 1
@@ -351,7 +360,8 @@ class Input:
                                 break
                         sample_last = sample_now
 
-                if time.time() - start_time >= time_out:
+                active_elapsed = time.time() - start_time - (deferred_time if self._window_tracking_enabled else 0.0)
+                if active_elapsed >= time_out:
                     break
 
                 current_pos = None
@@ -362,13 +372,16 @@ class Input:
                         click_done = False
                         max_attempts = 3
                         for _ in range(max_attempts):
-                            if time.time() - start_time >= time_out:
+                            active_elapsed = time.time() - start_time - deferred_time
+                            if active_elapsed >= time_out:
                                 break
 
                             if self._should_defer_tracking_interaction():
                                 self.window_tracker.hide_window_offscreen()
                                 self._log_shell_guard_wait()
+                                defer_started = time.time()
                                 self._sleep_for_shell_guard()
+                                deferred_time += max(0.0, time.time() - defer_started)
                                 continue
 
                             self._reset_shell_guard_wait()
@@ -431,7 +444,8 @@ class Input:
                         except Exception:
                             pass
 
-            if time.time() - start_time > time_out:
+            active_elapsed = time.time() - start_time - (deferred_time if self._window_tracking_enabled else 0.0)
+            if active_elapsed > time_out:
                 raise RuntimeError("等待点击超时")
         except Exception as e:
             # print(traceback.format_exc())
@@ -539,33 +553,40 @@ class Input:
             time.sleep(0.0015)
 
         if remainder > 0:
-            active_elapsed = time.time() - start_time - deferred_time
-            if active_elapsed >= effective_timeout:
-                self.logger.warning(
-                    f"窗口追踪滚轮超时(尾量)，放弃本次滚轮输入: ({x}, {y}, {delta}), "
-                    f"batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s"
-                )
-                return False
+            while True:
+                active_elapsed = time.time() - start_time - deferred_time
+                if active_elapsed >= effective_timeout:
+                    self.logger.warning(
+                        f"窗口追踪滚轮超时(尾量)，放弃本次滚轮输入: ({x}, {y}, {delta}), "
+                        f"batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s"
+                    )
+                    return False
 
-            if self._should_defer_tracking_interaction():
-                self.window_tracker.hide_window_offscreen()
-                self._log_shell_guard_wait()
-                return False
+                if self._should_defer_tracking_interaction():
+                    self.window_tracker.hide_window_offscreen()
+                    self._log_shell_guard_wait()
+                    defer_started = time.time()
+                    self._sleep_for_shell_guard()
+                    deferred_time += max(0.0, time.time() - defer_started)
+                    continue
 
-            aligned = False
-            for _ in range(5):
-                if self.window_tracker.align_target_to_cursor(x, y):
-                    aligned = True
-                    break
-                time.sleep(0.001)
+                self._reset_shell_guard_wait()
 
-            if not aligned:
-                self.logger.warning(f"窗口追踪滚轮尾量对齐失败，放弃本次滚轮输入: ({x}, {y}, {delta})")
-                return False
+                aligned = False
+                for _ in range(5):
+                    if self.window_tracker.align_target_to_cursor(x, y):
+                        aligned = True
+                        break
+                    time.sleep(0.001)
 
-            self.activate()
-            win32gui.SendMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
-            win32gui.SendMessage(self.hwnd, self.WmCode['mouse_wheel'], (direction * remainder) << 16, lparam)
+                if not aligned:
+                    self.logger.warning(f"窗口追踪滚轮尾量对齐失败，放弃本次滚轮输入: ({x}, {y}, {delta})")
+                    return False
+
+                self.activate()
+                win32gui.SendMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
+                win32gui.SendMessage(self.hwnd, self.WmCode['mouse_wheel'], (direction * remainder) << 16, lparam)
+                break
 
         self.logger.debug(f"窗口追踪模式滚动完成 ({x},{y}) delta={delta}")
         return True
