@@ -253,7 +253,9 @@ jobs:
           name: SaaAutomataAcacia ${{ steps.version.outputs.version }}
           draft: true
           prerelease: ${{ contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'rc') }}
-          files: ${{ steps.collect.outputs.release_files_dir }}/*.exe
+          files: |
+            ${{ steps.collect.outputs.release_files_dir }}/*.exe
+            ${{ steps.collect.outputs.release_files_dir }}/*.zip
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
