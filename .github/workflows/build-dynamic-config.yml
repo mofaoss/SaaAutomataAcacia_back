@@ -19,8 +19,6 @@ jobs:
 
     env:
       PYTHON_VERSION: '3.10'
-      CONDA_ENV_NAME: saa-build
-      CONDA_ALWAYS_YES: 'true'
       PIP_NO_INPUT: '1'
 
     steps:
@@ -42,31 +40,12 @@ jobs:
           }
           Write-Host "MSVC compiler found: $($cl.Source)"
 
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v3
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          auto-update-conda: true
           python-version: ${{ env.PYTHON_VERSION }}
-          activate-environment: ${{ env.CONDA_ENV_NAME }}
-          auto-activate-base: false
-          channels: conda-forge
-          channel-priority: strict
-
-      - name: Cache conda packages
-        uses: actions/cache@v4
-        with:
-          path: C:\Miniconda\pkgs
-          key: ${{ runner.os }}-conda-pkgs-py${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-conda-pkgs-py${{ env.PYTHON_VERSION }}-
-
-      - name: Cache pip downloads
-        uses: actions/cache@v4
-        with:
-          path: C:\Users\runneradmin\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-pip-py${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-py${{ env.PYTHON_VERSION }}-
+          cache: pip
+          cache-dependency-path: requirements.txt
 
       - name: Cache Nuitka artifacts
         uses: actions/cache@v4
@@ -104,8 +83,8 @@ jobs:
       - name: Install Python dependencies
         shell: powershell
         run: |
-          conda run -n $env:CONDA_ENV_NAME python -m pip install --upgrade pip setuptools wheel
-          conda run -n $env:CONDA_ENV_NAME pip install -r requirements.txt
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
 
       - name: Resolve version from tag/input
         id: version
@@ -170,11 +149,38 @@ jobs:
           INNO_SETUP_COMPILER: C:\Program Files (x86)\Inno Setup 6\ISCC.exe
         run: |
           Write-Host "Starting Nuitka build..."
-          conda run -n $env:CONDA_ENV_NAME python .\PerfectBuild\build.py --n
+          python .\PerfectBuild\build.py --n
           if ($LASTEXITCODE -ne 0) {
             Write-Error "Build failed"
             exit 1
           }
+
+      - name: Analyze package size
+        shell: powershell
+        run: |
+          $appExec = "SAA"
+          $distDir = Join-Path "build\Windows-64" "$appExec.dist"
+          if (-not (Test-Path $distDir)) {
+            Write-Warning "Dist directory not found: $distDir"
+            Get-ChildItem build -Recurse -ErrorAction SilentlyContinue | Select-Object -First 100
+            exit 0
+          }
+
+          Write-Host "=== Top 30 largest files in dist ==="
+          Get-ChildItem $distDir -Recurse -File |
+            Sort-Object Length -Descending |
+            Select-Object -First 30 @{Name='SizeMB';Expression={[math]::Round($_.Length/1MB,2)}}, FullName |
+            Format-Table -AutoSize
+
+          Write-Host "=== Top 20 largest top-level entries in dist ==="
+          Get-ChildItem $distDir | ForEach-Object {
+            if ($_.PSIsContainer) {
+              $size = (Get-ChildItem $_.FullName -Recurse -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum).Sum
+            } else {
+              $size = $_.Length
+            }
+            [PSCustomObject]@{ Name = $_.Name; SizeMB = [math]::Round($size/1MB,2) }
+          } | Sort-Object SizeMB -Descending | Select-Object -First 20 | Format-Table -AutoSize
 
       - name: Verify release output
         id: verify
@@ -201,11 +207,35 @@ jobs:
 
           "release_dir=$releaseDir" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
+      - name: Collect release files
+        id: collect
+        shell: powershell
+        run: |
+          $releaseDir = "${{ steps.verify.outputs.release_dir }}"
+          $outDir = "release_upload"
+          if (Test-Path $outDir) { Remove-Item $outDir -Recurse -Force }
+          New-Item -ItemType Directory -Path $outDir | Out-Null
+
+          Copy-Item -Path (Join-Path $releaseDir "*.zip") -Destination $outDir -ErrorAction SilentlyContinue
+          Copy-Item -Path (Join-Path $releaseDir "*.exe") -Destination $outDir -ErrorAction SilentlyContinue
+
+          $files = Get-ChildItem $outDir -File -ErrorAction SilentlyContinue
+          if (-not $files) {
+            Write-Error "No release files (*.zip/*.exe) found in $releaseDir"
+            Get-ChildItem $releaseDir -Recurse -ErrorAction SilentlyContinue
+            exit 1
+          }
+
+          Write-Host "Release files to upload:"
+          $files | ForEach-Object { Write-Host " - $($_.Name)" }
+
+          "release_files_dir=$outDir" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
       - name: Upload release artifacts
         uses: actions/upload-artifact@v4
         with:
           name: SaaAutomataAcacia-${{ steps.version.outputs.version }}-windows
-          path: ${{ steps.verify.outputs.release_dir }}/**
+          path: ${{ steps.collect.outputs.release_files_dir }}/*
           if-no-files-found: error
 
       - name: Create draft GitHub Release
@@ -216,9 +246,7 @@ jobs:
           name: SaaAutomataAcacia ${{ steps.version.outputs.version }}
           draft: true
           prerelease: ${{ contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'rc') }}
-          files: |
-            ${{ steps.verify.outputs.release_dir }}/*.zip
-            ${{ steps.verify.outputs.release_dir }}/*.exe
+          files: ${{ steps.collect.outputs.release_files_dir }}/*
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
