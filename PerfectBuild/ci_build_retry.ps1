@@ -3,7 +3,7 @@ param(
     [string]$CondaEnvName
 )
 
-$maxRetries = 3
+$maxRetries = 1
 $success = $false
 
 for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
@@ -17,7 +17,7 @@ for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
 
     if ($attempt -lt $maxRetries) {
         Write-Warning "Build failed, installing extra dependencies and retrying..."
-        conda run -n $CondaEnvName pip install --upgrade nuitka ordered-set zstandard pyinstaller
+        conda run -n $CondaEnvName pip install --no-input --upgrade nuitka ordered-set zstandard pyinstaller
         Start-Sleep -Seconds 20
     }
 }
