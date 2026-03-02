@@ -656,8 +656,10 @@ def _pick_release_download_url(release: dict):
     if not isinstance(assets, list) or not assets:
         return None
 
-    preferred_ext = (".exe", ".msi", ".zip", ".7z", ".rar")
-    best_url = None
+    exe_url = None
+    msi_url = None
+    portable_zip_url = None
+    portable_tokens = ("portable", "便携", "移动版", "green")
 
     for asset in assets:
         if not isinstance(asset, dict):
@@ -667,12 +669,18 @@ def _pick_release_download_url(release: dict):
             continue
 
         name = (asset.get("name") or "").strip().lower()
-        if name.endswith(preferred_ext):
-            return url
-        if best_url is None:
-            best_url = url
+        if name.endswith(".exe") and exe_url is None:
+            exe_url = url
+            continue
 
-    return best_url
+        if name.endswith(".msi") and msi_url is None:
+            msi_url = url
+            continue
+
+        if name.endswith(".zip") and any(token in name for token in portable_tokens) and portable_zip_url is None:
+            portable_zip_url = url
+
+    return exe_url or msi_url or portable_zip_url
 
 
 def get_github_release_channels(repo_url: str):
