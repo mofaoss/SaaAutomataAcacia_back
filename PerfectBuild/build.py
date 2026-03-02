@@ -115,6 +115,7 @@ class PerfectBuild:
             "--show-progress",
             "--show-memory",
             "--standalone",
+            "--assume-yes-for-downloads",
             "--plugin-enable=pyqt5",
             f"--output-dir={output_dir}",
             "--windows-uac-admin",

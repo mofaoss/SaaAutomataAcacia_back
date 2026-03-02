@@ -60,6 +60,19 @@ jobs:
             exit 1
           }
 
+      - name: Install Dependency Walker (for Nuitka)
+        shell: powershell
+        run: |
+          choco install dependencywalker --no-progress -y
+          $dependsPath = "C:\Program Files (x86)\Dependency Walker\depends.exe"
+          if (Test-Path $dependsPath) {
+            $dependsDir = Split-Path $dependsPath -Parent
+            echo $dependsDir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            Write-Host "Dependency Walker installed: $dependsPath"
+          } else {
+            Write-Warning "Dependency Walker package installed but depends.exe not found in expected location. Nuitka auto-download fallback will be used."
+          }
+
       - name: Install Python dependencies
         shell: powershell
         run: |
