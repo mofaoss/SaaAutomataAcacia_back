@@ -392,6 +392,11 @@ class MainWindow(FluentWindow):
     def initNavigation(self):
         # self.navigationInterface.setAcrylicEnabled(True)
 
+        nav_font = self.navigationInterface.font()
+        if nav_font.pointSize() <= 0:
+            nav_font.setPointSize(10)
+            self.navigationInterface.setFont(nav_font)
+
         # TODO: add navigation items
         startup_top_interface = None
         if self._startup_target_index == 2 and self.additionalInterface is not None:
@@ -423,10 +428,25 @@ class MainWindow(FluentWindow):
         )
 
         self.navigationInterface.setCollapsible(True)
-        self.navigationInterface.setMinimumExpandWidth(110)
-        self.navigationInterface.setExpandWidth(110)
+        if hasattr(self, "navigationInterface"):
+            if hasattr(self.navigationInterface, "setExpandWidth"):
+                if is_non_chinese_ui_language():
+                    self.navigationInterface.setExpandWidth(220)
+                else:
+                    self.navigationInterface.setExpandWidth(170)
 
-        QTimer.singleShot(200, self.navigationInterface.expand)
+        def _restore_nav_state():
+            if not hasattr(self, "navigationInterface") or self.navigationInterface is None:
+                return
+            is_currently_expanded = self.navigationInterface.width() > 100
+            should_be_expanded = bool(config.nav_expanded.value)
+            if is_currently_expanded != should_be_expanded:
+                if should_be_expanded and hasattr(self.navigationInterface, "expand"):
+                    self.navigationInterface.expand()
+                elif hasattr(self.navigationInterface, "toggle"):
+                    self.navigationInterface.toggle()
+
+        QTimer.singleShot(50, _restore_nav_state)
 
         if self._startup_target_index == 2 and self.additionalInterface is not None:
             self.stackedWidget.setCurrentWidget(self.additionalInterface, False)
@@ -735,6 +755,9 @@ class MainWindow(FluentWindow):
             self.ocr_module.stop_ocr()
         self.themeListener.terminate()
         self.themeListener.deleteLater()
+        if hasattr(self, "navigationInterface") and self.navigationInterface is not None:
+            is_expanded = self.navigationInterface.width() > 100
+            config.set(config.nav_expanded, is_expanded)
         try:
             # 保存日志到文件
             self.save_log()
@@ -746,6 +769,14 @@ class MainWindow(FluentWindow):
             logger.error(e)
             # traceback.print_exc()
         super().closeEvent(a0)
+
+    def changeEvent(self, event):
+        super().changeEvent(event)
+        if event.type() in [event.Type.LanguageChange, event.Type.FontChange, event.Type.ApplicationFontChange]:
+            app_font = QApplication.font()
+            if app_font.pointSize() <= 0:
+                app_font.setPointSize(10)
+                QApplication.setFont(app_font)
 
     def _onThemeChangedFinished(self):
         super()._onThemeChangedFinished()

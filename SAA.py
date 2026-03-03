@@ -208,10 +208,10 @@ def main():
             Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
 
     app = QApplication(sys.argv)
-    app_font = app.font()
-    if app_font.pointSize() <= 0:
-        app_font.setPointSize(10)
-        app.setFont(app_font)
+    global_font = app.font()
+    if global_font.pointSize() <= 0:
+        global_font.setPointSize(10)
+        app.setFont(global_font)
     app.setAttribute(Qt.ApplicationAttribute.AA_DontCreateNativeWidgetSiblings)
 
     early_splash = EarlySplash()

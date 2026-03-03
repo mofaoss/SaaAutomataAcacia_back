@@ -1,10 +1,15 @@
 from __future__ import annotations
 
 import re
+import threading
+import time
 from typing import Any, Dict, Optional, Tuple
 
 import requests
 from packaging.version import parse as parse_version
+
+# Lock to prevent concurrent API calls during startup
+_fetch_lock = threading.Lock()
 
 
 def _resolve_proxies(proxies: Optional[Dict[str, str]]) -> Optional[Dict[str, str]]:
@@ -108,7 +113,10 @@ def get_github_release_channels(
     per_page: int = 15,
     proxies: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Optional[Dict[str, Optional[str]]]]:
-    proxies = _resolve_proxies(proxies)
+    from app.common.config import config
+
+    CACHE_TTL_SECONDS = 3600 * 8  # 8 hours
+
     result: Dict[str, Optional[Dict[str, Optional[str]]]] = {
         "latest": None,
         "prerelease": None,
@@ -118,37 +126,67 @@ def get_github_release_channels(
     if not owner or not repo:
         return result
 
-    api_url = f"https://api.github.com/repos/{owner}/{repo}/releases?per_page={max(1, int(per_page))}"
-    headers = {
-        "Accept": "application/vnd.github+json",
-        "User-Agent": "SaaAutomataAcacia-Updater",
-    }
+    # 1. Check Config Cache First
+    cached_obj = config.github_api_cache.value or {}
+    if "timestamp" in cached_obj and "data" in cached_obj:
+        if time.time() - cached_obj["timestamp"] < CACHE_TTL_SECONDS:
+            return cached_obj["data"]  # Return ultra-fast, minimal parsed cache
 
-    try:
-        response = requests.get(api_url, headers=headers, timeout=timeout, proxies=proxies)
-        if response.status_code != 200:
-            return result
-        releases = response.json()
-    except Exception:
-        return result
+    # 2. Cache Miss or Expired: Fetch from API (with lock to prevent concurrent startup calls)
+    with _fetch_lock:
+        # Double-check cache in case another thread populated it while waiting for lock
+        cached_obj = config.github_api_cache.value or {}
+        if "timestamp" in cached_obj and "data" in cached_obj:
+            if time.time() - cached_obj["timestamp"] < CACHE_TTL_SECONDS:
+                return cached_obj["data"]
 
-    if not isinstance(releases, list):
-        return result
+        api_url = f"https://api.github.com/repos/{owner}/{repo}/releases?per_page={max(1, int(per_page))}"
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "SaaAutomataAcacia-Updater",
+        }
+        proxies = _resolve_proxies(proxies)
 
-    for release in releases:
-        if not isinstance(release, dict):
-            continue
-        if bool(release.get("draft")):
-            continue
+        try:
+            response = requests.get(api_url, headers=headers, timeout=timeout, proxies=proxies)
+            if response.status_code == 200:
+                releases = response.json()
+                if isinstance(releases, list):
+                    # Process the bloated raw data into our minimal `result`
+                    for release in releases:
+                        if not isinstance(release, dict) or bool(release.get("draft")):
+                            continue
+                        item = _build_release_item(release)
+                        if not item:
+                            continue
+                        if bool(release.get("prerelease")):
+                            result["prerelease"] = _choose_newer(result["prerelease"], item)
+                        else:
+                            result["latest"] = _choose_newer(result["latest"], item)
 
-        item = _build_release_item(release)
-        if not item:
-            continue
+                    # Save ONLY the minimal result and timestamp to config.json
+                    config.set(config.github_api_cache, {
+                        "timestamp": time.time(),
+                        "data": result
+                    })
+                    return result
 
-        if bool(release.get("prerelease")):
-            result["prerelease"] = _choose_newer(result["prerelease"], item)
-        else:
-            result["latest"] = _choose_newer(result["latest"], item)
+            elif response.status_code in (403, 429):
+                from app.common.logger import logger
+                logger.error(f"GitHub API {response.status_code} Rate Limit hit! Using fallback.")
+            else:
+                from app.common.logger import logger
+                logger.error(f"GitHub API Error {response.status_code}: {response.text}")
+
+        except Exception as e:
+            from app.common.logger import logger
+            logger.error(f"GitHub API Connection Error: {e}")
+
+    # 3. Fallback: If API failed, try to use expired config cache
+    if "data" in cached_obj and cached_obj["data"].get("latest"):
+        from app.common.logger import logger
+        logger.warning("Falling back to expired config cache due to API failure.")
+        return cached_obj["data"]
 
     return result
 
@@ -205,3 +243,43 @@ def get_local_version(file_path="update_data.txt"):
             return None
     except Exception:
         return None
+
+
+def get_best_update_candidate(repo_url: str, local_version: str, check_prerelease: bool = False) -> Optional[Dict[str, Any]]:
+    """
+    Makes a SINGLE call to get release channels and determines the absolute best candidate
+    based on the user's prerelease preferences.
+    """
+    channels = get_github_release_channels(repo_url)
+    stable = channels.get("latest")
+    prerelease = channels.get("prerelease")
+
+    if not stable and not prerelease:
+        return None
+
+    should_check_prerelease = is_prerelease_version(local_version) or check_prerelease
+    candidates = []
+
+    if stable and isinstance(stable, dict):
+        candidates.append({
+            "version": stable.get("version"),
+            "download_url": stable.get("download_url"),
+            "is_prerelease": False
+        })
+
+    if prerelease and isinstance(prerelease, dict) and should_check_prerelease:
+        candidates.append({
+            "version": prerelease.get("version"),
+            "download_url": prerelease.get("download_url"),
+            "is_prerelease": True
+        })
+
+    if not candidates:
+        return None
+
+    best = candidates[0]
+    for candidate in candidates[1:]:
+        if is_remote_version_newer(best["version"], candidate["version"]):
+            best = candidate
+
+    return best
