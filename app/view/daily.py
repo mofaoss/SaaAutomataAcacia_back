@@ -313,8 +313,17 @@ class Daily(QFrame, BaseInterface):
     def _initWidget(self):
         self._apply_home_i18n()
 
+        container_font = self.SimpleCardWidget_option.font()
+        if container_font.pointSize() <= 0:
+            container_font.setPointSize(10)
+            self.SimpleCardWidget_option.setFont(container_font)
+
         for tool_button in self.SimpleCardWidget_option.findChildren(ToolButton):
             tool_button.setIcon(FIF.SETTING)
+            btn_font = tool_button.font()
+            if btn_font.pointSize() <= 0:
+                btn_font.setPointSize(10)
+                tool_button.setFont(btn_font)
 
         # 设置combobox选项
         after_use_items = [
@@ -1131,7 +1140,7 @@ class Daily(QFrame, BaseInterface):
         self.CheckBox_buy_14.setText(self._ui_text("单极纤维", "Monopolar Fibers"))
         self.CheckBox_buy_15.setText(self._ui_text("光纤轴突", "Fiber Axon"))
 
-    def save_changed(self, widget):
+    def save_changed(self, widget, *args):
         # logger.debug(f"触发save_changed:{widget.objectName()}")
         # 当与配置相关的控件状态改变时调用此函数保存配置
         if isinstance(widget, CheckBox):
