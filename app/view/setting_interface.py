@@ -20,7 +20,7 @@ from ..common.logger import logger
 from ..common.setting import QQ, REPO_URL
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
-from ..common.utils import get_local_version, get_github_release_channels, is_remote_version_newer, is_prerelease_version
+from utils.updater_utils import get_local_version, get_github_release_channels, is_remote_version_newer, is_prerelease_version
 from ..repackage.slider_setting_card import SliderSettingCard
 from ..repackage.text_edit_card import TextEditCard
 
@@ -54,6 +54,7 @@ class SettingInterface(ScrollArea):
 
         self.progressBar = ProgressBar(self)
         self.progressBar.setVisible(False)
+        self._is_dialog_open = False
 
         self.app_name = "SaaAutomataAcacia"
         self.startup_task_name = f"{self.app_name} {self._ui_text('开机自启', 'Startup')}"
@@ -514,20 +515,23 @@ class SettingInterface(ScrollArea):
     def check_update(self):
         local_version = get_local_version()
         release_channels = get_github_release_channels(REPO_URL)
+        stable = release_channels.get("latest") if isinstance(release_channels, dict) else None
+        prerelease = release_channels.get("prerelease") if isinstance(release_channels, dict) else None
         best = self._select_update_candidate(local_version, release_channels)
 
         if best is None:
-            InfoBar.success(
-                self._ui_text('当前已是最新版本', 'You are on the latest version'),
-                self._ui_text(f'当前版本：{local_version}', f'Current version: {local_version}'),
-                isClosable=True,
-                duration=3000,
-                parent=self
-            )
-            logger.info(self._ui_text(
-                f"【检查更新】当前版本 {local_version} 已是最新版本",
-                f"[Check Update] Current version {local_version} is up to date"
-            ))
+            if not stable and not prerelease:
+                InfoBar.error(
+                    self._ui_text('检查更新失败', 'Update check failed'),
+                    self._ui_text('未获取到仓库版本信息，请稍后重试', 'No repository release data found. Please try again later'),
+                    isClosable=True,
+                    duration=5000,
+                    parent=self
+                )
+                logger.warning(self._ui_text(
+                    "【检查更新】未获取到仓库 release 版本（latest/prerelease）",
+                    "[Check Update] No repository release versions found (latest/prerelease)"
+                ))
             return
 
         self._log_clickable_update_links(best, local_version)
@@ -557,14 +561,20 @@ class SettingInterface(ScrollArea):
         """ Hide progress bar and show completion message """
         self.progressBar.setVisible(False)
         if os.path.exists(zip_path):
+            if self._is_dialog_open:
+                return
             title = self._ui_text('更新完成', 'Update ready')
             content = self._ui_text(f'压缩包已下载至{zip_path}，即将重启更新',
                                     f'Package downloaded to {zip_path}. Restarting to update')
-            message_box = MessageBox(title, content, self.parent.window())
-            message_box.cancelButton.setVisible(False)
-            if message_box.exec():
-                subprocess.Popen([sys.executable, 'update.py', zip_path])
-                self.parent.close()
+            self._is_dialog_open = True
+            try:
+                message_box = MessageBox(title, content, self.parent.window())
+                message_box.cancelButton.setVisible(False)
+                if message_box.exec():
+                    subprocess.Popen([sys.executable, 'update.py', zip_path])
+                    self.parent.close()
+            finally:
+                self._is_dialog_open = False
         else:
             InfoBar.error(
                 self._ui_text('更新下载失败', 'Update download failed'),

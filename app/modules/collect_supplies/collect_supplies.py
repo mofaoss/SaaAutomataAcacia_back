@@ -3,7 +3,7 @@ from datetime import datetime
 
 from app.common.config import config
 from app.common.data_models import parse_config_update_data
-from app.common.utils import get_cloudflare_data
+from utils.net_utils import get_cloudflare_data
 from app.modules.automation.timer import Timer
 
 

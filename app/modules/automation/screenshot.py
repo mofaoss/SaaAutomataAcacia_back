@@ -9,7 +9,7 @@ import win32con
 
 from app.common.image_utils import ImageUtils
 from app.common.logger import logger
-from app.common.utils import is_fullscreen
+from utils.win_utils import is_fullscreen
 from app.modules.automation.timer import Timer
 
 

@@ -19,14 +19,16 @@ from win11toast import toast
 
 from app.common.config import config, is_non_chinese_ui_language
 from app.common.data_models import Coordinates, UpdateData, RedeemCode, ApiData, ApiResponse, parse_config_update_data
-from app.common.logger import original_stdout, original_stderr, logger
+from app.common.logger import logger
 from app.common.signal_bus import signalBus
 from app.common.setting import REPO_URL
 from app.common.style_sheet import StyleSheet
-from app.common.utils import get_all_children, get_date_from_api, get_gitee_text, \
-    is_exist_snowbreak, get_cloudflare_data, get_local_version, is_remote_version_newer, \
-    launch_game_with_guard, \
-    get_github_release_channels, is_prerelease_version
+from utils.game_launcher import launch_game_with_guard
+from utils.net_utils import get_cloudflare_data, get_date_from_api
+from utils.ui_utils import get_all_children
+from utils.updater_utils import get_gitee_text, get_local_version, is_remote_version_newer, get_github_release_channels, \
+    is_prerelease_version
+from utils.win_utils import is_exist_snowbreak
 from app.modules.base_task.base_task import BaseTask
 from app.modules.chasm.chasm import ChasmModule
 from app.modules.collect_supplies.collect_supplies import CollectSuppliesModule
@@ -58,14 +60,39 @@ class CloudflareUpdateThread(QThread):
             self.update_failed.emit(f"网络请求异常: {str(e)}")
 
 
-class StartThread(QThread, BaseTask):
+class AutomationSession:
+    def __init__(self, logger_instance):
+        self.logger = logger_instance
+        self._task_context = BaseTask()
+        self._task_context.logger = self.logger
+
+    @property
+    def auto(self):
+        return self._task_context.auto
+
+    def prepare(self):
+        ok = self._task_context.init_auto('game')
+        if not ok:
+            return False
+        if self.auto is not None:
+            self.auto.reset()
+        return True
+
+    def stop(self):
+        if self.auto is None:
+            return
+        self.auto.stop()
+
+
+class StartThread(QThread):
     is_running_signal = Signal(str)
     stop_signal = Signal()  # 添加停止信号
 
-    def __init__(self, checkbox_dic):
-        super().__init__()
+    def __init__(self, checkbox_dic, parent=None):
+        super().__init__(parent)
         self.checkbox_dic = checkbox_dic
         self.logger = logger
+        self.session = AutomationSession(self.logger)
         self._is_running = True
         self._interrupted_reason = None
         self.name_list_zh = ['自动登录', '领取物资', '商店购买', '刷体力', '人物碎片', '精神拟境', '领取奖励']
@@ -77,9 +104,9 @@ class StartThread(QThread, BaseTask):
         if reason:
             self._interrupted_reason = reason
             self.logger.warn(f"检测到中断，停止自动任务：{reason}")
-        if self.auto is not None:
+        if self.session.auto is not None:
             try:
-                self.auto.stop()
+                self.session.stop()
             except Exception as e:
                 self.logger.warn(f"停止自动任务时发生异常，已忽略：{e}")
 
@@ -87,6 +114,14 @@ class StartThread(QThread, BaseTask):
         self.is_running_signal.emit('start')
         normal_stop_flag = True
         try:
+            has_enabled_task = any(self.checkbox_dic.values())
+            if has_enabled_task:
+                if not self.session.prepare():
+                    normal_stop_flag = False
+                    return
+
+            auto = self.session.auto
+
             for key, value in self.checkbox_dic.items():
                 if not self._is_running:
                     normal_stop_flag = False
@@ -95,30 +130,26 @@ class StartThread(QThread, BaseTask):
                     index = int(re.search(r'\d+', key).group()) - 1
                     task_name = self.name_list_en[index] if is_non_chinese_ui_language() else self.name_list_zh[index]
                     self.logger.info(f"当前任务：{task_name}")
-                    if not self.init_auto('game'):
-                        normal_stop_flag = False
-                        break
-                    self.auto.reset()
                     if index == 0:
-                        module = EnterGameModule(self.auto, self.logger)
+                        module = EnterGameModule(auto, self.logger)
                         module.run()
                     elif index == 1:
-                        module = CollectSuppliesModule(self.auto, self.logger)
+                        module = CollectSuppliesModule(auto, self.logger)
                         module.run()
                     elif index == 2:
-                        module = ShoppingModule(self.auto, self.logger)
+                        module = ShoppingModule(auto, self.logger)
                         module.run()
                     elif index == 3:
-                        module = UsePowerModule(self.auto, self.logger)
+                        module = UsePowerModule(auto, self.logger)
                         module.run()
                     elif index == 4:
-                        module = PersonModule(self.auto, self.logger)
+                        module = PersonModule(auto, self.logger)
                         module.run()
                     elif index == 5:
-                        module = ChasmModule(self.auto, self.logger)
+                        module = ChasmModule(auto, self.logger)
                         module.run()
                     elif index == 6:
-                        module = GetRewardModule(self.auto, self.logger)
+                        module = GetRewardModule(auto, self.logger)
                         module.run()
 
                     if not self._is_running:
@@ -132,7 +163,7 @@ class StartThread(QThread, BaseTask):
                 def empty_func(args):
                     pass
 
-                full_time = self.auto.calculate_power_time()
+                full_time = auto.calculate_power_time() if auto is not None else None
                 if full_time:
                     content = f'体力将在 {full_time} 完全恢复'
                 else:
@@ -147,11 +178,8 @@ class StartThread(QThread, BaseTask):
                 self.logger.warn(e)
             # traceback.print_exc()
         finally:
-            if self.auto is not None:
-                try:
-                    self.auto.stop()
-                except Exception as e:
-                    self.logger.warn(f"任务结束时恢复窗口位置失败：{e}")
+            if self.session.auto is not None:
+                self.session.stop()
             # 运行完成
             if normal_stop_flag and self._is_running:
                 self.is_running_signal.emit('end')
@@ -259,6 +287,7 @@ class Daily(QFrame, BaseInterface):
         self.launch_process = None
         self.launch_deadline = 0.0
         self.is_launch_pending = False
+        self._is_dialog_open = False
 
         self._initWidget()
         self._connect_to_slot()
@@ -592,12 +621,7 @@ class Daily(QFrame, BaseInterface):
         prerelease_ver = prerelease.get("version") if prerelease else None
 
         if best is None:
-            if stable_ver or prerelease_ver:
-                logger.info(self._ui_text(
-                    f"当前版本{local_version}已是最新可用版本（stable={stable_ver or 'N/A'}, prerelease={prerelease_ver or 'N/A'}）",
-                    f"Current version {local_version} is up to date (stable={stable_ver or 'N/A'}, prerelease={prerelease_ver or 'N/A'})"
-                ))
-            else:
+            if not (stable_ver or prerelease_ver):
                 logger.warning(self._ui_text(
                     "未获取到仓库 release 版本（latest/prerelease），已跳过版本更新检查",
                     "No repository release versions found (latest/prerelease), skipped update check"
@@ -792,13 +816,20 @@ class Daily(QFrame, BaseInterface):
             # 返回列表
             return result
 
-        w = CustomMessageBox(self, "导入兑换码", "text_edit")
-        w.content.setEnabled(True)
-        w.content.setPlaceholderText("一行一个兑换码")
-        if w.exec():
-            raw_codes = w.content.toPlainText()
-            codes = filter_codes(raw_codes)
-            config.set(config.import_codes, codes)
+        if self._is_dialog_open:
+            return
+
+        self._is_dialog_open = True
+        try:
+            w = CustomMessageBox(self, "导入兑换码", "text_edit")
+            w.content.setEnabled(True)
+            w.content.setPlaceholderText("一行一个兑换码")
+            if w.exec():
+                raw_codes = w.content.toPlainText()
+                codes = filter_codes(raw_codes)
+                config.set(config.import_codes, codes)
+        finally:
+            self._is_dialog_open = False
 
     def change_auto_open(self, state):
         if state == 2:
@@ -936,8 +967,7 @@ class Daily(QFrame, BaseInterface):
                 sorted_dict = dict(
                     sorted(checkbox_dic.items(), key=lambda item: int(re.search(r'\d+', item[0]).group())))
                 # logger.debug(sorted_dict)
-                self.redirectOutput(self.textBrowser_log)
-                self.start_thread = StartThread(sorted_dict)
+                self.start_thread = StartThread(sorted_dict, self)
                 self.start_thread.is_running_signal.connect(self.handle_start)
                 self.start_thread.start()
             else:
@@ -972,25 +1002,12 @@ class Daily(QFrame, BaseInterface):
                 self.PushButton_start.setText(self._ui_text("开始", "Start"))
                 # 后处理
                 self.after_finish()
-                self.resize_window()  # 把窗口还原成原本位置
             elif str_flag == 'no_auto':
                 self._set_launch_pending_state(False)
                 self.is_running = False
                 self.running_game_guard_timer.stop()
                 self.set_checkbox_enable(True)
                 self.PushButton_start.setText(self._ui_text("开始", "Start"))
-                text = self._ui_text("助手会自动缩放窗口至1920*1080", "the assistant will auto-resize to 1920*1080") \
-                    if config.autoScaling.value else self._ui_text("然后手动缩放窗口到16:9",
-                                                                   "then manually resize to 16:9")
-                InfoBar.error(
-                    title=self._ui_text('未成功初始化auto', 'Auto init failed'),
-                    content=self._ui_text(f"未打开游戏，{text}，然后再点击开始", f"Game is not opened, {text}, then click Start again"),
-                    orient=Qt.Orientation.Horizontal,
-                    isClosable=True,
-                    position=InfoBarPosition.TOP_RIGHT,
-                    duration=5000,
-                    parent=self
-                )
             elif str_flag == 'interrupted':
                 self._set_launch_pending_state(False)
                 self.is_running = False
@@ -1007,7 +1024,6 @@ class Daily(QFrame, BaseInterface):
                     duration=4000,
                     parent=self
                 )
-                self.resize_window()
         except Exception as e:
             logger.error(f'处理任务状态变更时出现异常：{e}')
             self._set_launch_pending_state(False)
@@ -1033,27 +1049,6 @@ class Daily(QFrame, BaseInterface):
         except Exception as e:
             logger.error(f'运行中窗口守护检测异常：{e}')
             self._stop_running_guard()
-
-    def resize_window(self):
-        # 恢复窗口
-        if config.is_resize.value is not None:
-            state = config.is_resize.value
-            config.set(config.is_resize, None)
-            try:
-                if self.game_hwnd and win32gui.IsWindow(self.game_hwnd):
-                    win32gui.SetWindowPos(
-                        self.game_hwnd,
-                        win32con.HWND_TOP,
-                        state[0],  # 原始左边界
-                        state[1],  # 原始上边界
-                        state[2] - state[0],  # 宽度
-                        state[3] - state[1],  # 高度
-                        win32con.SWP_NOZORDER | win32con.SWP_NOACTIVATE
-                    )
-                else:
-                    self.logger.warn('游戏窗口已关闭或句柄无效，跳过窗口还原')
-            except Exception as e:
-                self.logger.warn(f'窗口还原失败，已忽略：{e}')
 
     def after_finish(self):
         # 任务结束后的后处理
@@ -1256,7 +1251,4 @@ class Daily(QFrame, BaseInterface):
             logger.error(f"更新控件出错：{e}")
 
     def closeEvent(self, event):
-        # 恢复原始标准输出
-        sys.stdout = original_stdout
-        sys.stderr = original_stderr
         super().closeEvent(event)

@@ -1,9 +1,5 @@
-import sys
-import warnings
-
-import win32gui
-
-from app.common.logger import logger, stdout_stream, stderr_stream
+from app.common.logger import logger
+from app.common.gui_logger import bind_log_widget
 
 
 class BaseInterface:
@@ -12,32 +8,7 @@ class BaseInterface:
         self.auto = None
 
     def redirectOutput(self, log_widget):
-        # 普通输出
-        sys.stdout = stdout_stream
-        # 报错输出
-        sys.stderr = stderr_stream
-        if hasattr(log_widget, "setOpenExternalLinks"):
-            log_widget.setOpenExternalLinks(True)
-        # 先断开可能存在的所有连接
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RuntimeWarning)
-            try:
-                stdout_stream.message.disconnect()
-            except Exception:
-                pass
-            try:
-                stderr_stream.message.disconnect()
-            except Exception:
-                pass
-        # 将新消息信号连接到对应输出位置
-        stdout_stream.message.connect(lambda message: self.__updateDisplay(message, log_widget))
-        stderr_stream.message.connect(lambda message: self.__updateDisplay(message, log_widget))
-
-    def __updateDisplay(self, message, log_widget):
-        # 将消息添加到 textBrowser，自动识别 HTML
-        log_widget.insertHtml(message)
-        log_widget.insertPlainText('\n')  # 为下一行消息留出空间
-        log_widget.ensureCursorVisible()  # 滚动到最新消息
+        bind_log_widget(log_widget)
 
     def toggle_button(self, running):
         pass

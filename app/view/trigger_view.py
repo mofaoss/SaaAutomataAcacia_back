@@ -30,7 +30,6 @@ class TriggerItemCard(SimpleCardWidget):
         switch = SwitchButton(self)
         switch.setObjectName(switch_object_name)
 
-        main_layout.addStretch(1)
         main_layout.addLayout(text_layout)
         main_layout.addStretch(1)
         main_layout.addWidget(switch)

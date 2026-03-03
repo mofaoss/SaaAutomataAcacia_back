@@ -21,8 +21,10 @@ from ..common.logger import logger
 from ..common.matcher import matcher
 from ..common.setting import REPO_URL
 from ..common.signal_bus import signalBus
-from ..common.utils import get_gitee_text, get_local_version, get_cloudflare_data, launch_game_with_guard, \
-    get_github_release_channels, is_remote_version_newer, is_prerelease_version
+from utils.game_launcher import launch_game_with_guard
+from utils.net_utils import get_cloudflare_data
+from utils.updater_utils import get_gitee_text, get_local_version, get_github_release_channels, is_remote_version_newer, \
+    is_prerelease_version
 from ..repackage.custom_message_box import CustomMessageBox
 from ..common import resource  # don't delete
 
@@ -256,6 +258,9 @@ class MainWindow(FluentWindow):
         )
 
     def _finalize_startup(self):
+        if self.homeInterface is None:
+            self._create_home_interface()
+
         ocr_thread = threading.Thread(target=self.init_ocr)
         ocr_thread.daemon = True
         ocr_thread.start()
@@ -699,11 +704,9 @@ class MainWindow(FluentWindow):
             log_configs.extend([
                 ("./log/fishing", self.additionalInterface.textBrowser_log_fishing, "fishing"),
                 ("./log/action", self.additionalInterface.textBrowser_log_action, "action"),
-                ("./log/jigsaw", self.additionalInterface.textBrowser_log_jigsaw, "jigsaw"),
                 ("./log/water_bomb", self.additionalInterface.textBrowser_log_water_bomb, "water_bomb"),
                 ("./log/alien_guardian", self.additionalInterface.textBrowser_log_alien_guardian, "alien_guardian"),
                 ("./log/maze", self.additionalInterface.textBrowser_log_maze, "maze"),
-                ("./log/massaging", self.additionalInterface.textBrowser_log_massaging, "massaging"),
                 ("./log/drink", self.additionalInterface.textBrowser_log_drink, "drink"),
             ])
 

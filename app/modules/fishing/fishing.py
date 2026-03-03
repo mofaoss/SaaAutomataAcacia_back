@@ -8,7 +8,7 @@ from fuzzywuzzy import process
 
 from app.common.config import config
 from app.common.signal_bus import signalBus
-from app.common.utils import count_color_blocks
+from utils.cv_utils import count_color_blocks
 from app.modules.automation.timer import Timer
 
 

@@ -2,7 +2,7 @@ import time
 import numpy as np
 
 from app.common.config import config
-from app.common.utils import count_color_blocks
+from utils.cv_utils import count_color_blocks
 from app.modules.base_task.base_task import BaseTask
 
 

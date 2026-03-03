@@ -13,7 +13,7 @@ from qfluentwidgets import ScrollArea, CardWidget
 from app.common.config import config, is_non_chinese_ui_language
 from app.common.signal_bus import signalBus
 from app.common.style_sheet import StyleSheet
-from app.common.utils import get_local_version
+from utils.updater_utils import get_local_version
 
 from app.repackage.samplecardview import SampleCardView
 

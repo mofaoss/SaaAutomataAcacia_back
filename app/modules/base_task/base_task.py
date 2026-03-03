@@ -1,5 +1,3 @@
-import ctypes
-
 import win32api
 import win32con
 import win32gui
@@ -48,45 +46,13 @@ class BaseTask:
             f"窗口客户区尺寸: {client_width}x{client_height} "
             f"({actual_ratio:.3f}:1), {status}16:9标准比例"
         )
-        # 如果用户设置了自动缩放才执行以下命令
-        if config.autoScaling.value:
-            # 排除缩放干扰
-            ctypes.windll.user32.SetProcessDPIAware()
-            # 保存原始窗口矩形位置
-            original_rect = win32gui.GetWindowRect(hwnd)
-            config.set(config.is_resize, original_rect)
-            # 若不符合比例则进行窗口调整
-            if not is_16_9:
-                window_rect = win32gui.GetWindowRect(hwnd)
-                non_client_w = (window_rect[2] - window_rect[0]) - client_width
-                non_client_h = (window_rect[3] - window_rect[1]) - client_height
-
-                target_client_width = 1920
-                target_client_height = 1080
-                target_window_width = target_client_width + non_client_w
-                target_window_height = target_client_height + non_client_h
-
-                # 设置窗口位置和大小
-                win32gui.SetWindowPos(
-                    hwnd,
-                    win32con.HWND_TOP,
-                    0,
-                    0,
-                    target_window_width,
-                    target_window_height,
-                    win32con.SWP_NOZORDER | win32con.SWP_NOACTIVATE | win32con.SWP_NOMOVE
-                )
-
-                self.logger.warn(f"已调整窗口到16:9客户区（目标{target_client_width}x{target_client_height}）")
-                is_16_9 = True
-            else:
-                self.auto.scale_x = 1920 / client_width
-                self.auto.scale_y = 1080 / client_height
-            return is_16_9
+        if is_16_9:
+            self.auto.scale_x = 1920 / client_width
+            self.auto.scale_y = 1080 / client_height
         else:
-            if not is_16_9:
-                self.logger.warn(f"设置中未开启自动缩放，请手动调整窗口为16:9或在设置中开启自动缩放")
-            return is_16_9
+            self.logger.warn("游戏窗口不符合16:9比例，请手动调整。")
+
+        return is_16_9
 
     def init_auto(self, name):
         if config.server_interface.value != 2:

@@ -150,7 +150,8 @@ class StartupController(QObject):
         self.FluentTranslator = imported['FluentTranslator']
         self.patch_infobar_for_traditional = imported['patch_infobar_for_traditional']
         self.localize_widget_tree_for_traditional = imported['localize_widget_tree_for_traditional']
-        self.MainWindow = imported['MainWindow']
+        from app.view.main_window import MainWindow
+        self.MainWindow = MainWindow
         QTimer.singleShot(0, self._run_next_task)
 
     def _on_import_failed(self, message: str):
@@ -188,13 +189,11 @@ class RuntimeImportWorker(QThread):
         try:
             from qfluentwidgets import FluentTranslator
             from app.common.ui_localizer import patch_infobar_for_traditional, localize_widget_tree_for_traditional
-            from app.view.main_window import MainWindow
 
             self.ready.emit({
                 'FluentTranslator': FluentTranslator,
                 'patch_infobar_for_traditional': patch_infobar_for_traditional,
                 'localize_widget_tree_for_traditional': localize_widget_tree_for_traditional,
-                'MainWindow': MainWindow,
             })
         except Exception as e:
             self.failed.emit(str(e))

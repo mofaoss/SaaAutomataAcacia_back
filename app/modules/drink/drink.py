@@ -1,7 +1,7 @@
 import time
 
 from app.common.config import config
-from app.common.utils import random_rectangle_point
+from utils.math_utils import random_rectangle_point
 from app.modules.automation.timer import Timer
 
 

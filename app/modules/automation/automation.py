@@ -14,7 +14,8 @@ from app.common.image_utils import ImageUtils
 from app.common.matcher import matcher
 from app.common.signal_bus import signalBus
 from app.common.text_normalizer import normalize_chinese_text
-from app.common.utils import random_rectangle_point, get_hwnd
+from utils.math_utils import random_rectangle_point
+from utils.win_utils import get_hwnd
 from app.modules.automation.input import Input
 from app.modules.automation.screenshot import Screenshot
 from app.modules.automation.timer import Timer

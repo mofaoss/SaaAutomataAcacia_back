@@ -6,7 +6,7 @@ import numpy as np
 from app.common.config import config
 from app.common.image_utils import ImageUtils
 from app.common.text_normalizer import normalize_chinese_text
-from app.common.utils import cpu_support_avx2
+from utils.system_utils import cpu_support_avx2
 from app.modules.onnxocr.onnx_paddleocr import ONNXPaddleOcr
 
 
@@ -345,7 +345,7 @@ class OCR:
         """实例化OCR，若ocr实例未创建，则创建之"""
         if self.ocr is None:
             if config.cpu_support_avx2.value is None:
-                cpu_support_avx2()
+                cpu_support_avx2(config)
             try:
                 self.logger.debug("开始初始化OCR...")
                 #

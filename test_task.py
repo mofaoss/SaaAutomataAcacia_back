@@ -7,7 +7,7 @@ import win32gui
 from PIL import Image
 
 from app.common.image_utils import ImageUtils
-from app.common.utils import is_fullscreen
+from utils.win_utils import is_fullscreen
 from app.modules.base_task.base_task import BaseTask
 from app.modules.fishing.fishing import FishingModule
 from app.modules.water_bomb.water_bomb import WaterBombModule

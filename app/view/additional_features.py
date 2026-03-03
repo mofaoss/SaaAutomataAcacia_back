@@ -1,25 +1,19 @@
 import re
-import sys
 from functools import partial
 
 import cv2
 import numpy as np
-from PySide6.QtCore import QRect
-from PySide6.QtGui import QPainter, QColor, QPixmap
 from PySide6.QtWidgets import QFrame, QWidget, QLabel, QVBoxLayout
 from fuzzywuzzy import process
 from qfluentwidgets import SpinBox, CheckBox, ComboBox, LineEdit, Slider
 
 from app.common.config import config, is_non_chinese_ui_language
-from app.common.logger import original_stdout, original_stderr
 from app.common.signal_bus import signalBus
 from app.common.style_sheet import StyleSheet
-from app.common.utils import get_all_children
+from utils.ui_utils import get_all_children
 from app.modules.alien_guardian.alien_guardian import AlienGuardianModule
 from app.modules.drink.drink import DrinkModule
 from app.modules.fishing.fishing import FishingModule
-from app.modules.jigsaw.jigsaw import JigsawModule
-from app.modules.massaging.massaging import MassagingModule
 from app.modules.maze.maze import MazeModule
 from app.modules.operation_action.operation_action import OperationModule
 from app.modules.water_bomb.water_bomb import WaterBombModule
@@ -46,16 +40,13 @@ class Additional(QFrame, BaseInterface):
 
         self.is_running_fish = False
         self.is_running_action = False
-        self.is_running_jigsaw = False
         self.is_running_water_bomb = False
         self.is_running_alien_guardian = False
         self.is_running_maze = False
-        self.is_running_massaging = False
         self.is_running_drink = False
         self.is_running_capture_pals = False
         self.color_pixmap = None
         self.hsv_value = None
-        self.jigsaw_solution_pixmap = None
 
         self._initWidget()
         self._load_config()
@@ -77,10 +68,6 @@ class Additional(QFrame, BaseInterface):
                                      self._ui_text('常规行动', 'Operation'),
                                      onClick=lambda: self.stackedWidget.
                                      setCurrentWidget(self.page_action))
-        self.SegmentedWidget.addItem(self.page_jigsaw.objectName(),
-                                     self._ui_text('信源解析', 'Jigsaw Solver'),
-                                     onClick=lambda: self.stackedWidget.
-                                     setCurrentWidget(self.page_jigsaw))
         self.SegmentedWidget.addItem(self.page_water_bomb.objectName(),
                                      self._ui_text('心动水弹', 'Water Bomb'),
                                      onClick=lambda: self.stackedWidget.
@@ -94,10 +81,6 @@ class Additional(QFrame, BaseInterface):
                                      self._ui_text('验证战场', 'Maze'),
                                      onClick=lambda: self.stackedWidget.
                                      setCurrentWidget(self.page_maze))
-        self.SegmentedWidget.addItem(self.page_massaging.objectName(),
-                                     self._ui_text('按摩', 'Massage'),
-                                     onClick=lambda: self.stackedWidget.
-                                     setCurrentWidget(self.page_massaging))
         self.SegmentedWidget.addItem(self.page_card.objectName(),
                                      self._ui_text('猜心对局', 'Card Match'),
                                      onClick=lambda: self.stackedWidget.
@@ -123,11 +106,6 @@ class Additional(QFrame, BaseInterface):
             if self._is_non_chinese_ui else
             "### 提示\n* 自动完成常规行动，在看板娘页面点击开始\n* 重复刷指定次数实战训练第一关，不消耗体力\n* 用于完成凭证20次常规行动周常任务"
         )
-        self.BodyLabel_tip_jigsaw.setText(
-            "### Tips\n* This feature gives solutions only and does not auto-place pieces\n* Enter current piece counts manually\n* Higher max solution count takes longer but may yield better results (recommended 10~100)\n* Generated result is best within searched candidates, not global optimum\n"
-            if self._is_non_chinese_ui else
-            "### 提示\n* 本功能只提供解决方案，不自动拼\n* 需要手动输入当前拥有的各个拼图数量\n* 指定最大方案数越大，耗时越长，但可能会得到一个更优的方案,建议范围10~100\n* 设置过大方案数会产生卡顿\n* 生成的方案不是全局最优，而是目前方案数中的最优\n* 可以尝试降低9,10,11号碎片数量可能得到更优解\n* 当方案数量较少时，则应增加9,10,11号碎片数量"
-        )
         self.BodyLabel_tip_water.setText(
             self._ui_text(
                 "### 提示\n* 站在水弹入口位置后再点开始\n* 当无法识别道具或者生命时，适当调低上面两个置信度参数",
@@ -145,11 +123,6 @@ class Additional(QFrame, BaseInterface):
                 "### Tips\n* This feature only supports the new Buff Maze, not the old maze\n* Single Run is suitable for first 3 stages; Repeat Run keeps farming the last stage\n* Select buffs in team setup first, then click Start Maze in SaaAutomataAcacia\n* Recommended buffs: Skill-Chain Lightning and Shield-Steal\n* Team must include Chenxing - Qiongxian in the middle slot\n* Bring a strong support unit to reduce sudden deaths"
             )
         )
-        self.BodyLabel_tip_massaging.setText(
-            self._ui_text(
-                "### 提示\n* 此功能还没开发完，不要使用\n* 使用本功能建议按摩等级大于等于4级",
-                "### Tips\n* This feature is not fully implemented yet\n* Recommended massage level: 4 or higher"
-            ))
         self.BodyLabel_tip_card.setText(
             self._ui_text(
                 "### 提示\n* 站在猜心对局入口位置后再点开始\n* 两种模式均无策略，目的均是为了快速结束对局刷下一把\n* 逻辑：有质疑直接质疑，轮到自己出牌时出中间的那一张\n* 实测有赢有输，挂着刷经验就行",
@@ -186,7 +159,6 @@ class Additional(QFrame, BaseInterface):
         run_items = ["切换疾跑", "按住疾跑"]
         mode_items = ["无尽模式", "闯关模式"]
         mode_maze_items = ["单次运行", "重复运行"]
-        wife_items = ["凯茜娅", "肴", "芬妮", "里芙", "安卡希雅"]
         mode_card_items = ['标准模式（速刷经验）', '秘盒奇袭（刷经验成就）']
         if self._is_non_chinese_ui:
             lure_type_items = [
@@ -196,13 +168,11 @@ class Additional(QFrame, BaseInterface):
             run_items = ["Toggle Sprint", "Hold Sprint"]
             mode_items = ["Endless Mode", "Stage Mode"]
             mode_maze_items = ["Single Run", "Repeat Run"]
-            wife_items = ["Katya", "Yao", "Fenny", "Lyfe", "Acacia"]
             mode_card_items = ['Standard (fast EXP)', 'Mystery Box Raid (EXP/Achievements)']
         self.ComboBox_run.addItems(run_items)
         self.ComboBox_lure_type.addItems(lure_type_items)
         self.ComboBox_mode.addItems(mode_items)
         self.ComboBox_mode_maze.addItems(mode_maze_items)
-        self.ComboBox_wife.addItems(wife_items)
         self.ComboBox_card_mode.addItems(mode_card_items)
         capture_pals_mode_items = ["定点抓帕鲁", "巡逻抓帕鲁"]
         if self._is_non_chinese_ui:
@@ -212,11 +182,9 @@ class Additional(QFrame, BaseInterface):
 
         self.PushButton_start_fishing.setText(self._ui_text('开始钓鱼', 'Start Fishing'))
         self.PushButton_start_action.setText(self._ui_text('开始行动', 'Start Operation'))
-        self.PushButton_start_jigsaw.setText(self._ui_text('开始拼图', 'Start Jigsaw'))
         self.PushButton_start_water_bomb.setText(self._ui_text('开始心动水弹', 'Start Water Bomb'))
         self.PushButton_start_alien_guardian.setText(self._ui_text('开始异星守护', 'Start Alien Guardian'))
         self.PushButton_start_maze.setText(self._ui_text('开始迷宫', 'Start Maze'))
-        self.PushButton_start_massaging.setText(self._ui_text('开始按摩', 'Start Massage'))
         self.PushButton_start_drink.setText(self._ui_text('开始喝酒', 'Start Drink'))
         self.PushButton_start_capture_pals.setText(self._ui_text('开始抓帕鲁', 'Start Capture Pals'))
         self._apply_static_i18n()
@@ -226,14 +194,6 @@ class Additional(QFrame, BaseInterface):
         # self.PixmapLabel.setStyleSheet()
         # self.PixmapLabel.setPixmap(self.color_pixmap)
         StyleSheet.ADDITIONAL_FEATURES_INTERFACE.apply(self)
-        # 初始化拼图结果
-        self.paint_best_solution([
-            [0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0],
-        ])
 
     def _connect_to_slot(self):
         # 反向链接
@@ -243,15 +203,11 @@ class Additional(QFrame, BaseInterface):
             self.on_fishing_button_click)
         self.PushButton_start_action.clicked.connect(
             self.on_action_button_click)
-        self.PushButton_start_jigsaw.clicked.connect(
-            self.on_jigsaw_button_click)
         self.PushButton_start_water_bomb.clicked.connect(
             self.on_water_bomb_button_click)
         self.PushButton_start_alien_guardian.clicked.connect(
             self.on_alien_guardian_button_click)
         self.PushButton_start_maze.clicked.connect(self.on_maze_button_click)
-        self.PushButton_start_massaging.clicked.connect(
-            self.on_massaging_button_click)
         self.PushButton_start_drink.clicked.connect(self.on_drink_button_click)
         self.PushButton_start_capture_pals.clicked.connect(
             self.on_capture_pals_button_click)
@@ -265,8 +221,6 @@ class Additional(QFrame, BaseInterface):
         self.LineEdit_fish_key.editingFinished.connect(
             lambda: self.update_fish_key(self.LineEdit_fish_key.text()))
 
-        signalBus.jigsawDisplaySignal.connect(self.paint_best_solution)
-        signalBus.updatePiecesNum.connect(self.update_pieces_num)
         signalBus.updateFishKey.connect(self.update_fish_key)
 
     def _load_config(self):
@@ -335,11 +289,6 @@ class Additional(QFrame, BaseInterface):
                     if self.is_valid_format(text):
                         config.set(getattr(config, widget.objectName(), None),
                                    text)
-            elif widget.objectName().split('_')[1] == 'jigsaw':
-                text = widget.text()
-                if text == "-1":
-                    text = "0"
-                config.set(getattr(config, widget.objectName(), None), text)
         elif isinstance(widget, ComboBox):
             config.set(getattr(config, widget.objectName(), None),
                        widget.currentIndex())
@@ -401,22 +350,6 @@ class Additional(QFrame, BaseInterface):
         self.BodyLabel_22.setText(self._ui_text("疾跑方式", "Sprint mode"))
         self.TitleLabel_2.setText(self._ui_text("日志", "Log"))
 
-        self.BodyLabel_11.setText(self._ui_text("2号碎片", "Piece 2"))
-        self.BodyLabel_14.setText(self._ui_text("5号碎片", "Piece 5"))
-        self.BodyLabel_19.setText(self._ui_text("10号碎片", "Piece 10"))
-        self.BodyLabel_15.setText(self._ui_text("6号碎片", "Piece 6"))
-        self.BodyLabel_13.setText(self._ui_text("4号碎片", "Piece 4"))
-        self.BodyLabel_20.setText(self._ui_text("11号碎片", "Piece 11"))
-        self.BodyLabel_18.setText(self._ui_text("9号碎片", "Piece 9"))
-        self.BodyLabel_16.setText(self._ui_text("7号碎片", "Piece 7"))
-        self.BodyLabel_12.setText(self._ui_text("3号碎片", "Piece 3"))
-        self.BodyLabel_17.setText(self._ui_text("8号碎片", "Piece 8"))
-        self.BodyLabel_9.setText(self._ui_text("当前用户碎片数量：", "Current piece counts:"))
-        self.BodyLabel_8.setText(self._ui_text("当前寻找到的最优方案：", "Best solution found:"))
-        self.BodyLabel_3.setText(self._ui_text("寻找最大方案数：", "Max solutions to search:"))
-        self.BodyLabel_10.setText(self._ui_text("1号碎片", "Piece 1"))
-        self.TitleLabel_log_jigsaw.setText(self._ui_text("日志", "Log"))
-
         self.BodyLabel_28.setText(self._ui_text("模版图置信度", "Template confidence"))
         self.BodyLabel_29.setText(self._ui_text("计数置信度", "Count confidence"))
         self.BodyLabel_24.setText(self._ui_text("连胜", "Win streak"))
@@ -428,8 +361,6 @@ class Additional(QFrame, BaseInterface):
         self.BodyLabel_27.setText(self._ui_text("运行模式", "Run mode"))
         self.TitleLabel_5.setText(self._ui_text("日志", "Log"))
 
-        self.BodyLabel_30.setText(self._ui_text("按摩对象", "Massage target"))
-        self.TitleLabel_6.setText(self._ui_text("日志", "Log"))
         self.BodyLabel_32.setText(self._ui_text("刷取次数(-1代表无限刷)", "Run count (-1 means infinite)"))
         self.BodyLabel_31.setText(self._ui_text("模式", "Mode"))
         self.CheckBox_is_speed_up.setText(self._ui_text("是否已手动开启倍速", "I have enabled speed-up manually"))
@@ -468,16 +399,6 @@ class Additional(QFrame, BaseInterface):
         self.PixmapLabel.setStyleSheet(
             f"background-color: {rgb_color_str};border-radius: 5px;")
 
-    def update_pieces_num(self, pieces_num: dict):
-        try:
-            for key, value in pieces_num.items():
-                line_edit = self.SimpleCardWidget_jigsaw.findChildren(
-                    LineEdit, key)[0]
-                line_edit.setText(str(value))
-                line_edit.editingFinished.emit()
-        except Exception as e:
-            self.logger.error(e)
-
     def adjust_color(self):
         self.adjust_color_thread = AdjustColor()
         self.adjust_color_thread.color_changed.connect(
@@ -502,73 +423,6 @@ class Additional(QFrame, BaseInterface):
         self.LineEdit_fish_lower.setText(config.LineEdit_fish_lower.value)
         self.update_label_color()
 
-    def paint_best_solution(self, best_solution_board: list):
-
-        def get_color_for_value(piece_id: int):
-            """根据数组中的值返回相应的颜色"""
-            if piece_id == 1:
-                return QColor(169, 199, 218)
-            elif piece_id == 2:
-                return QColor(162, 164, 216)
-            elif piece_id == 3:
-                return QColor(119, 159, 193)
-            elif piece_id == 4:
-                return QColor(145, 200, 198)
-            elif piece_id == 5:
-                return QColor(181, 206, 156)
-            elif piece_id == 6:
-                return QColor(146, 191, 146)
-            elif piece_id == 7:
-                return QColor(180, 165, 132)
-            elif piece_id == 8:
-                return QColor(214, 217, 132)
-            elif piece_id == 9:
-                return QColor(216, 183, 205)
-            elif piece_id == 10:
-                return QColor(204, 139, 159)
-            elif piece_id == 11:
-                return QColor(156, 162, 198)
-            elif piece_id == -1:
-                return QColor(215, 226, 231)  # 不可用区域
-            else:
-                return QColor(170, 179, 186)
-
-        def generate_pixmap():
-            spacing = 5
-            rows = len(best_solution_board)
-            cols = len(best_solution_board[0])
-            total_height = 400
-
-            # 根据total_height计算每个小方块的高和宽
-            tile_height = tile_width = (total_height - spacing *
-                                        (rows - 1)) / rows
-            total_width = tile_width * cols + spacing * (cols - 1)
-            pixmap = QPixmap(int(total_width), int(total_height))
-            pixmap.fill(QColor(228, 237, 245))  # 设置背景色为白色
-
-            # 在 QPixmap 上绘制
-            painter = QPainter(pixmap)
-            for now in range(rows * cols):
-                x, y = divmod(now, cols)
-                value = best_solution_board[x][y]
-                # 根据值选择颜色
-                color = get_color_for_value(value)
-
-                # 计算每个单元格的位置，考虑间隔
-                x_pos = y * (tile_width + spacing)
-                y_pos = x * (tile_height + spacing)
-
-                rect = QRect(int(x_pos), int(y_pos), int(tile_width),
-                             int(tile_height))
-                painter.fillRect(rect, color)
-            painter.end()
-
-            self.jigsaw_solution_pixmap = pixmap
-            self.PixmapLabel_best_solution.setPixmap(
-                self.jigsaw_solution_pixmap)
-
-        generate_pixmap()
-
     def update_fish_key(self, key):
         # 添加模糊查询
         choices = ["ctrl", "space", "shift"]
@@ -579,9 +433,6 @@ class Additional(QFrame, BaseInterface):
         self.save_changed(self.LineEdit_fish_key)
 
     def closeEvent(self, event):
-        # 恢复原始标准输出
-        sys.stdout = original_stdout
-        sys.stderr = original_stderr
         super().closeEvent(event)
 
     def set_simple_card_enable(self, simple_card, enable: bool):
@@ -645,25 +496,6 @@ class Additional(QFrame, BaseInterface):
             self.PushButton_start_action.setText(self._ui_text("开始行动", "Start Operation"))
             self.is_running_action = False
 
-    def on_jigsaw_button_click(self):
-        if not self.is_running_jigsaw:
-            self.redirectOutput(self.textBrowser_log_jigsaw)
-            self.jigsaw_task = SubTask(JigsawModule)
-            self.jigsaw_task.is_running.connect(self.handle_jigsaw)
-            self.jigsaw_task.start()
-        else:
-            self.jigsaw_task.stop()
-
-    def handle_jigsaw(self, is_running):
-        if is_running:
-            self.set_simple_card_enable(self.SimpleCardWidget_jigsaw, False)
-            self.PushButton_start_jigsaw.setText(self._ui_text("停止拼图", "Stop Jigsaw"))
-            self.is_running_jigsaw = True
-        else:
-            self.set_simple_card_enable(self.SimpleCardWidget_jigsaw, True)
-            self.PushButton_start_jigsaw.setText(self._ui_text("开始拼图", "Start Jigsaw"))
-            self.is_running_jigsaw = False
-
     def on_water_bomb_button_click(self):
         if not self.is_running_water_bomb:
             self.redirectOutput(self.textBrowser_log_water_bomb)
@@ -724,27 +556,6 @@ class Additional(QFrame, BaseInterface):
             self.set_simple_card_enable(self.SimpleCardWidget_maze, True)
             self.PushButton_start_maze.setText(self._ui_text('开始迷宫', 'Start Maze'))
             self.is_running_maze = False
-
-    def on_massaging_button_click(self):
-        """钓鱼开始按键的信号处理"""
-        if not self.is_running_massaging:
-            self.redirectOutput(self.textBrowser_log_massaging)
-            self.massaging_task = SubTask(MassagingModule)
-            self.massaging_task.is_running.connect(self.handle_massaging)
-            self.massaging_task.start()
-        else:
-            self.massaging_task.stop()
-
-    def handle_massaging(self, is_running):
-        """按摩线程开始与结束的信号处理"""
-        if is_running:
-            self.set_simple_card_enable(self.SimpleCardWidget_massaging, False)
-            self.PushButton_start_massaging.setText(self._ui_text('停止按摩', 'Stop Massage'))
-            self.is_running_massaging = True
-        else:
-            self.set_simple_card_enable(self.SimpleCardWidget_massaging, True)
-            self.PushButton_start_massaging.setText(self._ui_text('开始按摩', 'Start Massage'))
-            self.is_running_massaging = False
 
     def on_drink_button_click(self):
         """酒馆开始按键的信号处理"""
