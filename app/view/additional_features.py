@@ -332,7 +332,7 @@ class Additional(QFrame, BaseInterface):
 
     def _apply_static_i18n(self):
         self.TitleLabel.setText(self._ui_text("日志", "Log"))
-        self.CheckBox_is_save_fish.setText(self._ui_text("是否保存新纪录截图", "Save screenshots for new records"))
+        self.CheckBox_is_save_fish.setText(self._ui_text("新纪录是否暂停", "Pause on new records"))
         self.BodyLabel_7.setText(self._ui_text("颜色查找下限", "Color lower bound"))
         self.PrimaryPushButton_get_color.setText(self._ui_text("校准颜色", "Calibrate Color"))
         self.BodyLabel.setText(self._ui_text("钓鱼次数：", "Fishing attempts:"))

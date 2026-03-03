@@ -57,8 +57,6 @@ jobs:
         with:
           path: C:\Users\runneradmin\AppData\Local\Nuitka\Nuitka\Cache
           key: nuitka-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            nuitka-${{ runner.os }}-
 
       - name: Main cache heartbeat (early exit)
         if: ${{ env.IS_MAIN == 'true' && steps.nuitka_cache.outputs.cache-hit == 'true' }}
@@ -94,8 +92,7 @@ jobs:
           }
 
       - name: Install Python dependencies
-        if: ${{ env.IS_TAG == 'true' || env.IS_MAIN != 'true' || steps.nuitka_cache.outputs.cache-hit != 'true' }}
-        shell: powershell
+        # 只要是正常的构建流程，都执行 pip install
         run: |
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
