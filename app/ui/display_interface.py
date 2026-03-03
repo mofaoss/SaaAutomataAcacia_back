@@ -13,9 +13,10 @@ from PyQt5.QtWidgets import (
 from qfluentwidgets import ScrollArea, FluentIcon, CardWidget, FlyoutView, Flyout
 
 from app.common.config import config, is_non_chinese_ui_language, Language, resolve_configured_locale
+from app.common.signal_bus import signalBus
 from app.common.setting import REPO_URL
 from app.common.style_sheet import StyleSheet
-from app.common.utils import get_local_version
+from app.common.utils import get_local_version, get_github_release_channels, is_remote_version_newer, is_prerelease_version
 
 from app.repackage.link_card import LinkCardView
 from app.repackage.samplecardview import SampleCardView
@@ -81,6 +82,73 @@ class BannerWidget(QWidget):
             self._ui_text("点击查看\n赞助二维码", "Click to view\nsupport QR") if self._is_simplified_ui else self._ui_text("前往 Ko-fi\n支持作者", "Visit Ko-fi\nto support"),
             "" if self._is_simplified_ui else "https://ko-fi.com/mofa",
             on_click=self._show_support_qr if self._is_simplified_ui else None,
+        )
+        self._add_update_card()
+
+    def _select_update_candidate(self, local_version: str, release_channels: dict):
+        stable = release_channels.get("latest") if isinstance(release_channels, dict) else None
+        prerelease = release_channels.get("prerelease") if isinstance(release_channels, dict) else None
+        should_check_prerelease = is_prerelease_version(local_version) or bool(config.checkPrereleaseForStable.value)
+
+        candidates = []
+        for channel_name, release_data in (("latest", stable), ("prerelease", prerelease)):
+            if channel_name == "prerelease" and not should_check_prerelease:
+                continue
+            if not release_data:
+                continue
+            remote_version = release_data.get("version")
+            if not remote_version:
+                continue
+            if is_remote_version_newer(local_version, remote_version):
+                candidates.append({
+                    "channel": channel_name,
+                    "version": remote_version,
+                    "download_url": release_data.get("download_url"),
+                    "is_prerelease": channel_name == "prerelease"
+                })
+
+        if not candidates:
+            return None
+
+        best = candidates[0]
+        for candidate in candidates[1:]:
+            if is_remote_version_newer(best["version"], candidate["version"]):
+                best = candidate
+        return best
+
+    def _add_update_card(self):
+        local_version = get_local_version() or "N/A"
+        release_channels = get_github_release_channels(REPO_URL)
+        best = self._select_update_candidate(local_version, release_channels)
+        is_prerelease = bool(best and best.get("is_prerelease"))
+
+        if best and best.get("download_url"):
+            title = self._ui_text("更新提示", "Update")
+            content = self._ui_text(
+                f"{'测试版 ' if is_prerelease else ''}{local_version} → {best['version']}\n点击下载最新",
+                f"{'Pre-release ' if is_prerelease else ''}{local_version} -> {best['version']}\nClick to download latest"
+            )
+            url = best.get("download_url")
+        elif best:
+            title = self._ui_text("更新提示", "Update")
+            content = self._ui_text(
+                f"{'测试版 ' if is_prerelease else ''}{local_version} → {best['version']}\n暂未找到直链",
+                f"{'Pre-release ' if is_prerelease else ''}{local_version} -> {best['version']}\nDirect download unavailable"
+            )
+            url = ""
+        else:
+            title = self._ui_text("更新提示", "Update")
+            content = self._ui_text(
+                f"当前已是最新\n版本 {local_version}",
+                f"You're up to date\nVersion {local_version}"
+            )
+            url = ""
+
+        self.linkCardView.addCard(
+            FluentIcon.DOWNLOAD,
+            title,
+            content,
+            url,
         )
 
     def _ui_text(self, zh_text: str, en_text: str) -> str:
@@ -200,7 +268,14 @@ class DisplayInterface(ScrollArea):
 
     def _sync_window_tracking_quick_switch(self):
         if self.windowTrackingQuickSwitchCard is not None:
-            self.windowTrackingQuickSwitchCard.setChecked(bool(config.windowTrackingInput.value), emit=False)
+            stealth_on = bool(config.windowTrackingInput.value) and int(config.windowTrackingAlpha.value) == 1
+            self.windowTrackingQuickSwitchCard.setChecked(stealth_on, emit=False)
+
+    def _toggle_stealth_mode(self, checked: bool):
+        alpha = 1 if checked else 255
+        config.set(config.windowTrackingInput, checked)
+        config.set(config.windowTrackingAlpha, alpha)
+        signalBus.windowTrackingStealthChanged.emit(bool(checked), int(alpha))
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -235,10 +310,11 @@ class DisplayInterface(ScrollArea):
         )
         self.windowTrackingQuickSwitchCard = quick_jump.addSampleCard_Switch(
             icon=os.path.join(self.basedir, "electronics.svg"),
-            title="Background Mode" if self._is_non_chinese_ui else "后台不抢鼠标",
-            content="Window-tracking mouse; turn OFF if it feels uncomfortable" if self._is_non_chinese_ui else self.tr("窗口追踪鼠标；如不适应可关闭"),
-            checked=bool(config.windowTrackingInput.value),
-            on_toggle=lambda checked: config.set(config.windowTrackingInput, checked),
+            title="Stealth Mode" if self._is_non_chinese_ui else "隐身模式",
+            content="ON: no-mouse-steal + opacity=1; OFF: normal display + disable no-mouse-steal"
+            if self._is_non_chinese_ui else self.tr("完全后台隐身运行游戏"),
+            checked=bool(config.windowTrackingInput.value) and int(config.windowTrackingAlpha.value) == 1,
+            on_toggle=self._toggle_stealth_mode,
         )
         self._sync_window_tracking_quick_switch()
         self.vBoxLayout.addWidget(quick_jump)

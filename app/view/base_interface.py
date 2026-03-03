@@ -16,6 +16,8 @@ class BaseInterface:
         sys.stdout = stdout_stream
         # 报错输出
         sys.stderr = stderr_stream
+        if isinstance(log_widget, QTextBrowser):
+            log_widget.setOpenExternalLinks(True)
         # 先断开可能存在的所有连接
         try:
             stdout_stream.message.disconnect()

@@ -17,7 +17,9 @@ class ChasmModule:
         else:
             self.is_log = config.isLog.value
             self.auto.back_to_home()
-            self.chasm()
+            if not self.chasm():
+                self.auto.back_to_home()
+                return
             self.receive_reward()
 
     def chasm(self):
@@ -31,6 +33,10 @@ class ChasmModule:
             if self.auto.find_element('测评次数不足', 'text', crop=(1141 / 2560, 684 / 1440, 1420 / 2560, 747 / 1440),
                                       is_log=self.is_log):
                 break
+            if self.auto.find_element(['拟境重构'], 'text', crop=(1516 / 1920, 145 / 1080, 1620 / 1920, 174 / 1080),
+                                       is_log=self.is_log):
+                self.logger.warn('当前未开放拟境')
+                return False
             if self.auto.click_element('确定', 'text', crop=(1888 / 2560, 980 / 1440, 2020 / 2560, 1059 / 1440),
                                        is_log=self.is_log):
                 second_finish_flag = False
@@ -84,8 +90,14 @@ class ChasmModule:
         enter_flag = False
         while True:
             self.auto.take_screenshot()
+            if not self.auto.find_element("app/resource/images/chasm/reward.png", "image",
+                                              threshold=0.65, crop=(62 / 1920, 857 / 1080, 193 / 1920, 973 / 1080),
+                                              is_log=self.is_log):
+                self.logger.warn('当前未开放拟境')
+                break
 
             if enter_flag:
+
                 if self.auto.find_element('获得道具', 'text', crop=(824 / 1920, 0, 1089 / 1920, 129 / 1080),
                                           is_log=self.is_log):
                     break

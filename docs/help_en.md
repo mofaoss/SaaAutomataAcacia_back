@@ -10,8 +10,7 @@ FAQ: [https://saadocs.netlify.app/issue/Q&A](https://saadocs.netlify.app/feature
 
 ## Game Settings
 
-- If your screen is `16:9` (1080p / 2K / 4K), set the game to `Borderless Fullscreen`.
-- If you use an ultrawide or curved display, follow the tutorial above and apply the recommended resolution settings.
+- Whether in windowed mode or fullscreen, the game must maintain a 16:9 aspect ratio. The resolution should preferably not be lower than 1280×720.
 
 ## SaaAutomataAcacia Settings
 

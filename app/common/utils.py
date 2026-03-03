@@ -648,6 +648,41 @@ def is_prerelease_version(version: str) -> bool:
     return bool(re.search(r'(?:-|_|\.)?(alpha|a|beta|b|rc|pre|preview)(?:-|_|\.)?\d*', raw))
 
 
+def _pick_release_download_url(release: dict):
+    if not isinstance(release, dict):
+        return None
+
+    assets = release.get("assets")
+    if not isinstance(assets, list) or not assets:
+        return None
+
+    exe_url = None
+    msi_url = None
+    portable_zip_url = None
+    portable_tokens = ("portable", "便携", "移动版", "green")
+
+    for asset in assets:
+        if not isinstance(asset, dict):
+            continue
+        url = (asset.get("browser_download_url") or "").strip()
+        if not url:
+            continue
+
+        name = (asset.get("name") or "").strip().lower()
+        if name.endswith(".exe") and exe_url is None:
+            exe_url = url
+            continue
+
+        if name.endswith(".msi") and msi_url is None:
+            msi_url = url
+            continue
+
+        if name.endswith(".zip") and any(token in name for token in portable_tokens) and portable_zip_url is None:
+            portable_zip_url = url
+
+    return exe_url or msi_url or portable_zip_url
+
+
 def get_github_release_channels(repo_url: str):
     """
     获取 GitHub 的稳定版与预发布版版本信息。
@@ -655,7 +690,7 @@ def get_github_release_channels(repo_url: str):
     返回示例：
     {
         "latest": {"version": "2.1.0", "url": "..."} | None,
-        "prerelease": {"version": "2.2.0-beta", "url": "..."} | None
+        "prerelease": {"version": "2.3.0-beta", "url": "..."} | None
     }
     """
     result = {
@@ -687,7 +722,8 @@ def get_github_release_channels(repo_url: str):
 
                     release_item = {
                         "version": tag_name,
-                        "url": (release.get("html_url") or "").strip() or f"{repo_url.rstrip('/')}/releases"
+                        "url": (release.get("html_url") or "").strip() or f"{repo_url.rstrip('/')}/releases",
+                        "download_url": _pick_release_download_url(release)
                     }
 
                     if release.get("prerelease"):
@@ -712,7 +748,8 @@ def get_github_release_channels(repo_url: str):
                 if tag_name:
                     result["latest"] = {
                         "version": tag_name,
-                        "url": (data.get("html_url") or "").strip() or f"{repo_url.rstrip('/')}/releases"
+                        "url": (data.get("html_url") or "").strip() or f"{repo_url.rstrip('/')}/releases",
+                        "download_url": _pick_release_download_url(data)
                     }
             except Exception:
                 pass

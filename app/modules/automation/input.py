@@ -103,7 +103,29 @@ class Input:
             "x1": 0x0001<<16,  # 侧键后退按钮
             "x2": 0x0002<<16,  # 侧键前进按钮
         }
+        self._tracking_align_tolerance = 2
+        self._tracking_stable_samples = 2
+        self._tracking_sample_interval = 0.004
+        self._tracking_post_align_settle = 0.006
         self._mouse_action_lock = threading.Lock()
+        self._last_shell_guard_log_time = 0.0
+        self._shell_guard_log_interval = 2.0
+        self._shell_guard_check_interval = 0.08
+        self._shell_guard_next_check_time = 0.0
+        self._shell_guard_cached_result = False
+        self._shell_guard_wait_step = 0.06
+        self._shell_guard_max_wait_step = 0.2
+        self._shell_window_classes = {
+            "progman",
+            "workerw",
+            "shell_traywnd",
+            "shell_secondarytraywnd",
+            "notifyiconoverflowwindow",
+            "dv2controlhost",
+            "multitaskingviewframe",
+            "tasklistthumbnailwnd",
+            "xamlexplorerhostislandwindow",
+        }
         self.window_tracker = WindowTracker(self.hwnd, self.logger)
         # 排除缩放干扰
         ctypes.windll.user32.SetProcessDPIAware()
@@ -115,6 +137,74 @@ class Input:
     def _sync_tracker_hwnd(self):
         if self.window_tracker.hwnd != self.hwnd:
             self.window_tracker.update_hwnd(self.hwnd)
+
+    @staticmethod
+    def _safe_get_root_hwnd(hwnd):
+        if not hwnd or not win32gui.IsWindow(hwnd):
+            return None
+        try:
+            root = win32gui.GetAncestor(hwnd, win32con.GA_ROOT)
+            return root or hwnd
+        except Exception:
+            return hwnd
+
+    def _is_shell_related_hwnd(self, hwnd):
+        root_hwnd = self._safe_get_root_hwnd(hwnd)
+        if not root_hwnd:
+            return False
+        try:
+            class_name = (win32gui.GetClassName(root_hwnd) or "").lower()
+            if class_name in self._shell_window_classes:
+                return True
+
+            title = (win32gui.GetWindowText(root_hwnd) or "").lower()
+            if "start" in title or "开始" in title or "search" in title or "搜索" in title:
+                return True
+            if "xaml" in class_name and ("start" in title or "search" in title or "开始" in title or "搜索" in title):
+                return True
+        except Exception:
+            return False
+        return False
+
+    def _should_defer_tracking_interaction(self):
+        if not self._window_tracking_enabled:
+            return False
+
+        now = time.time()
+        if now < self._shell_guard_next_check_time:
+            return self._shell_guard_cached_result
+
+        try:
+            cursor_pos = win32api.GetCursorPos()
+            cursor_hwnd = win32gui.WindowFromPoint(cursor_pos)
+            foreground_hwnd = win32gui.GetForegroundWindow()
+
+            if self._is_shell_related_hwnd(cursor_hwnd) or self._is_shell_related_hwnd(foreground_hwnd):
+                self._shell_guard_cached_result = True
+                self._shell_guard_next_check_time = now + self._shell_guard_check_interval
+                return True
+        except Exception:
+            self._shell_guard_cached_result = False
+            self._shell_guard_next_check_time = now + self._shell_guard_check_interval
+            return False
+
+        self._shell_guard_cached_result = False
+        self._shell_guard_next_check_time = now + self._shell_guard_check_interval
+        return False
+
+    def _log_shell_guard_wait(self):
+        now = time.time()
+        if now - self._last_shell_guard_log_time >= self._shell_guard_log_interval:
+            self.logger.debug("检测到用户正在与桌面/任务栏等交互，窗口追踪保持隐藏并等待")
+            self._last_shell_guard_log_time = now
+
+    def _sleep_for_shell_guard(self):
+        wait_step = self._shell_guard_wait_step
+        time.sleep(wait_step)
+        self._shell_guard_wait_step = min(self._shell_guard_max_wait_step, wait_step + 0.02)
+
+    def _reset_shell_guard_wait(self):
+        self._shell_guard_wait_step = 0.06
 
     def restore_window_position(self):
         self._sync_tracker_hwnd()
@@ -143,6 +233,12 @@ class Input:
 
     def _send_mouse_button(self, x: int, y: int, mouse_key: str, is_down: bool, sync: bool = False):
         wparam = 0
+        if mouse_key == "left" and is_down:
+            wparam |= win32con.MK_LBUTTON
+        elif mouse_key == "right" and is_down:
+            wparam |= win32con.MK_RBUTTON
+        elif mouse_key == "middle" and is_down:
+            wparam |= win32con.MK_MBUTTON
         if mouse_key in ["x1", "x2"]:
             wparam = self.MwParam[mouse_key]
         lparam = y << 16 | x
@@ -157,6 +253,28 @@ class Input:
         target = self._client_to_screen(x, y)
         cursor = win32api.GetCursorPos()
         return abs(cursor[0] - target[0]), abs(cursor[1] - target[1])
+
+    def _is_tracking_alignment_stable(self, x: int, y: int):
+        stable_count = 0
+        for _ in range(self._tracking_stable_samples):
+            dx, dy = self._tracking_alignment_error(x, y)
+            if dx <= self._tracking_align_tolerance and dy <= self._tracking_align_tolerance:
+                stable_count += 1
+            else:
+                stable_count = 0
+            time.sleep(self._tracking_sample_interval)
+        return stable_count >= self._tracking_stable_samples
+
+    def _align_tracking_target(self, x: int, y: int, max_align_attempts=6):
+        for _ in range(max_align_attempts):
+            if not self.window_tracker.align_target_to_cursor(x, y):
+                time.sleep(0.001)
+                continue
+
+            time.sleep(self._tracking_post_align_settle)
+            if self._is_tracking_alignment_stable(x, y):
+                return True
+        return False
 
     def mouse_down(self, x: int, y: int, mouse_key: str = 'left'):
         """鼠标按下，可以指定按键, 默认左键"""
@@ -203,6 +321,7 @@ class Input:
             y = int(y)
 
         start_time = time.time()
+        deferred_time = 0.0
         lock_timeout = max(0.1, min(time_out, 1.0))
         if not self._mouse_action_lock.acquire(timeout=lock_timeout):
             self.logger.error(f"鼠标移动点击({x}, {y})出错：获取鼠标操作锁超时")
@@ -212,13 +331,23 @@ class Input:
             self._sync_tracker_hwnd()
             if not self._window_tracking_enabled:
                 self.window_tracker.restore_window_position()
+            else:
+                self.window_tracker.apply_tracking_visual_mode()
 
-            while time.time() - start_time < time_out:
+            while True:
+                active_elapsed = time.time() - start_time - (deferred_time if self._window_tracking_enabled else 0.0)
+                if active_elapsed >= time_out:
+                    break
+
                 if not self._window_tracking_enabled:
                     # 旧模式：稳定空闲判定，减少与用户抢鼠标
                     idle_start = None
                     sample_last = win32api.GetCursorPos()
-                    while time.time() - start_time < time_out:
+                    while True:
+                        active_elapsed = time.time() - start_time
+                        if active_elapsed >= time_out:
+                            break
+
                         time.sleep(0.02)
                         sample_now = win32api.GetCursorPos()
                         moved = abs(sample_now[0] - sample_last[0]) > 1 or abs(sample_now[1] - sample_last[1]) > 1
@@ -231,7 +360,8 @@ class Input:
                                 break
                         sample_last = sample_now
 
-                if time.time() - start_time >= time_out:
+                active_elapsed = time.time() - start_time - (deferred_time if self._window_tracking_enabled else 0.0)
+                if active_elapsed >= time_out:
                     break
 
                 current_pos = None
@@ -242,22 +372,26 @@ class Input:
                         click_done = False
                         max_attempts = 3
                         for _ in range(max_attempts):
-                            if time.time() - start_time >= time_out:
+                            active_elapsed = time.time() - start_time - deferred_time
+                            if active_elapsed >= time_out:
                                 break
 
-                            aligned = False
-                            for _ in range(4):
-                                if self.window_tracker.align_target_to_cursor(x, y):
-                                    aligned = True
-                                    break
-                                time.sleep(0.001)
+                            if self._should_defer_tracking_interaction():
+                                self.window_tracker.hide_window_offscreen()
+                                self._log_shell_guard_wait()
+                                defer_started = time.time()
+                                self._sleep_for_shell_guard()
+                                deferred_time += max(0.0, time.time() - defer_started)
+                                continue
 
-                            if not aligned:
+                            self._reset_shell_guard_wait()
+
+                            if not self._align_tracking_target(x, y):
                                 continue
 
                             dx, dy = self._tracking_alignment_error(x, y)
-                            if dx > 2 or dy > 2:
-                                self.window_tracker.align_target_to_cursor(x, y)
+                            if dx > self._tracking_align_tolerance or dy > self._tracking_align_tolerance:
+                                continue
 
                             lparam = y << 16 | x
                             win32gui.SendMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
@@ -265,13 +399,18 @@ class Input:
                             time.sleep(max(0.01, press_time))
                             self._send_mouse_button(x, y, mouse_key, is_down=False, sync=True)
 
-                            # 点击后快速复检对齐状态；若漂移太大则重试一次
+                            # 点击后复检对齐稳定性，减少窗口微抖导致的“点击丢失”
                             dx_after, dy_after = self._tracking_alignment_error(x, y)
-                            if dx_after <= 4 and dy_after <= 4:
+                            if (
+                                dx_after <= self._tracking_align_tolerance + 1
+                                and dy_after <= self._tracking_align_tolerance + 1
+                                and self._is_tracking_alignment_stable(x, y)
+                            ):
                                 click_done = True
                                 break
 
                         if click_done:
+                            self.window_tracker.hide_window_offscreen()
                             self.logger.debug(f"窗口追踪点击完成({x}, {y})")
                             return
                         time.sleep(0.003)
@@ -305,12 +444,15 @@ class Input:
                         except Exception:
                             pass
 
-            if time.time() - start_time > time_out:
+            active_elapsed = time.time() - start_time - (deferred_time if self._window_tracking_enabled else 0.0)
+            if active_elapsed > time_out:
                 raise RuntimeError("等待点击超时")
         except Exception as e:
             # print(traceback.format_exc())
             self.logger.error(f"鼠标移动点击({x}, {y})出错：{repr(e)}")
         finally:
+            if self._window_tracking_enabled:
+                self.window_tracker.hide_window_offscreen()
             self._mouse_action_lock.release()
 
     def mouse_click(self, x: int, y: int, mouse_key='left', press_time: float = 0.002):
@@ -364,17 +506,29 @@ class Input:
 
         min_timeout = min(60.0, 1.2 + total_batches * 0.12)
         effective_timeout = max(time_out, min_timeout)
+        deferred_time = 0.0
 
         finished_batches = 0
         sent_notches = 0
 
         while sent_notches < notch_count:
-            if time.time() - start_time >= effective_timeout:
+            active_elapsed = time.time() - start_time - deferred_time
+            if active_elapsed >= effective_timeout:
                 self.logger.warning(
                     f"窗口追踪滚轮超时，放弃本次滚轮输入: ({x}, {y}, {delta}), "
                     f"batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s"
                 )
                 return False
+
+            if self._should_defer_tracking_interaction():
+                self.window_tracker.hide_window_offscreen()
+                self._log_shell_guard_wait()
+                defer_started = time.time()
+                self._sleep_for_shell_guard()
+                deferred_time += max(0.0, time.time() - defer_started)
+                continue
+
+            self._reset_shell_guard_wait()
 
             aligned = False
             for _ in range(5):
@@ -399,27 +553,40 @@ class Input:
             time.sleep(0.0015)
 
         if remainder > 0:
-            if time.time() - start_time >= effective_timeout:
-                self.logger.warning(
-                    f"窗口追踪滚轮超时(尾量)，放弃本次滚轮输入: ({x}, {y}, {delta}), "
-                    f"batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s"
-                )
-                return False
+            while True:
+                active_elapsed = time.time() - start_time - deferred_time
+                if active_elapsed >= effective_timeout:
+                    self.logger.warning(
+                        f"窗口追踪滚轮超时(尾量)，放弃本次滚轮输入: ({x}, {y}, {delta}), "
+                        f"batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s"
+                    )
+                    return False
 
-            aligned = False
-            for _ in range(5):
-                if self.window_tracker.align_target_to_cursor(x, y):
-                    aligned = True
-                    break
-                time.sleep(0.001)
+                if self._should_defer_tracking_interaction():
+                    self.window_tracker.hide_window_offscreen()
+                    self._log_shell_guard_wait()
+                    defer_started = time.time()
+                    self._sleep_for_shell_guard()
+                    deferred_time += max(0.0, time.time() - defer_started)
+                    continue
 
-            if not aligned:
-                self.logger.warning(f"窗口追踪滚轮尾量对齐失败，放弃本次滚轮输入: ({x}, {y}, {delta})")
-                return False
+                self._reset_shell_guard_wait()
 
-            self.activate()
-            win32gui.SendMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
-            win32gui.SendMessage(self.hwnd, self.WmCode['mouse_wheel'], (direction * remainder) << 16, lparam)
+                aligned = False
+                for _ in range(5):
+                    if self.window_tracker.align_target_to_cursor(x, y):
+                        aligned = True
+                        break
+                    time.sleep(0.001)
+
+                if not aligned:
+                    self.logger.warning(f"窗口追踪滚轮尾量对齐失败，放弃本次滚轮输入: ({x}, {y}, {delta})")
+                    return False
+
+                self.activate()
+                win32gui.SendMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
+                win32gui.SendMessage(self.hwnd, self.WmCode['mouse_wheel'], (direction * remainder) << 16, lparam)
+                break
 
         self.logger.debug(f"窗口追踪模式滚动完成 ({x},{y}) delta={delta}")
         return True
@@ -449,7 +616,10 @@ class Input:
             if not self._window_tracking_enabled:
                 self.window_tracker.restore_window_position()
             else:
-                return self._send_scroll_tracking(x, y, delta, time_out, start_time)
+                self.window_tracker.apply_tracking_visual_mode()
+                result = self._send_scroll_tracking(x, y, delta, time_out, start_time)
+                self.window_tracker.hide_window_offscreen()
+                return result
 
             while time.time() - start_time < time_out:
                 if not self.is_mouse_in_use(last_position):

@@ -542,8 +542,8 @@ class UsePowerModule:
 
             no_progress_count += 1
             if no_progress_count >= 8:
-                self.logger.warn("常规后勤当前页面无进展，执行ESC回退并重试")
-                self.auto.press_key('esc')
+                self.logger.warn("常规后勤当前页面无进展，重试")
+                self.auto.back_to_home()
                 time.sleep(0.4)
                 no_progress_count = 0
 

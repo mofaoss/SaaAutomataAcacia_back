@@ -1,485 +1,283 @@
-name: 创建 SaaAutomataAcacia Release
+name: 构建 SaaAutomataAcacia Windows 安装包
 
 on:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
-      build_mode:
-        description: 'Build mode'
-        type: choice
-        options:
-        - nuitka
-        - pyinstaller
-        default: nuitka
-      create_release:
-        description: 'Create release'
-        type: boolean
-        default: false
-      inno_setup:
-        description: 'Create Inno Setup installer'
-        type: boolean
-        default: false
+      version:
+        description: '可选：手动指定版本号（例如 2.3.2），不填则自动取 tag 或 perfect_build.py 当前版本'
+        required: false
+        type: string
 
 jobs:
-  get-config:
-    runs-on: ubuntu-latest
-    outputs:
-      app_ver: ${{ steps.config.outputs.app_ver }}
-      app_name: ${{ steps.config.outputs.app_name }}
-      app_exec: ${{ steps.config.outputs.app_exec }}
-      app_publisher: ${{ steps.config.outputs.app_publisher }}
-      app_url: ${{ steps.config.outputs.app_url }}
-      app_icon: ${{ steps.config.outputs.app_icon }}
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+  build-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-
-    - name: Extract config from perfect_build.py
-      id: config
-      run: |
-        python3 << 'EOF'
-        import sys
-        import os
-        sys.path.append('PerfectBuild')
-
-        try:
-            from perfect_build import Config
-
-            # 输出配置到 GitHub Actions 环境变量
-            print(f"app_ver={Config.app_ver}")
-            print(f"app_name={Config.app_name}")
-            print(f"app_exec={Config.app_exec}")
-            print(f"app_publisher={Config.app_publisher}")
-            print(f"app_url={Config.app_url}")
-            print(f"app_icon={Config.app_icon}")
-
-            # 设置为 GitHub Actions 输出
-            with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-                f.write(f"app_ver={Config.app_ver}\n")
-                f.write(f"app_name={Config.app_name}\n")
-                f.write(f"app_exec={Config.app_exec}\n")
-                f.write(f"app_publisher={Config.app_publisher}\n")
-                f.write(f"app_url={Config.app_url}\n")
-                f.write(f"app_icon={Config.app_icon}\n")
-
-        except ImportError as e:
-            print(f"Error importing config: {e}")
-            # 使用默认值
-            defaults = {
-                'app_ver': '2.0.5-official',
-              'app_name': 'SaaAutomataAcacia',
-              'app_exec': 'SaaAutomataAcacia',
-                'app_publisher': 'mofaoss',
-              'app_url': 'https://github.com/mofaoss/SaaAutomataAcacia',
-                'app_icon': 'app/resource/images/logo.ico'
-            }
-
-            with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
-                for key, value in defaults.items():
-                    f.write(f"{key}={value}\n")
-        EOF
-
-  build:
-    needs: get-config
-    strategy:
-      matrix:
-        os: [windows-latest]
-        python-version: ['3.10']
-      fail-fast: false
-
-    runs-on: ${{ matrix.os }}
+    env:
+      PYTHON_VERSION: '3.10'
+      PIP_NO_INPUT: '1'
+      IS_TAG: ${{ startsWith(github.ref, 'refs/tags/') }}
+      IS_MAIN: ${{ github.ref == 'refs/heads/main' }}
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-        architecture: 'x64'
-        cache: 'pip'
-        cache-dependency-path: requirements.txt
+      - name: Set up MSVC build environment (C compiler for Nuitka)
+        uses: ilammy/msvc-dev-cmd@v1
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Verify C compiler
+        shell: powershell
+        run: |
+          $cl = Get-Command cl.exe -ErrorAction SilentlyContinue
+          if (-not $cl) {
+            Write-Error "未找到 cl.exe（MSVC C 编译器），Nuitka 无法继续"
+            exit 1
+          }
+          Write-Host "MSVC compiler found: $($cl.Source)"
 
-    - name: Build with Nuitka (from config)
-      if: github.event.inputs.build_mode != 'pyinstaller'
-      uses: Nuitka/Nuitka-Action@main
-      with:
-        nuitka-version: main
-        script-name: ${{ needs.get-config.outputs.app_exec }}.py
-        mode: standalone
-        enable-plugins: pyqt5
-        windows-uac-admin: true
-        windows-console-mode: disable
-        windows-icon-from-ico: ${{ needs.get-config.outputs.app_icon }}
-        output-dir: build
-        output-file: ${{ needs.get-config.outputs.app_exec }}.exe
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements.txt
 
-        # 包含数据文件和目录（基于 build.py 中的配置）
-        include-data-files: |
-          patch/scipy.libs/.load-order-scipy-1.10.1=scipy.libs/.load-order-scipy-1.10.1
-          patch/shapely.libs/.load-order-shapely-2.0.7=shapely.libs/.load-order-shapely-2.0.7
-          AppData/ocr_replacements.json=AppData/ocr_replacements.json
-          docs/help.md=docs/help.md
-          update_data.txt=update_data.txt
+      - name: Cache Nuitka artifacts
+        id: nuitka_cache
+        uses: actions/cache@v4
+        with:
+          path: C:\Users\runneradmin\AppData\Local\Nuitka\Nuitka\Cache
+          key: nuitka-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            nuitka-${{ runner.os }}-
 
-        include-data-dir: |
-          app/resource/images=app/resource/images
-          asset=asset
-          app/modules/onnxocr/models=app/modules/onnxocr/models
+      - name: Main cache heartbeat (early exit)
+        if: ${{ env.IS_MAIN == 'true' && steps.nuitka_cache.outputs.cache-hit == 'true' }}
+        shell: powershell
+        run: |
+          Write-Host "Main cache heartbeat: cache hit, skip heavy build steps."
 
-        include-package: |
-          app
-          PyQt5
-          qfluentwidgets
+      - name: Install Inno Setup
+        if: ${{ env.IS_TAG == 'true' || env.IS_MAIN != 'true' || steps.nuitka_cache.outputs.cache-hit != 'true' }}
+        shell: powershell
+        run: |
+          choco install innosetup --no-progress -y
 
-        # 排除不需要的模块
-        nofollow-import-to: |
-          *.tests
-          test
-          tests
-          unittest
-          doctest
-          setuptools
-          distutils
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          $compil32 = "C:\Program Files (x86)\Inno Setup 6\Compil32.exe"
+          if ((-not (Test-Path $iscc)) -and (-not (Test-Path $compil32))) {
+            Write-Error "Inno Setup 安装失败，未找到 ISCC.exe/Compil32.exe"
+            exit 1
+          }
 
-    - name: Build with PyInstaller (fallback)
-      if: github.event.inputs.build_mode == 'pyinstaller'
-      run: |
-        pyinstaller --onedir --add-data="app/resource/images;app/resource/images" --add-data="asset;asset" --add-data="AppData/ocr_replacements.json;AppData" --add-data="docs/help.md;docs" --add-data="update_data.txt;." --add-data="app/modules/onnxocr/models;app/modules/onnxocr/models" -i "${{ needs.get-config.outputs.app_icon }}" --name "${{ needs.get-config.outputs.app_exec }}" --distpath build/dist --workpath build/build --contents-directory=. "${{ needs.get-config.outputs.app_exec }}.py"
-      shell: bash
-
-    - name: Verify build
-      run: |
-        if (Test-Path "build/${{ needs.get-config.outputs.app_exec }}.dist/${{ needs.get-config.outputs.app_exec }}.exe") {
-          Write-Host "Nuitka build successful! ${{ needs.get-config.outputs.app_exec }}.exe created."
-          Get-ChildItem "build/${{ needs.get-config.outputs.app_exec }}.dist" -Recurse | Select-Object Name, Length | Format-Table
-        } elseif (Test-Path "build/dist/${{ needs.get-config.outputs.app_exec }}/${{ needs.get-config.outputs.app_exec }}.exe") {
-          Write-Host "PyInstaller build successful! ${{ needs.get-config.outputs.app_exec }}.exe created."
-          Get-ChildItem "build/dist/${{ needs.get-config.outputs.app_exec }}" -Recurse | Select-Object Name, Length | Format-Table
-        } else {
-          Write-Error "Build failed! ${{ needs.get-config.outputs.app_exec }}.exe not found."
-          Get-ChildItem build -Recurse | Format-Table
-          exit 1
-        }
-      shell: powershell
-
-    - name: Cache Inno Setup installer
-      if: github.event.inputs.inno_setup == 'true' && github.event.inputs.build_mode != 'pyinstaller'
-      uses: actions/cache@v4
-      id: cache-inno-installer
-      with:
-        path: ${{ runner.temp }}\innosetup-6.2.2.exe
-        key: innosetup-6.2.2-installer
-
-    - name: Download Inno Setup installer
-      if: github.event.inputs.inno_setup == 'true' && github.event.inputs.build_mode != 'pyinstaller' && steps.cache-inno-installer.outputs.cache-hit != 'true'
-      run: |
-        $url = "https://files.jrsoftware.org/is/6/innosetup-6.2.2.exe"
-        $output = "$env:TEMP\innosetup-6.2.2.exe"
-        Write-Host "Downloading Inno Setup from: $url"
-        Invoke-WebRequest -Uri $url -OutFile $output
-        Write-Host "Downloaded to: $output"
-      shell: powershell
-
-    - name: Cache Inno Setup installation
-      if: github.event.inputs.inno_setup == 'true' && github.event.inputs.build_mode != 'pyinstaller'
-      uses: actions/cache@v4
-      id: cache-inno-setup
-      with:
-        path: C:\Program Files (x86)\Inno Setup 6
-        key: innosetup-6.2.2-installation-${{ runner.os }}
-
-    - name: Install Inno Setup
-      if: github.event.inputs.inno_setup == 'true' && github.event.inputs.build_mode != 'pyinstaller' && steps.cache-inno-setup.outputs.cache-hit != 'true'
-      run: |
-        $installer = "$env:TEMP\innosetup-6.2.2.exe"
-        if (Test-Path $installer) {
-          Write-Host "Installing Inno Setup from cached installer..."
-          Start-Process -FilePath $installer -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait
-          Write-Host "Inno Setup installation completed"
-        } else {
-          Write-Error "Installer not found at: $installer"
-          exit 1
-        }
-      shell: powershell
-
-    - name: Add Inno Setup to PATH
-      if: github.event.inputs.inno_setup == 'true' && github.event.inputs.build_mode != 'pyinstaller'
-      run: |
-        $innoPath = "C:\Program Files (x86)\Inno Setup 6"
-        if (Test-Path $innoPath) {
-          echo $innoPath | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          Write-Host "Added Inno Setup to PATH: $innoPath"
-
-          # 验证安装
-          $compiler = "$innoPath\Compil32.exe"
-          if (Test-Path $compiler) {
-            Write-Host "[OK] Inno Setup compiler found: $compiler"
+      - name: Install Dependency Walker (for Nuitka)
+        if: ${{ env.IS_TAG == 'true' || env.IS_MAIN != 'true' || steps.nuitka_cache.outputs.cache-hit != 'true' }}
+        shell: powershell
+        run: |
+          choco install dependencywalker --no-progress -y
+          $dependsPath = "C:\Program Files (x86)\Dependency Walker\depends.exe"
+          if (Test-Path $dependsPath) {
+            $dependsDir = Split-Path $dependsPath -Parent
+            echo $dependsDir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            Write-Host "Dependency Walker installed: $dependsPath"
           } else {
-            Write-Warning "[WARNING] Inno Setup compiler not found at expected location"
+            Write-Warning "Dependency Walker package installed but depends.exe not found in expected location. Nuitka auto-download fallback will be used."
           }
-        } else {
-          Write-Warning "[WARNING] Inno Setup installation directory not found"
-        }
-      shell: powershell
 
-    - name: Create installer and portable packages
-      run: |
-        $version = "${{ needs.get-config.outputs.app_ver }}"
-        $appName = "${{ needs.get-config.outputs.app_exec }}"
-        $buildMode = "${{ github.event.inputs.build_mode }}"
-        $useInnoSetup = "${{ github.event.inputs.inno_setup }}"
-        if (-not $buildMode) { $buildMode = "nuitka" }
+      - name: Install Python dependencies
+        if: ${{ env.IS_TAG == 'true' || env.IS_MAIN != 'true' || steps.nuitka_cache.outputs.cache-hit != 'true' }}
+        shell: powershell
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
 
-        # 创建便携版
-        $portableArchiveName = "${appName}-${version}-${buildMode}-Portable-Windows-x64.zip"
+      - name: Resolve version from tag/input
+        id: version
+        if: ${{ env.IS_TAG == 'true' || env.IS_MAIN != 'true' || steps.nuitka_cache.outputs.cache-hit != 'true' }}
+        shell: powershell
+        run: |
+          $inputVersion = "${{ github.event.inputs.version }}"
+          $refName = "${{ github.ref_name }}"
 
-        if (Test-Path "build/${appName}.dist") {
-          # Nuitka 构建
-          Write-Host "Creating portable package from Nuitka build..."
-          Compress-Archive -Path "build/${appName}.dist/*" -DestinationPath $portableArchiveName -CompressionLevel Optimal
+          if ($inputVersion) {
+            $version = $inputVersion
+          } elseif ("${{ github.ref }}" -like "refs/tags/*") {
+            $version = $refName -replace '^v', ''
+          } else {
+            $version = ""
+          }
 
-          # 为 Nuitka 构建创建安装程序
-          if ($buildMode -ne "pyinstaller") {
-            Write-Host "Creating installer for Nuitka build..."
-
-            # 创建 ISS 脚本文件
-            $issFile = "${appName}-setup.iss"
-
-            # 写入 ISS 脚本内容
-            $issLines = @(
-              '#define MyAppName "${{ needs.get-config.outputs.app_name }}"',
-              '#define MyAppVersion "${{ needs.get-config.outputs.app_ver }}"',
-              '#define MyAppPublisher "${{ needs.get-config.outputs.app_publisher }}"',
-              '#define MyAppURL "${{ needs.get-config.outputs.app_url }}"',
-              '#define MyAppExeName "${{ needs.get-config.outputs.app_exec }}.exe"',
-              '',
-              '[Setup]',
-              'AppId={{EF37701A-BF20-4C1C-8459-34041F620CFE}',
-              'AppName={#MyAppName}',
-              'AppVersion={#MyAppVersion}',
-              'AppPublisher={#MyAppPublisher}',
-              'AppPublisherURL={#MyAppURL}',
-              'AppSupportURL={#MyAppURL}',
-              'AppUpdatesURL={#MyAppURL}',
-              'DefaultDirName={autopf}\{#MyAppName}',
-              'DisableProgramGroupPage=yes',
-              'OutputDir=.',
-              'OutputBaseFilename=${{ needs.get-config.outputs.app_exec }}-${{ needs.get-config.outputs.app_ver }}-Setup-Windows-x64',
-              'SetupIconFile=${{ needs.get-config.outputs.app_icon }}',
-              'Compression=lzma',
-              'SolidCompression=yes',
-              'WizardStyle=modern',
-              'PrivilegesRequired=admin',
-              '',
-              '[Languages]',
-              'Name: "english"; MessagesFile: "compiler:Default.isl"',
-              'Name: "chinesesimp"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"',
-              '',
-              '[Tasks]',
-              'Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked',
-              '',
-              '[Files]',
-              'Source: "build\${{ needs.get-config.outputs.app_exec }}.dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs',
-              '',
-              '[Icons]',
-              'Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"',
-              'Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon',
-              '',
-              '[Run]',
-              'Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, ''&'', ''&&'')}}"; Flags: nowait postinstall skipifsilent'
-            )
-
-            $issLines | Set-Content $issFile -Encoding UTF8
-            Write-Host "Created ISS script: $issFile"
-
-            # 运行 Inno Setup 编译器
-            $innoCompiler = "C:\Program Files (x86)\Inno Setup 6\Compil32.exe"
-
-            if ((Test-Path $innoCompiler) -and (Test-Path $issFile) -and ($useInnoSetup -eq "true")) {
-              Write-Host "Running Inno Setup compiler..."
-              Write-Host "Compiler: $innoCompiler"
-              Write-Host "Script: $issFile"
-
-              # 运行编译器并等待完成
-              $process = Start-Process -FilePath $innoCompiler -ArgumentList "/cc", $issFile -Wait -PassThru -WindowStyle Hidden
-
-              $installerName = "${appName}-${version}-Setup-Windows-x64.exe"
-              if ($process.ExitCode -eq 0 -and (Test-Path $installerName)) {
-                Write-Host "[SUCCESS] Successfully created installer: $installerName"
-              } else {
-                Write-Warning "[WARNING] Installer creation failed (exit code: $($process.ExitCode))"
-                Write-Host "Checking for any generated files..."
-                Get-ChildItem -Filter "*.exe" | Where-Object { $_.Name -like "*Setup*" } | ForEach-Object {
-                  Write-Host "Found: $($_.Name)"
-                }
-              }
+          if (-not $version) {
+            $content = Get-Content "PerfectBuild/perfect_build.py" -Raw
+            if ($content -match 'app_ver\s*=\s*"([^"]+)"') {
+              $version = $Matches[1]
             } else {
-              if (-not (Test-Path $innoCompiler)) {
-                Write-Warning "[WARNING] Inno Setup compiler not found at: $innoCompiler"
-              }
-              if (-not (Test-Path $issFile)) {
-                Write-Warning "[WARNING] ISS file not found: $issFile"
-              }
-              Write-Warning "Skipping installer creation"
+              Write-Error "无法从 perfect_build.py 解析 app_ver"
+              exit 1
             }
           }
 
-        } elseif (Test-Path "build/dist/${appName}") {
-          # PyInstaller 构建
-          Write-Host "Creating portable package from PyInstaller build..."
-          Compress-Archive -Path "build/dist/${appName}/*" -DestinationPath $portableArchiveName -CompressionLevel Optimal
-        } else {
-          Write-Error "No build output found to package"
-          exit 1
-        }
+          Write-Host "Build version: $version"
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-        Write-Host "=== Build Artifacts Summary ==="
-        Write-Host "Portable version: $portableArchiveName"
-        if (Test-Path $portableArchiveName) {
-          Write-Host "[SUCCESS] Portable version created successfully, size: $([math]::Round((Get-Item $portableArchiveName).Length / 1MB, 2)) MB"
-        } else {
-          Write-Warning "[WARNING] Portable version creation failed"
-        }
+      - name: Update version in files
+        if: ${{ env.IS_TAG == 'true' || env.IS_MAIN != 'true' || steps.nuitka_cache.outputs.cache-hit != 'true' }}
+        shell: powershell
+        env:
+          TARGET_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $version = $env:TARGET_VERSION
 
-        # Check if installer was created
-        $installerName = "${appName}-${version}-Setup-Windows-x64.exe"
-        if (Test-Path $installerName) {
-          Write-Host "[SUCCESS] Installer created successfully: $installerName"
-          Write-Host "  Installer size: $([math]::Round((Get-Item $installerName).Length / 1MB, 2)) MB"
-        } elseif ($buildMode -eq "nuitka") {
-          Write-Warning "[WARNING] Expected to create installer but not found"
-        } else {
-          Write-Host "[INFO] PyInstaller mode, skipping installer creation"
-        }
+          $perfectBuildPath = "PerfectBuild/perfect_build.py"
+          $perfectBuildContent = Get-Content -Path $perfectBuildPath -Raw -Encoding UTF8
+          $perfectBuildUpdated = [regex]::Replace(
+            $perfectBuildContent,
+            'app_ver\s*=\s*"[^"]+"',
+            "app_ver = `"$version`"",
+            1
+          )
+          Set-Content -Path $perfectBuildPath -Value $perfectBuildUpdated -Encoding UTF8
 
-        Write-Host "=== All Generated Files ==="
-        Get-ChildItem | Where-Object { ($_.Name -like "*.zip" -or $_.Name -like "*.exe") -and $_.Name -like "${appName}*" } | ForEach-Object {
-          Write-Host "[FILE] $($_.Name) - $([math]::Round($_.Length / 1MB, 2)) MB"
-        }
-      shell: powershell
+          $updateDataPath = "update_data.txt"
+          $lines = @(Get-Content -Path $updateDataPath -Encoding UTF8)
+          if ($lines.Count -eq 0) {
+            $lines = @("")
+          }
+          $lines[$lines.Count - 1] = $version
+          $updateDataContent = ($lines -join "`n") + "`n"
+          Set-Content -Path $updateDataPath -Value $updateDataContent -Encoding UTF8
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ needs.get-config.outputs.app_name }}-${{ needs.get-config.outputs.app_ver }}-${{ runner.os }}
-        path: |
-          ${{ needs.get-config.outputs.app_exec }}-*-Portable-*.zip
-          ${{ needs.get-config.outputs.app_exec }}-*-Setup-*.exe
-        include-hidden-files: true
+          Write-Host "Updated version in PerfectBuild/perfect_build.py and update_data.txt"
 
-    - name: Generate changelog
-      if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.create_release == 'true'
-      id: changelog
-      run: |
-        # 获取当前标签
-        if ("${{ github.ref }}" -match "^refs/tags/v") {
-          $CURRENT_TAG = "${{ github.ref_name }}"
-        } else {
-          $CURRENT_TAG = "v${{ needs.get-config.outputs.app_ver }}"
-        }
+      - name: Build (Nuitka mode)
+        if: ${{ env.IS_TAG == 'true' || env.IS_MAIN != 'true' || steps.nuitka_cache.outputs.cache-hit != 'true' }}
+        shell: powershell
+        env:
+          SAA_APP_DIR: ${{ github.workspace }}
+          INNO_SETUP_COMPILER: C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+        run: |
+          Write-Host "Starting Nuitka build..."
+          python .\PerfectBuild\build.py --n
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Build failed"
+            exit 1
+          }
 
-        Write-Host "Current tag: $CURRENT_TAG"
+      - name: Analyze package size
+        if: ${{ env.IS_TAG == 'true' }}
+        shell: powershell
+        run: |
+          $appExec = "SAA"
+          $distDir = Join-Path "build\Windows-64" "$appExec.dist"
+          if (-not (Test-Path $distDir)) {
+            Write-Warning "Dist directory not found: $distDir"
+            Get-ChildItem build -Recurse -ErrorAction SilentlyContinue | Select-Object -First 100
+            exit 0
+          }
 
-        # 检查是否有任何标签存在
-        $tagOutput = git tag 2>$null
-        if ($LASTEXITCODE -ne 0 -or -not $tagOutput) {
-          Write-Host "No tags found in repository, showing all commits"
-          $HAS_TAGS = $false
-          $PREVIOUS_TAG = ""
-        } else {
-          # 获取上一个标签
-          $allTags = git tag --sort=-version:refname
-          $PREVIOUS_TAG = $allTags | Where-Object { $_ -ne $CURRENT_TAG } | Select-Object -First 1
-          $HAS_TAGS = $true
-        }
+          Write-Host "=== Top 30 largest files in dist ==="
+          Get-ChildItem $distDir -Recurse -File |
+            Sort-Object Length -Descending |
+            Select-Object -First 30 @{Name='SizeMB';Expression={[math]::Round($_.Length/1MB,2)}}, FullName |
+            Format-Table -AutoSize
 
-        if ((-not $PREVIOUS_TAG) -and ($HAS_TAGS -eq $true)) {
-          Write-Host "No previous tag found (this might be the first tag), showing all commits"
-          $PREVIOUS_TAG = ""
-        }
+          Write-Host "=== Top 20 largest top-level entries in dist ==="
+          Get-ChildItem $distDir | ForEach-Object {
+            if ($_.PSIsContainer) {
+              $size = (Get-ChildItem $_.FullName -Recurse -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum).Sum
+            } else {
+              $size = $_.Length
+            }
+            [PSCustomObject]@{ Name = $_.Name; SizeMB = [math]::Round($size/1MB,2) }
+          } | Sort-Object SizeMB -Descending | Select-Object -First 20 | Format-Table -AutoSize
 
-        Write-Host "Previous tag: $(if ($PREVIOUS_TAG) { $PREVIOUS_TAG } else { '(none - showing all commits)' })"
+      - name: Verify release output
+        id: verify
+        if: ${{ env.IS_TAG == 'true' }}
+        shell: powershell
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $releaseDir = Join-Path "release" "$version-n"
 
-        # 生成更新日志
-        "### ChangeLog" | Out-File -FilePath "changelog.md" -Encoding utf8
-        "" | Out-File -FilePath "changelog.md" -Encoding utf8 -Append
+          if (-not (Test-Path $releaseDir)) {
+            Write-Error "未找到 release 目录: $releaseDir"
+            Get-ChildItem release -ErrorAction SilentlyContinue
+            exit 1
+          }
 
-        if (-not $PREVIOUS_TAG) {
-          # 如果没有上一个标签，显示所有提交（按日期倒序，最新的在上面）
-          git log --pretty=format:"- %s (%ad)" --date=short | Out-File -FilePath "changelog.md" -Encoding utf8 -Append
-        } else {
-          # 获取两个标签之间的提交，按日期倒序
-          Write-Host "All commits since ${PREVIOUS_TAG}:"
-          git log --pretty=format:"- %s (%ad)" --date=short "${PREVIOUS_TAG}..HEAD" | Out-File -FilePath "changelog.md" -Encoding utf8 -Append
-        }
+          $exeFiles = Get-ChildItem $releaseDir -Recurse -Filter *.exe
+          if (-not $exeFiles) {
+            Write-Error "release 目录中未找到 exe: $releaseDir"
+            Get-ChildItem $releaseDir -Recurse
+            exit 1
+          }
 
-        # 检查是否有提交记录
-        $changelogContent = Get-Content -Path "changelog.md" -Raw
-        if ((-not $changelogContent) -or ($changelogContent.Trim().Split("`n").Length -le 2)) {
-          "- No commits" | Out-File -FilePath "changelog.md" -Encoding utf8 -Append
-        }
+          Write-Host "找到以下 exe 文件："
+          $exeFiles | ForEach-Object { Write-Host " - $($_.FullName)" }
 
-        # 将更新日志内容保存到输出
-        $changelogText = Get-Content -Path "changelog.md" -Raw
-        "changelog<<EOF" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-        $changelogText | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-        "EOF" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "release_dir=$releaseDir" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-        # 显示生成的更新日志
-        Write-Host "Generated changelog:"
-        Get-Content -Path "changelog.md"
-      shell: powershell
+      - name: Collect release files
+        id: collect
+        if: ${{ env.IS_TAG == 'true' }}
+        shell: powershell
+        run: |
+          $releaseDir = "${{ steps.verify.outputs.release_dir }}"
+          $outDir = "release_upload"
+          if (Test-Path $outDir) { Remove-Item $outDir -Recurse -Force }
+          New-Item -ItemType Directory -Path $outDir | Out-Null
 
-    - name: Create Release
-      if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.create_release == 'true'
-      uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          ${{ needs.get-config.outputs.app_exec }}-*-Portable-*.zip
-          ${{ needs.get-config.outputs.app_exec }}-*-Setup-*.exe
-        tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v{0}', needs.get-config.outputs.app_ver) }}
-        name: ${{ needs.get-config.outputs.app_name }} ${{ needs.get-config.outputs.app_ver }}
-        draft: false
-        prerelease: ${{ contains(needs.get-config.outputs.app_ver, 'beta') || contains(needs.get-config.outputs.app_ver, 'alpha') }}
-        generate_release_notes: true
-        body: |
-          ## ${{ needs.get-config.outputs.app_name }} ${{ needs.get-config.outputs.app_ver }}
+          Copy-Item -Path (Join-Path $releaseDir "*.zip") -Destination $outDir -ErrorAction SilentlyContinue
+          Copy-Item -Path (Join-Path $releaseDir "*.exe") -Destination $outDir -ErrorAction SilentlyContinue
 
-          ${{ steps.changelog.outputs.changelog }}
+          $files = Get-ChildItem $outDir -File -ErrorAction SilentlyContinue
+          if (-not $files) {
+            Write-Error "No release files (*.zip/*.exe) found in $releaseDir"
+            Get-ChildItem $releaseDir -Recurse -ErrorAction SilentlyContinue
+            exit 1
+          }
 
-          ---
+          Write-Host "Release files to upload:"
+          $files | ForEach-Object { Write-Host " - $($_.Name)" }
 
-          ### 📦 下载说明
+          "release_files_dir=$outDir" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
-          - **便携版 (推荐)**: 下载 `*-Portable-*.zip` 文件，解压后直接运行
-          - **安装程序**: 下载 `*-Setup-*.exe` 文件，按向导安装
+      - name: Upload portable zip artifact
+        if: ${{ env.IS_TAG == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: SaaAutomataAcacia-${{ steps.version.outputs.version }}-portable
+          path: ${{ steps.collect.outputs.release_files_dir }}/*.zip
+          if-no-files-found: error
 
-          ### 🚀 使用方法
-          1. 下载 Portable 便携版压缩包
-          2. 解压到任意目录
-          3. 右键 `${{ needs.get-config.outputs.app_exec }}.exe` "以管理员身份运行"
-          4. 无需安装，可直接运行
+      - name: Upload installer exe artifact
+        if: ${{ env.IS_TAG == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: SaaAutomataAcacia-${{ steps.version.outputs.version }}-installer
+          path: ${{ steps.collect.outputs.release_files_dir }}/*.exe
+          if-no-files-found: error
 
-          ### ⚙️ 构建信息
-          - **版本**: `${{ needs.get-config.outputs.app_ver }}`
-          - **构建工具**: `${{ github.event.inputs.build_mode || 'nuitka' }}`
-          - **平台**: Windows x64
-          - **Python**: ${{ matrix.python-version }}
-          - **构建引擎**: ${{ github.event.inputs.build_mode == 'pyinstaller' && 'PyInstaller' || 'Nuitka' }}
-          - **支持系统**: Windows 10/11 (x64)
-
-          ### 📖 更多信息
-          项目主页: ${{ needs.get-config.outputs.app_url }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create draft GitHub Release
+        if: ${{ env.IS_TAG == 'true' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: SaaAutomataAcacia ${{ steps.version.outputs.version }}
+          draft: true
+          prerelease: ${{ contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'rc') }}
+          files: |
+            ${{ steps.collect.outputs.release_files_dir }}/*.exe
+            ${{ steps.collect.outputs.release_files_dir }}/*.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

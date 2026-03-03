@@ -20,28 +20,24 @@
 
 > [!Tip]
 > **Update**
-> 1. Renamed the project to SaaAutomataAcacia and optimized the loading animation.
-> 2. Added Traditional Chinese support.
-> 3. Fixed the issue where Steam could not log in automatically.
-> 4. Added support for farming operation logistics when using stamina.
-> 5. Optimized memory chip usage logic and auto-applies by selected character count.
-> 6. Added Star Exploration Pal Capture.
-> 7. Improved background stability: better fault tolerance and quieter background operations.
-> 8. Optimized shop purchase flow: fewer accidental clicks and more stable scrolling.
-> 9. Fixed stamina potion day matching errors (e.g., 1/3 no longer mismatches to 11/13).
-> 10. The UI now mostly supports English in core areas (Display/Home/Additional features).
-> 11. The configured startup entry page will be pinned to the top.
-> 12. Added window-tracking mouse input to minimize mouse takeover during background click/scroll actions.
-> 13. Improved OCR recognition stability for low resolutions: 1600×900 and 1280×720.
-> 14. Removed the requirement that windowed auto-scaling must keep the game window fixed at the top-left corner.
-> 15. More features to be updated...
+> 1. Epic update: added **stealth background mode**, allowing the game to run fully hidden in the background.
+> 2. Renamed the project to SaaAutomataAcacia and optimized the loading animation and logo.
+> 3. Added Traditional Chinese and English support, including Traditional Chinese game compatibility.
+> 4. Fixed the issue where Steam could not log in automatically.
+> 5. Added support for farming operation logistics when using stamina.
+> 6. Optimized memory chip usage logic and auto-applies by selected character count.
+> 7. Added Star Exploration Pal Capture.
+> 8. Fixed stamina potion day matching errors (avoids using 11-day/13-day potions when 1-day/3-day is selected).
+> 9. Improved UI, startup speed, and execution reliability.
+> 10. Improved OCR recognition stability for low resolutions.
+> 11. Removed the requirement that windowed auto-scaling must keep the game window fixed at the top-left corner.
+> 12. More features to be updated...
 
 > [!Warning]
 >
-> After version 2.0, all tasks support running while the window is obscured. Mouse clicks use an optimized method to
-> minimize user disruption, enabling pure background operation for tasks not requiring mouse interaction. Only supports 16:
-> 9 screen ratios. Works in both fullscreen and windowed modes. For other ratios, enable auto-scaling in settings to
-> automatically resize the game window, and it no longer needs to be fixed in the top-left corner.
+> 1. Game can now run fully hidden in the background, and this feature can be enabled on the display page.
+> 2. Currently supports only 16:9 game aspect ratios, with both fullscreen and windowed modes. A resolution of at least 1280×720 is recommended. The higher the resolution, the better.
+> 3. Game language must be simplified/traditional chinese.
 
 ### ✨Feature List
 

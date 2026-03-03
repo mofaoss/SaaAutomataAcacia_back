@@ -258,10 +258,6 @@ class OCR:
             low_res_mode = self._is_low_resolution(image)
             strategy_order = ["base", "binary", "fast"] if low_res_mode else ["fast", "base", "binary"]
 
-            if is_log:
-                mode_text = "低分辨率优先增强" if low_res_mode else "高分辨率优先快速"
-                self.logger.debug(f"OCR模式: {mode_text}，策略顺序: {' -> '.join(strategy_order)}")
-
             candidates = []
             for strategy in strategy_order:
                 formatted = self._try_strategy(image, strategy, is_log=is_log and strategy == strategy_order[0])

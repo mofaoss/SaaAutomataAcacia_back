@@ -9,6 +9,7 @@
 @Desc    :   使用前需要先安装InnoSetup,应用更新时请不要修改app_id
 """
 import glob
+import os
 import platform
 import subprocess
 import sys
@@ -21,7 +22,26 @@ import uuid
 # python .\PerfectBuild\build.py --n
 
 
-iss_compiler = "C:\\Users\\Japhen\\AppData\\Local\\Programs\\Inno Setup 6\\Compil32.exe"
+def find_iss_compiler() -> str:
+    env_candidates = [
+        os.environ.get("INNO_SETUP_COMPILER"),
+        os.environ.get("ISCC_PATH"),
+    ]
+    path_candidates = [
+        "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe",
+        "C:\\Program Files (x86)\\Inno Setup 6\\Compil32.exe",
+        "C:\\Program Files\\Inno Setup 6\\ISCC.exe",
+        "C:\\Program Files\\Inno Setup 6\\Compil32.exe",
+        "C:\\Users\\Japhen\\AppData\\Local\\Programs\\Inno Setup 6\\Compil32.exe",
+    ]
+    candidates = [p for p in env_candidates + path_candidates if p]
+    for candidate in candidates:
+        if Path(candidate).exists():
+            return candidate
+    return ""
+
+
+iss_compiler = find_iss_compiler()
 
 
 # subprocess.call(['pip', 'install', '-U', 'nuitka'])
@@ -95,6 +115,7 @@ class PerfectBuild:
             "--show-progress",
             "--show-memory",
             "--standalone",
+            "--assume-yes-for-downloads",
             "--plugin-enable=pyqt5",
             f"--output-dir={output_dir}",
             "--windows-uac-admin",
@@ -112,7 +133,7 @@ class PerfectBuild:
             "--nofollow-import-to=scipy.stats",
         ]
         if platform.system() == "Windows":
-            cmd_args.extend((f"--windows-icon-from-ico={self.app_icon}",))
+            cmd_args.extend((f"--windows-icon-from-ico={self.app_icon}", "--msvc=latest"))
         # '--windows-console-mode=disable',
         cmd_args.append(f"{self.app_dir}/{self.app_exec}.py")
         process = subprocess.run(cmd_args, shell=True)
@@ -149,9 +170,17 @@ class PerfectBuild:
 
     def create_setup(self):
         iss_work = self.update_iss()
-        if Path(iss_compiler).exists:
+        if not iss_compiler:
+            raise FileNotFoundError(
+                "Inno Setup compiler not found. Please install Inno Setup or set INNO_SETUP_COMPILER."
+            )
+        if Path(iss_compiler).exists():
             print("Creating Windows Installer...", end="")
-            compiler_cmd = [str(iss_compiler), "/cc", str(iss_work)]
+            compiler_name = Path(iss_compiler).name.lower()
+            if compiler_name == "iscc.exe":
+                compiler_cmd = [str(iss_compiler), str(iss_work)]
+            else:
+                compiler_cmd = [str(iss_compiler), "/cc", str(iss_work)]
             process = subprocess.run(compiler_cmd)
             if process.returncode != 0:
                 raise ChildProcessError("Creating Windows installer failed.")
