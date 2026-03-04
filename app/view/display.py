@@ -232,7 +232,7 @@ class DisplayInterface(ScrollArea, BaseInterface):
         quick_jump.addSampleCard(
             icon=os.path.join(self.basedir, "setting.svg"),
             title="Settings" if self._is_non_chinese_ui else "设置",
-            content="Please set up the automata acacia settings first" if self._is_non_chinese_ui else self.tr("首次下载请先设置"),
+            content="Please set up the automata acacia settings first" if self._is_non_chinese_ui else self.tr("首次下载，请先设置"),
             routeKey="settingInterface",
             index=0,
         )
@@ -250,7 +250,7 @@ class DisplayInterface(ScrollArea, BaseInterface):
         quick_jump.addSampleCard(
             icon=os.path.join(self.basedir, "explain.svg"),
             title="Tutorial" if self._is_non_chinese_ui else "使用教程",
-            content="Read the guide to get started quickly" if self._is_non_chinese_ui else self.tr("查看教程快速使用"),
+            content="Read the guide to get started quickly" if self._is_non_chinese_ui else self.tr("查看教程，答疑解惑"),
             routeKey="Help-Interface",
             index=0,
         )
@@ -260,7 +260,7 @@ class DisplayInterface(ScrollArea, BaseInterface):
         self.windowTrackingQuickSwitchCard = quick_jump.addSampleCard_Switch(
             icon=os.path.join(self.basedir, "electronics.svg"),
             title="Stealth Mode" if self._is_non_chinese_ui else "隐身模式",
-            content="Make the game completely invisible in the background" if self._is_non_chinese_ui else self.tr("游戏完全隐身后台"),
+            content="Make the game completely invisible in the background" if self._is_non_chinese_ui else self.tr("游戏隐身，完全后台"),
             checked=stealth_on,
             on_toggle=self._toggle_stealth_mode,
         )
