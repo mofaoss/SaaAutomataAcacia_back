@@ -642,6 +642,41 @@ class RewardPage(BaseDailyPage):
         self.finalize()
 
 
+class OperationPage(BaseDailyPage):
+    def __init__(self, parent=None):
+        super().__init__("page_operation", parent=parent)
+
+        # 疾跑方式设置行
+        sprint_line = QHBoxLayout()
+        self.BodyLabel_22 = BodyLabel(self)
+        self.BodyLabel_22.setObjectName("BodyLabel_22")
+        self.ComboBox_run = ComboBox(self)
+        self.ComboBox_run.setObjectName("ComboBox_run")
+        sprint_line.addWidget(self.BodyLabel_22)
+        sprint_line.addWidget(self.ComboBox_run)
+
+        # 刷取次数设置行
+        count_line = QHBoxLayout()
+        self.BodyLabel_4 = BodyLabel(self)
+        self.BodyLabel_4.setObjectName("BodyLabel_4")
+        self.SpinBox_action_times = SpinBox(self)
+        self.SpinBox_action_times.setObjectName("SpinBox_action_times")
+        self.SpinBox_action_times.setRange(1, 999) # 限制刷取次数范围
+        count_line.addWidget(self.BodyLabel_4)
+        count_line.addWidget(self.SpinBox_action_times)
+
+        # 底部提示文字
+        self.BodyLabel_tip_action = BodyLabel(self)
+        self.BodyLabel_tip_action.setObjectName("BodyLabel_tip_action")
+        self.BodyLabel_tip_action.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.BodyLabel_tip_action.setWordWrap(True)
+
+        self.main_layout.addLayout(sprint_line)
+        self.main_layout.addLayout(count_line)
+        self.main_layout.addWidget(self.BodyLabel_tip_action)
+        self.finalize()
+
+
 class DailyView(QWidget):
     def __init__(self, parent=None, is_non_chinese_ui=False):
         super().__init__(parent)
@@ -747,6 +782,9 @@ class DailyView(QWidget):
         self.page_person = PersonPage(self.PopUpAniStackedWidget)
         self.page_chasm = ChasmPage(self.PopUpAniStackedWidget)
         self.page_reward = RewardPage(self.PopUpAniStackedWidget)
+        self.page_operation = OperationPage(self.PopUpAniStackedWidget)
+
+
 
         self.PopUpAniStackedWidget.addWidget(self.page_enter)
         self.PopUpAniStackedWidget.addWidget(self.page_collect)
@@ -755,6 +793,7 @@ class DailyView(QWidget):
         self.PopUpAniStackedWidget.addWidget(self.page_person)
         self.PopUpAniStackedWidget.addWidget(self.page_chasm)
         self.PopUpAniStackedWidget.addWidget(self.page_reward)
+        self.PopUpAniStackedWidget.addWidget(self.page_operation)
 
         layout.addWidget(self.TitleLabel_setting)
         layout.addWidget(self.PopUpAniStackedWidget, 1)
@@ -781,7 +820,8 @@ class DailyView(QWidget):
             "ComboBox_power_usage", "StrongBodyLabel_2", "CheckBox_is_use_power", "ComboBox_power_day", "BodyLabel_6",
             "BodyLabel_8", "LineEdit_c4", "BodyLabel_person_tip", "BodyLabel_5", "LineEdit_c3",
             "CheckBox_is_use_chip", "BodyLabel_3", "LineEdit_c1", "StrongBodyLabel_3", "BodyLabel_4", "LineEdit_c2",
-            "BodyLabel_chasm_tip", "BodyLabel_reward_tip",
+            "BodyLabel_chasm_tip", "BodyLabel_reward_tip", "BodyLabel_22", "ComboBox_run", "BodyLabel_4",
+            "SpinBox_action_times", "BodyLabel_tip_action"
         ]
 
         pages = [
@@ -792,6 +832,7 @@ class DailyView(QWidget):
             self.page_person,
             self.page_chasm,
             self.page_reward,
+            self.page_operation
         ]
         for attr in page_attrs:
             for page in pages:
@@ -870,6 +911,9 @@ class DailyView(QWidget):
             self._ui_text('活动材料本', 'Event Stages'),
             self._ui_text('刷常规后勤', 'Operation Logistics')
         ])
+        self.ComboBox_run.addItems(
+            ["Toggle Sprint", "Hold Sprint"] if self.is_non_chinese_ui else ["切换疾跑", "按住疾跑"]
+        )
 
         # 3. 输入框提示词
         for line_edit in [self.LineEdit_c1, self.LineEdit_c2, self.LineEdit_c3, self.LineEdit_c4]:
@@ -930,6 +974,13 @@ class DailyView(QWidget):
         self.BodyLabel_8.setText(self._ui_text("角色4：", "Character 4:"))
         self.CheckBox_is_use_chip.setText(self._ui_text("是否使用记忆嵌片", "Use memory chip"))
         self.TitleLabel_3.setText(self._ui_text("日程提醒", "Schedule"))
+        self.BodyLabel_22.setText(self._ui_text("疾跑方式", "Sprint mode"))
+        self.BodyLabel_4.setText(self._ui_text("刷取次数", "Run count"))
+        self.BodyLabel_tip_action.setText(
+            "### Tips\n* Auto-run operation from the lobby page\n* Repeats the first training stage for specified times with no stamina cost\n* Useful for weekly pass mission count"
+            if self.is_non_chinese_ui else
+            "### 提示\n* 自动完成常规行动，在看板娘页面点击开始\n* 重复刷指定次数实战训练第一关，不消耗体力\n* 用于完成凭证20次常规行动周常任务"
+        )
 
         # 商店物资名称
         shop_items = [
