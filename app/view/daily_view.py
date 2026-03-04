@@ -28,6 +28,7 @@ from qfluentwidgets import (
     StrongBodyLabel,
     TitleLabel,
     ToolButton,
+    TextEdit,
 )
 
 
@@ -211,7 +212,8 @@ class SharedSchedulingPanel(QWidget):
         super().__init__(parent)
         self.task_id = None
         self.is_non_chinese_ui = is_non_chinese_ui
-        self.setFixedHeight(220)
+
+        self.setFixedHeight(255)
 
         self.setStyleSheet("SharedSchedulingPanel { border-top: 1px solid rgba(0,0,0,0.1); }")
 
@@ -219,17 +221,20 @@ class SharedSchedulingPanel(QWidget):
         main_layout.setContentsMargins(8, 8, 8, 8)
         main_layout.setSpacing(6)
 
-        activation_row = QHBoxLayout()
-        activation_row.setContentsMargins(0, 0, 0, 0)
-        activation_row.setSpacing(6)
-
+        checkbox_row = QHBoxLayout()
         enable_text = "Enable Cycle" if is_non_chinese_ui else "启用周期"
         self.enable_checkbox = CheckBox(enable_text, self)
         font = self.enable_checkbox.font()
         font.setPointSize(10)
         self.enable_checkbox.setFont(font)
-        activation_row.addWidget(self.enable_checkbox)
-        activation_row.addStretch(1)
+        checkbox_row.addWidget(self.enable_checkbox)
+        checkbox_row.addStretch(1) # 把复选框推到最左边
+
+        main_layout.addLayout(checkbox_row) # 加到主布局的最上面
+
+        activation_row = QHBoxLayout()
+        activation_row.setContentsMargins(0, 0, 0, 0)
+        activation_row.setSpacing(6)
 
         activation_label_text = "Activation:" if is_non_chinese_ui else "生效周期："
         self.activation_label = StrongBodyLabel(activation_label_text, self)
@@ -465,14 +470,15 @@ class CollectSuppliesPage(BaseDailyPage):
         self.PrimaryPushButton_import_codes.setObjectName("PrimaryPushButton_import_codes")
         self.PushButton_reset_codes = PushButton(self)
         self.PushButton_reset_codes.setObjectName("PushButton_reset_codes")
+
         redeem_line.addWidget(self.CheckBox_redeem_code, 1)
         redeem_line.addWidget(self.PrimaryPushButton_import_codes)
         redeem_line.addWidget(self.PushButton_reset_codes)
 
-        self.textBrowser_import_codes = QTextBrowser(self)
-        self.textBrowser_import_codes.setObjectName("textBrowser_import_codes")
-        self.textBrowser_import_codes.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.textBrowser_import_codes.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        # ⬇️ 已经全部替换为 TextEdit_import_codes ⬇️
+        self.TextEdit_import_codes = TextEdit(self)
+        self.TextEdit_import_codes.setObjectName("TextEdit_import_codes")
+        self.TextEdit_import_codes.setFixedHeight(80)
 
         self.BodyLabel_collect_supplies = BodyLabel(self)
         self.BodyLabel_collect_supplies.setObjectName("BodyLabel_collect_supplies")
@@ -483,10 +489,10 @@ class CollectSuppliesPage(BaseDailyPage):
         self.main_layout.addWidget(self.CheckBox_fish_bait)
         self.main_layout.addWidget(self.CheckBox_dormitory)
         self.main_layout.addLayout(redeem_line)
-        self.main_layout.addWidget(self.textBrowser_import_codes)
+        self.main_layout.addWidget(self.TextEdit_import_codes)  # 对应修改
         self.main_layout.addWidget(self.BodyLabel_collect_supplies)
-        self.finalize()
 
+        self.finalize()
 
 class ShopPage(BaseDailyPage):
     def __init__(self, parent=None):
@@ -661,6 +667,10 @@ class DailyView(QWidget):
         self.gridLayout_2.setRowStretch(0, 1)
         self.gridLayout_2.setRowStretch(1, 0)
 
+        self.gridLayout_2.setColumnStretch(0, 1) # 左侧稍窄
+        self.gridLayout_2.setColumnStretch(1, 4) # 中间稍宽
+        self.gridLayout_2.setColumnStretch(2, 3) # 右侧稍窄
+
     def _build_option_card(self):
         self.SimpleCardWidget_option = SimpleCardWidget(self)
         self.SimpleCardWidget_option.setObjectName("SimpleCardWidget_option")
@@ -675,7 +685,7 @@ class DailyView(QWidget):
         layout.addWidget(self.taskListWidget, 1)
 
         btn_row = QHBoxLayout()
-        hint_text = "Drag to reorder" if self.is_non_chinese_ui else "拖动可调整任务顺序"
+        hint_text = "Drag to reorder" if self.is_non_chinese_ui else "拖动调整顺序"
         self.hint_label = BodyLabel(hint_text, self.SimpleCardWidget_option)
         self.hint_label.setObjectName("BodyLabel_drag_hint")
         btn_row.addWidget(self.hint_label, 1)
@@ -764,7 +774,7 @@ class DailyView(QWidget):
             "StrongBodyLabel_4", "PrimaryPushButton_path_tutorial", "CheckBox_open_game_directly",
             "LineEdit_game_directory", "PushButton_select_directory", "BodyLabel_enter_tip",
             "CheckBox_mail", "CheckBox_redeem_code", "CheckBox_dormitory", "CheckBox_fish_bait",
-            "PushButton_reset_codes", "PrimaryPushButton_import_codes", "textBrowser_import_codes",
+            "PushButton_reset_codes", "PrimaryPushButton_import_codes", "TextEdit_import_codes",
             "BodyLabel_collect_supplies",
             "ScrollArea", "scrollAreaWidgetContents", "gridLayout", "StrongBodyLabel", "widget", "widget_2",
             "CheckBox_buy_3", "CheckBox_buy_4", "CheckBox_buy_5", "CheckBox_buy_6", "CheckBox_buy_7",

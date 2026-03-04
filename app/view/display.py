@@ -234,7 +234,7 @@ class DisplayInterface(ScrollArea):
         )
         quick_jump.addSampleCard(
             icon=os.path.join(self.basedir, "play.svg"),
-            title="Start Daily" if self._is_non_chinese_ui else "立刻日常",
+            title="Start Daily" if self._is_non_chinese_ui else "开始自律",
             content="SAA handles daily tasks in one click" if self._is_non_chinese_ui else self.tr("自律姬帮你一键种草。"),
             routeKey="Home-Start-Now",
             index=0,
