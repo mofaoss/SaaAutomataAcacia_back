@@ -76,10 +76,6 @@ class TaskItemWidget(QWidget):
         layout.setSpacing(6)
 
         self.checkbox = CheckBox(parent=self)
-        cb_font = self.checkbox.font()
-        if cb_font.pointSize() <= 0:
-            cb_font.setPointSize(10)
-            self.checkbox.setFont(cb_font)
         self.checkbox.setChecked(is_enabled)
         self.checkbox.stateChanged.connect(
             lambda: self.checkbox_state_changed.emit(self.task_id, self.checkbox.isChecked())
@@ -859,17 +855,8 @@ class DailyView(QWidget):
 
     def _apply_ui_settings(self):
         # 1. 字体和特殊样式设置
-        container_font = self.SimpleCardWidget_option.font()
-        if container_font.pointSize() <= 0:
-            container_font.setPointSize(10)
-            self.SimpleCardWidget_option.setFont(container_font)
-
         for tool_button in self.SimpleCardWidget_option.findChildren(ToolButton):
             tool_button.setIcon(FIF.SETTING)
-            btn_font = tool_button.font()
-            if btn_font.pointSize() <= 0:
-                btn_font.setPointSize(10)
-                tool_button.setFont(btn_font)
 
         # 2. 下拉框初始化
         self.ComboBox_after_use.addItems([
