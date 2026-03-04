@@ -14,6 +14,7 @@ class OperationModule:
     def run(self):
         self.is_log = config.isLog.value
         self.times = config.SpinBox_action_times.value
+        self.auto.back_to_home()
 
         self.enter_train()
         for _ in range(self.times):
