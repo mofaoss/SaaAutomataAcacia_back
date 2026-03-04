@@ -38,6 +38,7 @@ from app.modules.shopping.shopping import ShoppingModule
 from app.modules.use_power.use_power import UsePowerModule
 from app.repackage.custom_message_box import CustomMessageBox
 from app.repackage.tree import TreeFrame_person, TreeFrame_weapon
+from app.modules.operation_action.operation_action import OperationModule
 
 # 导入视图与基类
 from app.view.daily_view import DailyView, TaskItemWidget
@@ -87,6 +88,13 @@ TASK_REGISTRY = {
         "option_key": "CheckBox_chasm_6",
         "zh_name": "精神拟境",
         "en_name": "Neural Simulation",
+    },
+    "task_operation": {
+        "module_class": OperationModule,
+        "ui_page_index": 7,
+        "option_key": "CheckBox_operation_8",
+        "zh_name": "常规行动",
+        "en_name": "Operation",
     },
     "task_reward": {
         "module_class": GetRewardModule,
@@ -274,6 +282,7 @@ class Daily(QFrame, BaseInterface):
             self._ui_text('商店', 'Shop'), self._ui_text('体力', 'Stamina'),
             self._ui_text('碎片', 'Shards'), self._ui_text('精神拟境', 'Neural Simulation'),
             self._ui_text('领取奖励', 'Claim Rewards'),
+            self._ui_text('常规行动', 'Operation'),
         ]
 
         self.person_dic = {
