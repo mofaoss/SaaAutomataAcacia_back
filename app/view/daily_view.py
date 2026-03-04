@@ -614,6 +614,32 @@ class PersonPage(BaseDailyPage):
         return line
 
 
+class ChasmPage(BaseDailyPage):
+    def __init__(self, parent=None):
+        super().__init__("page_chasm", parent=parent)
+
+        self.BodyLabel_chasm_tip = BodyLabel(self)
+        self.BodyLabel_chasm_tip.setObjectName("BodyLabel_chasm_tip")
+        self.BodyLabel_chasm_tip.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.BodyLabel_chasm_tip.setWordWrap(True)
+
+        self.main_layout.addWidget(self.BodyLabel_chasm_tip)
+        self.finalize()
+
+
+class RewardPage(BaseDailyPage):
+    def __init__(self, parent=None):
+        super().__init__("page_reward", parent=parent)
+
+        self.BodyLabel_reward_tip = BodyLabel(self)
+        self.BodyLabel_reward_tip.setObjectName("BodyLabel_reward_tip")
+        self.BodyLabel_reward_tip.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.BodyLabel_reward_tip.setWordWrap(True)
+
+        self.main_layout.addWidget(self.BodyLabel_reward_tip)
+        self.finalize()
+
+
 class DailyView(QWidget):
     def __init__(self, parent=None, is_non_chinese_ui=False):
         super().__init__(parent)
@@ -711,12 +737,16 @@ class DailyView(QWidget):
         self.page_shop = ShopPage(self.PopUpAniStackedWidget)
         self.page_use_power = UsePowerPage(self.PopUpAniStackedWidget)
         self.page_person = PersonPage(self.PopUpAniStackedWidget)
+        self.page_chasm = ChasmPage(self.PopUpAniStackedWidget)
+        self.page_reward = RewardPage(self.PopUpAniStackedWidget)
 
         self.PopUpAniStackedWidget.addWidget(self.page_enter)
         self.PopUpAniStackedWidget.addWidget(self.page_collect)
         self.PopUpAniStackedWidget.addWidget(self.page_shop)
         self.PopUpAniStackedWidget.addWidget(self.page_use_power)
         self.PopUpAniStackedWidget.addWidget(self.page_person)
+        self.PopUpAniStackedWidget.addWidget(self.page_chasm)
+        self.PopUpAniStackedWidget.addWidget(self.page_reward)
 
         layout.addWidget(self.TitleLabel_setting)
         layout.addWidget(self.PopUpAniStackedWidget, 1)
@@ -743,9 +773,18 @@ class DailyView(QWidget):
             "ComboBox_power_usage", "StrongBodyLabel_2", "CheckBox_is_use_power", "ComboBox_power_day", "BodyLabel_6",
             "BodyLabel_8", "LineEdit_c4", "BodyLabel_person_tip", "BodyLabel_5", "LineEdit_c3",
             "CheckBox_is_use_chip", "BodyLabel_3", "LineEdit_c1", "StrongBodyLabel_3", "BodyLabel_4", "LineEdit_c2",
+            "BodyLabel_chasm_tip", "BodyLabel_reward_tip",
         ]
 
-        pages = [self.page_enter, self.page_collect, self.page_shop, self.page_use_power, self.page_person]
+        pages = [
+            self.page_enter,
+            self.page_collect,
+            self.page_shop,
+            self.page_use_power,
+            self.page_person,
+            self.page_chasm,
+            self.page_reward,
+        ]
         for attr in page_attrs:
             for page in pages:
                 if hasattr(page, attr):
