@@ -1,10 +1,10 @@
-from app.common.logger import logger
+import logging
 from app.common.gui_logger import bind_log_widget
 
 
 class BaseInterface:
     def __init__(self):
-        self.logger = logger
+        self.logger = logging.getLogger(__name__)
         self.auto = None
 
     def redirectOutput(self, log_widget):

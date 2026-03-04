@@ -1,6 +1,7 @@
 # coding: utf-8
 import datetime
 import html
+import logging
 import os.path
 import re
 import sys
@@ -16,7 +17,6 @@ from qfluentwidgets import NavigationItemPosition, FluentWindow, setThemeColor
 from ..common.config import config
 from ..common.config import is_non_chinese_ui_language, is_traditional_ui_language
 from ..common.icon import Icon
-from ..common.logger import logger
 from ..common.matcher import matcher
 from ..common.setting import REPO_URL
 from ..common.signal_bus import signalBus
@@ -25,6 +25,9 @@ from utils.updater_utils import get_local_version, get_github_release_channels, 
     is_prerelease_version
 from ..repackage.custom_message_box import CustomMessageBox
 from ..common import resource  # don't delete
+
+
+logger = logging.getLogger(__name__)
 
 
 class InstallOcr(QThread):

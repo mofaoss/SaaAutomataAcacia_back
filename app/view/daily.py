@@ -1,4 +1,5 @@
 import copy
+import logging
 import os
 import re
 import sys
@@ -18,7 +19,6 @@ from win11toast import toast
 
 from app.common.config import config, is_non_chinese_ui_language
 from app.common.data_models import Coordinates, UpdateData, RedeemCode, ApiData, ApiResponse, parse_config_update_data
-from app.common.logger import logger
 from app.common.signal_bus import signalBus
 from app.common.style_sheet import StyleSheet
 from utils.game_launcher import launch_game_with_guard
@@ -38,6 +38,9 @@ from app.repackage.custom_message_box import CustomMessageBox
 from app.repackage.tree import TreeFrame_person, TreeFrame_weapon
 from app.view.daily_view import DailyView, TaskItemWidget
 from app.view.base_interface import BaseInterface
+
+
+logger = logging.getLogger(__name__)
 
 
 TASK_REGISTRY = {

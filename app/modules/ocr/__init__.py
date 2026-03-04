@@ -1,10 +1,13 @@
 # 读取 OCR 替换配置
 import os
 import json
+import logging
 import sys
 
-from app.common.logger import logger
 from app.modules.ocr.ocr import OCR
+
+
+logger = logging.getLogger(__name__)
 
 if getattr(sys, 'frozen', False):
     base_dir = os.path.dirname(sys.executable)

@@ -72,8 +72,8 @@ class Timer:
             time.sleep(diff)
 
     def show(self):
-        from app.common.logger import logger
-        logger.info(str(self))
+        import logging
+        logging.getLogger(__name__).info(str(self))
 
     def __str__(self):
         return f'Timer(limit={round(self.current(), 3)}/{self.limit}, count={self._reach_count}/{self.count})'

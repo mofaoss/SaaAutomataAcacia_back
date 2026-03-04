@@ -1,4 +1,5 @@
 import ctypes
+import logging
 import string
 import threading
 import time
@@ -9,8 +10,10 @@ import win32con
 import win32gui  # 不能删
 
 from app.common.config import config
-from app.common.logger import logger
 from app.modules.automation.window_tracker import WindowTracker
+
+
+logger = logging.getLogger(__name__)
 
 
 # from pynput import mouse

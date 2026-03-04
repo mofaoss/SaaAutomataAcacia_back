@@ -1,11 +1,15 @@
+import logging
+
 import cv2
 import numpy as np
 from PySide6.QtCore import QThread, Signal
 import win32gui
 from app.common.config import config
-from app.common.logger import logger
 from app.modules.base_task.base_task import BaseTask
 from app.modules.ocr import ocr
+
+
+logger = logging.getLogger(__name__)
 
 
 class SubTask(QThread, BaseTask):

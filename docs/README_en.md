@@ -11,20 +11,15 @@
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/P5P21QG9LW)
 </div>
 
-## 🌏 Language Compatibility
-
-- Supported game languages: Simplified Chinese, Traditional Chinese
-- Supported UI languages: Simplified Chinese, Traditional Chinese (Traditional uses `zh_HK` resources)
-
 ## ✨Feature Introduction
 
 > [!Tip]
 > **Update**
-> 1. Epic update: **Stealth Mode**, allowing the game to run completely hidden in the background
-> 2. The software has been renamed to **Ankaxia · Self‑Discipline Assistant**, with a **fully redesigned UI**
+> 1. **Stealth Mode**, allowing the game to run completely hidden in the background
+> 2. **Automata Acacia** now has a **fully redesigned UI**
 > 3. Added **custom task lists** and **periodic/scheduled execution** features
 > 4. Added support for **Traditional Chinese and English**, including compatibility with Traditional Chinese game clients
-> 5. Added automated routines for **standard logistics farming** and **Pal capturing in New Star Expedition**
+> 5. Added **standard logistics** and **Pals capturing** functions
 > 6. Enhanced OCR accuracy; fixed Steam login issues and stamina potion duration recognition; optimized memory shard usage; **removed the windowed‑mode restriction**
 
 > [!Warning]
@@ -104,8 +99,7 @@
 
 > [!Important]
 >
-> Special thanks to [vmoranv](https://github.com/vmoranv) for documentation support
-> SaaAutomataAcacia Documentation: https://saadocs.netlify.app/
+> SaaAutomataAcacia Documentation: https://saadocs.netlify.app/ (Partly outdated)
 
 
 ### ✨ Running
@@ -127,10 +121,6 @@
 ## ❤️ Related Projects
 
 - Thanks for upstream: https://github.com/LaoZhuJackson/SnowbreakAutoAssistant
-- OCR text recognition https://github.com/JaidedAI/EasyOCR
-- Honkai: Star Rail Assistan https://github.com/moesnow/March7thAssistant
-- MAA Arknights Assistant https://github.com/MaaAssistantArknights/MaaAssistantArknights
-- GUI component library https://github.com/zhiyiYo/PyQt-Fluent-Widgets
 
 ## 📝License
 

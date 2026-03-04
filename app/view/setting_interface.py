@@ -1,4 +1,5 @@
 # coding:utf-8
+import logging
 import os.path
 import subprocess
 import sys
@@ -17,7 +18,6 @@ from qfluentwidgets import (SwitchSettingCard, PrimaryPushSettingCard, ScrollAre
                             )
 
 from ..common.config import config, isWin11, is_non_chinese_ui_language
-from ..common.logger import logger
 from ..common.setting import QQ, REPO_URL
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
@@ -30,6 +30,9 @@ from utils.updater_utils import (
 )
 from ..repackage.slider_setting_card import SliderSettingCard
 from ..repackage.text_edit_card import TextEditCard
+
+
+logger = logging.getLogger(__name__)
 
 
 class UpdatingThread(QThread):
@@ -655,7 +658,6 @@ class SettingInterface(ScrollArea):
 
         # 1. Absolute Failure Check (No API data AND No Cache)
         if not stable and not prerelease:
-            from app.common.logger import logger
             logger.warning("【检查更新】获取数据失败：网络异常或被限流，且无本地缓存。")
             # Only show UI error if it's a manual check
             if not is_silent:

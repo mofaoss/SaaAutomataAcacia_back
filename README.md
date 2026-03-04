@@ -15,8 +15,8 @@
 ## ✨功能介绍
 > [!Tip]
 > **Update**
-> 1. 史诗级更新，**隐身模式**，游戏将完全后台隐身运行
-> 2. 软件更名为安卡希雅·自律姬，**UI完全重构**
+> 1. **隐身模式**，游戏将完全后台隐身运行
+> 2. 安卡希雅·自律姬现在有**全新UI**
 > 3. 新增**任务自定义列表和周期/定时执行**功能
 > 4. 新增繁体中文和英文支持，支持繁中游戏运行
 > 5. 新增刷取常规后勤、新星开拓抓帕鲁功能
@@ -95,7 +95,7 @@
 
 > [!Important]
 >
-> SAA文档站:https://saadocs.netlify.app/
+> SAA文档站:https://saadocs.netlify.app/ (部分过时)
 
 
 ### ✨ 运行
@@ -117,10 +117,6 @@
 ## ❤️相关项目
 
 - 致敬上游 https://github.com/LaoZhuJackson/SnowbreakAutoAssistant
-- OCR文字识别 https://github.com/jingsongliujing/OnnxOCR
-- 三月七星穹铁道助手 https://github.com/moesnow/March7thAssistant
-- maa明日方舟助手 https://github.com/MaaAssistantArknights/MaaAssistantArknights
-- 图形界面组件库 https://github.com/zhiyiYo/PyQt-Fluent-Widgets
 
 ## 📝License
 
