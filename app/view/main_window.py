@@ -8,7 +8,7 @@ import sys
 import threading
 import time
 from pathlib import Path
-from PySide6.QtCore import QSize, QTimer, QThread, Qt, QUrl
+from PySide6.QtCore import QSize, QTimer, QThread, Qt, QUrl, QPoint
 from PySide6.QtGui import QIcon, QImage, QPixmap, QMovie, QDesktopServices
 from PySide6.QtWidgets import QApplication, QFrame, QLabel
 from qfluentwidgets import FluentIcon as FIF, SystemThemeListener, MessageBox, InfoBar, InfoBarPosition
@@ -173,19 +173,17 @@ class MainWindow(FluentWindow):
     def _run_next_init_task(self):
         if not self._init_tasks:
             return
-
         task = self._init_tasks.pop(0)
         task()
-        QTimer.singleShot(0, self._run_next_init_task)
+        QTimer.singleShot(16, self._run_next_init_task)
 
     def _run_next_deferred_init_task(self):
         if not self._deferred_init_tasks:
             self._deferred_initialized = True
             return
-
         task = self._deferred_init_tasks.pop(0)
         task()
-        QTimer.singleShot(0, self._run_next_deferred_init_task)
+        QTimer.singleShot(16, self._run_next_deferred_init_task)
 
     def _defer_load_remaining_interfaces(self):
         self._deferred_init_tasks = [
@@ -256,10 +254,6 @@ class MainWindow(FluentWindow):
     def _finalize_startup(self):
         if self.homeInterface is None:
             self._create_home_interface()
-
-        ocr_thread = threading.Thread(target=self.init_ocr)
-        ocr_thread.daemon = True
-        ocr_thread.start()
 
         if config.auto_start_task.value or '--auto' in sys.argv:
             if self.homeInterface is None:
@@ -379,12 +373,6 @@ class MainWindow(FluentWindow):
         signalBus.showScreenshot.connect(self.showScreenshot)
         # signalBus.check_ocr_progress.connect(self.update_ring)
 
-    def setMicaEffectEnabled(self, enabled):
-        return
-
-    def isMicaEffectEnabled(self):
-        return False
-
     def initNavigation(self):
         # self.navigationInterface.setAcrylicEnabled(True)
 
@@ -415,12 +403,12 @@ class MainWindow(FluentWindow):
             self._register_nav_item(key, startup_top_interface[0], *startup_top_interface[1:])
 
         self.navigationInterface.setCollapsible(True)
-        if hasattr(self, "navigationInterface"):
-            if hasattr(self.navigationInterface, "setExpandWidth"):
-                if is_non_chinese_ui_language():
-                    self.navigationInterface.setExpandWidth(220)
-                else:
-                    self.navigationInterface.setExpandWidth(170)
+        self.navigationInterface.setReturnButtonVisible(False)
+
+        if self._is_non_chinese_ui:
+            self.navigationInterface.setExpandWidth(220)
+        else:
+            self.navigationInterface.setExpandWidth(170)
 
         def _restore_nav_state():
             if not hasattr(self, "navigationInterface") or self.navigationInterface is None:
@@ -461,29 +449,43 @@ class MainWindow(FluentWindow):
         # logger.info(f"区域截图识别每次平均耗时：{benchmark(ocr.run, 'app/resource/images/start_game/age.png')}")
 
     def initWindow(self):
-        self.resize(self.DEFAULT_WINDOW_WIDTH, self.DEFAULT_WINDOW_HEIGHT)
-        self.setMinimumSize(1000, 680)
+        # 1. 先读取上次保存的位置
+        position = config.position.value
+        target_screen = None
+
+        # 2. 探明将要打开的屏幕
+        if position:
+            # 检查这个坐标现在属于哪块屏幕
+            target_screen = QApplication.screenAt(QPoint(position[0], position[1]))
+
+        # 如果没有保存过位置，或者原来的副屏被拔掉了导致坐标悬空，安全回退到主屏
+        if target_screen is None:
+            target_screen = QApplication.primaryScreen()
+
+        # 3. 获取【目标屏幕】的可用几何区域，并以此计算比例
+        target_geo = target_screen.availableGeometry()
+
+        # 强制转为 int，防止 float 导致 Qt 报错
+        self.resize(int(target_geo.width() * 0.7), int(target_geo.height() * 0.8))
+        self.setMinimumSize(int(target_geo.width() * 0.5), int(target_geo.height() * 0.6))
+
+        # 4. 基础 UI 设置
         base_dir = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parents[2]))
-        head_icon_path = base_dir / 'app/resource/images/logo.png'
-        self.setWindowIcon(QIcon(str(head_icon_path)))
+        self.setWindowIcon(QIcon(str(base_dir / 'app/resource/images/logo.png')))
         self.setWindowTitle(self._ui_text('安卡希雅·自律姬', 'SaaAutomataAcacia'))
-
         setThemeColor("#009FAA")
-
-        # 触发重绘，使一开始的背景颜色正确
-        # self.setCustomBackgroundColor(QColor(240, 244, 249), QColor(32, 32, 32))
-        # self.setBackgroundColor(QColor(240, 244, 249))
         self.setMicaEffectEnabled(False)
 
-        position = config.position.value
-        if position:
-            self.move(position[0], position[1])
-            self.show()
+        # 5. 安排窗口就位
+        if position and target_screen == QApplication.screenAt(QPoint(position[0], position[1])):
+            self.move(*position)
         else:
-            desktop = QApplication.primaryScreen().availableGeometry()
-            w, h = desktop.width(), desktop.height()
-            self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
-            self.show()
+            # 如果是首次打开，或由于拔插显示器触发了回退，则在目标屏幕（此时为主屏）完美居中
+            rect = self.frameGeometry()
+            rect.moveCenter(target_geo.center())
+            self.move(rect.topLeft())
+
+        self.show()
         QApplication.processEvents()
 
     def resizeEvent(self, e):
@@ -538,6 +540,7 @@ class MainWindow(FluentWindow):
         self.splashMovieFallbackTimer.start(1200)
         self.splashMovieLabel.raise_()
         self.splashMovieLabel.show()
+        self.splashShownAt = time.perf_counter()
         logger.info(f'启动动画已启用：{source}')
         return True
 
@@ -603,6 +606,10 @@ class MainWindow(FluentWindow):
         self.splashShownAt = None
         if hasattr(self, 'splashScreen'):
             self.splashScreen.finish()
+
+        ocr_thread = threading.Thread(target=self.init_ocr)
+        ocr_thread.daemon = True
+        ocr_thread.start()
 
     # def update_ring(self, value, speed):
     #     self.progressRing.setValue(value)
@@ -770,15 +777,8 @@ class MainWindow(FluentWindow):
         :return:
         """
         def ndarray_to_qpixmap(ndarray):
-            if self.numpy_module is None:
-                import numpy as np
-                self.numpy_module = np
-            if self.cv2_module is None:
-                import cv2
-                self.cv2_module = cv2
-
-            np = self.numpy_module
-            cv2 = self.cv2_module
+            import numpy as np
+            import cv2
 
             # 确保ndarray是3维的 (height, width, channels)
             if ndarray.ndim == 2:

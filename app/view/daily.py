@@ -902,8 +902,8 @@ class Daily(QFrame, BaseInterface):
 
     def on_reset_codes_click(self):
         content = ''
-        if self.textBrowser_import_codes.toPlainText():
-            self.textBrowser_import_codes.setText("")
+        if self.TextEdit_import_codes.toPlainText():
+            self.TextEdit_import_codes.setText("")
         # 重置导入
         if config.import_codes.value:
             config.set(config.import_codes, [])
@@ -942,7 +942,7 @@ class Daily(QFrame, BaseInterface):
                     # 如果没有冒号
                     result.append(stripped_line)
             # 将结果重新组合成每行一个的字符串并设置显示
-            self.textBrowser_import_codes.setText("\n".join(result))
+            self.TextEdit_import_codes.setText("\n".join(result))
             # 返回列表
             return result
 
@@ -1296,7 +1296,8 @@ class Daily(QFrame, BaseInterface):
         self.TitleLabel.setText(self._ui_text("日志", "Log"))
         self.PushButton_select_all.setText(self._ui_text("全选", "Select All"))
         self.PushButton_no_select.setText(self._ui_text("清空", "Clear"))
-        self.hint_label.setText(self._ui_text("拖动可调整任务顺序", "Drag to reorder"))
+        self.ui.shared_scheduling_panel.enable_checkbox.setText(self._ui_text("启用周期", "Enable Cycle"))
+        self.hint_label.setText(self._ui_text("拖动调整顺序", "Drag to reorder"))
         self.BodyLabel.setText(self._ui_text("结束后进行", "After Finish"))
         self.PushButton_start.setText(self._ui_text("开始", "Start"))
         self.PrimaryPushButton_path_tutorial.setText(self._ui_text("查看教程", "Tutorial"))

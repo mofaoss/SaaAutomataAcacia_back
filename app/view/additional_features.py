@@ -99,7 +99,7 @@ class Additional(QFrame, BaseInterface):
         self.BodyLabel_tip_fish.setText(
             "### Tips\n* Side mouse buttons are not supported in background mode\n* Use analyst for fishing character, otherwise it may fail\n* Configure cast key, fishing times and lure type in game first\n* Daily limit: rare spot 25, epic spot 50, normal spot unlimited\n* Move to next fishing spot manually after one spot is exhausted\n* If yellow block detection is abnormal, recalibrate HSV color\n"
             if self._is_non_chinese_ui else
-            "### 提示\n* 为实现纯后台，现已不支持鼠标侧键\n* 钓鱼角色选择分析员，否则无法正常工作\n* 根据游戏右下角手动设置好抛竿按键、钓鱼次数和鱼饵类型后再点开始\n* 珍奇钓鱼点每天最多钓25次\n* 稀有钓鱼点每天最多钓50次\n* 普通钓鱼点无次数限制\n* 当一个钓鱼点钓完后需要手动移动到下一个钓鱼点，进入钓鱼界面后再启动一次\n* 当黄色块数异常时尝试上面的校准HSV，钓鱼出现圆环时点`校准颜色`，然后点黄色区域\n"
+            "### 提示\n* 为实现纯后台，现已不支持鼠标侧键\n* 钓鱼角色选择分析员，否则无法正常工作\n* 根据游戏右下角手动设置好抛竿按键、钓鱼次数和鱼饵类型后再点开始\n* 珍奇钓点系统上限25次/天； 稀有钓点上限50次/天； 普通钓点无限制\n* 一个钓点钓完后需手动移动下一个钓鱼点再启动脚本\n* 黄色块异常时请校准HSV，钓鱼出现圆环时点`校准颜色`，再点黄色区域\n"
         )
         self.BodyLabel_tip_action.setText(
             "### Tips\n* Auto-run operation from the lobby page\n* Repeats the first training stage for specified times with no stamina cost\n* Useful for weekly pass mission count"
@@ -134,20 +134,16 @@ class Additional(QFrame, BaseInterface):
             "* Auto-capture pals based on community strategy\n"
             "* Configure support skill key to C before running\n"
             "* Ensure full-screen 16:9 and stay on Partner/Adventure island selection page\n"
-            "* Both islands support Fixed-point mode and Patrol mode\n"
             "* Patrol mode exits and re-enters map each cycle to refresh targets\n"
-            "* If surrender fails repeatedly, check your location and UI page\n"
             if self._is_non_chinese_ui else
             "### 提示\n"
             "* 通过视频BV1SV8wzjEpE和BV1SV8wzjEpE的抓捕思路实现\n"
-            "* 本功能用于自动抓帕鲁，需要携带有高伤害满级召雷+碎冰冰/布防的帕鲁来秒杀敌人，比如武装会员，爆破会员等\n"
+            "* 需要携带有高伤害满级召雷+碎冰冰/布防的帕鲁如武装，爆破会员来秒杀\n"
             "* 抓帕鲁前请确保已在游戏内设置好狂猎支援技快捷键为 C 键\n"
             "* 启动前请确保当前是全屏模式16：9并且界面在选择伙伴岛/探险岛页面\n"
-            "* 伙伴岛/探险岛可分别选择：定点抓帕鲁 或 巡逻抓帕鲁\n"
             "* 定点抓帕鲁：进图后按狂猎支援技C再尝试按 F 进行抓取；按设定间隔循环\n"
             "* 巡逻抓帕鲁：每次抓完会 ESC 退出地图并重新进入，以刷新巡逻帕鲁\n"
-            "* 同步抓帕鲁：双岛同时勾选时，按“各自间隔周期”在两岛间切换；某一岛抓完后会自动只刷未完成的岛\n"
-            "* 若多次劝降失败会提示你检查抓帕鲁地点/界面是否正确\n"
+            "* 同步抓帕鲁：双岛同时勾选，按“各自周期”在两岛间切换；一岛结束会只刷另一岛\n"
         )
 
 
