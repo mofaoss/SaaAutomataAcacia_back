@@ -166,7 +166,7 @@ class MainWindow(FluentWindow):
         self._localize_widget_if_needed(self.tableInterface)
 
     def _create_setting_interface(self):
-        from .setting_interface import SettingInterface
+        from .setting_view import SettingInterface
         self.settingInterface = SettingInterface(self)
         self._localize_widget_if_needed(self.settingInterface)
 
@@ -269,7 +269,8 @@ class MainWindow(FluentWindow):
                 logger.warning(f'未勾选"自动打开游戏"')
 
         self._finish_splash_screen()
-        QTimer.singleShot(0, self._show_update_popup_if_needed)
+        if config.checkUpdateAtStartUp.value:
+            QTimer.singleShot(0, self._show_update_popup_if_needed)
         self._defer_load_remaining_interfaces()
 
     def _select_update_candidate(self, local_version: str, release_channels: dict):
@@ -305,6 +306,9 @@ class MainWindow(FluentWindow):
         return best
 
     def _show_update_popup_if_needed(self):
+        if not config.checkUpdateAtStartUp.value:
+            return
+
         if self._has_shown_update_popup:
             return
         self._has_shown_update_popup = True
