@@ -1,4 +1,7 @@
 import os
+import random
+import sys
+from pathlib import Path
 
 from PySide6.QtCore import Qt, QRectF
 from PySide6.QtGui import QPixmap, QPainter, QPainterPath, QBrush
@@ -16,6 +19,51 @@ from app.common.style_sheet import StyleSheet
 from utils.updater_utils import get_local_version
 
 from app.repackage.samplecardview import SampleCardView
+
+
+def _resolve_display_image_dir() -> Path:
+    candidates = []
+
+    compiled_info = globals().get("__compiled__")
+    containing_dir = getattr(compiled_info, "containing_dir", None)
+    if containing_dir:
+        candidates.append(Path(containing_dir))
+
+    meipass = getattr(sys, "_MEIPASS", None)
+    if meipass:
+        candidates.append(Path(meipass))
+
+    nuitka_onefile_temp = os.environ.get("NUITKA_ONEFILE_TEMP")
+    if nuitka_onefile_temp:
+        candidates.append(Path(nuitka_onefile_temp))
+
+    candidates.append(Path(__file__).resolve().parents[2])
+
+    if getattr(sys, "frozen", False):
+        try:
+            candidates.append(Path(sys.executable).resolve().parent)
+        except Exception:
+            pass
+
+    try:
+        candidates.append(Path(sys.argv[0]).resolve().parent)
+    except Exception:
+        pass
+
+    candidates.append(Path.cwd())
+
+    seen = set()
+    for base in candidates:
+        key = str(base)
+        if key in seen:
+            continue
+        seen.add(key)
+
+        display_dir = base / "app" / "resource" / "images" / "display"
+        if display_dir.exists() and display_dir.is_dir():
+            return display_dir
+
+    return Path("app") / "resource" / "images" / "display"
 
 
 class BannerWidget(QWidget):
@@ -40,15 +88,36 @@ class BannerWidget(QWidget):
 
         self.galleryLabel.setGraphicsEffect(shadow)
 
-        self.basedir = "app/resource/images/display"
-        banner_path = os.path.join(self.basedir, "101.png")
-        self.banner = QPixmap(banner_path)
+        self.basedir = _resolve_display_image_dir()
+        self.banner = self._load_random_banner()
         self.galleryLabel.setObjectName("galleryLabel")
 
         self.vBoxLayout.setSpacing(0)
         self.vBoxLayout.setContentsMargins(0, 20, 0, 0)
         self.vBoxLayout.addWidget(self.galleryLabel)
         self.vBoxLayout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+
+    def _load_random_banner(self) -> QPixmap:
+        candidates = self._get_banner_candidates()
+        if candidates:
+            selected = random.choice(candidates)
+            pixmap = QPixmap(str(selected))
+            if not pixmap.isNull():
+                return pixmap
+
+        fallback = self.basedir / "background_1.jpg"
+        return QPixmap(str(fallback))
+
+    def _get_banner_candidates(self):
+        if not self.basedir.exists() or not self.basedir.is_dir():
+            return []
+
+        allowed_suffixes = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
+        return sorted([
+            path
+            for path in self.basedir.iterdir()
+            if path.is_file() and path.suffix.lower() in allowed_suffixes
+            ], key=lambda item: item.name.lower())
 
     def paintEvent(self, e):
         super().paintEvent(e)
@@ -98,7 +167,7 @@ class DisplayInterface(ScrollArea):
         self.gameLanguageNoticeLayout = QVBoxLayout(self.gameLanguageNoticeCard)
         self.gameLanguageNoticeTitle = QLabel("Language Notice", self.gameLanguageNoticeCard)
         self.gameLanguageNoticeLabel = QLabel(self.gameLanguageNoticeCard)
-        self.basedir = "app/resource/images/display"
+        self.basedir = str(_resolve_display_image_dir())
 
         self.__initWidget()
         self.loadSamples()

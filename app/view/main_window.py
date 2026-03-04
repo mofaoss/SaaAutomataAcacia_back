@@ -45,7 +45,7 @@ class MainWindow(FluentWindow):
     SPLASH_ICON_SIZE = QSize(150, 150)
     SPLASH_MOVIE_SIZE = QSize(160, 160)
     SPLASH_PREFERRED_MIN_MS = 1200
-    DEFAULT_WINDOW_WIDTH = 1280
+    DEFAULT_WINDOW_WIDTH = 1080
     DEFAULT_WINDOW_HEIGHT = 800
 
     def __init__(self):
@@ -329,8 +329,8 @@ class MainWindow(FluentWindow):
                 content=self._ui_text("已是最新版", "Already up to date"),
                 orient=Qt.Orientation.Horizontal,
                 isClosable=True,
-                position=InfoBarPosition.TOP_RIGHT,
-                duration=6000,
+                position=InfoBarPosition.TOP,
+                duration=800,
                 parent=self,
             )
             return
@@ -350,8 +350,8 @@ class MainWindow(FluentWindow):
             content=content_html,
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
-            position=InfoBarPosition.TOP_RIGHT,
-            duration=10000,
+            position=InfoBarPosition.TOP,
+            duration=3000,
             parent=self,
         )
 

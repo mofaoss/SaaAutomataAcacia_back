@@ -256,7 +256,7 @@ class SettingInterface(ScrollArea):
         self.stealthModeCard = SwitchSettingCard(
             FIF.HIDE,
             self._ui_text('隐身模式', 'Stealth Mode'),
-            self._ui_text('开启完全后台隐身运行游戏', 'Enable to run game in complete stealth mode in background'),
+            self._ui_text('开启游戏完全隐身运行', 'Enable to run game in complete stealth mode in background'),
             configItem=config.windowTrackingInput,
             parent=self.coreSettingsGroup
         )
@@ -297,7 +297,7 @@ class SettingInterface(ScrollArea):
             configItem=config.windowTrackingAlpha,
             icon=FIF.HIDE,
             title=self._ui_text('隐身模式可见度', 'Stealth mode visibility'),
-            content=self._ui_text('数值越低越隐形：1=极度隐藏，255=正常显示。建议设置1',
+            content=self._ui_text('数值越低越隐形：1=极度隐藏，255=正常显示，建议设置1',
                                   'Lower value means more invisible: 1 = highly hidden, 255 = normal visibility. Recommended to set to 1'),
             parent=self.aboutSoftwareGroup,
             min_value=1,
