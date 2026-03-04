@@ -311,14 +311,6 @@ class SettingInterface(ScrollArea):
             configItem=config.saveScaleCache,
             parent=self.aboutSoftwareGroup
         )
-        self.autoScaling = SwitchSettingCard(
-            FIF.BACK_TO_WINDOW,
-            self._ui_text('自动缩放比例', 'Auto scaling'),
-            self._ui_text('默认开启，在启动安卡希雅·自律姬时如果发现游戏窗口比例不是16:9会自动缩放成1920*1080',
-                          'Enabled by default. If the game is not 16:9, it auto-resizes to 1920*1080 on startup'),
-            configItem=config.autoScaling,
-            parent=self.aboutSoftwareGroup
-        )
         self.autoStartTask = SwitchSettingCard(
             FIF.PLAY,
             self._ui_text('自动开始任务', 'Auto start tasks'),
@@ -396,7 +388,6 @@ class SettingInterface(ScrollArea):
         self.aboutSoftwareGroup.addSettingCard(self.isLogCard)
         self.aboutSoftwareGroup.addSettingCard(self.showScreenshotCard)
         self.aboutSoftwareGroup.addSettingCard(self.saveScaleCacheCard)
-        self.aboutSoftwareGroup.addSettingCard(self.autoScaling)
         self.aboutSoftwareGroup.addSettingCard(self.autoStartTask)
         self.aboutSoftwareGroup.addSettingCard(self.autoBootStartup)
         self.aboutSoftwareGroup.addSettingCard(self.informMessage)

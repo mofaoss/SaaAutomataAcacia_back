@@ -26,6 +26,8 @@ class WindowTracker:
         self._tracking_visual_applied = False
         self._saved_exstyle = None
         self._align_deadzone_px = 1
+        self._restore_width = 1920
+        self._restore_height = 1080
 
     @contextmanager
     def _per_monitor_dpi_context(self):
@@ -78,6 +80,18 @@ class WindowTracker:
     def _get_offscreen_position(self):
         _, _, vs_right, vs_bottom = self._get_virtual_screen_rect()
         return vs_right + self._offscreen_margin, vs_bottom + self._offscreen_margin
+
+    @staticmethod
+    def _get_primary_monitor_rect():
+        try:
+            monitor = win32api.MonitorFromPoint((0, 0), win32con.MONITOR_DEFAULTTOPRIMARY)
+            monitor_info = win32api.GetMonitorInfo(monitor)
+            return monitor_info.get("Monitor", (0, 0, win32api.GetSystemMetrics(win32con.SM_CXSCREEN),
+                                                  win32api.GetSystemMetrics(win32con.SM_CYSCREEN)))
+        except Exception:
+            width = win32api.GetSystemMetrics(win32con.SM_CXSCREEN)
+            height = win32api.GetSystemMetrics(win32con.SM_CYSCREEN)
+            return 0, 0, width, height
 
     def _is_hwnd_valid(self):
         return bool(self.hwnd) and win32gui.IsWindow(self.hwnd)
@@ -323,26 +337,34 @@ class WindowTracker:
             return False
 
     def restore_window_position(self):
-        if not self._session_started:
-            self.restore_tracking_visual_mode()
-            return
         try:
             with self._per_monitor_dpi_context():
                 root_hwnd = self._resolve_root_hwnd()
-                if root_hwnd and win32gui.IsWindow(root_hwnd) and self._origin_rect is not None:
+                if root_hwnd and win32gui.IsWindow(root_hwnd):
                     if win32gui.IsIconic(root_hwnd):
                         win32gui.ShowWindow(root_hwnd, win32con.SW_RESTORE)
-                    origin_width = self._locked_width if self._locked_width else max(1, self._origin_rect[2] - self._origin_rect[0])
-                    origin_height = self._locked_height if self._locked_height else max(1, self._origin_rect[3] - self._origin_rect[1])
+
+                    monitor_left, monitor_top, monitor_right, monitor_bottom = self._get_primary_monitor_rect()
+                    monitor_width = max(1, monitor_right - monitor_left)
+                    monitor_height = max(1, monitor_bottom - monitor_top)
+
+                    target_width = self._restore_width
+                    target_height = self._restore_height
+                    target_left = monitor_left + (monitor_width - target_width) // 2
+                    target_top = monitor_top + (monitor_height - target_height) // 2
+
                     win32gui.SetWindowPos(
                         root_hwnd,
                         None,
-                        self._origin_rect[0],
-                        self._origin_rect[1],
-                        origin_width,
-                        origin_height,
+                        target_left,
+                        target_top,
+                        target_width,
+                        target_height,
                         win32con.SWP_NOZORDER | win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER,
                     )
+                    self._last_good_rect = win32gui.GetWindowRect(root_hwnd)
+                    self._locked_width = target_width
+                    self._locked_height = target_height
                 self.restore_tracking_visual_mode()
         except Exception as e:
             self.logger.warning(f"窗口归位失败：{repr(e)}")

@@ -19,5 +19,4 @@ FAQ: [https://saadocs.netlify.app/issue/Q&A](https://saadocs.netlify.app/feature
 - Show OCR results: useful when behavior is unexpected. If OCR has wrong text, add replacement rules in `Replacement`.
 - Show runtime screenshots: normally unnecessary for daily use.
 - Save scaling cache: recommended OFF.
-- Auto scaling: recommended ON. SaaAutomataAcacia will resize/reposition the game window automatically.
 - Proxy: if you use a proxy, fill in the port; otherwise keep it empty.
