@@ -228,14 +228,14 @@ class DisplayInterface(ScrollArea):
         quick_jump.addSampleCard(
             icon=os.path.join(self.basedir, "setting.svg"),
             title="Settings" if self._is_non_chinese_ui else "设置",
-            content="Please set up the automata acacia settings first" if self._is_non_chinese_ui else self.tr("首次下载请先设置自律姬"),
+            content="Please set up the automata acacia settings first" if self._is_non_chinese_ui else self.tr("首次下载请先设置"),
             routeKey="settingInterface",
             index=0,
         )
         quick_jump.addSampleCard(
             icon=os.path.join(self.basedir, "play.svg"),
             title="Start Daily" if self._is_non_chinese_ui else "开始自律",
-            content="SAA handles daily tasks in one click" if self._is_non_chinese_ui else self.tr("自律姬帮你一键种草。"),
+            content="Acacia, Let's go!" if self._is_non_chinese_ui else self.tr("安卡希雅，Let's go!"),
             routeKey="Home-Start-Now",
             index=0,
         )
@@ -249,8 +249,8 @@ class DisplayInterface(ScrollArea):
         self.windowTrackingQuickSwitchCard = quick_jump.addSampleCard_Switch(
             icon=os.path.join(self.basedir, "electronics.svg"),
             title="Stealth Mode" if self._is_non_chinese_ui else "隐身模式",
-            content="ON: no-mouse-steal + opacity=1; OFF: normal display + disable no-mouse-steal"
-            if self._is_non_chinese_ui else self.tr("完全后台隐身运行游戏"),
+            content="Make the game completely invisible in the background"
+            if self._is_non_chinese_ui else self.tr("游戏完全隐身后台"),
             checked=bool(config.windowTrackingInput.value) and int(config.windowTrackingAlpha.value) == 1,
             on_toggle=self._toggle_stealth_mode,
         )

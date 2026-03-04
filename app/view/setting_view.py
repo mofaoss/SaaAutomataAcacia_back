@@ -259,7 +259,7 @@ class SettingInterface(ScrollArea):
         self.stealthModeCard = SwitchSettingCard(
             FIF.HIDE,
             self._ui_text('隐身模式', 'Stealth Mode'),
-            self._ui_text('开启游戏完全隐身运行', 'Enable to run game in complete stealth mode in background'),
+            self._ui_text('游戏完全隐身后台', 'Enable to run game in complete stealth mode in background'),
             configItem=config.windowTrackingInput,
             parent=self.coreSettingsGroup
         )
