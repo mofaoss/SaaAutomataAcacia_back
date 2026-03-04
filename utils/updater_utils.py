@@ -217,23 +217,6 @@ def get_github_latest_release_version(repo_url: str) -> Optional[str]:
     return version or None
 
 
-def get_gitee_text(text_path: str, timeout: float = 5, proxies: Optional[Dict[str, str]] = None) -> Optional[list]:
-    proxies = _resolve_proxies(proxies)
-    if not text_path:
-        return None
-    url = f"https://gitee.com/laozhu520/auto_chenbai/raw/main/{text_path}"
-    headers = {"User-Agent": "SaaAutomataAcacia-Updater"}
-
-    try:
-        response = requests.get(url, headers=headers, timeout=timeout, proxies=proxies)
-        if response.status_code != 200:
-            return None
-        response.encoding = response.apparent_encoding
-        return response.text.splitlines()
-    except Exception:
-        return None
-
-
 def get_local_version(file_path="update_data.txt"):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
