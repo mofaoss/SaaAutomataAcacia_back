@@ -11,8 +11,7 @@ from PySide6.QtCore import QSize, QTimer, QThread, Qt, QUrl
 from PySide6.QtGui import QIcon, QImage, QPixmap, QMovie, QDesktopServices
 from PySide6.QtWidgets import QApplication, QFrame, QLabel
 from qfluentwidgets import FluentIcon as FIF, SystemThemeListener, MessageBox, InfoBar, InfoBarPosition
-from qfluentwidgets import NavigationItemPosition, FluentWindow, FlyoutView, \
-    Flyout, setThemeColor
+from qfluentwidgets import NavigationItemPosition, FluentWindow, setThemeColor
 
 from ..common.config import config
 from ..common.config import is_non_chinese_ui_language, is_traditional_ui_language
@@ -22,8 +21,7 @@ from ..common.matcher import matcher
 from ..common.setting import REPO_URL
 from ..common.signal_bus import signalBus
 from utils.game_launcher import launch_game_with_guard
-from utils.net_utils import get_cloudflare_data
-from utils.updater_utils import get_gitee_text, get_local_version, get_github_release_channels, is_remote_version_newer, \
+from utils.updater_utils import get_local_version, get_github_release_channels, is_remote_version_newer, \
     is_prerelease_version
 from ..repackage.custom_message_box import CustomMessageBox
 from ..common import resource  # don't delete
@@ -68,7 +66,6 @@ class MainWindow(FluentWindow):
         self.helpInterface = None
         self.tableInterface = None
         self.settingInterface = None
-        self.support_button = None
         self.ocr_module = None
         self.numpy_module = None
         self.cv2_module = None
@@ -88,7 +85,6 @@ class MainWindow(FluentWindow):
 
         self.initWindow()
         self._init_tasks = self._build_initial_init_tasks() + [
-            self._create_support_button,
             self.connectSignalToSlot,
             self.initNavigation,
             self._finalize_startup,
@@ -170,9 +166,6 @@ class MainWindow(FluentWindow):
         from .setting_interface import SettingInterface
         self.settingInterface = SettingInterface(self)
         self._localize_widget_if_needed(self.settingInterface)
-
-    def _create_support_button(self):
-        self.support_button = None
 
     def _run_next_init_task(self):
         if not self._init_tasks:
@@ -418,15 +411,6 @@ class MainWindow(FluentWindow):
                 key = 'home'
             self._register_nav_item(key, startup_top_interface[0], *startup_top_interface[1:])
 
-        self.support_button = self.navigationInterface.addItem(
-            routeKey='support',
-            icon=FIF.HEART,
-            text=self._to_traditional_if_needed(self._ui_text('赞赏', 'Support')),
-            onClick=self.onSupport,
-            selectable=False,
-            position=NavigationItemPosition.BOTTOM,
-        )
-
         self.navigationInterface.setCollapsible(True)
         if hasattr(self, "navigationInterface"):
             if hasattr(self.navigationInterface, "setExpandWidth"):
@@ -634,24 +618,6 @@ class MainWindow(FluentWindow):
 
     def cancel_click(self):
         self.close()
-
-    def onSupport(self):
-        support_image = "asset/support.jpg"
-        if self._is_non_chinese_ui or is_traditional_ui_language():
-            support_image = "asset/support_kofi.png"
-        view = FlyoutView(
-            title=self._ui_text("赞助作者", "Support Author"),
-            content=self._ui_text("如果这个助手帮助到你，可以考虑赞助作者一杯奶茶(>ω･* )ﾉ",
-                                  "If this assistant helps you, consider buying the author a coffee (>ω･* )ﾉ"),
-            image=support_image,
-            isClosable=True,
-        )
-        view.widgetLayout.insertSpacing(1, 5)
-        view.widgetLayout.addSpacing(5)
-
-        target = self.support_button if self.support_button is not None else self.navigationInterface
-        w = Flyout.make(view, target, self)
-        view.closed.connect(w.close)
 
     def _ui_text(self, zh_text: str, en_text: str) -> str:
         return en_text if self._is_non_chinese_ui else self.tr(zh_text)

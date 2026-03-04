@@ -24,7 +24,6 @@ from app.common.style_sheet import StyleSheet
 from utils.game_launcher import launch_game_with_guard
 from utils.net_utils import get_cloudflare_data, get_date_from_api
 from utils.ui_utils import get_all_children
-from utils.updater_utils import get_gitee_text
 from utils.win_utils import is_exist_snowbreak
 from app.modules.base_task.base_task import BaseTask
 from app.modules.chasm.chasm import ChasmModule
@@ -702,31 +701,6 @@ class Daily(QFrame, BaseInterface):
         w = Flyout.make(view, self.PrimaryPushButton_path_tutorial, self)
         view.closed.connect(w.close)
 
-    def update_online(self):
-        """通过gitee在线更新(停用)"""
-        text = get_gitee_text("update_data.txt")
-        # 返回字典说明必定出现报错了
-        if isinstance(text, dict):
-            logger.error(text["error"])
-            return
-        # 只有在获得新内容的时候才做更新动作,text[0]为第一行：坐标等数据
-        if text[0] != config.update_data.value or not config.date_tip.value:
-            if config.isLog.value:
-                logger.info(f'获取到更新信息：{text[0]}')
-            # 更新配置
-            config.set(config.update_data, text[0])
-
-            data = text[0].split("_")
-            # 设置任务名
-            config.set(config.task_name, data[9])
-            # 更新链活动提醒
-            url = f"https://www.cbjq.com/api.php?op=search_api&action=get_article_detail&catid={data[10]}&id={data[11]}"
-
-            self.get_tips(url=url)
-            # 更新材料和深渊位置在use_power.py
-        else:
-            # 获取本地保存的信息
-            self.get_tips()
 
     def update_online_cloudflare(self):
         """通过cloudflare在线更新（异步）更新内容包括版本号，版本坐标，兑换码"""

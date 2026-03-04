@@ -207,29 +207,3 @@ class Matcher:
 
 
 matcher = Matcher()
-# 使用示例
-# if __name__ == "__main__":
-#     from time import time
-#
-#     matcher = Matcher()
-#     orig_target = cv2.imread("C:/Users/laozhu/Desktop/test/PixPin_2025-02-28_16-05-00.png")
-#     start = time()
-#     matches = matcher.match("../resource/images/water_bomb/hp.png", orig_target)
-#     print(time() - start)
-#     print(matcher.scales)
-#     print(f"找到 {len(matches)} 个有效匹配：")
-#     for idx, (x, y, w, h, conf) in enumerate(matches):
-#         cv2.rectangle(orig_target,
-#                       (x, y),
-#                       (x + w, y + h),
-#                       (0, 255, 0), 2)
-#         text = f"{conf:.2f}"
-#         cv2.putText(orig_target, text,
-#                     (x, y - 5),
-#                     cv2.FONT_HERSHEY_SIMPLEX,
-#                     0.5, (0, 255, 0), 2)
-#     # 显示最终结果
-#     cv2.namedWindow("results")
-#     cv2.imshow("results", orig_target)
-#     cv2.waitKey(0)
-#     cv2.destroyAllWindows()
