@@ -5,7 +5,7 @@ inspired by and adapted from the open-source project MAA_SnowBreak.
 Special thanks to the original author, overflow65537, for their outstanding
 work, reverse-engineering efforts, and contribution to the community.
 
-Original Repository: [https://github.com/overflow65537/MAA_SnowBreak/](https://github.com/overflow65537/MAA_SnowBreak/)
+Original Repository: https://github.com/overflow65537/MAA_SnowBreak/
 License: MIT License
 
 # This script respects the original author's copyright and is built upon the foundation of their MIT-licensed pipeline files.
@@ -36,13 +36,9 @@ class ShardExchangeModule:
         self.enable_recycle = self.config_data.get("enable_recycle_shards", True)
 
     def _roi(self, x, y, w, h):
-        """将 JSON 的 [x, y, w, h] 转换为 auto 类 crop 所需的比例 (x1/w, y1/h, x2/w, y2/h)"""
         return (x / self.base_w, y / self.base_h, (x + w) / self.base_w, (y + h) / self.base_h)
 
     def _is_color_match(self, crop_ratio, lower_bgr, upper_bgr):
-        """
-        模拟 MaaFramework 的 ColorMatch 功能，适配你的 Automation 截图
-        """
         if self.auto.first_screenshot is None:
             return False
 

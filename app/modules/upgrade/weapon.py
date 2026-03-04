@@ -28,7 +28,7 @@ class WeaponUpgradeModule:
         self.logger = logger
         self.is_log = True
 
-        # JSON 的基准分辨率
+        # 基准分辨率
         self.base_w = 1280
         self.base_h = 720
 
@@ -37,7 +37,6 @@ class WeaponUpgradeModule:
         self.enable_weapon_upgrade = self.config_data.get("enable_weapon_upgrade", True)
 
     def _roi(self, x, y, w, h):
-        """将 JSON 的 [x, y, w, h] 转换为 auto 类 crop 所需的比例 (x1/w, y1/h, x2/w, y2/h)"""
         return (x / self.base_w, y / self.base_h, (x + w) / self.base_w, (y + h) / self.base_h)
 
     def _count_color_pixels(self, crop_ratio, lower_bgr, upper_bgr, min_count=100):
@@ -151,8 +150,8 @@ class WeaponUpgradeModule:
             has_materials_on_screen = any(self.auto.find_element(mat, 'image', crop=self._roi(0, 20, 387, 192), take_screenshot=False) for mat in mat_imgs)
 
             if has_materials_on_screen:
-                # 【核心逻辑】：通过 ColorMatch 检查升级按钮是否亮起 (变成橙红色)
-                # JSON 中的 RGB为 [239, 72, 39] 到 [241, 74, 41]。在 OpenCV 中转换为 BGR！
+                # 检查升级按钮是否亮起 (变成橙红色)
+                # RGB为 [239, 72, 39] 到 [241, 74, 41]。在 OpenCV 中转换为 BGR！
                 is_ready_to_upgrade = self._count_color_pixels(
                     self._roi(21, 61, 496, 561),
                     lower_bgr=[39, 72, 239],
