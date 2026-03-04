@@ -14,7 +14,7 @@ import win32gui
 from PySide6.QtCore import QThread, Signal, Qt, QTimer
 from PySide6.QtWidgets import QFrame, QWidget, QTreeWidgetItemIterator, QFileDialog, QVBoxLayout
 from qfluentwidgets import FluentIcon as FIF, InfoBar, InfoBarPosition, CheckBox, ComboBox, LineEdit, \
-    BodyLabel, ProgressBar, FlyoutView, Flyout
+    BodyLabel, ProgressBar, FlyoutView, Flyout, SpinBox
 from win11toast import toast
 
 from app.common.config import config, is_non_chinese_ui_language
@@ -564,6 +564,8 @@ class Daily(QFrame, BaseInterface):
                     widget.setCurrentIndex(config_item.value)
                 elif isinstance(widget, LineEdit):
                     widget.setText(str(config_item.value))
+                elif isinstance(widget, SpinBox):
+                    widget.setValue(config_item.value)
         self._load_item_config()
 
     def _load_item_config(self):
@@ -595,6 +597,8 @@ class Daily(QFrame, BaseInterface):
                 children.currentIndexChanged.connect(partial(self.save_changed, children))
             elif isinstance(children, LineEdit):
                 children.editingFinished.connect(partial(self.save_changed, children))
+            elif isinstance(children, SpinBox):
+                children.valueChanged.connect(partial(self.save_changed, children))
 
     def set_hwnd(self, hwnd):
         self.game_hwnd = hwnd
@@ -1145,6 +1149,8 @@ class Daily(QFrame, BaseInterface):
                 self.ui.PushButton_select_directory.setEnabled(widget.isChecked())
         elif isinstance(widget, ComboBox):
             config.set(config_item, widget.currentIndex())
+        elif isinstance(widget, SpinBox):
+            config.set(config_item, widget.value())
         elif isinstance(widget, LineEdit):
             if 'x1' in widget.objectName() or 'x2' in widget.objectName() or 'y1' in widget.objectName() or 'y2' in widget.objectName():
                 config.set(config_item, int(widget.text()))
@@ -1225,3 +1231,8 @@ class Daily(QFrame, BaseInterface):
 
     def closeEvent(self, event):
         super().closeEvent(event)
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        # 只要切回这个页面，就强制从 config 重新读取一次最新数据覆盖 UI
+        self._load_config()

@@ -266,7 +266,7 @@ class Additional(QFrame, BaseInterface):
                 children.valueChanged.connect(
                     partial(self.save_changed, children))
 
-    def save_changed(self, widget):
+    def save_changed(self, widget, *args, **kwargs):
         if isinstance(widget, SpinBox):
             config.set(getattr(config, widget.objectName(), None),
                        widget.value())
@@ -591,3 +591,8 @@ class Additional(QFrame, BaseInterface):
             self.set_simple_card_enable(self.SimpleCardWidget_capture_pals, True)
             self.PushButton_start_capture_pals.setText(self._ui_text('开始抓帕鲁', 'Start Capture Pals'))
             self.is_running_capture_pals = False
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        # 只要切回这个页面，就强制从 config 重新读取一次最新数据覆盖 UI
+        self._load_config()

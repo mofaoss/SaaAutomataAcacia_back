@@ -644,37 +644,41 @@ class RewardPage(BaseDailyPage):
 
 class OperationPage(BaseDailyPage):
     def __init__(self, parent=None):
+        # 注意：这里的 objectName 可以根据需要命名，只要里面的控件名对得上就行
         super().__init__("page_operation", parent=parent)
 
-        # 疾跑方式设置行
-        sprint_line = QHBoxLayout()
-        self.BodyLabel_22 = BodyLabel(self)
-        self.BodyLabel_22.setObjectName("BodyLabel_22")
-        self.ComboBox_run = ComboBox(self)
-        self.ComboBox_run.setObjectName("ComboBox_run")
-        sprint_line.addWidget(self.BodyLabel_22)
-        sprint_line.addWidget(self.ComboBox_run)
-
-        # 刷取次数设置行
-        count_line = QHBoxLayout()
+        # 1. 刷取次数设置
         self.BodyLabel_4 = BodyLabel(self)
         self.BodyLabel_4.setObjectName("BodyLabel_4")
         self.SpinBox_action_times = SpinBox(self)
         self.SpinBox_action_times.setObjectName("SpinBox_action_times")
-        self.SpinBox_action_times.setRange(1, 999) # 限制刷取次数范围
-        count_line.addWidget(self.BodyLabel_4)
-        count_line.addWidget(self.SpinBox_action_times)
+        self.SpinBox_action_times.setRange(1, 999)
 
-        # 底部提示文字
+        # 2. 疾跑方式设置
+        self.BodyLabel_22 = BodyLabel(self)
+        self.BodyLabel_22.setObjectName("BodyLabel_22")
+        self.ComboBox_run = ComboBox(self)
+        self.ComboBox_run.setObjectName("ComboBox_run")
+
+        # 3. 提示文字
         self.BodyLabel_tip_action = BodyLabel(self)
         self.BodyLabel_tip_action.setObjectName("BodyLabel_tip_action")
         self.BodyLabel_tip_action.setTextFormat(Qt.TextFormat.MarkdownText)
         self.BodyLabel_tip_action.setWordWrap(True)
 
-        self.main_layout.addLayout(sprint_line)
-        self.main_layout.addLayout(count_line)
+        # 4. 加入主布局
+        self.main_layout.addLayout(self._row(self.BodyLabel_4, self.SpinBox_action_times))
+        self.main_layout.addLayout(self._row(self.BodyLabel_22, self.ComboBox_run))
         self.main_layout.addWidget(self.BodyLabel_tip_action)
+
         self.finalize()
+
+    @staticmethod
+    def _row(label, edit):
+        line = QHBoxLayout()
+        line.addWidget(label, 1)
+        line.addWidget(edit, 2)
+        return line
 
 
 class DailyView(QWidget):
