@@ -32,7 +32,7 @@ class WeaponUpgradeModule:
         self.base_w = 1280
         self.base_h = 720
 
-        # 读取用户的勾选状态（请根据你实际的 config.py 键名进行替换）
+        # 读取用户的勾选状态
         self.config_data = config.toDict()
         self.enable_weapon_upgrade = self.config_data.get("enable_weapon_upgrade", True)
 
@@ -42,7 +42,6 @@ class WeaponUpgradeModule:
 
     def _count_color_pixels(self, crop_ratio, lower_bgr, upper_bgr, min_count=100):
         """
-        完美模拟 MAA 的 ColorMatch (带 count 阈值) 功能。
         寻找指定区域内，符合颜色范围的像素点总数是否达到 min_count。
         """
         if self.auto.first_screenshot is None:
@@ -89,7 +88,7 @@ class WeaponUpgradeModule:
         return False
 
     def open_inventory_and_sort(self):
-        """对应 JSON 中从打开背包 -> 排序 -> 选择枪械 -> 点击枪械培养 的一连串前置操作"""
+        """打开背包 -> 排序 -> 选择枪械 -> 点击枪械培养 的一连串前置操作"""
         self.logger.info("正在打开背包并筛选武器...")
 
         # 1. 打开背包
@@ -124,10 +123,10 @@ class WeaponUpgradeModule:
         return False
 
     def upgrade_loop(self):
-        """对应 JSON 中极度复杂的循环判断图: 升级枪械 -> 选择材料 -> 检查颜色 -> 升级 -> 确认升级"""
+        """升级枪械 -> 选择材料 -> 检查颜色 -> 升级 -> 确认升级"""
         timeout = Timer(60).start()
 
-        # 确保我们在“升级”页签
+        # 确保在“升级”页签
         self._wait_and_click('升级', 'text', self._roi(46, 140, 136, 121))
 
         while True:
