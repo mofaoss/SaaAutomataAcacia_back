@@ -1,3 +1,7 @@
+# Notice
+SaaAutomataAcacia is a completely free and open‑source project: [Visit the GitHub Repository](https://github.com/mofaoss/SaaAutomataAcacia/)
+
+
 # Help
 
 SaaAutomataAcacia Docs: [https://saadocs.netlify.app](https://saadocs.netlify.app)

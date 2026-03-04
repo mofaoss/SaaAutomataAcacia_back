@@ -1,3 +1,6 @@
+# 注意
+自律姬是完全免费开源的项目：[前往Github仓库](https://github.com/mofaoss/SaaAutomataAcacia/)
+
 # 帮助文档
 
 SAA文档站：[https://saadocs.netlify.app](https://saadocs.netlify.app)
