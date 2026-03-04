@@ -58,17 +58,14 @@ class Trigger(QFrame, BaseInterface):
             self.SwitchButton_f.setChecked(False)
 
     def on_f_toggled(self, isChecked: bool):
-        """
-        采集f
-        :param isChecked:
-        :return:
-        """
+        """自动采集 F"""
         if isChecked:
             self.f_thread = SubTask(AutoFModule)
             self.f_thread.is_running.connect(self.turn_off_f_switch)
             self.f_thread.start()
         else:
-            if self.f_thread.run:
+            # ✅ 修复：使用官方的 isRunning() 方法判断，而不是访问自定义的属性
+            if hasattr(self, 'f_thread') and self.f_thread.isRunning():
                 self.f_thread.stop()
                 InfoBar.success(
                     self._ui_text('自动按F', 'Auto F'),
@@ -80,24 +77,21 @@ class Trigger(QFrame, BaseInterface):
             else:
                 InfoBar.error(
                     self._ui_text('错误', 'Error'),
-                    self._ui_text('游戏未打开', 'Game is not running'),
+                    self._ui_text('游戏未打开或任务未运行', 'Game/Task is not running'),
                     isClosable=True,
                     duration=2000,
                     parent=self
                 )
 
     def on_e_toggled(self, isChecked: bool):
-        """
-        妮塔e
-        :param isChecked:
-        :return:
-        """
+        """妮塔自动 E"""
         if isChecked:
             self.nita_e_thread = SubTask(NitaAutoEModule)
             self.nita_e_thread.is_running.connect(self.turn_off_e_switch)
             self.nita_e_thread.start()
         else:
-            if self.nita_e_thread.run:
+            # ✅ 修复：同上
+            if hasattr(self, 'nita_e_thread') and self.nita_e_thread.isRunning():
                 self.nita_e_thread.stop()
                 InfoBar.success(
                     self._ui_text('妮塔自动E', 'Nita Auto E'),
@@ -109,7 +103,7 @@ class Trigger(QFrame, BaseInterface):
             else:
                 InfoBar.error(
                     self._ui_text('错误', 'Error'),
-                    self._ui_text('游戏未打开', 'Game is not running'),
+                    self._ui_text('游戏未打开或任务未运行', 'Game/Task is not running'),
                     isClosable=True,
                     duration=2000,
                     parent=self

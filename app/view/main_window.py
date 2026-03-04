@@ -209,7 +209,7 @@ class MainWindow(FluentWindow, BaseInterface):
     def _create_display_and_add_nav(self):
         if self.displayInterface is None:
             self._create_display_interface()
-        self._register_nav_item('display', self.displayInterface, FIF.PHOTO, self._ui_text('展示页', 'Display'))
+        self._register_nav_item('display', self.displayInterface, FIF.PHOTO, self._ui_text('首页', 'Display'))
 
     def _create_home_and_add_nav(self):
         if self.homeInterface is None:
@@ -219,17 +219,23 @@ class MainWindow(FluentWindow, BaseInterface):
     def _create_additional_and_add_nav(self):
         if self.additionalInterface is None:
             self._create_additional_interface()
-        self._register_nav_item('additional', self.additionalInterface, FIF.APPLICATION, self._ui_text('小工具', 'Tools'))
+        self._register_nav_item('additional', self.additionalInterface, FIF.APPLICATION, self._ui_text('工具', 'Tools'))
 
     def _create_trigger_and_add_nav(self):
         if self.triggerInterface is None:
             self._create_trigger_interface()
-        self._register_nav_item('trigger', self.triggerInterface, FIF.COMPLETED, self._ui_text('触发器', 'Trigger'))
+        self._register_nav_item('trigger', self.triggerInterface, FIF.COMPLETED, self._ui_text('辅助', 'Trigger'))
 
     def _create_table_and_add_nav(self):
         if self.tableInterface is None:
             self._create_table_interface()
-        self._register_nav_item('table', self.tableInterface, FIF.SYNC, self._ui_text('替换表', 'Replacement'))
+        self._register_nav_item(
+            'table',
+            self.tableInterface,
+            FIF.SYNC,
+            self._ui_text('替换', 'Replacement'),
+            position=NavigationItemPosition.BOTTOM,
+        )
 
     def _create_help_and_add_nav(self):
         if self.helpInterface is None:
@@ -382,23 +388,18 @@ class MainWindow(FluentWindow, BaseInterface):
     def initNavigation(self):
         # self.navigationInterface.setAcrylicEnabled(True)
 
-        nav_font = self.navigationInterface.font()
-        if nav_font.pointSize() <= 0:
-            nav_font.setPointSize(10)
-            self.navigationInterface.setFont(nav_font)
-
         # TODO: add navigation items
         startup_top_interface = None
         if self._startup_target_index == 2 and self.additionalInterface is not None:
-            startup_top_interface = (self.additionalInterface, FIF.APPLICATION, self._ui_text('小工具', 'Tools'))
+            startup_top_interface = (self.additionalInterface, FIF.APPLICATION, self._ui_text('工具', 'Tools'))
         elif self._startup_target_index == 1 and self.homeInterface is not None:
             startup_top_interface = (self.homeInterface, FIF.HOME, self._ui_text('日常', 'Daily'))
         elif self.displayInterface is not None:
-            startup_top_interface = (self.displayInterface, FIF.PHOTO, self._ui_text('展示页', 'Display'))
+            startup_top_interface = (self.displayInterface, FIF.PHOTO, self._ui_text('首页', 'Display'))
         elif self.homeInterface is not None:
             startup_top_interface = (self.homeInterface, FIF.HOME, self._ui_text('日常', 'Daily'))
         elif self.additionalInterface is not None:
-            startup_top_interface = (self.additionalInterface, FIF.APPLICATION, self._ui_text('小工具', 'Tools'))
+            startup_top_interface = (self.additionalInterface, FIF.APPLICATION, self._ui_text('工具', 'Tools'))
 
         if startup_top_interface is not None:
             key = 'display'
@@ -751,11 +752,6 @@ class MainWindow(FluentWindow, BaseInterface):
 
     def changeEvent(self, event):
         super().changeEvent(event)
-        if event.type() in [event.Type.LanguageChange, event.Type.FontChange, event.Type.ApplicationFontChange]:
-            app_font = QApplication.font()
-            if app_font.pointSize() <= 0:
-                app_font.setPointSize(10)
-                QApplication.setFont(app_font)
 
     def _onThemeChangedFinished(self):
         super()._onThemeChangedFinished()

@@ -3,7 +3,7 @@ import os
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QTranslator, QSize, QObject, QThread, QTimer, Signal, QPoint
+from PySide6.QtCore import Qt, QTranslator, QSize, QObject, QThread, QTimer, Signal, QPoint, QtMsgType, qInstallMessageHandler
 from PySide6.QtGui import QMovie, QPixmap, QFont
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
 
@@ -198,8 +198,15 @@ class RuntimeImportWorker(QThread):
         except Exception as e:
             self.failed.emit(str(e))
 
+def qt_message_handler(mode, context, message):
+    if mode == QtMsgType.QtWarningMsg and "Point size <= 0" in message:
+        return  # 遇到这句警告，直接丢弃，不打印到控制台
+    print(message)
+
 
 def main():
+    qInstallMessageHandler(qt_message_handler)
+
     if config.get(config.dpiScale) != "Auto":
         os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "0"
         os.environ["QT_SCALE_FACTOR"] = str(config.get(config.dpiScale))
