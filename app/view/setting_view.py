@@ -21,6 +21,7 @@ from ..common.config import config, isWin11, is_non_chinese_ui_language
 from ..common.setting import QQ, REPO_URL
 from ..common.signal_bus import signalBus
 from ..common.style_sheet import StyleSheet
+from .base_interface import BaseInterface
 from utils.updater_utils import (
     get_local_version,
     get_github_release_channels,
@@ -73,7 +74,7 @@ class VersionCheckThread(QThread):
         self.finishedSignal.emit(payload)
 
 
-class AboutHeaderWidget(QWidget):
+class AboutHeaderWidget(QWidget, BaseInterface):
 
     def __init__(self, is_non_chinese_ui: bool = False, parent=None):
         super().__init__(parent=parent)
@@ -139,10 +140,6 @@ class AboutHeaderWidget(QWidget):
 
         self.mainLayout.addStretch(1)
 
-    def _ui_text(self, zh_text: str, en_text: str) -> str:
-        return en_text if self._is_non_chinese_ui else zh_text
-
-
 class SettingCardGroup(CardGroup):
 
     def __init__(self, title: str, parent=None):
@@ -150,7 +147,7 @@ class SettingCardGroup(CardGroup):
         setFont(self.titleLabel, 14, QFont.Weight.DemiBold)
 
 
-class SettingInterface(ScrollArea):
+class SettingInterface(ScrollArea, BaseInterface):
     """ Setting interface """
 
     def __init__(self, parent=None):
@@ -422,9 +419,6 @@ class SettingInterface(ScrollArea):
             duration=2000,
             parent=self
         )
-
-    def _ui_text(self, zh_text: str, en_text: str) -> str:
-        return en_text if self._is_non_chinese_ui else zh_text
 
     def _connectSignalToSlot(self):
         """ connect signal to slot """

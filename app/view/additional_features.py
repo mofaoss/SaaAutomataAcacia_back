@@ -19,7 +19,7 @@ from app.modules.operation_action.operation_action import OperationModule
 from app.modules.water_bomb.water_bomb import WaterBombModule
 from app.modules.capture_pals.capture_pals import CapturePalsModule
 from app.view.additional_features_view import AdditionalFeaturesView
-from app.view.base_interface import BaseInterface
+from .base_interface import BaseInterface
 from app.view.subtask import AdjustColor, SubTask
 
 
@@ -322,9 +322,6 @@ class Additional(QFrame, BaseInterface):
         else:
             self.logger.error(self._ui_text("保存失败，输入不符合“int,int,int”的格式", "Save failed: input format must be int,int,int"))
         return False
-
-    def _ui_text(self, zh_text: str, en_text: str) -> str:
-        return en_text if self._is_non_chinese_ui else zh_text
 
     def _apply_static_i18n(self):
         self.TitleLabel.setText(self._ui_text("日志", "Log"))

@@ -37,7 +37,7 @@ from app.modules.use_power.use_power import UsePowerModule
 from app.repackage.custom_message_box import CustomMessageBox
 from app.repackage.tree import TreeFrame_person, TreeFrame_weapon
 from app.view.daily_view import DailyView, TaskItemWidget
-from app.view.base_interface import BaseInterface
+from .base_interface import BaseInterface
 
 
 logger = logging.getLogger(__name__)
@@ -1288,9 +1288,6 @@ class Daily(QFrame, BaseInterface):
 
         execution_rules = _normalize_rules(task_config.get("execution_config"), default_rules)
         return any(_is_rule_matched(rule) for rule in execution_rules)
-
-    def _ui_text(self, zh_text: str, en_text: str) -> str:
-        return en_text if self._is_non_chinese_ui else zh_text
 
     def _apply_home_i18n(self):
         self.TitleLabel.setText(self._ui_text("日志", "Log"))

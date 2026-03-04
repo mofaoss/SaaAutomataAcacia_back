@@ -16,6 +16,7 @@ from qfluentwidgets import ScrollArea, CardWidget
 from app.common.config import config, is_non_chinese_ui_language
 from app.common.signal_bus import signalBus
 from app.common.style_sheet import StyleSheet
+from .base_interface import BaseInterface
 from utils.updater_utils import get_local_version
 
 from app.repackage.samplecardview import SampleCardView
@@ -153,8 +154,10 @@ class BannerWidget(QWidget):
             painter.end()
 
 
-class DisplayInterface(ScrollArea):
+class DisplayInterface(ScrollArea, BaseInterface):
     """Display interface"""
+
+    _ui_text_use_qt_tr = True
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
@@ -204,9 +207,6 @@ class DisplayInterface(ScrollArea):
         self.gameLanguageNoticeCard.setVisible(is_non_chinese_ui_language())
         self.vBoxLayout.addWidget(self.gameLanguageNoticeCard)
         self.vBoxLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
-
-    def _ui_text(self, zh_text: str, en_text: str) -> str:
-        return en_text if self._is_non_chinese_ui else self.tr(zh_text)
 
     def _sync_window_tracking_quick_switch(self):
         if self.windowTrackingQuickSwitchCard is not None:

@@ -4,7 +4,7 @@ from qfluentwidgets import InfoBar
 from app.common.config import is_non_chinese_ui_language
 from app.modules.trigger.auto_f import AutoFModule
 from app.modules.trigger.nita_auto_e import NitaAutoEModule
-from app.view.base_interface import BaseInterface
+from .base_interface import BaseInterface
 from app.view.subtask import SubTask
 from app.view.trigger_view import TriggerView
 
@@ -44,9 +44,6 @@ class Trigger(QFrame, BaseInterface):
                 "### 提示\n* 先启动游戏再开启本功能\n* 这里的功能相当于开关，开了就会一直检测，遇到符合的情况就自动触发\n* 不影响手动游玩，更像是辅助半自动",
                 "### Tips\n* Launch the game before enabling this feature\n* These are toggle switches. Once enabled, detection keeps running and triggers automatically when conditions match\n* It does not block manual gameplay, acting as semi-automation assistance"
             ))
-
-    def _ui_text(self, zh_text: str, en_text: str) -> str:
-        return en_text if self._is_non_chinese_ui else zh_text
 
     def _connect_to_slot(self):
         self.SwitchButton_f.checkedChanged.connect(self.on_f_toggled)

@@ -8,10 +8,11 @@ from qfluentwidgets import InfoBar, InfoBarPosition
 
 from app.common.config import is_non_chinese_ui_language
 from app.common.style_sheet import StyleSheet
+from .base_interface import BaseInterface
 from app.view.ocr_replacement_table_view import OcrReplacementTableView
 
 
-class OcrReplacementTable(QFrame):
+class OcrReplacementTable(QFrame, BaseInterface):
     def __init__(self, text: str, parent=None):
         super().__init__()
 
@@ -90,9 +91,6 @@ class OcrReplacementTable(QFrame):
         self.old_type = 'direct' if cell_text in ["直接替换", "Direct Replace"] else 'conditional'
         self.old_key = self.TableWidget_ocr_table.item(row, 1).text()
         self.old_value = self.TableWidget_ocr_table.item(row, 2).text()
-
-    def _ui_text(self, zh_text: str, en_text: str) -> str:
-        return en_text if self._is_non_chinese_ui else zh_text
 
     def change_row(self, row, col):
         # 临时断开信号

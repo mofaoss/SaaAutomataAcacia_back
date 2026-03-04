@@ -20,6 +20,7 @@ from ..common.icon import Icon
 from ..common.matcher import matcher
 from ..common.setting import REPO_URL
 from ..common.signal_bus import signalBus
+from .base_interface import BaseInterface
 from utils.game_launcher import launch_game_with_guard
 from utils.updater_utils import get_local_version, get_github_release_channels, is_remote_version_newer, \
     is_prerelease_version
@@ -41,13 +42,14 @@ class InstallOcr(QThread):
         self.ocr_installer.install_ocr()
 
 
-class MainWindow(FluentWindow):
+class MainWindow(FluentWindow, BaseInterface):
 
     SPLASH_ICON_SIZE = QSize(150, 150)
     SPLASH_MOVIE_SIZE = QSize(160, 160)
     SPLASH_PREFERRED_MIN_MS = 1200
     DEFAULT_WINDOW_WIDTH = 1080
     DEFAULT_WINDOW_HEIGHT = 800
+    _ui_text_use_qt_tr = True
 
     def __init__(self):
         super().__init__()
@@ -632,9 +634,6 @@ class MainWindow(FluentWindow):
 
     def cancel_click(self):
         self.close()
-
-    def _ui_text(self, zh_text: str, en_text: str) -> str:
-        return en_text if self._is_non_chinese_ui else self.tr(zh_text)
 
     def switchToSample(self, routeKey, index):
         """
