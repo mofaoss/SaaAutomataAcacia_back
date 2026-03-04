@@ -238,7 +238,7 @@ class SettingInterface(ScrollArea, BaseInterface):
         self.updateOnStartUpCard = SwitchSettingCard(
             FIF.UPDATE,
             self.tr('Check for updates when the application starts'),
-            self._ui_text('如果开启，每次游戏版本更新会自动更新对应活动刷体力的坐标和安卡希雅·自律姬提醒的链接',
+            self._ui_text('如果开启，每次游戏版本更新会自动更新对应活动刷体力的坐标和安卡希雅更新提醒的链接',
                           'If enabled, coordinates and schedule reminder links update automatically after each game version update'),
             configItem=config.checkUpdateAtStartUp,
             parent=self.aboutSoftwareGroup
@@ -314,15 +314,15 @@ class SettingInterface(ScrollArea, BaseInterface):
         self.autoStartTask = SwitchSettingCard(
             FIF.PLAY,
             self._ui_text('自动开始任务', 'Auto start tasks'),
-            self._ui_text('打开安卡希雅·自律姬自动开始运行日常，必须先勾选并配置好自动打开游戏',
-                          'Automatically starts daily tasks when SaaAutomataAcacia launches. Requires auto-open game to be enabled and configured first'),
+            self._ui_text('唤醒安卡希雅后自动开始运行日常，必须先勾选并配置好自动打开游戏',
+                          'Automatically starts daily tasks when Acacia is called. Requires auto-open game to be enabled and configured first'),
             configItem=config.auto_start_task,
             parent=self.aboutSoftwareGroup
         )
         self.autoBootStartup = SwitchSettingCard(
             FIF.POWER_BUTTON,
             self._ui_text('开机自启', 'Start on boot'),
-            self._ui_text('开机时自动打开安卡希雅·自律姬', 'Launch SaaAutomataAcacia automatically when Windows starts'),
+            self._ui_text('开机时自动唤醒安卡希雅', 'Call Acacia automatically when Windows starts'),
             configItem=config.auto_boot_startup,
             parent=self.aboutSoftwareGroup
         )

@@ -16,7 +16,7 @@
 > [!Tip]
 > **Update**
 > 1. **Stealth Mode**, allowing the game to run completely hidden in the background
-> 2. **Automata Acacia** now has a **fully redesigned UI**
+> 2. Acacia now has a **fully redesigned UI**
 > 3. Added **custom task lists** and **periodic/scheduled execution** features
 > 4. Added support for **Traditional Chinese and English**, including compatibility with Traditional Chinese game clients
 > 5. Added **standard logistics** and **Pals capturing** functions
@@ -69,7 +69,7 @@
 
 ✅ Automatic coordinate updates & schedule reminders
 
-✅ Direct game launch via SaaAutomataAcacia
+✅ Direct game launch via Acacia
 
 ✅ GPU acceleration support for NVIDIA/AMD
 
