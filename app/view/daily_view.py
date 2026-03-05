@@ -706,7 +706,7 @@ class DailyView(QWidget):
 
         self.gridLayout_2.setColumnStretch(0, 1) # 左侧稍窄
         self.gridLayout_2.setColumnStretch(1, 4) # 中间稍宽
-        self.gridLayout_2.setColumnStretch(2, 3) # 右侧稍窄
+        self.gridLayout_2.setColumnStretch(2, 1) # 右侧稍窄
 
         self._apply_ui_settings()
 
