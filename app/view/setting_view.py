@@ -102,7 +102,7 @@ class AboutHeaderWidget(QWidget, BaseInterface):
 
         self.row1Layout = QHBoxLayout()
         self.row1Layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        self.titleLabel = SubtitleLabel(self._ui_text("作者：mofaoss", "Author: mofaoss"), self)
+        self.titleLabel = SubtitleLabel(self._ui_text("作者：Dr. Sun", "Author: mofaoss"), self)
         self.githubBtn = PushButton(self._ui_text("前往 GitHub", "Open GitHub"), self)
         self.githubBtn.setFixedSize(110, 30)
 
