@@ -133,27 +133,24 @@ jobs:
           TARGET_VERSION: ${{ steps.version.outputs.version }}
         run: |
           $version = $env:TARGET_VERSION
-
-          $perfectBuildPath = "PerfectBuild/perfect_build.py"
-          $perfectBuildContent = Get-Content -Path $perfectBuildPath -Raw -Encoding UTF8
-          $perfectBuildUpdated = [regex]::Replace(
-            $perfectBuildContent,
-            'app_ver\s*=\s*"[^"]+"',
-            "app_ver = `"$version`"",
-            1
-          )
-          Set-Content -Path $perfectBuildPath -Value $perfectBuildUpdated -Encoding UTF8
-
           $updateDataPath = "update_data.txt"
+
+          # 读取文件内容
           $lines = @(Get-Content -Path $updateDataPath -Encoding UTF8)
-          if ($lines.Count -eq 0) {
-            $lines = @("")
+
+          # 确保文件至少包含两行
+          while ($lines.Count -lt 2) {
+            $lines += ""
           }
-          $lines[$lines.Count - 1] = $version
-          $updateDataContent = ($lines -join "`n") + "`n"
+
+          # 将第二行（索引为 1）更新为目标版本号
+          $lines[1] = $version
+
+          # 重新组合并写入文件
+          $updateDataContent = ($lines -join "`n")
           Set-Content -Path $updateDataPath -Value $updateDataContent -Encoding UTF8
 
-          Write-Host "Updated version in PerfectBuild/perfect_build.py and update_data.txt"
+          Write-Host "Updated version to $version in update_data.txt"
 
       - name: Build (Nuitka mode)
         if: ${{ env.IS_TAG == 'true' || env.IS_MAIN != 'true' || steps.nuitka_cache.outputs.cache-hit != 'true' }}

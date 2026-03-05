@@ -1,46 +1,53 @@
 import sys
 import os
-# from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QTextBrowser
-# from PySide6.QtGui import QIcon
-
 from pathlib import Path
 
 
 def app_dir():
     """Returns the base application path."""
     if hasattr(sys, "frozen"):
-        # Handles PyInstaller
-        return Path(sys.executable).parent  # 使用pyinstaller打包后的exe目录
-    return Path(__file__).resolve().parent.parent  # 没打包前的项目根目录
+        # Handles PyInstaller/Nuitka frozen execution
+        return Path(sys.executable).parent
+    return Path(__file__).resolve().parent.parent
+
+
+def get_app_version() -> str:
+    """
+    Dynamically read the application version from update_data.txt.
+    Expects a plain text file where the second line contains the version string.
+    Ensures Single Source of Truth (SSOT) for versioning.
+    """
+    default_version = "2.3.1"
+    try:
+        root_dir = Path(__file__).resolve().parent.parent
+        update_file = root_dir / "update_data.txt"
+
+        if not update_file.exists():
+            print(f"Warning: {update_file.name} not found. Using default version: {default_version}")
+            return default_version
+
+        with open(update_file, "r", encoding="utf-8") as f:
+            lines = f.read().splitlines()
+
+            # 校验文件是否至少包含两行内容
+            if len(lines) >= 2:
+                version_str = lines[1].strip()
+                if version_str:
+                    return version_str
+
+            print(f"Warning: Unexpected format in {update_file.name}. Using default version: {default_version}")
+
+    except Exception as e:
+        print(f"Error parsing version from update_data.txt: {e}. Using default version: {default_version}")
+
+    return default_version
 
 
 class Config:
-    app_ver = "2.3.1"
+    app_ver = get_app_version()
     app_name = "SaaAutomataAcacia"
     app_exec = "SAA"
     app_publisher = "mofaoss"
     app_url = "https://github.com/mofaoss/SaaAutomataAcacia"
     app_icon = "app/resource/images/logo.ico"
     app_dir = os.getenv("SAA_APP_DIR", str(app_dir()))
-
-# class MainWindow(QDialog):
-#     def __init__(self, parent=None):
-#         super().__init__(parent)
-#         # self.setWindowFlags(Qt.WindowCloseButtonHint)  # 只显示关闭按钮
-#         self.setFixedSize(400, 300)
-#
-#         self.setWindowTitle("HELLO")
-#         layout = QVBoxLayout(self)
-#         purpose = QTextBrowser()
-#         purpose.setText("Perfect Build!\n" * 50)
-#         purpose.setReadOnly(True)  # 设置为只读，防止用户编辑文本
-#         layout.addWidget(purpose)
-#         self.setLayout(layout)
-#
-#
-# if __name__ == "__main__":
-#     app = QApplication([])
-#     window = MainWindow()
-#     window.setWindowIcon(QIcon(Config.app_icon))
-#     window.show()
-#     app.exec()
