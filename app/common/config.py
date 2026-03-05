@@ -161,6 +161,7 @@ class Config(QConfig):
     CheckBox_chasm_6     = ConfigItem("home_interface_option", "CheckBox_chasm", False, BoolValidator())
     CheckBox_reward_7    = ConfigItem("home_interface_option", "CheckBox_reward", False, BoolValidator())
     CheckBox_weapon_8    = ConfigItem("home_interface_option", "CheckBox_weapon_8", False, BoolValidator())
+    CheckBox_shard_exchange_9 = ConfigItem("home_interface_option", "CheckBox_shard_exchange_9", False, BoolValidator())
 
     ComboBox_after_use   = OptionsConfigItem("home_interface_after_use", "ComboBox_after_use", 0, OptionsValidator([-1, 0, 1, 2, 3]))
 
@@ -222,6 +223,15 @@ class Config(QConfig):
     item_weapon_2 = ConfigItem("home_interface_shopping_weapon", "item_weapon_2", False, BoolValidator())
     item_weapon_3 = ConfigItem("home_interface_shopping_weapon", "item_weapon_3", False, BoolValidator())
 
+
+    # --- 武器培养 ---
+    enable_weapon_upgrade = ConfigItem("Daily", "enable_weapon_upgrade", False)
+
+    # 信源碎片相关设置
+    enable_receive_shards = ConfigItem("ShardExchange", "enable_receive_shards", True, BoolValidator())
+    enable_gift_shards    = ConfigItem("ShardExchange", "enable_gift_shards", True, BoolValidator())
+    enable_recycle_shards = ConfigItem("ShardExchange", "enable_recycle_shards", True, BoolValidator())
+
     # =========================================================
     # 4. 自动化任务调度清单 (DailyTasks Sequence)
     # =========================================================
@@ -272,18 +282,20 @@ class Config(QConfig):
                 "id": "task_weapon", "enabled": False, "use_periodic": True, "last_run": 0,
                 "activation_config": [{"type": "weekly", "day": 0, "time": "05:00", "max_runs": 1}],
                 "execution_config":  [{"type": "weekly", "day": 0, "time": "05:00", "max_runs": 1}]
-            }
+            },
+            {
+                "id": "task_shard_exchange", "enabled": False, "use_periodic": True, "last_run": 0,
+                "activation_config": [{"type": "weekly", "day": 0, "time": "05:00", "max_runs": 1}],
+                "execution_config":  [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}]
+            },
         ]
     )
 
     # =========================================================
-    # 5. 核心模块与小游戏自动化 (Minigames & Modules)
+    # 5. 小游戏自动化 (Minigames & Modules)
     # =========================================================
     game_title_name = ConfigItem("automation", "game_title_name", "尘白禁区")
     game_language   = OptionsConfigItem("automation", "game_language", 0, OptionsValidator([0, 1]))
-
-    # --- 武器培养 ---
-    enable_weapon_upgrade = ConfigItem("Daily", "enable_weapon_upgrade", False)
 
     # --- 常规行动 ---
     SpinBox_action_times = ConfigItem("add_action", "SpinBox_action_times", 20)

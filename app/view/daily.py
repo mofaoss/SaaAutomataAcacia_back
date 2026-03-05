@@ -40,6 +40,7 @@ from app.repackage.custom_message_box import CustomMessageBox
 from app.repackage.tree import TreeFrame_person, TreeFrame_weapon
 from app.modules.operation_action.operation_action import OperationModule
 from app.modules.upgrade.weapon import WeaponUpgradeModule
+from app.modules.jigsaw.shards import ShardExchangeModule
 
 # 导入视图与基类
 from app.view.daily_view import DailyView, TaskItemWidget
@@ -106,10 +107,17 @@ TASK_REGISTRY = {
     },
     "task_weapon": {
         "module_class": WeaponUpgradeModule,
-        "ui_page_index": 8,  # 对应刚才 stacked widget 里的 index 8
-        "option_key": "CheckBox_weapon_8", # 控制复选框绑定的 key
+        "ui_page_index": 8,
+        "option_key": "CheckBox_weapon_8",
         "zh_name": "武器升级",
         "en_name": "Weapon Upgrade",
+    },
+    "task_shard_exchange": {
+        "module_class": ShardExchangeModule,
+        "ui_page_index": 9,
+        "option_key": "CheckBox_shard_exchange_9",
+        "zh_name": "信源碎片",
+        "en_name": "Shard Exchange",
     },
 }
 
@@ -296,6 +304,7 @@ class Daily(QFrame, BaseInterface):
             self._ui_text('奖励', 'Claim Rewards'),
             self._ui_text('常规行动', 'Operation'),
             self._ui_text('武器培养', 'Weapon'),
+            self._ui_text('信源碎片', 'Shard Exchange'),
         ]
 
         self.person_dic = {
