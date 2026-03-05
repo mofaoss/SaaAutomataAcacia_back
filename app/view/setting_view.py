@@ -7,14 +7,14 @@ import html
 from functools import partial
 
 from PySide6.QtCore import Qt, QUrl, QThread, Signal
-from PySide6.QtGui import QDesktopServices, QFont, QPixmap, QCursor
+from PySide6.QtGui import QDesktopServices, QFont, QPixmap
 from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QApplication, QSizePolicy
 from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import InfoBar
 from qfluentwidgets import SettingCardGroup as CardGroup
-from qfluentwidgets import (SwitchSettingCard, PrimaryPushSettingCard, ScrollArea,
+from qfluentwidgets import (SwitchSettingCard, ScrollArea,
                             ComboBoxSettingCard, ExpandLayout, setTheme, setFont, MessageBox, ProgressBar,
-                            TitleLabel, SubtitleLabel, BodyLabel, PrimaryPushButton, PushButton, HyperlinkButton,
+                            LargeTitleLabel, SubtitleLabel, BodyLabel, PushButton, HyperlinkButton,
                             )
 
 from ..common.config import config, isWin11, is_non_chinese_ui_language
@@ -172,7 +172,7 @@ class SettingInterface(ScrollArea, BaseInterface):
             self.app_path = sys.argv[0]
 
         # setting label
-        self.settingLabel = QLabel(self.tr("Settings"), self)
+        self.settingLabel = LargeTitleLabel(self.tr("Settings"), self)
         self.aboutHeaderWidget = AboutHeaderWidget(self._is_non_chinese_ui, self.scrollWidget)
         self.versionCheckThread = None
 
