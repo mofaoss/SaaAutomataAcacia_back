@@ -456,7 +456,7 @@ class MainWindow(FluentWindow, BaseInterface):
         target_geo = target_screen.availableGeometry()
 
         # 强制转为 int，防止 float 导致 Qt 报错
-        self.resize(int(target_geo.width() * 0.7), int(target_geo.height() * 0.8))
+        self.resize(int(target_geo.width() * 0.55), int(target_geo.height() * 0.8))
         self.setMinimumSize(int(target_geo.width() * 0.5), int(target_geo.height() * 0.6))
 
         # 4. 基础 UI 设置

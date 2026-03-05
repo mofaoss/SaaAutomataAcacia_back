@@ -190,7 +190,6 @@ class StartThread(QThread):
         self.session = AutomationSession(self.logger)
         self._is_running = True
         self._interrupted_reason = None
-        # (删掉了以前那两个死板的 name_list_zh 和 name_list_en 列表)
 
     def stop(self, reason=None):
         self._is_running = False
@@ -220,7 +219,6 @@ class StartThread(QThread):
                     normal_stop_flag = False
                     break
 
-                # 3. ✨ 核心魔法：从注册表获取任务元数据和执行类
                 meta = TASK_REGISTRY.get(task_id)
                 if not meta:
                     continue
@@ -228,7 +226,6 @@ class StartThread(QThread):
                 task_name = meta["en_name"] if is_non_chinese_ui_language() else meta["zh_name"]
                 self.logger.info(f"当前任务：{task_name}")
 
-                # 直接实例化类并运行，彻底消灭 if-elif !
                 module_class = meta["module_class"]
                 module = module_class(auto, self.logger)
                 module.run()
@@ -325,7 +322,6 @@ class Daily(QFrame, BaseInterface):
 
         self.is_running = False
 
-        # 这两个组件因为强绑定逻辑
         self.select_person = TreeFrame_person(parent=self.ui.ScrollArea, enableCheck=True, is_non_chinese_ui=self._is_non_chinese_ui)
         self.select_weapon = TreeFrame_weapon(parent=self.ui.ScrollArea, enableCheck=True, is_non_chinese_ui=self._is_non_chinese_ui)
 

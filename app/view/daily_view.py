@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QWidget,
     QTextBrowser,
 )
+from PySide6.QtGui import QIntValidator
 from qfluentwidgets import (
     BodyLabel,
     CheckBox,
@@ -95,7 +96,6 @@ class TaskItemWidget(QWidget):
         layout.addStretch(1)
         layout.addWidget(self.btn, 0)
 
-
 class ExecutionRuleWidget(QWidget):
     deleted = Signal(QWidget)
     changed = Signal()
@@ -128,30 +128,37 @@ class ExecutionRuleWidget(QWidget):
 
         self.time_edit = LineEdit(self)
         self.time_edit.setText("05:00")
-        self.time_edit.setFixedWidth(70)
+        # 文字居中，并固定在刚好能完整显示的最小宽度
+        self.time_edit.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.time_edit.setFixedWidth(64)
 
-        self.runs_spin = SpinBox(self)
-        self.runs_spin.setRange(1, 99)
-        self.runs_spin.setMinimumWidth(120)
-        self.runs_spin.setPrefix("Count: " if is_non_chinese_ui else "次数: ")
-        self.runs_spin.setButtonSymbols(QAbstractSpinBox.ButtonSymbols.NoButtons)
+        self.runs_edit = LineEdit(self)
+        self.runs_edit.setValidator(QIntValidator(1, 99, self))  # 只能输入 1-99 的数字
+        self.runs_edit.setText("1")                              # 默认值
+        self.runs_edit.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.runs_edit.setMinimumWidth(40)
+        self.runs_edit.setMaximumWidth(60)
 
         self.delete_btn = ToolButton(self)
         self.delete_btn.setIcon(FIF.DELETE)
 
-        for w in [self.freq_combo, self.week_combo, self.month_combo, self.time_edit, self.runs_spin, self.delete_btn]:
+        for w in [self.freq_combo, self.week_combo, self.month_combo, self.time_edit, self.runs_edit, self.delete_btn]:
             font = w.font()
             font.setPointSize(10)
             w.setFont(font)
 
+        self.label_after_time = BodyLabel("after, run" if is_non_chinese_ui else "后，执行", self)
+        self.label_times = BodyLabel("times" if is_non_chinese_ui else "次", self)
+
         layout.addWidget(self.freq_combo)
         layout.addWidget(self.week_combo)
         layout.addWidget(self.month_combo)
-        time_label_text = "Time:" if is_non_chinese_ui else "时间:"
-        layout.addWidget(BodyLabel(time_label_text, self))
+        layout.addWidget(BodyLabel("Time:" if is_non_chinese_ui else "时间:", self))
         layout.addWidget(self.time_edit)
-        layout.addWidget(BodyLabel("after" if is_non_chinese_ui else "后", self))
-        layout.addWidget(self.runs_spin)
+
+        layout.addWidget(self.label_after_time)
+        layout.addWidget(self.runs_edit)  # 换成了 runs_edit
+        layout.addWidget(self.label_times)
         layout.addWidget(self.delete_btn)
         layout.addStretch(1)
 
@@ -160,11 +167,16 @@ class ExecutionRuleWidget(QWidget):
 
         for w in [self.freq_combo, self.week_combo, self.month_combo]:
             w.currentIndexChanged.connect(self.changed)
-        for w in [self.runs_spin]:
-            w.valueChanged.connect(self.changed)
+
+        self.runs_edit.textChanged.connect(self.changed)
         self.time_edit.editingFinished.connect(self.changed)
 
         self._update_visibility()
+
+    def set_runs_visible(self, visible: bool):
+        self.label_after_time.setVisible(visible)
+        self.runs_edit.setVisible(visible)  # 换成了 runs_edit
+        self.label_times.setVisible(visible)
 
     def _update_visibility(self):
         idx = self.freq_combo.currentIndex()
@@ -184,7 +196,8 @@ class ExecutionRuleWidget(QWidget):
                 month_day = max(1, min(31, month_day))
                 self.month_combo.setCurrentIndex(month_day - 1)
             self.time_edit.setText(data.get("time", "05:00"))
-            self.runs_spin.setValue(data.get("max_runs", 1))
+            # 转换为字符串填入 LineEdit
+            self.runs_edit.setText(str(data.get("max_runs", 1)))
         except Exception:
             pass
         self._update_visibility()
@@ -193,13 +206,17 @@ class ExecutionRuleWidget(QWidget):
         t = ["daily", "weekly", "monthly"]
         idx = self.freq_combo.currentIndex()
         day = self.week_combo.currentIndex() if idx == 1 else (self.month_combo.currentIndex() + 1)
+
+        # 获取文本并转换为数字，如果是空字符串就默认回退到 1
+        runs_text = self.runs_edit.text()
+        runs_val = int(runs_text) if runs_text.isdigit() else 1
+
         return {
             "type": t[idx],
             "day": day,
             "time": self.time_edit.text(),
-            "max_runs": self.runs_spin.value(),
+            "max_runs": runs_val,
         }
-
 
 class SharedSchedulingPanel(QWidget):
     config_changed = Signal(str, dict)
@@ -209,7 +226,9 @@ class SharedSchedulingPanel(QWidget):
         self.task_id = None
         self.is_non_chinese_ui = is_non_chinese_ui
 
-        self.setFixedHeight(255)
+        self.setMinimumHeight(200)
+        self.setMaximumHeight(400)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         self.setStyleSheet("SharedSchedulingPanel { border-top: 1px solid rgba(0,0,0,0.1); }")
 
@@ -224,9 +243,9 @@ class SharedSchedulingPanel(QWidget):
         font.setPointSize(10)
         self.enable_checkbox.setFont(font)
         checkbox_row.addWidget(self.enable_checkbox)
-        checkbox_row.addStretch(1) # 把复选框推到最左边
+        checkbox_row.addStretch(1)
 
-        main_layout.addLayout(checkbox_row) # 加到主布局的最上面
+        main_layout.addLayout(checkbox_row)
 
         activation_row = QHBoxLayout()
         activation_row.setContentsMargins(0, 0, 0, 0)
@@ -285,9 +304,13 @@ class SharedSchedulingPanel(QWidget):
 
     def _add_activation_rule(self, data):
         w = ExecutionRuleWidget(self.is_non_chinese_ui, self)
-        w.runs_spin.setVisible(False)
-        w.runs_spin.setEnabled(False)
-        w.runs_spin.setValue(1)
+
+        # 整体隐藏
+        w.set_runs_visible(False)
+
+        # 🟢 这里把 w.runs_spin.setValue(1) 换成下面这句：
+        w.runs_edit.setText("1")
+
         w.delete_btn.setVisible(False)
         w.delete_btn.setEnabled(False)
         w.deleted.connect(self._remove_activation_rule)
@@ -345,11 +368,8 @@ class SharedSchedulingPanel(QWidget):
 
     def load_task(self, task_id, config_dict):
         self.task_id = task_id
-
         self.enable_checkbox.blockSignals(True)
-
         self.enable_checkbox.setChecked(config_dict.get("use_periodic", True))
-
         self.enable_checkbox.blockSignals(False)
 
         while self.activation_layout.count() > 1:
@@ -367,7 +387,6 @@ class SharedSchedulingPanel(QWidget):
             activation_rules = [{"type": "daily", "time": "05:00", "max_runs": 1}]
 
         self._add_activation_rule(activation_rules[0])
-
         self._update_activation_delete_btns()
 
         while self.rules_layout.count() > 1:
@@ -401,6 +420,8 @@ class SharedSchedulingPanel(QWidget):
         }
         self.config_changed.emit(self.task_id, new_cfg)
 
+
+# ===== 页面基类以及各子页面必须在这里定义 =====
 
 class BaseDailyPage(QWidget):
     def __init__(self, object_name: str, parent=None):
@@ -473,10 +494,10 @@ class CollectSuppliesPage(BaseDailyPage):
         redeem_line.addWidget(self.PrimaryPushButton_import_codes)
         redeem_line.addWidget(self.PushButton_reset_codes)
 
-        # ⬇️ 已经全部替换为 TextEdit_import_codes ⬇️
         self.TextEdit_import_codes = TextEdit(self)
         self.TextEdit_import_codes.setObjectName("TextEdit_import_codes")
-        self.TextEdit_import_codes.setFixedHeight(80)
+        self.TextEdit_import_codes.setMinimumHeight(60)
+        self.TextEdit_import_codes.setMaximumHeight(120)
 
         self.BodyLabel_collect_supplies = BodyLabel(self)
         self.BodyLabel_collect_supplies.setObjectName("BodyLabel_collect_supplies")
@@ -487,10 +508,11 @@ class CollectSuppliesPage(BaseDailyPage):
         self.main_layout.addWidget(self.CheckBox_fish_bait)
         self.main_layout.addWidget(self.CheckBox_dormitory)
         self.main_layout.addLayout(redeem_line)
-        self.main_layout.addWidget(self.TextEdit_import_codes)  # 对应修改
+        self.main_layout.addWidget(self.TextEdit_import_codes)
         self.main_layout.addWidget(self.BodyLabel_collect_supplies)
 
         self.finalize()
+
 
 class ShopPage(BaseDailyPage):
     def __init__(self, parent=None):
@@ -646,30 +668,25 @@ class RewardPage(BaseDailyPage):
 
 class OperationPage(BaseDailyPage):
     def __init__(self, parent=None):
-        # 注意：这里的 objectName 可以根据需要命名，只要里面的控件名对得上就行
         super().__init__("page_operation", parent=parent)
 
-        # 1. 刷取次数设置
-        self.BodyLabel_4 = BodyLabel(self)
-        self.BodyLabel_4.setObjectName("BodyLabel_4")
+        self.BodyLabel_7 = BodyLabel(self)
+        self.BodyLabel_7.setObjectName("BodyLabel_7")
         self.SpinBox_action_times = SpinBox(self)
         self.SpinBox_action_times.setObjectName("SpinBox_action_times")
         self.SpinBox_action_times.setRange(1, 999)
 
-        # 2. 疾跑方式设置
         self.BodyLabel_22 = BodyLabel(self)
         self.BodyLabel_22.setObjectName("BodyLabel_22")
         self.ComboBox_run = ComboBox(self)
         self.ComboBox_run.setObjectName("ComboBox_run")
 
-        # 3. 提示文字
         self.BodyLabel_tip_action = BodyLabel(self)
         self.BodyLabel_tip_action.setObjectName("BodyLabel_tip_action")
         self.BodyLabel_tip_action.setTextFormat(Qt.TextFormat.MarkdownText)
         self.BodyLabel_tip_action.setWordWrap(True)
 
-        # 4. 加入主布局
-        self.main_layout.addLayout(self._row(self.BodyLabel_4, self.SpinBox_action_times))
+        self.main_layout.addLayout(self._row(self.BodyLabel_7, self.SpinBox_action_times))
         self.main_layout.addLayout(self._row(self.BodyLabel_22, self.ComboBox_run))
         self.main_layout.addWidget(self.BodyLabel_tip_action)
 
@@ -683,16 +700,23 @@ class OperationPage(BaseDailyPage):
         return line
 
 
-class DailyView(QWidget):
+class DailyView(ScrollArea):
     def __init__(self, parent=None, is_non_chinese_ui=False):
         super().__init__(parent)
         self.setObjectName("daily")
         self.is_non_chinese_ui = is_non_chinese_ui
 
-        self.gridLayout_2 = QGridLayout(self)
+        self.setWidgetResizable(True)
+        self.setStyleSheet("QScrollArea#daily { border: none; background: transparent; }")
+
+        self.content_widget = QWidget()
+        self.content_widget.setObjectName("daily_content_widget")
+        self.content_widget.setStyleSheet("background: transparent;")
+
+        self.gridLayout_2 = QGridLayout(self.content_widget)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout_2.setSpacing(0)
+        self.gridLayout_2.setContentsMargins(10, 10, 10, 10)
+        self.gridLayout_2.setSpacing(12)
 
         self._build_option_card()
         self._build_action_card()
@@ -700,20 +724,23 @@ class DailyView(QWidget):
         self._build_log_card()
         self._build_tips_card()
 
-        # Force the top row to expand and the bottom row to stay compact
         self.gridLayout_2.setRowStretch(0, 1)
         self.gridLayout_2.setRowStretch(1, 0)
 
-        self.gridLayout_2.setColumnStretch(0, 1) # 左侧稍窄
-        self.gridLayout_2.setColumnStretch(1, 4) # 中间稍宽
-        self.gridLayout_2.setColumnStretch(2, 3) # 右侧稍窄
+        self.gridLayout_2.setColumnStretch(0, 1)
+        self.gridLayout_2.setColumnStretch(1, 3)
+        self.gridLayout_2.setColumnStretch(2, 2)
+
+        self.setWidget(self.content_widget)
 
         self._apply_ui_settings()
 
     def _build_option_card(self):
-        self.SimpleCardWidget_option = SimpleCardWidget(self)
+        self.SimpleCardWidget_option = SimpleCardWidget(self.content_widget)
         self.SimpleCardWidget_option.setObjectName("SimpleCardWidget_option")
         self.SimpleCardWidget_option.setMinimumWidth(200)
+        self.SimpleCardWidget_option.setMaximumWidth(350)
+        self.SimpleCardWidget_option.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         layout = QVBoxLayout(self.SimpleCardWidget_option)
         layout.setContentsMargins(9, 9, 9, 9)
@@ -742,10 +769,13 @@ class DailyView(QWidget):
         self.gridLayout_2.addWidget(self.SimpleCardWidget_option, 0, 0, 1, 1)
 
     def _build_action_card(self):
-        self.SimpleCardWidget_3 = SimpleCardWidget(self)
+        self.SimpleCardWidget_3 = SimpleCardWidget(self.content_widget)
         self.SimpleCardWidget_3.setObjectName("SimpleCardWidget_3")
         self.SimpleCardWidget_3.setMinimumWidth(237)
-        self.SimpleCardWidget_3.setFixedHeight(220)
+        self.SimpleCardWidget_3.setMaximumWidth(350)
+        self.SimpleCardWidget_3.setMinimumHeight(150)
+        self.SimpleCardWidget_3.setMaximumHeight(250)
+        self.SimpleCardWidget_3.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
         layout = QVBoxLayout(self.SimpleCardWidget_3)
         self.BodyLabel = BodyLabel(self.SimpleCardWidget_3)
@@ -767,9 +797,11 @@ class DailyView(QWidget):
         self.gridLayout_2.addWidget(self.SimpleCardWidget_3, 1, 0, 1, 1)
 
     def _build_setting_card(self):
-        self.SimpleCardWidget_2 = SimpleCardWidget(self)
+        self.SimpleCardWidget_2 = SimpleCardWidget(self.content_widget)
         self.SimpleCardWidget_2.setObjectName("SimpleCardWidget_2")
-        self.SimpleCardWidget_2.setMinimumWidth(237)
+        self.SimpleCardWidget_2.setMinimumWidth(300)
+        self.SimpleCardWidget_2.setMaximumWidth(700)
+        self.SimpleCardWidget_2.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         layout = QVBoxLayout(self.SimpleCardWidget_2)
         layout.setContentsMargins(9, 9, 9, 9)
@@ -790,8 +822,6 @@ class DailyView(QWidget):
         self.page_reward = RewardPage(self.PopUpAniStackedWidget)
         self.page_operation = OperationPage(self.PopUpAniStackedWidget)
 
-
-
         self.PopUpAniStackedWidget.addWidget(self.page_enter)
         self.PopUpAniStackedWidget.addWidget(self.page_collect)
         self.PopUpAniStackedWidget.addWidget(self.page_shop)
@@ -809,7 +839,6 @@ class DailyView(QWidget):
         layout.addWidget(self.shared_scheduling_panel, 0)
 
         self.gridLayout_2.addWidget(self.SimpleCardWidget_2, 0, 1, 2, 1)
-
         self._alias_page_widgets()
 
     def _alias_page_widgets(self):
@@ -838,7 +867,6 @@ class DailyView(QWidget):
         self.StrongBodyLabel = self.page_shop.StrongBodyLabel
         self.widget = self.page_shop.widget
         self.widget_2 = self.page_shop.widget_2
-        # 使用循环处理有规律的 CheckBox
         for i in range(3, 16):
             name = f"CheckBox_buy_{i}"
             setattr(self, name, getattr(self.page_shop, name))
@@ -870,17 +898,16 @@ class DailyView(QWidget):
         # OperationPage
         self.BodyLabel_22 = self.page_operation.BodyLabel_22
         self.ComboBox_run = self.page_operation.ComboBox_run
-        # 注意这里解决了一个潜在的 Bug: BodyLabel_4 在 PersonPage 中也存在，直接赋值会覆盖
-        self.BodyLabel_4_op = self.page_operation.BodyLabel_4
+        self.BodyLabel_7 = self.page_operation.BodyLabel_7
         self.SpinBox_action_times = self.page_operation.SpinBox_action_times
         self.BodyLabel_tip_action = self.page_operation.BodyLabel_tip_action
 
     def _build_log_card(self):
-        self.SimpleCardWidget = SimpleCardWidget(self)
+        self.SimpleCardWidget = SimpleCardWidget(self.content_widget)
         self.SimpleCardWidget.setObjectName("SimpleCardWidget")
         self.SimpleCardWidget.setMinimumWidth(246)
-        self.SimpleCardWidget.setMinimumHeight(0)
-        self.SimpleCardWidget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Ignored)
+        self.SimpleCardWidget.setMaximumWidth(450)
+        self.SimpleCardWidget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         layout = QVBoxLayout(self.SimpleCardWidget)
         layout.setSpacing(4)
@@ -897,12 +924,13 @@ class DailyView(QWidget):
         self.gridLayout_2.addWidget(self.SimpleCardWidget, 0, 2, 1, 1)
 
     def _build_tips_card(self):
-        self.SimpleCardWidget_tips = SimpleCardWidget(self)
+        self.SimpleCardWidget_tips = SimpleCardWidget(self.content_widget)
         self.SimpleCardWidget_tips.setObjectName("SimpleCardWidget_tips")
         self.SimpleCardWidget_tips.setMinimumWidth(237)
-        self.SimpleCardWidget_tips.setMinimumHeight(0)
-        self.SimpleCardWidget_tips.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Ignored)
-        self.SimpleCardWidget_tips.setFixedHeight(220)
+        self.SimpleCardWidget_tips.setMaximumWidth(450)
+        self.SimpleCardWidget_tips.setMinimumHeight(150)
+        self.SimpleCardWidget_tips.setMaximumHeight(250)
+        self.SimpleCardWidget_tips.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
         layout = QVBoxLayout(self.SimpleCardWidget_tips)
         layout.setSpacing(3)
@@ -930,11 +958,9 @@ class DailyView(QWidget):
         return en_text if self.is_non_chinese_ui else zh_text
 
     def _apply_ui_settings(self):
-        # 1. 字体和特殊样式设置
         for tool_button in self.SimpleCardWidget_option.findChildren(ToolButton):
             tool_button.setIcon(FIF.SETTING)
 
-        # 2. 下拉框初始化
         self.ComboBox_after_use.addItems([
             self._ui_text('无动作', 'Do Nothing'),
             self._ui_text('退出游戏和代理', 'Exit Game and Assistant'),
@@ -950,15 +976,12 @@ class DailyView(QWidget):
             ["Toggle Sprint", "Hold Sprint"] if self.is_non_chinese_ui else ["切换疾跑", "按住疾跑"]
         )
 
-        # 3. 输入框提示词
         for line_edit in [self.LineEdit_c1, self.LineEdit_c2, self.LineEdit_c3, self.LineEdit_c4]:
             line_edit.setPlaceholderText(self._ui_text("未输入", "Not set"))
 
-        # 4. 设置快捷键和 Tooltip
         self.PushButton_start.setShortcut("F1")
         self.PushButton_start.setToolTip(self._ui_text("快捷键：F1", "Shortcut: F1"))
 
-        # 5. 长文本 Tips 初始化
         self.BodyLabel_enter_tip.setText(
             "### Tips\n* Select your server in Settings\n* Enable \"Auto open game\" and select the correct game path by the tutorial above\n* Click \"Start\" to launch and run automatically"
             if self.is_non_chinese_ui else
@@ -981,7 +1004,6 @@ class DailyView(QWidget):
             "### Tips\n* Claim monthly card and daily rewards" if self.is_non_chinese_ui else "### 提示\n* 领取大月卡和日常奖励"
         )
 
-        # 6. 所有常规控件的文本多语言映射
         self.TitleLabel.setText(self._ui_text("日志", "Log"))
         self.PushButton_select_all.setText(self._ui_text("全选", "Select All"))
         self.PushButton_no_select.setText(self._ui_text("清空", "Clear"))
@@ -1010,14 +1032,13 @@ class DailyView(QWidget):
         self.CheckBox_is_use_chip.setText(self._ui_text("是否使用记忆嵌片", "Use memory chip"))
         self.TitleLabel_3.setText(self._ui_text("日程提醒", "Schedule"))
         self.BodyLabel_22.setText(self._ui_text("疾跑方式", "Sprint mode"))
-        self.BodyLabel_4_op.setText(self._ui_text("刷取次数", "Run count"))
+        self.BodyLabel_7.setText(self._ui_text("刷取次数", "Run count"))
         self.BodyLabel_tip_action.setText(
             "### Tips\n* Auto-run operation from the lobby page\n* Repeats the first training stage for specified times with no stamina cost\n* Useful for weekly pass mission count"
             if self.is_non_chinese_ui else
             "### 提示\n* 自动完成常规行动，在看板娘页面点击开始\n* 重复刷指定次数实战训练第一关，不消耗体力\n* 用于完成凭证20次常规行动周常任务"
         )
 
-        # 商店物资名称
         shop_items = [
             ("CheckBox_buy_3", "通用强化套件", "Universal Enhancement Kit"),
             ("CheckBox_buy_4", "优选强化套件", "Premium Enhancement Kit"),
