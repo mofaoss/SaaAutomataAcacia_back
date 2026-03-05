@@ -14,15 +14,14 @@ SaaAutomataAcacia/
 │   │   ├── 📄 config.py            # 文件操作工具
 │   │   ├── 📄 icon.py              # 忘记了，好像没啥用
 │   │   ├── 📄 image_utils.py       # 图像相关的工具
-│   │   ├── 📄 logger.py            # 图像相关的工具
+│   │   ├── 📄 gui_logger.py        # 日志
 │   │   ├── 📄 matcher.py           # 实现模板匹配
 │   │   ├── 📄 resource.py          # 转换成二进制的资源，实际也不是很需要
 │   │   ├── 📄 setting.py           # 一些全局设置，也不是很重要
 │   │   ├── 📄 signal_bus.py        # 信号中转站，实现全局通信
-│   │   ├── 📄 singleton.py         # 实现单例
-│   │   ├── 📄 style_sheet.py       # 样式
-│   │   ├── 📄 updater.py           # 更新器，没用上
-│   │   └── 📄 utils.py             # 普通常用工具
+│   │   └── 📄 style_sheet.py       # 样式
+│   │
+│   │
 │   │
 │   ├── 📁 modules/                 # 【加新功能在这加】各个功能模块
 │   │   ├── 📁 alien_guardian/      # 异星守护
@@ -33,6 +32,7 @@ SaaAutomataAcacia/
 │   │   │   └── 📄 timer.py         # 计时器
 │   │   ├── 📁 base_task/           # 任务基类
 │   │   ├── 📁 chasm/               # 精神拟境
+│   │   ├── 📁 capture_pals/        # 抓帕鲁
 │   │   ├── 📁 collect_supplies/    # 收集物资
 │   │   ├── 📁 drink/               # 猜心对局
 │   │   ├── 📁 enter_game/          # 登入游戏
@@ -65,15 +65,10 @@ SaaAutomataAcacia/
 │   │   ├── 📄 help.md              # 内嵌的帮助文档（很久没更新了）
 │   │   └── 📄 resource.qrc         # 指明资源路径
 │   │
-│   ├── 📁 ui/                                        # ui文件（.py靠生成）
-│   │   ├── 📄 additional_features_interface.py       # .ui生成的对应.py文件
-│   │   ├── 📄 additional_features_interface.ui       # 可用qt designer手动编辑的文件
-│   │   ├── 📄 ...                                    # 其他gui对应的文件
-│   │   └── 📄 ...
 │   │
-│   └── 📁 view/                                      # 继承调用ui/下的文件，实现页面响应逻辑
-│       ├── 📄 additional_features.py                 # .ui生成的对应.py文件
-│       ├── 📄 additional_features_interface.ui       # 可用qt designer手动编辑的文件
+│   └── 📁 view/                                      # Pyside6 UI
+│       ├── 📄 additional_features.py                 # 业务逻辑
+│       ├── 📄 additional_features_view.py            # UI
 │       ├── 📄 ...                                    # 其他gui对应的文件
 │       └── 📄 ...
 │
@@ -87,7 +82,7 @@ SaaAutomataAcacia/
 │
 ├── 📁 PerfectBuild/            # 构建安装包
 │
-├── 📁 test/                    # 测试文件
+├── 📁 utils/                   # 工具
 │
 ├── 📄 main.py                  # 应用启动入口
 ├── 📄 requirements.txt         # Python依赖清单

@@ -1,4 +1,5 @@
 import ctypes
+import logging
 import time
 
 import cv2
@@ -8,9 +9,10 @@ import win32ui
 import win32con
 
 from app.common.image_utils import ImageUtils
-from app.common.logger import logger
-from utils.win_utils import is_fullscreen
 from app.modules.automation.timer import Timer
+
+
+logger = logging.getLogger(__name__)
 
 
 def auto_crop_image(img):

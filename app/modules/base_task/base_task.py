@@ -1,11 +1,15 @@
+import logging
+
 import win32api
 import win32con
 import win32gui
 
 from app.common.config import config
-from app.common.logger import logger
 from app.common.signal_bus import signalBus
 from app.modules.automation.automation import Automation
+
+
+logger = logging.getLogger(__name__)
 
 
 class BaseTask:

@@ -46,7 +46,7 @@ class ShoppingModule:
             'CheckBox_buy_15': 'Fiber Axon',
         }
         self.person_dic_re_zh = {
-            "item_person_0": "人物碎片",
+            "item_person_0": "角色碎片",
             "item_person_1": "肴",
             "item_person_2": "安卡希雅",
             "item_person_3": "里芙",
@@ -217,7 +217,7 @@ class ShoppingModule:
         收集所有要购买的商品
         :return: list
         """
-        # 收集勾选的人物碎片
+        # 收集勾选的角色碎片
         first_flag = True
         result_list = []
         for key, value in self.person_dic.items():

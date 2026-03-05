@@ -359,4 +359,7 @@ class OCR:
                 raise Exception("初始化OCR失败")
 
     def stop_ocr(self):
-        pass
+        """销毁OCR实例，释放资源"""
+        if self.ocr is not None:
+            del self.ocr
+            self.ocr = None

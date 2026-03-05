@@ -28,35 +28,13 @@ class TreeFrame_person(Frame):
         self.tree = TreeWidget(self.parent)
         self.addWidget(self.tree)
 
-        title = 'Character Shards' if is_non_chinese_ui else '人物碎片'
+        title = 'Character Shards' if is_non_chinese_ui else '角色碎片'
         children = [
-            "Yao",
-            "Acacia",
-            "Lyfe",
-            "Chenxing",
-            "Marian",
-            "Fenny",
-            "Fritia",
-            "Siris",
-            "Cherno",
-            "Mauxir",
-            "Haru",
-            "Enya",
-            "Nita",
+            "Yao", "Acacia", "Lyfe", "Chenxing", "Marian", "Fenny",
+            "Fritia", "Siris", "Cherno", "Mauxir", "Haru", "Enya", "Nita",
         ] if is_non_chinese_ui else [
-            "肴",
-            "安卡希雅",
-            "里芙",
-            "辰星",
-            "茉莉安",
-            "芬妮",
-            "芙提雅",
-            "瑟瑞斯",
-            "琴诺",
-            "猫汐尔",
-            "晴",
-            "恩雅",
-            "妮塔",
+            "肴", "安卡希雅", "里芙", "辰星", "茉莉安", "芬妮",
+            "芙提雅", "瑟瑞斯", "琴诺", "猫汐尔", "晴", "恩雅", "妮塔",
         ]
 
         item1 = QTreeWidgetItem([title])
@@ -77,6 +55,7 @@ class TreeFrame_person(Frame):
         if enableCheck:
             it = QTreeWidgetItemIterator(self.tree)
             while it.value():
+                # 这里的 setCheckState 语法是完全正确的
                 it.value().setCheckState(0, Qt.CheckState.Unchecked)
                 it += 1
 
@@ -112,7 +91,9 @@ class TreeFrame_person(Frame):
             index = item_path[0]
         else:
             index = item_path[1] + 1
-        self.itemStateChanged.emit(index, item.checkState(0))
+
+        # ✨ 核心修复：加上 .value 将枚举(Qt.CheckState)转换为整数(int)，完美匹配 Signal(int, int)
+        self.itemStateChanged.emit(index, item.checkState(0).value)
 
     def get_item_path(self, item):
         """
@@ -211,7 +192,9 @@ class TreeFrame_weapon(Frame):
             index = item_path[0]
         else:
             index = item_path[1] + 1
-        self.itemStateChanged.emit(index, item.checkState(0))
+
+        # ✨ 核心修复：同样加上 .value
+        self.itemStateChanged.emit(index, item.checkState(0).value)
 
     def get_item_path(self, item):
         """
