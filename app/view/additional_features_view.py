@@ -57,6 +57,77 @@ class BaseFeaturePage(QWidget):
         return card, title, browser
 
 
+# 1. 确保在 qfluentwidgets 的导入中包含了 SwitchButton
+from qfluentwidgets import (
+    # ... 原有导入 ...
+    SwitchButton,
+)
+
+
+class TriggerPage(BaseFeaturePage):
+    def __init__(self, parent=None):
+        super().__init__("page_trigger", parent)
+
+        self.SimpleCardWidget_trigger = SimpleCardWidget(self)
+        layout = QVBoxLayout(self.SimpleCardWidget_trigger)
+
+        # 自动采集 F
+        row_f = QHBoxLayout()
+        text_layout_f = QVBoxLayout()
+        self.StrongBodyLabel = StrongBodyLabel(self.SimpleCardWidget_trigger)
+        self.StrongBodyLabel.setObjectName("StrongBodyLabel")
+        self.BodyLabel = BodyLabel(self.SimpleCardWidget_trigger)
+        self.BodyLabel.setObjectName("BodyLabel")
+        text_layout_f.addWidget(self.StrongBodyLabel)
+        text_layout_f.addWidget(self.BodyLabel)
+
+        self.SwitchButton_f = SwitchButton(self.SimpleCardWidget_trigger)
+        self.SwitchButton_f.setObjectName("SwitchButton_f")
+
+        row_f.addLayout(text_layout_f)
+        row_f.addStretch(1)
+        row_f.addWidget(self.SwitchButton_f)
+        layout.addLayout(row_f)
+
+        # 妮塔自动 E
+        row_e = QHBoxLayout()
+        text_layout_e = QVBoxLayout()
+        self.StrongBodyLabel_2 = StrongBodyLabel(self.SimpleCardWidget_trigger)
+        self.StrongBodyLabel_2.setObjectName("StrongBodyLabel_2")
+        self.BodyLabel_2 = BodyLabel(self.SimpleCardWidget_trigger)
+        self.BodyLabel_2.setObjectName("BodyLabel_2")
+        text_layout_e.addWidget(self.StrongBodyLabel_2)
+        text_layout_e.addWidget(self.BodyLabel_2)
+
+        self.SwitchButton_e = SwitchButton(self.SimpleCardWidget_trigger)
+        self.SwitchButton_e.setObjectName("SwitchButton_e")
+
+        row_e.addLayout(text_layout_e)
+        row_e.addStretch(1)
+        row_e.addWidget(self.SwitchButton_e)
+        layout.addLayout(row_e)
+
+        # 提示信息
+        self.BodyLabel_trigger_tip = BodyLabel(self.SimpleCardWidget_trigger)
+        self.BodyLabel_trigger_tip.setObjectName("BodyLabel_trigger_tip")
+        self.BodyLabel_trigger_tip.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.BodyLabel_trigger_tip.setWordWrap(True)
+        layout.addWidget(self.BodyLabel_trigger_tip)
+        layout.addStretch(1)
+
+        self.left_layout.addWidget(self.SimpleCardWidget_trigger)
+        self.left_layout.addStretch(1)
+
+        # 日志卡片区域
+        self.SimpleCardWidget_trigger_log, self.TitleLabel_trigger_log, self.textBrowser_log_trigger = self.create_log_card(
+            self,
+            "TitleLabel_trigger_log",
+            "textBrowser_log_trigger",
+        )
+        self.SimpleCardWidget_trigger_log.setObjectName("SimpleCardWidget_trigger_log")
+        self.right_layout.addWidget(self.SimpleCardWidget_trigger_log)
+
+
 class FishingPage(BaseFeaturePage):
     def __init__(self, parent=None):
         super().__init__("page_fishing", parent)
@@ -511,6 +582,8 @@ class AdditionalFeaturesView(QWidget):
         self.stackedWidget = QStackedWidget(self)
         self.stackedWidget.setObjectName("stackedWidget")
 
+        # 实例化页面
+        self.page_trigger = TriggerPage(self.stackedWidget)
         self.page_fishing = FishingPage(self.stackedWidget)
         self.page_action = ActionPage(self.stackedWidget)
         self.page_water_bomb = WaterBombPage(self.stackedWidget)
@@ -520,6 +593,7 @@ class AdditionalFeaturesView(QWidget):
         self.page_capture_pals = CapturePalsPage(self.stackedWidget)
 
         for page in (
+            self.page_trigger,
             self.page_fishing,
             self.page_action,
             self.page_water_bomb,
@@ -538,6 +612,7 @@ class AdditionalFeaturesView(QWidget):
 
     def _alias_widgets(self):
         for page in (
+            self.page_trigger,
             self.page_fishing,
             self.page_action,
             self.page_water_bomb,

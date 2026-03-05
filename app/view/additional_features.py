@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from PySide6.QtWidgets import QFrame, QWidget, QLabel, QVBoxLayout
 from fuzzywuzzy import process
-from qfluentwidgets import SpinBox, CheckBox, ComboBox, LineEdit, Slider
+from qfluentwidgets import SpinBox, CheckBox, ComboBox, LineEdit, Slider, InfoBar
 
 from app.common.config import config, is_non_chinese_ui_language
 from app.common.signal_bus import signalBus
@@ -18,6 +18,8 @@ from app.modules.maze.maze import MazeModule
 from app.modules.operation_action.operation_action import OperationModule
 from app.modules.water_bomb.water_bomb import WaterBombModule
 from app.modules.capture_pals.capture_pals import CapturePalsModule
+from app.modules.trigger.auto_f import AutoFModule
+from app.modules.trigger.nita_auto_e import NitaAutoEModule
 from app.view.additional_features_view import AdditionalFeaturesView
 from .base_interface import BaseInterface
 from app.view.subtask import AdjustColor, SubTask
@@ -38,6 +40,8 @@ class Additional(QFrame, BaseInterface):
         self.setObjectName(text.replace(' ', '-'))
         self.parent = parent
 
+        self.f_thread = None
+        self.nita_e_thread = None
         self.is_running_fish = False
         self.is_running_action = False
         self.is_running_water_bomb = False
@@ -60,6 +64,10 @@ class Additional(QFrame, BaseInterface):
 
     def _initWidget(self):
         # 正向链接
+        self.SegmentedWidget.addItem(self.page_trigger.objectName(),
+                                     self._ui_text('自动辅助', 'Trigger'),
+                                     onClick=lambda: self.stackedWidget.
+                                     setCurrentWidget(self.page_trigger))
         self.SegmentedWidget.addItem(self.page_fishing.objectName(),
                                      self._ui_text('钓鱼', 'Fishing'),
                                      onClick=lambda: self.stackedWidget.
@@ -89,7 +97,7 @@ class Additional(QFrame, BaseInterface):
                                      self._ui_text('抓帕鲁', 'Capture Pals'),
                                      onClick=lambda: self.stackedWidget.
                                      setCurrentWidget(self.page_capture_pals))
-        self.SegmentedWidget.setCurrentItem(self.page_fishing.objectName())
+        self.SegmentedWidget.setCurrentItem(self.page_trigger.objectName())
         self.stackedWidget.setCurrentIndex(0)
         self.ComboBox_fishing_mode.addItems(
             [
@@ -192,6 +200,8 @@ class Additional(QFrame, BaseInterface):
         StyleSheet.ADDITIONAL_FEATURES_INTERFACE.apply(self)
 
     def _connect_to_slot(self):
+        self.SwitchButton_f.checkedChanged.connect(self.on_f_toggled)
+        self.SwitchButton_e.checkedChanged.connect(self.on_e_toggled)
         # 反向链接
         self.stackedWidget.currentChanged.connect(self.onCurrentIndexChanged)
         # 按钮信号
@@ -325,6 +335,18 @@ class Additional(QFrame, BaseInterface):
 
     def _apply_static_i18n(self):
         self.TitleLabel.setText(self._ui_text("日志", "Log"))
+
+        self.StrongBodyLabel.setText(self._ui_text("自动采集或劝降", "Auto Collect"))
+        self.BodyLabel.setText(self._ui_text("按钮出现时就按下F键", "Automatically press F when collect prompt appears"))
+        self.StrongBodyLabel_2.setText(self._ui_text("自动妮塔悸响qte", "Nita E Auto QTE"))
+        self.BodyLabel_2.setText(self._ui_text("到qte时机就按下E键", "Automatically press E during QTE stage"))
+        self.TitleLabel_trigger_log.setText(self._ui_text("日志", "Log"))
+        self.BodyLabel_trigger_tip.setText(
+            self._ui_text(
+                "### 提示\n* 先启动游戏再开启本功能\n* 开启后，遇到符合的情况就自动触发\n* 不影响手动游玩",
+                "### Tips\n* Launch the game before enabling this feature\n* These are toggle switches. Once enabled, detection keeps running and triggers automatically when conditions match\n* It does not block manual gameplay, acting as semi-automation assistance"
+            ))
+
         self.CheckBox_is_save_fish.setText(self._ui_text("新纪录是否暂停", "Pause on new records"))
         self.BodyLabel_7.setText(self._ui_text("颜色查找下限", "Color lower bound"))
         self.PrimaryPushButton_get_color.setText(self._ui_text("校准颜色", "Calibrate Color"))
@@ -435,6 +457,66 @@ class Additional(QFrame, BaseInterface):
                     child, LineEdit) or isinstance(
                         child, SpinBox) or isinstance(child, ComboBox):
                 child.setEnabled(enable)
+
+    def turn_off_e_switch(self, is_running):
+        if not is_running:
+            self.SwitchButton_e.setChecked(False)
+
+    def turn_off_f_switch(self, is_running):
+        if not is_running:
+            self.SwitchButton_f.setChecked(False)
+
+    def on_f_toggled(self, isChecked: bool):
+        """自动采集 F"""
+        if isChecked:
+            self.redirectOutput(self.textBrowser_log_trigger)  # 重定向日志
+            self.f_thread = SubTask(AutoFModule)
+            self.f_thread.is_running.connect(self.turn_off_f_switch)
+            self.f_thread.start()
+        else:
+            if hasattr(self, 'f_thread') and self.f_thread and self.f_thread.isRunning():
+                self.f_thread.stop()
+                InfoBar.success(
+                    self._ui_text('自动按F', 'Auto F'),
+                    self._ui_text('已关闭', 'Disabled'),
+                    isClosable=True,
+                    duration=2000,
+                    parent=self
+                )
+            else:
+                InfoBar.error(
+                    self._ui_text('错误', 'Error'),
+                    self._ui_text('游戏未打开或任务未运行', 'Game/Task is not running'),
+                    isClosable=True,
+                    duration=2000,
+                    parent=self
+                )
+
+    def on_e_toggled(self, isChecked: bool):
+        """妮塔自动 E"""
+        if isChecked:
+            self.redirectOutput(self.textBrowser_log_trigger)  # 重定向日志
+            self.nita_e_thread = SubTask(NitaAutoEModule)
+            self.nita_e_thread.is_running.connect(self.turn_off_e_switch)
+            self.nita_e_thread.start()
+        else:
+            if hasattr(self, 'nita_e_thread') and self.nita_e_thread and self.nita_e_thread.isRunning():
+                self.nita_e_thread.stop()
+                InfoBar.success(
+                    self._ui_text('妮塔自动E', 'Nita Auto E'),
+                    self._ui_text('已关闭', 'Disabled'),
+                    isClosable=True,
+                    duration=2000,
+                    parent=self
+                )
+            else:
+                InfoBar.error(
+                    self._ui_text('错误', 'Error'),
+                    self._ui_text('游戏未打开或任务未运行', 'Game/Task is not running'),
+                    isClosable=True,
+                    duration=2000,
+                    parent=self
+                )
 
     def on_fishing_button_click(self):
         """钓鱼开始按键的信号处理"""
