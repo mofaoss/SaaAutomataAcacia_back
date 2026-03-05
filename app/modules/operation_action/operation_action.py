@@ -85,7 +85,7 @@ class OperationModule:
                 time.sleep(2)
 
             if timeout.reached():
-                self.logger.error("执行常规行动超时")
+                self.logger.error("执行常规教学超时")
                 break
 
     def enter_train(self):

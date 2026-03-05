@@ -297,7 +297,7 @@ class Config(QConfig):
     game_title_name = ConfigItem("automation", "game_title_name", "尘白禁区")
     game_language   = OptionsConfigItem("automation", "game_language", 0, OptionsValidator([0, 1]))
 
-    # --- 常规行动 ---
+    # --- 常规教学 ---
     SpinBox_action_times = ConfigItem("add_action", "SpinBox_action_times", 20)
     ComboBox_run         = OptionsConfigItem("add_action", "ComboBox_run", 0, OptionsValidator([0, 1]))
 

@@ -1105,9 +1105,9 @@ class DailyView(ScrollArea):
         self.BodyLabel_22.setText(self._ui_text("疾跑方式", "Sprint mode"))
         self.BodyLabel_7.setText(self._ui_text("刷取次数", "Run count"))
         self.BodyLabel_tip_action.setText(
-            "### Tips\n* Auto-run operation from the lobby page\n* Repeats the first training stage for specified times with no stamina cost\n* Useful for weekly pass mission count"
+            "### Tips\n* Auto-run operation \n* Repeats the first training stage for specified times with no stamina cost\n* Useful for weekly pass mission count"
             if self.is_non_chinese_ui else
-            "### 提示\n* 自动完成无体力常规行动\n* 重复刷指定次数实战训练第一关，不消耗体力\n* 用于完成凭证20次常规行动周常任务"
+            "### 提示\n* 自动完成无体力常规教学\n* 重复刷指定次数实战训练第一关，不消耗体力\n* 用于完成凭证20次常规行动周常任务"
         )
 
         shop_items = [
