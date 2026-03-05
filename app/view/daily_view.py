@@ -973,7 +973,7 @@ class DailyView(ScrollArea):
             self._ui_text('退出游戏和代理', 'Exit Game and Assistant'),
             self._ui_text('退出代理', 'Exit Assistant'),
             self._ui_text('退出游戏', 'Exit Game'),
-            self._ui_text("循环", "Loop"),
+            self._ui_text("循环 (记忆周期计划)", "Loop (Memory Schedule)"),
             self._ui_text("关机", "Shutdown"),
         ])
         self.ComboBox_power_day.addItems(['1', '2', '3', '4', '5', '6'])
