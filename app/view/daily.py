@@ -1,11 +1,10 @@
 import copy
 import logging
 import os
-import re
 import sys
 import time
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import partial
 from typing import Dict, Any, List
 
@@ -204,6 +203,7 @@ class AutomationSession:
 class StartThread(QThread):
     is_running_signal = Signal(str)
     stop_signal = Signal()
+    task_completed_signal = Signal(str)
 
     # 1. 接收的参数改为 tasks_to_run 列表
     def __init__(self, tasks_to_run: list, parent=None):
@@ -252,6 +252,9 @@ class StartThread(QThread):
                 module_class = meta["module_class"]
                 module = module_class(auto, self.logger)
                 module.run()
+
+                if self._is_running:
+                    self.task_completed_signal.emit(task_id)
 
                 if not self._is_running:
                     normal_stop_flag = False
@@ -367,6 +370,11 @@ class Daily(QFrame, BaseInterface):
         self.check_game_window_timer.timeout.connect(self.check_game_open)
         self.running_game_guard_timer = QTimer()
         self.running_game_guard_timer.timeout.connect(self._guard_running_game_window)
+        # === 新增：循环守护定时器 ===
+        self.loop_timer = QTimer(self)
+        self.loop_timer.timeout.connect(self._check_and_run_loop_tasks)
+        self.is_loop_waiting = False  # 标记当前是否处于循环挂机等待状态
+
         self.checkbox_dic = None
 
         if config.checkUpdateAtStartUp.value:
@@ -380,6 +388,42 @@ class Daily(QFrame, BaseInterface):
         if ui is not None and hasattr(ui, item):
             return getattr(ui, item)
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
+
+    def _check_and_run_loop_tasks(self):
+        """后台循环定时器触发：检查是否有到达计划时间的任务需要执行"""
+        tasks_to_run = []
+        login_task_checked = False
+
+        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
+        for task_cfg in sequence:
+            task_id = task_cfg.get("id")
+            task_item = self.task_widget_map.get(task_id)
+            is_checked = bool(task_item.checkbox.isChecked()) if task_item else False
+
+            if task_id == "task_login":
+                login_task_checked = is_checked
+            else:
+                # 判断当前任务是否被勾选 且 满足 schedule 计划时间和次数要求
+                if is_checked and self.should_run_task(task_cfg):
+                    tasks_to_run.append(task_id)
+
+        # 如果发现有任务需要执行了
+        if tasks_to_run:
+            self.loop_timer.stop()  # 暂停检查
+            self.is_loop_waiting = False
+
+            # 如果勾选了自动登录，把它塞在最前面
+            if login_task_checked:
+                tasks_to_run.insert(0, "task_login")
+
+            self.logger.info(f"到达计划时间，触发循环自动执行: {tasks_to_run}")
+
+            # 走常规的启动流程（带游戏启动检测）
+            if config.CheckBox_open_game_directly.value and not is_exist_snowbreak() and login_task_checked:
+                self.tasks_to_run = tasks_to_run
+                self.open_game_directly()
+            else:
+                self.after_start_button_click(tasks_to_run)
 
     def _initWidget(self):
 
@@ -952,6 +996,14 @@ class Daily(QFrame, BaseInterface):
             self._set_launch_pending_state(False)
 
     def on_start_button_click(self):
+        if getattr(self, 'is_loop_waiting', False):
+            self.loop_timer.stop()
+            self.is_loop_waiting = False
+            self.set_checkbox_enable(True)
+            self.ui.PushButton_start.setText(self._ui_text("开始", "Start"))
+            self.logger.info(self._ui_text("已手动取消循环等待状态", "Manually cancelled loop waiting state"))
+            return
+
         if self.is_launch_pending:
             self._clear_launch_watch_state()
             self._set_launch_pending_state(False)
@@ -984,10 +1036,13 @@ class Daily(QFrame, BaseInterface):
             self.after_start_button_click(tasks_to_run)
 
     def after_start_button_click(self, tasks_to_run):
-        if tasks_to_run: # 只要列表不为空，就说明有任务
+        if tasks_to_run:
             if not self.is_running:
                 self.start_thread = StartThread(tasks_to_run, self)
                 self.start_thread.is_running_signal.connect(self.handle_start)
+                # === 新增：绑定任务完成的信号 ===
+                self.start_thread.task_completed_signal.connect(self.record_task_completed)
+                # ==============================
                 self.start_thread.start()
             else:
                 self.start_thread.stop()
@@ -1001,6 +1056,44 @@ class Daily(QFrame, BaseInterface):
                 duration=2000,
                 parent=self
             )
+
+    def record_task_completed(self, task_id: str):
+        """当某个任务成功执行完毕后，更新 last_run 和 执行次数(run_count)"""
+        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
+        now = datetime.now()
+        now_ts = time.time()
+
+        for task_cfg in sequence:
+            if task_cfg.get("id") == task_id:
+                last_run_ts = task_cfg.get("last_run", 0)
+                last_run_dt = datetime.fromtimestamp(last_run_ts) if last_run_ts else datetime.min
+
+                # 取出当前任务设定的触发时间（比如 05:00）
+                execution_rules = task_cfg.get("execution_config", [{"time": "05:00"}])
+                rule = execution_rules[0] if execution_rules else {"time": "05:00"}
+                rule_time = str(rule.get("time", "05:00"))
+                try:
+                    hour, minute = map(int, rule_time.split(":"))
+                except ValueError:
+                    hour, minute = 5, 0
+
+                # 算出本周期的逻辑触发时间点
+                trigger_time = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+                if now < trigger_time:
+                    # 如果现在是凌晨 3 点，而刷新时间是 5 点，说明现在属于“昨天”的周期
+                    trigger_time -= timedelta(days=1)
+
+                # 判断是不是新的一轮
+                if last_run_dt < trigger_time:
+                    task_cfg["run_count"] = 1  # 跨过了刷新时间，重置为 1
+                else:
+                    task_cfg["run_count"] = task_cfg.get("run_count", 0) + 1  # 还在周期内，次数累加
+
+                task_cfg["last_run"] = now_ts
+                self.logger.info(f"已记录任务 [{task_id}] 完成，当前周期已执行 {task_cfg['run_count']} 次。")
+                break
+
+        self._save_task_sequence(sequence)
 
     def handle_start(self, str_flag):
         try:
@@ -1062,16 +1155,33 @@ class Daily(QFrame, BaseInterface):
         elif idx == 1:
             if self.game_hwnd:
                 win32gui.SendMessage(self.game_hwnd, win32con.WM_CLOSE, 0, 0)
-            else:
-                self.logger.warning('home未获取窗口句柄，无法关闭游戏')
             self.parent.close()
         elif idx == 2:
             self.parent.close()
         elif idx == 3:
             if self.game_hwnd:
                 win32gui.SendMessage(self.game_hwnd, win32con.WM_CLOSE, 0, 0)
-            else:
-                self.logger.warning('home未获取窗口句柄，无法关闭游戏')
+
+        # === 新增：循环 ===
+        elif idx == 4:
+            self.is_loop_waiting = True
+            self.set_checkbox_enable(False) # 面板保持灰态不可点击
+            self.ui.PushButton_start.setText(self._ui_text("停止等待", "Stop Loop"))
+            self.logger.info(self._ui_text("当前队列执行完毕。进入循环模式，挂机等待下一个计划任务的到来...",
+                                           "Queue finished. Entering loop mode, waiting for the next scheduled task..."))
+
+            # 每 60 秒 (60000 毫秒) 唤醒检查一次 schedule
+            self.loop_timer.start(60000)
+
+        # === 新增：关机 ===
+        elif idx == 5:
+            self.logger.warning(self._ui_text("任务结束，系统将在 60 秒后关机。若需取消，请在系统运行(Win+R)中输入 'shutdown -a'",
+                                              "Task finished. System will shut down in 60s. Run 'shutdown -a' to abort."))
+            if self.game_hwnd:
+                win32gui.SendMessage(self.game_hwnd, win32con.WM_CLOSE, 0, 0)
+            # -s 关机, -t 60 延迟60秒，给用户留一点反悔时间
+            os.system('shutdown -s -t 60')
+            self.parent.close()
 
     def set_checkbox_enable(self, enable: bool):
         for checkbox in self.ui.findChildren(CheckBox):
@@ -1094,6 +1204,10 @@ class Daily(QFrame, BaseInterface):
 
         if now is None:
             now = datetime.now()
+
+        last_run_ts = task_config.get("last_run", 0)
+        last_run_dt = datetime.fromtimestamp(last_run_ts) if last_run_ts else datetime.min
+        run_count = task_config.get("run_count", 0)
 
         def _normalize_rules(value, default_rules):
             if value is None:
@@ -1127,24 +1241,38 @@ class Daily(QFrame, BaseInterface):
             if target_minutes is None:
                 return False
 
-            now_minutes = now.hour * 60 + now.minute
-            if now_minutes < target_minutes:
-                return False
+            # 1. 计算当前的周期边界 (修复凌晨执行判定bug)
+            trigger_time = now.replace(hour=target_minutes // 60, minute=target_minutes % 60, second=0, microsecond=0)
+            if now < trigger_time:
+                trigger_time -= timedelta(days=1)
 
+            # 2. 读取 schedule 中设定的最大执行次数
+            max_runs = int(rule.get("max_runs", 1))
+
+            # 3. 如果上次执行的时间在这个周期内，判断是否达到了次数上限
+            if last_run_dt >= trigger_time:
+                if run_count >= max_runs:
+                    return False # 已经做满规定的次数了，拦住！
+
+            # 4. 星期 / 月份 的校验
             if rule_type == "weekly":
                 try:
-                    return now.weekday() == int(rule.get("day", 0))
+                    # 注意：如果 now < 设定的 trigger_time，此时逻辑上应该算“昨天”是周几
+                    logical_now = now if now >= trigger_time else now - timedelta(days=1)
+                    return logical_now.weekday() == int(rule.get("day", 0))
                 except (TypeError, ValueError):
                     return False
 
             if rule_type == "monthly":
                 try:
-                    return now.day == int(rule.get("day", 1))
+                    logical_now = now if now >= trigger_time else now - timedelta(days=1)
+                    return logical_now.day == int(rule.get("day", 1))
                 except (TypeError, ValueError):
                     return False
 
             return True
 
+        default_rules = [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}]
         default_rules = [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}]
         activation_config = task_config.get("activation_config")
         if activation_config is None:
