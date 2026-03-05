@@ -68,7 +68,6 @@ class MainWindow(FluentWindow, BaseInterface):
         self.displayInterface = None
         self.homeInterface = None
         self.additionalInterface = None
-        self.triggerInterface = None
         self.helpInterface = None
         self.tableInterface = None
         self.settingInterface = None
@@ -83,7 +82,6 @@ class MainWindow(FluentWindow, BaseInterface):
             'display': False,
             'home': False,
             'additional': False,
-            'trigger': False,
             'table': False,
             'help': False,
             'setting': False,
@@ -153,11 +151,6 @@ class MainWindow(FluentWindow, BaseInterface):
         self.additionalInterface = Additional('Additional Interface', self)
         self._localize_widget_if_needed(self.additionalInterface)
 
-    def _create_trigger_interface(self):
-        from .trigger import Trigger
-        self.triggerInterface = Trigger('Trigger Interface', self)
-        self._localize_widget_if_needed(self.triggerInterface)
-
     def _create_help_interface(self):
         from .help import Help
         self.helpInterface = Help('Help Interface', self)
@@ -193,7 +186,6 @@ class MainWindow(FluentWindow, BaseInterface):
             self._create_display_and_add_nav,
             self._create_home_and_add_nav,
             self._create_additional_and_add_nav,
-            self._create_trigger_and_add_nav,
             self._create_table_and_add_nav,
             self._create_help_and_add_nav,
             self._create_setting_and_add_nav,
@@ -221,11 +213,6 @@ class MainWindow(FluentWindow, BaseInterface):
         if self.additionalInterface is None:
             self._create_additional_interface()
         self._register_nav_item('additional', self.additionalInterface, FIF.DEVELOPER_TOOLS, self._ui_text('工具', 'Tools'))
-
-    def _create_trigger_and_add_nav(self):
-        if self.triggerInterface is None:
-            self._create_trigger_interface()
-        self._register_nav_item('trigger', self.triggerInterface, FIF.ROBOT, self._ui_text('辅助', 'Trigger'))
 
     def _create_table_and_add_nav(self):
         if self.tableInterface is None:
@@ -609,6 +596,7 @@ class MainWindow(FluentWindow, BaseInterface):
                 ("./log/alien_guardian", self.additionalInterface.textBrowser_log_alien_guardian, "alien_guardian"),
                 ("./log/maze", self.additionalInterface.textBrowser_log_maze, "maze"),
                 ("./log/drink", self.additionalInterface.textBrowser_log_drink, "drink"),
+                ("./log/trigger", self.additionalInterface.textBrowser_log_trigger, "trigger"),
             ])
 
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
