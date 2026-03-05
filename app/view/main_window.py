@@ -210,7 +210,7 @@ class MainWindow(FluentWindow, BaseInterface):
     def _create_display_and_add_nav(self):
         if self.displayInterface is None:
             self._create_display_interface()
-        self._register_nav_item('display', self.displayInterface, FIF.HOME, self._ui_text('首页', 'Display'))
+        self._register_nav_item('display', self.displayInterface, FIF.HOME, self._ui_text('首页', 'Home'))
 
     def _create_home_and_add_nav(self):
         if self.homeInterface is None:

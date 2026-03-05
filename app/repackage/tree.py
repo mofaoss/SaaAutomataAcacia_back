@@ -28,7 +28,7 @@ class TreeFrame_person(Frame):
         self.tree = TreeWidget(self.parent)
         self.addWidget(self.tree)
 
-        title = 'Character Shards' if is_non_chinese_ui else '人物碎片'
+        title = 'Character Shards' if is_non_chinese_ui else '角色碎片'
         children = [
             "Yao", "Acacia", "Lyfe", "Chenxing", "Marian", "Fenny",
             "Fritia", "Siris", "Cherno", "Mauxir", "Haru", "Enya", "Nita",

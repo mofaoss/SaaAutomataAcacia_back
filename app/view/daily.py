@@ -79,7 +79,7 @@ TASK_REGISTRY = {
         "module_class": PersonModule,
         "ui_page_index": 4,
         "option_key": "CheckBox_person_5",
-        "zh_name": "人物碎片",
+        "zh_name": "角色碎片",
         "en_name": "Character Shards",
     },
     "task_chasm": {
@@ -87,7 +87,7 @@ TASK_REGISTRY = {
         "ui_page_index": 5,
         "option_key": "CheckBox_chasm_6",
         "zh_name": "精神拟境",
-        "en_name": "Neural Simulation",
+        "en_name": "Mental Simulation",
     },
     "task_operation": {
         "module_class": OperationModule,
@@ -284,13 +284,13 @@ class Daily(QFrame, BaseInterface):
         self.setting_name_list = [
             self._ui_text('登录', 'Login'), self._ui_text('福利', 'Supplies'),
             self._ui_text('商店', 'Shop'), self._ui_text('体力', 'Stamina'),
-            self._ui_text('碎片', 'Shards'), self._ui_text('拟境', 'Neural Simulation'),
+            self._ui_text('碎片', 'Shards'), self._ui_text('拟境', 'Mental Simulation'),
             self._ui_text('奖励', 'Claim Rewards'),
             self._ui_text('常规行动', 'Operation'),
         ]
 
         self.person_dic = {
-            "人物碎片": "item_person_0", "肴": "item_person_1", "安卡希雅": "item_person_2",
+            "角色碎片": "item_person_0", "肴": "item_person_1", "安卡希雅": "item_person_2",
             "里芙": "item_person_3", "辰星": "item_person_4", "茉莉安": "item_person_5",
             "芬妮": "item_person_6", "芙提雅": "item_person_7", "瑟瑞斯": "item_person_8",
             "琴诺": "item_person_9", "猫汐尔": "item_person_10", "晴": "item_person_11",

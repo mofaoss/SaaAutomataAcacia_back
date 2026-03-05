@@ -84,6 +84,8 @@ class TaskItemWidget(QWidget):
 
         self.label = BodyLabel(en_name if is_non_chinese_ui else zh_name, self)
 
+        self.label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+
         self.btn = ToolButton(self)
         self.btn.setIcon(FIF.SETTING)
         btn_font = self.btn.font()
@@ -92,7 +94,9 @@ class TaskItemWidget(QWidget):
         self.btn.clicked.connect(lambda: self.settings_clicked.emit(self.task_id))
 
         layout.addWidget(self.checkbox, 0)
-        layout.addWidget(self.label, 1)
+
+        layout.addWidget(self.label, 0)
+
         layout.addStretch(1)
         layout.addWidget(self.btn, 0)
 
@@ -1001,16 +1005,16 @@ class DailyView(ScrollArea):
             "### 提示 \n* 默认必领供应站体力和好友体力\n* 勾选“领取兑换码”会自动拉取在线兑换码进行兑换\n* 在线兑换码由开发者维护，更新不一定及时\n* 导入txt文本文件可以批量使用用户兑换码，txt需要一行一个兑换码"
         )
         self.BodyLabel_chasm_tip.setText(
-            "### Tips\n* Neural Simulation opens every Tuesday at 10:00" if self.is_non_chinese_ui else "### 提示\n* 拟境每周2的10:00开启"
+            "### Tips\n* Mental Simulation Realm opens every Tuesday at 10:00" if self.is_non_chinese_ui else "### 提示\n* 拟境每周2的10:00开启"
         )
         self.BodyLabel_reward_tip.setText(
             "### Tips\n* Claim monthly card and daily rewards" if self.is_non_chinese_ui else "### 提示\n* 领取大月卡和日常奖励"
         )
 
         self.TitleLabel.setText(self._ui_text("日志", "Log"))
-        self.PushButton_select_all.setText(self._ui_text("全选", "Select All"))
+        self.PushButton_select_all.setText(self._ui_text("全选", "All"))
         self.PushButton_no_select.setText(self._ui_text("清空", "Clear"))
-        self.hint_label.setText(self._ui_text("拖动调整顺序", "Drag to reorder"))
+        self.hint_label.setText(self._ui_text("拖动调整顺序", "Drag to sort"))
         self.BodyLabel.setText(self._ui_text("结束后进行", "After Finish"))
         self.PushButton_start.setText(self._ui_text("开始", "Start"))
         self.PrimaryPushButton_path_tutorial.setText(self._ui_text("查看教程", "Tutorial"))
@@ -1032,7 +1036,7 @@ class DailyView(ScrollArea):
         self.BodyLabel_4.setText(self._ui_text("角色2：", "Character 2:"))
         self.BodyLabel_5.setText(self._ui_text("角色3：", "Character 3:"))
         self.BodyLabel_8.setText(self._ui_text("角色4：", "Character 4:"))
-        self.CheckBox_is_use_chip.setText(self._ui_text("是否使用记忆嵌片", "Use memory chip"))
+        self.CheckBox_is_use_chip.setText(self._ui_text("记忆嵌片不足时自动使用2片", "Auto use 2 chips when not enough"))
         self.TitleLabel_3.setText(self._ui_text("日程提醒", "Schedule"))
         self.BodyLabel_22.setText(self._ui_text("疾跑方式", "Sprint mode"))
         self.BodyLabel_7.setText(self._ui_text("刷取次数", "Run count"))

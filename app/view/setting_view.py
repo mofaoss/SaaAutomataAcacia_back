@@ -207,7 +207,7 @@ class SettingInterface(ScrollArea, BaseInterface):
             self._ui_text('启动时进入', 'Startup page'),
             self._ui_text("选择启动软件时直接进入哪个页面", "Choose which page to open on startup"),
             texts=[
-                self._ui_text('首页', 'Display'), self._ui_text('日常', 'Daily'),
+                self._ui_text('首页', 'Home'), self._ui_text('日常', 'Daily'),
                 self._ui_text('工具', 'Tools')
             ],
             parent=self.personalGroup
