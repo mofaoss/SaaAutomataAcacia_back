@@ -42,8 +42,8 @@ class OcrReplacementTable(QFrame, BaseInterface):
 
         self.BodyLabel_tips.setText(
             self._ui_text(
-                "### 提示\n* 双击单元格可修改\n* 填好上面对应的内容后点击“新增”按钮可以添加新的替换规则\n* 错误文本：ocr识别出来的错误内容，如果看不到去设置那开启显示ocr识别结果。正确文本：游戏中对应的正确文字\n* 删除需要先选中你需要删除的行，然后再点删除按钮",
-                "### Tips\n* Double-click a cell to edit\n* Fill the fields above and click Add to create a new replacement rule\n* Wrong Text: OCR-recognized incorrect text. If missing, enable OCR result display in Settings. Correct Text: expected in-game text\n* To delete, select a row first and then click Delete"
+                "### 提示\n* ocr识别问题的替换字表 \n* 双击单元格可修改\n* 填好上面对应的内容后点击“新增”按钮可以添加新的替换规则\n* 错误文本：ocr识别出来的错误内容，如果看不到去设置那开启显示ocr识别结果\n* 正确文本：游戏中对应的正确文字\n* 删除需要先选中你需要删除的行，然后再点删除按钮",
+                "### Tips\n* This is a replacement table for OCR recognition issues\n* Double-click a cell to edit\n* Fill the fields above and click Add to create a new replacement rule\n* Wrong Text: OCR-recognized incorrect text. If missing, enable OCR result display in Settings\n* Correct Text: expected in-game text\n* To delete, select a row first and then click Delete"
             ))
 
         power_usage_items = [self._ui_text('直接替换', 'Direct Replace'), self._ui_text('条件替换', 'Conditional Replace')]
