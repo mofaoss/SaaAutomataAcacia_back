@@ -101,7 +101,7 @@ TASK_REGISTRY = {
         "module_class": OperationModule,
         "ui_page_index": 7,
         "option_key": "CheckBox_operation_8",
-        "zh_name": "常规教学",
+        "zh_name": "常规训练",
         "en_name": "Operation",
     },
     "task_weapon": {
@@ -305,7 +305,7 @@ class Daily(QFrame, BaseInterface):
             self._ui_text('商店', 'Shop'), self._ui_text('体力', 'Stamina'),
             self._ui_text('碎片', 'Shards'), self._ui_text('拟境', 'Mental Simulation'),
             self._ui_text('奖励', 'Claim Rewards'),
-            self._ui_text('常规教学', 'Operation'),
+            self._ui_text('常规训练', 'Operation'),
             self._ui_text('武器培养', 'Weapon'),
             self._ui_text('信源碎片', 'Shard Exchange'),
         ]
