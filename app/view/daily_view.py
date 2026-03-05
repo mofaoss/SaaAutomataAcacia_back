@@ -168,7 +168,6 @@ class ExecutionRuleWidget(QWidget):
         for w in [self.freq_combo, self.week_combo, self.month_combo]:
             w.currentIndexChanged.connect(self.changed)
 
-        # 🟢 绑定的事件也从 valueChanged 变成了 textChanged
         self.runs_edit.textChanged.connect(self.changed)
         self.time_edit.editingFinished.connect(self.changed)
 
@@ -197,7 +196,7 @@ class ExecutionRuleWidget(QWidget):
                 month_day = max(1, min(31, month_day))
                 self.month_combo.setCurrentIndex(month_day - 1)
             self.time_edit.setText(data.get("time", "05:00"))
-            # 🟢 转换为字符串填入 LineEdit
+            # 转换为字符串填入 LineEdit
             self.runs_edit.setText(str(data.get("max_runs", 1)))
         except Exception:
             pass
@@ -208,7 +207,7 @@ class ExecutionRuleWidget(QWidget):
         idx = self.freq_combo.currentIndex()
         day = self.week_combo.currentIndex() if idx == 1 else (self.month_combo.currentIndex() + 1)
 
-        # 🟢 获取文本并转换为数字，如果是空字符串就默认回退到 1
+        # 获取文本并转换为数字，如果是空字符串就默认回退到 1
         runs_text = self.runs_edit.text()
         runs_val = int(runs_text) if runs_text.isdigit() else 1
 
@@ -700,8 +699,6 @@ class OperationPage(BaseDailyPage):
         line.addWidget(edit, 2)
         return line
 
-
-# ===== 核心视窗，整体替换为自适应网格 + 滚动条方案 =====
 
 class DailyView(ScrollArea):
     def __init__(self, parent=None, is_non_chinese_ui=False):
