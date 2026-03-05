@@ -334,12 +334,12 @@ class Additional(QFrame, BaseInterface):
         return False
 
     def _apply_static_i18n(self):
-        self.TitleLabel.setText(self._ui_text("日志", "Log"))
 
-        self.StrongBodyLabel.setText(self._ui_text("自动采集或劝降", "Auto Collect"))
-        self.BodyLabel.setText(self._ui_text("按钮出现时就按下F键", "Automatically press F when collect prompt appears"))
-        self.StrongBodyLabel_2.setText(self._ui_text("自动妮塔悸响qte", "Nita E Auto QTE"))
-        self.BodyLabel_2.setText(self._ui_text("到qte时机就按下E键", "Automatically press E during QTE stage"))
+        # 辅助功能界面
+        self.StrongBodyLabel_trigger_f.setText(self._ui_text("自动采集或劝降", "Auto Collect"))
+        self.BodyLabel_trigger_f.setText(self._ui_text("按钮出现时就按下F键", "Automatically press F when collect prompt appears"))
+        self.StrongBodyLabel_trigger_e.setText(self._ui_text("自动妮塔悸响qte", "Nita E Auto QTE"))
+        self.BodyLabel_trigger_e.setText(self._ui_text("到qte时机就按下E键", "Automatically press E during QTE stage"))
         self.TitleLabel_trigger_log.setText(self._ui_text("日志", "Log"))
         self.BodyLabel_trigger_tip.setText(
             self._ui_text(
@@ -347,6 +347,8 @@ class Additional(QFrame, BaseInterface):
                 "### Tips\n* Launch the game before enabling this feature\n* These are toggle switches. Once enabled, detection keeps running and triggers automatically when conditions match\n* It does not block manual gameplay, acting as semi-automation assistance"
             ))
 
+        # 钓鱼界面
+        self.TitleLabel.setText(self._ui_text("日志", "Log"))
         self.CheckBox_is_save_fish.setText(self._ui_text("新纪录是否暂停", "Pause on new records"))
         self.BodyLabel_7.setText(self._ui_text("颜色查找下限", "Color lower bound"))
         self.PrimaryPushButton_get_color.setText(self._ui_text("校准颜色", "Calibrate Color"))

@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
     QTextBrowser,
     QVBoxLayout,
     QWidget,
+    QFrame,
 )
 from qfluentwidgets import (
     BodyLabel,
@@ -24,6 +25,7 @@ from qfluentwidgets import (
     SpinBox,
     StrongBodyLabel,
     TitleLabel,
+    SwitchButton,
 )
 
 
@@ -57,63 +59,42 @@ class BaseFeaturePage(QWidget):
         return card, title, browser
 
 
-# 1. 确保在 qfluentwidgets 的导入中包含了 SwitchButton
-from qfluentwidgets import (
-    # ... 原有导入 ...
-    SwitchButton,
-)
-
-
 class TriggerPage(BaseFeaturePage):
     def __init__(self, parent=None):
         super().__init__("page_trigger", parent)
 
         self.SimpleCardWidget_trigger = SimpleCardWidget(self)
-        layout = QVBoxLayout(self.SimpleCardWidget_trigger)
+        self.card_layout = QVBoxLayout(self.SimpleCardWidget_trigger)
 
-        # 自动采集 F
-        row_f = QHBoxLayout()
-        text_layout_f = QVBoxLayout()
-        self.StrongBodyLabel = StrongBodyLabel(self.SimpleCardWidget_trigger)
-        self.StrongBodyLabel.setObjectName("StrongBodyLabel")
-        self.BodyLabel = BodyLabel(self.SimpleCardWidget_trigger)
-        self.BodyLabel.setObjectName("BodyLabel")
-        text_layout_f.addWidget(self.StrongBodyLabel)
-        text_layout_f.addWidget(self.BodyLabel)
+        # 用来记录当前已经添加了几个功能模块
+        self.item_count = 0
 
-        self.SwitchButton_f = SwitchButton(self.SimpleCardWidget_trigger)
-        self.SwitchButton_f.setObjectName("SwitchButton_f")
+        # 1. 添加自动采集 F
+        self._add_switch_item(
+            title_obj_name="StrongBodyLabel_trigger_f",
+            desc_obj_name="BodyLabel_trigger_f",
+            switch_obj_name="SwitchButton_f"
+        )
 
-        row_f.addLayout(text_layout_f)
-        row_f.addStretch(1)
-        row_f.addWidget(self.SwitchButton_f)
-        layout.addLayout(row_f)
+        # 2. 添加妮塔自动 E (会自动在上方生成分割线)
+        self._add_switch_item(
+            title_obj_name="StrongBodyLabel_trigger_e",
+            desc_obj_name="BodyLabel_trigger_e",
+            switch_obj_name="SwitchButton_e"
+        )
 
-        # 妮塔自动 E
-        row_e = QHBoxLayout()
-        text_layout_e = QVBoxLayout()
-        self.StrongBodyLabel_2 = StrongBodyLabel(self.SimpleCardWidget_trigger)
-        self.StrongBodyLabel_2.setObjectName("StrongBodyLabel_2")
-        self.BodyLabel_2 = BodyLabel(self.SimpleCardWidget_trigger)
-        self.BodyLabel_2.setObjectName("BodyLabel_2")
-        text_layout_e.addWidget(self.StrongBodyLabel_2)
-        text_layout_e.addWidget(self.BodyLabel_2)
-
-        self.SwitchButton_e = SwitchButton(self.SimpleCardWidget_trigger)
-        self.SwitchButton_e.setObjectName("SwitchButton_e")
-
-        row_e.addLayout(text_layout_e)
-        row_e.addStretch(1)
-        row_e.addWidget(self.SwitchButton_e)
-        layout.addLayout(row_e)
+        # 以后如果有新功能，只需要像这样加一行即可，它会自动自带分割线：
+        # self._add_switch_item("StrongBodyLabel_trigger_new", "BodyLabel_trigger_new", "SwitchButton_new")
 
         # 提示信息
         self.BodyLabel_trigger_tip = BodyLabel(self.SimpleCardWidget_trigger)
         self.BodyLabel_trigger_tip.setObjectName("BodyLabel_trigger_tip")
         self.BodyLabel_trigger_tip.setTextFormat(Qt.TextFormat.MarkdownText)
         self.BodyLabel_trigger_tip.setWordWrap(True)
-        layout.addWidget(self.BodyLabel_trigger_tip)
-        layout.addStretch(1)
+        # 给提示信息上方留一点距离
+        self.BodyLabel_trigger_tip.setStyleSheet("margin-top: 10px;")
+        self.card_layout.addWidget(self.BodyLabel_trigger_tip)
+        self.card_layout.addStretch(1)
 
         self.left_layout.addWidget(self.SimpleCardWidget_trigger)
         self.left_layout.addStretch(1)
@@ -127,6 +108,50 @@ class TriggerPage(BaseFeaturePage):
         self.SimpleCardWidget_trigger_log.setObjectName("SimpleCardWidget_trigger_log")
         self.right_layout.addWidget(self.SimpleCardWidget_trigger_log)
 
+    def _add_switch_item(self, title_obj_name: str, desc_obj_name: str, switch_obj_name: str):
+        """
+        自动化生成带有 Switch 的功能行，并自动管理分割线
+        """
+        # 如果不是第一个元素，先加一条分隔线
+        if self.item_count > 0:
+            separator = QFrame(self.SimpleCardWidget_trigger)
+            separator.setFrameShape(QFrame.Shape.HLine)
+            separator.setStyleSheet(
+                "QFrame { background-color: rgba(128, 128, 128, 0.2); border: none; max-height: 1px; margin-top: 8px; margin-bottom: 8px; }"
+            )
+            self.card_layout.addWidget(separator)
+
+        # 构建左右布局
+        row = QHBoxLayout()
+        text_layout = QVBoxLayout()
+
+        # 构建标题和描述
+        title_label = StrongBodyLabel(self.SimpleCardWidget_trigger)
+        title_label.setObjectName(title_obj_name)
+        desc_label = BodyLabel(self.SimpleCardWidget_trigger)
+        desc_label.setObjectName(desc_obj_name)
+
+        text_layout.addWidget(title_label)
+        text_layout.addWidget(desc_label)
+
+        # 构建开关
+        switch_btn = SwitchButton(self.SimpleCardWidget_trigger)
+        switch_btn.setObjectName(switch_obj_name)
+
+        row.addLayout(text_layout)
+        row.addStretch(1)
+        row.addWidget(switch_btn)
+
+        # 添加到主面板
+        self.card_layout.addLayout(row)
+
+        # 将动态生成的控件绑定为 self 的属性，以便底层框架通过 ObjectName 抓取
+        setattr(self, title_obj_name, title_label)
+        setattr(self, desc_obj_name, desc_label)
+        setattr(self, switch_obj_name, switch_btn)
+
+        # 增加计数
+        self.item_count += 1
 
 class FishingPage(BaseFeaturePage):
     def __init__(self, parent=None):
