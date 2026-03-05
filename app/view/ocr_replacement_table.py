@@ -8,10 +8,11 @@ from qfluentwidgets import InfoBar, InfoBarPosition
 
 from app.common.config import is_non_chinese_ui_language
 from app.common.style_sheet import StyleSheet
+from .base_interface import BaseInterface
 from app.view.ocr_replacement_table_view import OcrReplacementTableView
 
 
-class OcrReplacementTable(QFrame):
+class OcrReplacementTable(QFrame, BaseInterface):
     def __init__(self, text: str, parent=None):
         super().__init__()
 
@@ -41,8 +42,8 @@ class OcrReplacementTable(QFrame):
 
         self.BodyLabel_tips.setText(
             self._ui_text(
-                "### 提示\n* 双击单元格可修改\n* 填好上面对应的内容后点击“新增”按钮可以添加新的替换规则\n* 错误文本：ocr识别出来的错误内容，如果看不到去设置那开启显示ocr识别结果。正确文本：游戏中对应的正确文字\n* 删除需要先选中你需要删除的行，然后再点删除按钮",
-                "### Tips\n* Double-click a cell to edit\n* Fill the fields above and click Add to create a new replacement rule\n* Wrong Text: OCR-recognized incorrect text. If missing, enable OCR result display in Settings. Correct Text: expected in-game text\n* To delete, select a row first and then click Delete"
+                "### 提示\n* ocr识别问题的替换字表 \n* 双击单元格可修改\n* 填好上面对应的内容后点击“新增”按钮可以添加新的替换规则\n* 错误文本：ocr识别出来的错误内容，如果看不到去设置那开启显示ocr识别结果\n* 正确文本：游戏中对应的正确文字\n* 删除需要先选中你需要删除的行，然后再点删除按钮",
+                "### Tips\n* This is a replacement table for OCR recognition issues\n* Double-click a cell to edit\n* Fill the fields above and click Add to create a new replacement rule\n* Wrong Text: OCR-recognized incorrect text. If missing, enable OCR result display in Settings\n* Correct Text: expected in-game text\n* To delete, select a row first and then click Delete"
             ))
 
         power_usage_items = [self._ui_text('直接替换', 'Direct Replace'), self._ui_text('条件替换', 'Conditional Replace')]
@@ -90,9 +91,6 @@ class OcrReplacementTable(QFrame):
         self.old_type = 'direct' if cell_text in ["直接替换", "Direct Replace"] else 'conditional'
         self.old_key = self.TableWidget_ocr_table.item(row, 1).text()
         self.old_value = self.TableWidget_ocr_table.item(row, 2).text()
-
-    def _ui_text(self, zh_text: str, en_text: str) -> str:
-        return en_text if self._is_non_chinese_ui else zh_text
 
     def change_row(self, row, col):
         # 临时断开信号

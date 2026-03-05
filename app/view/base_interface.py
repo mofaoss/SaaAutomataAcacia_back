@@ -1,10 +1,12 @@
-from app.common.logger import logger
+import logging
 from app.common.gui_logger import bind_log_widget
 
 
 class BaseInterface:
-    def __init__(self):
-        self.logger = logger
+    _ui_text_use_qt_tr = False
+
+    def __init__(self, *args, **kwargs):
+        self.logger = logging.getLogger(__name__)
         self.auto = None
 
     def redirectOutput(self, log_widget):
@@ -12,6 +14,17 @@ class BaseInterface:
 
     def toggle_button(self, running):
         pass
+
+    def _ui_text(self, zh_text: str, en_text: str) -> str:
+        if getattr(self, "_is_non_chinese_ui", False):
+            return en_text
+
+        if getattr(self, "_ui_text_use_qt_tr", False):
+            translate = getattr(self, "tr", None)
+            if callable(translate):
+                return translate(zh_text)
+
+        return zh_text
 
     # def chose_auto(self, only_game=False):
     #     """

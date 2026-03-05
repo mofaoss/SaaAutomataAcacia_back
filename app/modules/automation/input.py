@@ -1,4 +1,5 @@
 import ctypes
+import logging
 import string
 import threading
 import time
@@ -9,8 +10,10 @@ import win32con
 import win32gui  # 不能删
 
 from app.common.config import config
-from app.common.logger import logger
 from app.modules.automation.window_tracker import WindowTracker
+
+
+logger = logging.getLogger(__name__)
 
 
 # from pynput import mouse
@@ -479,14 +482,6 @@ class Input:
         wparam = 0
         lparam = y << 16 | x
         win32gui.PostMessage(self.hwnd, self.WmCode['mouse_move'], wparam, lparam)
-
-    def move_down(self, x, y, mouse_key='left'):
-        """鼠标移动到（x,y）后按下key键,默认左键"""
-        pass
-
-    def move_up(self, x, y, mouse_key='left'):
-        """鼠标移动到（x,y）后松开key键,默认左键"""
-        pass
 
     def _send_scroll_tracking(self, x: int, y: int, delta: int, time_out: float, start_time: float) -> bool:
         if delta == 0:

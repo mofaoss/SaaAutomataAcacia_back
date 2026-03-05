@@ -1,32 +1,35 @@
 # coding: utf-8
 import datetime
 import html
+import logging
 import os.path
 import re
 import sys
 import threading
 import time
 from pathlib import Path
-from PySide6.QtCore import QSize, QTimer, QThread, Qt, QUrl
+from PySide6.QtCore import QSize, QTimer, QThread, Qt, QUrl, QPoint
 from PySide6.QtGui import QIcon, QImage, QPixmap, QMovie, QDesktopServices
 from PySide6.QtWidgets import QApplication, QFrame, QLabel
 from qfluentwidgets import FluentIcon as FIF, SystemThemeListener, MessageBox, InfoBar, InfoBarPosition
-from qfluentwidgets import NavigationItemPosition, FluentWindow, FlyoutView, \
-    Flyout, setThemeColor
+from qfluentwidgets import NavigationItemPosition, FluentWindow, setThemeColor
 
 from ..common.config import config
 from ..common.config import is_non_chinese_ui_language, is_traditional_ui_language
 from ..common.icon import Icon
-from ..common.logger import logger
 from ..common.matcher import matcher
 from ..common.setting import REPO_URL
 from ..common.signal_bus import signalBus
+from .base_interface import BaseInterface
 from utils.game_launcher import launch_game_with_guard
-from utils.net_utils import get_cloudflare_data
-from utils.updater_utils import get_gitee_text, get_local_version, get_github_release_channels, is_remote_version_newer, \
+from utils.updater_utils import get_local_version, get_github_release_channels, is_remote_version_newer, \
     is_prerelease_version
 from ..repackage.custom_message_box import CustomMessageBox
 from ..common import resource  # don't delete
+
+
+logger = logging.getLogger(__name__)
+SIDEBAR_EXPAND_THRESHOLD = 60 # 侧边栏展开判定的阈值像素
 
 
 class InstallOcr(QThread):
@@ -40,13 +43,14 @@ class InstallOcr(QThread):
         self.ocr_installer.install_ocr()
 
 
-class MainWindow(FluentWindow):
+class MainWindow(FluentWindow, BaseInterface):
 
     SPLASH_ICON_SIZE = QSize(150, 150)
     SPLASH_MOVIE_SIZE = QSize(160, 160)
     SPLASH_PREFERRED_MIN_MS = 1200
-    DEFAULT_WINDOW_WIDTH = 1280
+    DEFAULT_WINDOW_WIDTH = 1080
     DEFAULT_WINDOW_HEIGHT = 800
+    _ui_text_use_qt_tr = True
 
     def __init__(self):
         super().__init__()
@@ -68,7 +72,6 @@ class MainWindow(FluentWindow):
         self.helpInterface = None
         self.tableInterface = None
         self.settingInterface = None
-        self.support_button = None
         self.ocr_module = None
         self.numpy_module = None
         self.cv2_module = None
@@ -88,7 +91,6 @@ class MainWindow(FluentWindow):
 
         self.initWindow()
         self._init_tasks = self._build_initial_init_tasks() + [
-            self._create_support_button,
             self.connectSignalToSlot,
             self.initNavigation,
             self._finalize_startup,
@@ -167,29 +169,24 @@ class MainWindow(FluentWindow):
         self._localize_widget_if_needed(self.tableInterface)
 
     def _create_setting_interface(self):
-        from .setting_interface import SettingInterface
+        from .setting_view import SettingInterface
         self.settingInterface = SettingInterface(self)
         self._localize_widget_if_needed(self.settingInterface)
-
-    def _create_support_button(self):
-        self.support_button = None
 
     def _run_next_init_task(self):
         if not self._init_tasks:
             return
-
         task = self._init_tasks.pop(0)
         task()
-        QTimer.singleShot(0, self._run_next_init_task)
+        QTimer.singleShot(16, self._run_next_init_task)
 
     def _run_next_deferred_init_task(self):
         if not self._deferred_init_tasks:
             self._deferred_initialized = True
             return
-
         task = self._deferred_init_tasks.pop(0)
         task()
-        QTimer.singleShot(0, self._run_next_deferred_init_task)
+        QTimer.singleShot(16, self._run_next_deferred_init_task)
 
     def _defer_load_remaining_interfaces(self):
         self._deferred_init_tasks = [
@@ -213,27 +210,33 @@ class MainWindow(FluentWindow):
     def _create_display_and_add_nav(self):
         if self.displayInterface is None:
             self._create_display_interface()
-        self._register_nav_item('display', self.displayInterface, FIF.PHOTO, self._ui_text('展示页', 'Display'))
+        self._register_nav_item('display', self.displayInterface, FIF.HOME, self._ui_text('首页', 'Home'))
 
     def _create_home_and_add_nav(self):
         if self.homeInterface is None:
             self._create_home_interface()
-        self._register_nav_item('home', self.homeInterface, FIF.HOME, self._ui_text('日常', 'Daily'))
+        self._register_nav_item('home', self.homeInterface, FIF.PLAY, self._ui_text('日常', 'Daily'))
 
     def _create_additional_and_add_nav(self):
         if self.additionalInterface is None:
             self._create_additional_interface()
-        self._register_nav_item('additional', self.additionalInterface, FIF.APPLICATION, self._ui_text('小工具', 'Tools'))
+        self._register_nav_item('additional', self.additionalInterface, FIF.DEVELOPER_TOOLS, self._ui_text('工具', 'Tools'))
 
     def _create_trigger_and_add_nav(self):
         if self.triggerInterface is None:
             self._create_trigger_interface()
-        self._register_nav_item('trigger', self.triggerInterface, FIF.COMPLETED, self._ui_text('触发器', 'Trigger'))
+        self._register_nav_item('trigger', self.triggerInterface, FIF.ROBOT, self._ui_text('辅助', 'Trigger'))
 
     def _create_table_and_add_nav(self):
         if self.tableInterface is None:
             self._create_table_interface()
-        self._register_nav_item('table', self.tableInterface, FIF.SYNC, self._ui_text('替换表', 'Replacement'))
+        self._register_nav_item(
+            'table',
+            self.tableInterface,
+            FIF.SYNC,
+            self._ui_text('词表', 'OCR'),
+            position=NavigationItemPosition.BOTTOM,
+        )
 
     def _create_help_and_add_nav(self):
         if self.helpInterface is None:
@@ -261,10 +264,6 @@ class MainWindow(FluentWindow):
         if self.homeInterface is None:
             self._create_home_interface()
 
-        ocr_thread = threading.Thread(target=self.init_ocr)
-        ocr_thread.daemon = True
-        ocr_thread.start()
-
         if config.auto_start_task.value or '--auto' in sys.argv:
             if self.homeInterface is None:
                 self._create_home_and_add_nav()
@@ -279,7 +278,8 @@ class MainWindow(FluentWindow):
                 logger.warning(f'未勾选"自动打开游戏"')
 
         self._finish_splash_screen()
-        QTimer.singleShot(0, self._show_update_popup_if_needed)
+        if config.checkUpdateAtStartUp.value:
+            QTimer.singleShot(0, self._show_update_popup_if_needed)
         self._defer_load_remaining_interfaces()
 
     def _select_update_candidate(self, local_version: str, release_channels: dict):
@@ -315,6 +315,9 @@ class MainWindow(FluentWindow):
         return best
 
     def _show_update_popup_if_needed(self):
+        if not config.checkUpdateAtStartUp.value:
+            return
+
         if self._has_shown_update_popup:
             return
         self._has_shown_update_popup = True
@@ -329,8 +332,8 @@ class MainWindow(FluentWindow):
                 content=self._ui_text("已是最新版", "Already up to date"),
                 orient=Qt.Orientation.Horizontal,
                 isClosable=True,
-                position=InfoBarPosition.TOP_RIGHT,
-                duration=6000,
+                position=InfoBarPosition.TOP,
+                duration=800,
                 parent=self,
             )
             return
@@ -350,8 +353,8 @@ class MainWindow(FluentWindow):
             content=content_html,
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
-            position=InfoBarPosition.TOP_RIGHT,
-            duration=10000,
+            position=InfoBarPosition.TOP,
+            duration=3000,
             parent=self,
         )
 
@@ -365,6 +368,13 @@ class MainWindow(FluentWindow):
 
             info_bar.contentLabel.linkActivated.connect(_on_link_activated)
             info_bar.contentLabel.setText(content_html)
+
+    def isSidebarExpanded(self) -> bool:
+        """统一判断侧边栏当前是否处于展开状态"""
+        if not hasattr(self, "navigationInterface") or self.navigationInterface is None:
+            return False
+        # 将所有的物理判定逻辑只写在这里一次
+        return self.navigationInterface.width() > SIDEBAR_EXPAND_THRESHOLD
 
     def open_game_directly(self):
         """直接启动游戏（兼容 Steam/Epic 与国服等不同目录结构）"""
@@ -381,78 +391,33 @@ class MainWindow(FluentWindow):
         signalBus.switchToSampleCard.connect(self.switchToSample)
         signalBus.showMessageBox.connect(self.showMessageBox)
         signalBus.showScreenshot.connect(self.showScreenshot)
-        # signalBus.check_ocr_progress.connect(self.update_ring)
-
-    def setMicaEffectEnabled(self, enabled):
-        return
-
-    def isMicaEffectEnabled(self):
-        return False
 
     def initNavigation(self):
-        # self.navigationInterface.setAcrylicEnabled(True)
-
-        nav_font = self.navigationInterface.font()
-        if nav_font.pointSize() <= 0:
-            nav_font.setPointSize(10)
-            self.navigationInterface.setFont(nav_font)
-
-        # TODO: add navigation items
-        startup_top_interface = None
-        if self._startup_target_index == 2 and self.additionalInterface is not None:
-            startup_top_interface = (self.additionalInterface, FIF.APPLICATION, self._ui_text('小工具', 'Tools'))
-        elif self._startup_target_index == 1 and self.homeInterface is not None:
-            startup_top_interface = (self.homeInterface, FIF.HOME, self._ui_text('日常', 'Daily'))
-        elif self.displayInterface is not None:
-            startup_top_interface = (self.displayInterface, FIF.PHOTO, self._ui_text('展示页', 'Display'))
-        elif self.homeInterface is not None:
-            startup_top_interface = (self.homeInterface, FIF.HOME, self._ui_text('日常', 'Daily'))
-        elif self.additionalInterface is not None:
-            startup_top_interface = (self.additionalInterface, FIF.APPLICATION, self._ui_text('小工具', 'Tools'))
-
-        if startup_top_interface is not None:
-            key = 'display'
-            if self._startup_target_index == 2:
-                key = 'additional'
-            elif self._startup_target_index == 1:
-                key = 'home'
-            self._register_nav_item(key, startup_top_interface[0], *startup_top_interface[1:])
-
-        self.support_button = self.navigationInterface.addItem(
-            routeKey='support',
-            icon=FIF.HEART,
-            text=self._to_traditional_if_needed(self._ui_text('赞赏', 'Support')),
-            onClick=self.onSupport,
-            selectable=False,
-            position=NavigationItemPosition.BOTTOM,
-        )
-
+        # 1. 基础 UI 设置
         self.navigationInterface.setCollapsible(True)
-        if hasattr(self, "navigationInterface"):
-            if hasattr(self.navigationInterface, "setExpandWidth"):
-                if is_non_chinese_ui_language():
-                    self.navigationInterface.setExpandWidth(220)
-                else:
-                    self.navigationInterface.setExpandWidth(170)
 
+        # 2. 侧边栏宽度控制
+        if self._is_non_chinese_ui:
+            self.navigationInterface.setExpandWidth(130)
+        else:
+            self.navigationInterface.setExpandWidth(100)
+
+        # 3. 恢复侧边栏折叠/展开记忆状态
         def _restore_nav_state():
-            if not hasattr(self, "navigationInterface") or self.navigationInterface is None:
-                return
-            is_currently_expanded = self.navigationInterface.width() > 100
             should_be_expanded = bool(config.nav_expanded.value)
-            if is_currently_expanded != should_be_expanded:
-                if should_be_expanded and hasattr(self.navigationInterface, "expand"):
-                    self.navigationInterface.expand()
-                elif hasattr(self.navigationInterface, "toggle"):
-                    self.navigationInterface.toggle()
+            if self.isSidebarExpanded() != should_be_expanded:
+                self.navigationInterface.expand() if should_be_expanded else self.navigationInterface.collapse()
 
         QTimer.singleShot(50, _restore_nav_state)
 
-        if self._startup_target_index == 2 and self.additionalInterface is not None:
+        if self._startup_target_index == 2:
+            self._create_additional_and_add_nav()
             self.stackedWidget.setCurrentWidget(self.additionalInterface, False)
-        elif self._startup_target_index == 1 and self.homeInterface is not None:
+        elif self._startup_target_index == 1:
+            self._create_home_and_add_nav()
             self.stackedWidget.setCurrentWidget(self.homeInterface, False)
-        elif self.displayInterface is not None:
+        else:
+            self._create_display_and_add_nav()
             self.stackedWidget.setCurrentWidget(self.displayInterface, False)
 
     def init_ocr(self):
@@ -474,29 +439,44 @@ class MainWindow(FluentWindow):
         # logger.info(f"区域截图识别每次平均耗时：{benchmark(ocr.run, 'app/resource/images/start_game/age.png')}")
 
     def initWindow(self):
-        self.resize(self.DEFAULT_WINDOW_WIDTH, self.DEFAULT_WINDOW_HEIGHT)
-        self.setMinimumSize(1000, 680)
-        base_dir = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parents[2]))
-        head_icon_path = base_dir / 'app/resource/images/logo.png'
-        self.setWindowIcon(QIcon(str(head_icon_path)))
-        self.setWindowTitle(self._ui_text('安卡希雅·自律姬', 'SaaAutomataAcacia'))
-
-        setThemeColor("#009FAA")
-
-        # 触发重绘，使一开始的背景颜色正确
-        # self.setCustomBackgroundColor(QColor(240, 244, 249), QColor(32, 32, 32))
-        # self.setBackgroundColor(QColor(240, 244, 249))
-        self.setMicaEffectEnabled(False)
-
+        # 1. 先读取上次保存的位置
         position = config.position.value
+        target_screen = None
+
+        # 2. 探明将要打开的屏幕
         if position:
-            self.move(position[0], position[1])
-            self.show()
+            # 检查这个坐标现在属于哪块屏幕
+            target_screen = QApplication.screenAt(QPoint(position[0], position[1]))
+
+        # 如果没有保存过位置，或者原来的副屏被拔掉了导致坐标悬空，安全回退到主屏
+        if target_screen is None:
+            target_screen = QApplication.primaryScreen()
+
+        # 3. 获取【目标屏幕】的可用几何区域，并以此计算比例
+        target_geo = target_screen.availableGeometry()
+
+        # 强制转为 int，防止 float 导致 Qt 报错
+        self.resize(int(target_geo.width() * 0.55), int(target_geo.height() * 0.8))
+        self.setMinimumSize(int(target_geo.width() * 0.5), int(target_geo.height() * 0.6))
+
+        # 4. 基础 UI 设置
+        base_dir = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parents[2]))
+        self.setWindowIcon(QIcon(str(base_dir / 'app/resource/images/logo.png')))
+        self.setWindowTitle(self._ui_text('安卡希雅·自律姬', 'SaaAutomataAcacia'))
+        setThemeColor("#009FAA")
+        self.setMicaEffectEnabled(False)
+        self.navigationInterface.setReturnButtonVisible(False)
+
+        # 5. 安排窗口就位
+        if position and target_screen == QApplication.screenAt(QPoint(position[0], position[1])):
+            self.move(*position)
         else:
-            desktop = QApplication.primaryScreen().availableGeometry()
-            w, h = desktop.width(), desktop.height()
-            self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
-            self.show()
+            # 如果是首次打开，或由于拔插显示器触发了回退，则在目标屏幕（此时为主屏）完美居中
+            rect = self.frameGeometry()
+            rect.moveCenter(target_geo.center())
+            self.move(rect.topLeft())
+
+        self.show()
         QApplication.processEvents()
 
     def resizeEvent(self, e):
@@ -504,88 +484,6 @@ class MainWindow(FluentWindow):
         if hasattr(self, 'splashScreen') and self.splashMovieLabel is not None:
             self.splashScreen.resize(self.size())
             self.splashMovieLabel.resize(self.splashScreen.size())
-
-    def _setup_splash_animation(self):
-        if not self._start_splash_movie_from_source(':/app/resource/images/logo_loading.gif'):
-            if not self._start_splash_movie_from_source(':/app/resource/images/loading.gif'):
-                base_dir = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parents[2]))
-                file_candidates = [
-                    base_dir / 'app/resource/images/logo_loading.gif',
-                    base_dir / 'app/resource/images/loading.gif',
-                    Path('app/resource/images/logo_loading.gif'),
-                    Path('app/resource/images/loading.gif'),
-                ]
-
-                gif_path = next((str(path) for path in file_candidates if path.exists()), None)
-                if not gif_path:
-                    return
-
-                self._start_splash_movie_from_source(gif_path)
-
-    def _start_splash_movie_from_source(self, source: str) -> bool:
-        movie = QMovie(source)
-        if not movie.isValid():
-            return False
-        movie.setCacheMode(QMovie.CacheNone)
-        movie.setScaledSize(self.SPLASH_MOVIE_SIZE)
-
-        self.splashMovie = movie
-        self._splashFrameRendered = False
-
-        self.splashScreen.setIconSize(QSize(0, 0))
-        self.splashScreen.iconWidget.hide()
-        self.splashMovieLabel = QLabel(self.splashScreen)
-        self.splashMovieLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.splashMovieLabel.resize(self.splashScreen.size())
-        self.splashMovieLabel.setMinimumSize(self.SPLASH_MOVIE_SIZE)
-        self.splashMovieLabel.setMovie(self.splashMovie)
-
-        self.splashMovie.frameChanged.connect(self._on_splash_movie_frame_changed)
-        self.splashMovie.error.connect(self._on_splash_movie_error)
-
-        self.splashMovieFallbackTimer = QTimer(self)
-        self.splashMovieFallbackTimer.setSingleShot(True)
-        self.splashMovieFallbackTimer.timeout.connect(self._on_splash_movie_timeout)
-
-        self.splashMovie.start()
-        self.splashMovieFallbackTimer.start(1200)
-        self.splashMovieLabel.raise_()
-        self.splashMovieLabel.show()
-        logger.info(f'启动动画已启用：{source}')
-        return True
-
-    def _on_splash_movie_frame_changed(self, frame_number):
-        if frame_number >= 0 and not self._splashFrameRendered:
-            self._splashFrameRendered = True
-            if self.splashMovieFallbackTimer is not None and self.splashMovieFallbackTimer.isActive():
-                self.splashMovieFallbackTimer.stop()
-
-    def _on_splash_movie_error(self, _error):
-        self._fallback_to_static_splash('GIF 播放错误')
-
-    def _on_splash_movie_timeout(self):
-        if not self._splashFrameRendered:
-            self._fallback_to_static_splash('GIF 首帧超时')
-
-    def _fallback_to_static_splash(self, reason: str):
-        if self.splashMovieFallbackTimer is not None:
-            self.splashMovieFallbackTimer.stop()
-            self.splashMovieFallbackTimer.deleteLater()
-            self.splashMovieFallbackTimer = None
-
-        if self.splashMovie is not None:
-            self.splashMovie.stop()
-            self.splashMovie = None
-
-        if self.splashMovieLabel is not None:
-            self.splashMovieLabel.hide()
-            self.splashMovieLabel.deleteLater()
-            self.splashMovieLabel = None
-
-        self._splashFrameRendered = False
-        self.splashScreen.iconWidget.show()
-        self.splashScreen.setIconSize(self.SPLASH_ICON_SIZE)
-        logger.warning(f'启动动画不可用，已回退静态 logo：{reason}')
 
     def _finish_splash_screen(self):
         if self.splashMovie is not None and self.splashShownAt is not None:
@@ -617,6 +515,10 @@ class MainWindow(FluentWindow):
         if hasattr(self, 'splashScreen'):
             self.splashScreen.finish()
 
+        ocr_thread = threading.Thread(target=self.init_ocr)
+        ocr_thread.daemon = True
+        ocr_thread.start()
+
     # def update_ring(self, value, speed):
     #     self.progressRing.setValue(value)
     #     self.speed.setText(speed)
@@ -634,27 +536,6 @@ class MainWindow(FluentWindow):
 
     def cancel_click(self):
         self.close()
-
-    def onSupport(self):
-        support_image = "asset/support.jpg"
-        if self._is_non_chinese_ui or is_traditional_ui_language():
-            support_image = "asset/support_kofi.png"
-        view = FlyoutView(
-            title=self._ui_text("赞助作者", "Support Author"),
-            content=self._ui_text("如果这个助手帮助到你，可以考虑赞助作者一杯奶茶(>ω･* )ﾉ",
-                                  "If this assistant helps you, consider buying the author a coffee (>ω･* )ﾉ"),
-            image=support_image,
-            isClosable=True,
-        )
-        view.widgetLayout.insertSpacing(1, 5)
-        view.widgetLayout.addSpacing(5)
-
-        target = self.support_button if self.support_button is not None else self.navigationInterface
-        w = Flyout.make(view, target, self)
-        view.closed.connect(w.close)
-
-    def _ui_text(self, zh_text: str, en_text: str) -> str:
-        return en_text if self._is_non_chinese_ui else self.tr(zh_text)
 
     def switchToSample(self, routeKey, index):
         """
@@ -756,8 +637,7 @@ class MainWindow(FluentWindow):
         self.themeListener.terminate()
         self.themeListener.deleteLater()
         if hasattr(self, "navigationInterface") and self.navigationInterface is not None:
-            is_expanded = self.navigationInterface.width() > 100
-            config.set(config.nav_expanded, is_expanded)
+            config.set(config.nav_expanded, self.isSidebarExpanded())
         try:
             # 保存日志到文件
             self.save_log()
@@ -772,11 +652,6 @@ class MainWindow(FluentWindow):
 
     def changeEvent(self, event):
         super().changeEvent(event)
-        if event.type() in [event.Type.LanguageChange, event.Type.FontChange, event.Type.ApplicationFontChange]:
-            app_font = QApplication.font()
-            if app_font.pointSize() <= 0:
-                app_font.setPointSize(10)
-                QApplication.setFont(app_font)
 
     def _onThemeChangedFinished(self):
         super()._onThemeChangedFinished()
@@ -791,8 +666,6 @@ class MainWindow(FluentWindow):
             w.scrollToAboutCard()
             if self.updater:
                 self.settingInterface.start_download(self.updater)
-        else:
-            pass
 
     def showScreenshot(self, screenshot):
         """
@@ -801,15 +674,8 @@ class MainWindow(FluentWindow):
         :return:
         """
         def ndarray_to_qpixmap(ndarray):
-            if self.numpy_module is None:
-                import numpy as np
-                self.numpy_module = np
-            if self.cv2_module is None:
-                import cv2
-                self.cv2_module = cv2
-
-            np = self.numpy_module
-            cv2 = self.cv2_module
+            import numpy as np
+            import cv2
 
             # 确保ndarray是3维的 (height, width, channels)
             if ndarray.ndim == 2:

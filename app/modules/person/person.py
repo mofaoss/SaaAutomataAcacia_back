@@ -145,61 +145,57 @@ class PersonModule:
 
     def use_chip(self):
         """
-        使用记忆嵌片
-        :return:
+        使用记忆嵌片：固定使用 2 片
+        :return: bool 是否成功使用
         """
-        valid_characters = [c for c in self.character_list if c != '']
-        char_count = len(valid_characters)
-        if char_count <= 2:
-            self.no_chip = True
-            return False
-
         timeout = Timer(20).start()
-        confirm_flag = False
+
         while True:
             self.auto.take_screenshot()
 
-            # 道具不足，返回false
-            if self.auto.find_element('没有该类道具', 'text', crop=(821 / 1920, 511 / 1080, 1092 / 1920, 568 / 1080),
-                                      is_log=self.is_log):
+            # 1. 检查是否提示“没有该类道具”（即碎片/嵌片已经彻底用光）
+            if self.auto.find_element('没有该类道具', 'text', crop=(821 / 1920, 511 / 1080, 1092 / 1920, 568 / 1080), is_log=self.is_log):
+                self.logger.warning("记忆嵌片已用尽")
                 self.no_chip = True
                 return False
-            # 未点到加号
-            if self.auto.find_element("记忆嵌片", "text", crop=(803 / 1920, 275 / 1080, 991 / 1920, 346 / 1080),
-                                      is_log=self.is_log):
+
+            # 2. 检查是否在补充对话框内（通过识别“是否”关键字）
+            if self.auto.find_element("是否", "text", crop=(588 / 1920, 309 / 1080, 1324 / 1920, 384 / 1080), is_log=self.is_log):
+                self.logger.info("已打开补充对话框，准备使用 2 片记忆嵌片")
+
+                # 核心修改：固定点击加号 2 次（1235, 624 为对话框内加号的坐标）
+                for _ in range(2):
+                    self.auto.click_element_with_pos(pos=(int(1235 / self.auto.scale_x), int(624 / self.auto.scale_y)))
+                    time.sleep(0.2)
+
+                # 点击确定
+                self.auto.click_element('确定', 'text', crop=(1353 / 1920, 729 / 1080, 1528 / 1920, 800 / 1080), is_log=self.is_log)
+                time.sleep(1)
+
+                # 确认后按 ESC 关闭可能弹出的“获得物品”提示框
+                self.auto.press_key('esc')
+                time.sleep(1)
+                return True
+
+            # 3. 容错处理：如果不小心点到了物品详情（而不是右上角的加号）
+            if self.auto.find_element("记忆嵌片", "text", crop=(803 / 1920, 275 / 1080, 991 / 1920, 346 / 1080), is_log=self.is_log):
+                self.logger.debug("未点到加号（点成了物品详情），按 ESC 退出重试")
                 self.auto.press_key('esc')
                 time.sleep(0.5)
                 continue
-            if self.auto.find_element("是否", "text", crop=(588 / 1920, 309 / 1080, 1324 / 1920, 384 / 1080),
-                                      is_log=self.is_log):
-                confirm_flag = True
-            if confirm_flag:
-                if self.auto.find_element('最大', 'text', crop=(1722 / 2560, 797 / 1440, 1848 / 2560, 867 / 1440),
-                                           is_log=self.is_log):
-                    click_times = 0
-                    if char_count == 3:
-                        click_times = 2
-                    elif char_count == 4:
-                        click_times = 4
-                    for _ in range(click_times):
-                        self.auto.click_element_with_pos(pos=(int(1235 / self.auto.scale_x), int(624 / self.auto.scale_y)))
-                        time.sleep(0.2)
 
-                    self.auto.click_element('确定', 'text', crop=(1353 / 1920, 729 / 1080, 1528 / 1920, 800 / 1080),
-                                            is_log=self.is_log)
-                    self.auto.press_key('esc')
-                    time.sleep(1)
-                    return True
-            # 点添加嵌片
-            if self.auto.find_element("故事", "text", crop=(786 / 1920, 985 / 1080, 1022 / 1920, 1069 / 1080),
-                                      is_log=self.is_log):
+            # 4. 如果在列表界面，点击右上角的“+”号打开补充对话框
+            if self.auto.find_element("故事", "text", crop=(786 / 1920, 985 / 1080, 1022 / 1920, 1069 / 1080), is_log=self.is_log):
+                self.logger.info("点击右上角加号补充体力")
+                # 1574, 50 为右上角加号的坐标
                 self.auto.click_element_with_pos(pos=(int(1574 / self.auto.scale_x), int(50 / self.auto.scale_y)))
-                time.sleep(0.5)
+                time.sleep(1)
                 continue
+
+            # 5. 超时判断
             if timeout.reached():
                 self.logger.error("使用记忆嵌片超时")
-                if confirm_flag:
-                    self.auto.press_key('esc')
+                self.auto.press_key('esc')
                 return False
 
     def scroll_page(self, direction: int = 1, page=1):

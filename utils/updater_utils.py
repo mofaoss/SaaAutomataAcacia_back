@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import re
 import threading
 import time
@@ -10,6 +11,7 @@ from packaging.version import parse as parse_version
 
 # Lock to prevent concurrent API calls during startup
 _fetch_lock = threading.Lock()
+logger = logging.getLogger(__name__)
 
 
 def _resolve_proxies(proxies: Optional[Dict[str, str]]) -> Optional[Dict[str, str]]:
@@ -172,19 +174,15 @@ def get_github_release_channels(
                     return result
 
             elif response.status_code in (403, 429):
-                from app.common.logger import logger
                 logger.error(f"GitHub API {response.status_code} Rate Limit hit! Using fallback.")
             else:
-                from app.common.logger import logger
                 logger.error(f"GitHub API Error {response.status_code}: {response.text}")
 
         except Exception as e:
-            from app.common.logger import logger
             logger.error(f"GitHub API Connection Error: {e}")
 
     # 3. Fallback: If API failed, try to use expired config cache
     if "data" in cached_obj and cached_obj["data"].get("latest"):
-        from app.common.logger import logger
         logger.warning("Falling back to expired config cache due to API failure.")
         return cached_obj["data"]
 
@@ -215,23 +213,6 @@ def get_github_latest_release_version(repo_url: str) -> Optional[str]:
         return None
     version = (latest.get("version") or "").strip()
     return version or None
-
-
-def get_gitee_text(text_path: str, timeout: float = 5, proxies: Optional[Dict[str, str]] = None) -> Optional[list]:
-    proxies = _resolve_proxies(proxies)
-    if not text_path:
-        return None
-    url = f"https://gitee.com/laozhu520/auto_chenbai/raw/main/{text_path}"
-    headers = {"User-Agent": "SaaAutomataAcacia-Updater"}
-
-    try:
-        response = requests.get(url, headers=headers, timeout=timeout, proxies=proxies)
-        if response.status_code != 200:
-            return None
-        response.encoding = response.apparent_encoding
-        return response.text.splitlines()
-    except Exception:
-        return None
 
 
 def get_local_version(file_path="update_data.txt"):

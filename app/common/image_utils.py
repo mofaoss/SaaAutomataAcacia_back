@@ -5,7 +5,6 @@ import numpy as np
 import win32api
 import win32con
 import win32gui
-from skimage.metrics import structural_similarity as ssim
 
 
 def is_fullscreen(hwnd):
@@ -63,30 +62,41 @@ class ImageUtils:
     @staticmethod
     def calculate_ssim(image1, image2) -> float:
         """
-        计算两张图像的结构相似度（SSIM）。传入的两张图像需要长宽一致
+        计算两张图像的相似度。
 
         参数:
-        - image1: 第一张图像,一般为模板
-        - image2: 第二张图像，一般为target
+        - image1: 第一张图像路径或 numpy 数组, 一般为模板
+        - image2: 第二张图像路径或 numpy 数组, 一般为 target
 
         返回:
-        - SSIM值：0到1之间，值越接近1表示图像越相似。
+        - 相似度值：一般在 0 到 1 之间（极端不匹配可能为负），值越接近 1 表示图像越相似。
         """
         if isinstance(image1, str):
             image1 = cv2.imread(image1)
         if isinstance(image2, str):
             image2 = cv2.imread(image2)
-        # 确保图像是灰度图像，转换为灰度图
-        image1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
-        image2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
 
-        # 检查图像形状是否一致，如果不一致，将image2调整为image1的大小
+        if image1 is None or image2 is None:
+            return 0.0
+
+        # 确保图像是灰度图像，转换为灰度图
+        if len(image1.shape) == 3:
+            image1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+        if len(image2.shape) == 3:
+            image2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+
+        # 检查图像形状是否一致，如果不一致，将 image2 调整为 image1 的大小
         if image1.shape != image2.shape:
             image2 = cv2.resize(image2, (image1.shape[1], image1.shape[0]))
 
-        # 计算SSIM
-        similarity_index, _ = ssim(image1, image2, full=True)
-        return similarity_index
+        # 使用 OpenCV 的归一化相关系数匹配计算相似度
+        result = cv2.matchTemplate(image1, image2, cv2.TM_CCOEFF_NORMED)
+
+        # minMaxLoc 返回 (min_val, max_val, min_loc, max_loc)
+        # 归一化相关系数匹配中，最大值即为最佳匹配分数
+        _, max_val, _, _ = cv2.minMaxLoc(result)
+
+        return max_val
 
     @staticmethod
     def match_template(screenshot, template, mask=None, scale=(1, 1), match_method=cv2.TM_SQDIFF_NORMED, extract=None):

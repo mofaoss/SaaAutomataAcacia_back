@@ -19,7 +19,7 @@ from app.modules.operation_action.operation_action import OperationModule
 from app.modules.water_bomb.water_bomb import WaterBombModule
 from app.modules.capture_pals.capture_pals import CapturePalsModule
 from app.view.additional_features_view import AdditionalFeaturesView
-from app.view.base_interface import BaseInterface
+from .base_interface import BaseInterface
 from app.view.subtask import AdjustColor, SubTask
 
 
@@ -99,12 +99,12 @@ class Additional(QFrame, BaseInterface):
         self.BodyLabel_tip_fish.setText(
             "### Tips\n* Side mouse buttons are not supported in background mode\n* Use analyst for fishing character, otherwise it may fail\n* Configure cast key, fishing times and lure type in game first\n* Daily limit: rare spot 25, epic spot 50, normal spot unlimited\n* Move to next fishing spot manually after one spot is exhausted\n* If yellow block detection is abnormal, recalibrate HSV color\n"
             if self._is_non_chinese_ui else
-            "### 提示\n* 为实现纯后台，现已不支持鼠标侧键\n* 钓鱼角色选择分析员，否则无法正常工作\n* 根据游戏右下角手动设置好抛竿按键、钓鱼次数和鱼饵类型后再点开始\n* 珍奇钓鱼点每天最多钓25次\n* 稀有钓鱼点每天最多钓50次\n* 普通钓鱼点无次数限制\n* 当一个钓鱼点钓完后需要手动移动到下一个钓鱼点，进入钓鱼界面后再启动一次\n* 当黄色块数异常时尝试上面的校准HSV，钓鱼出现圆环时点`校准颜色`，然后点黄色区域\n"
+            "### 提示\n* 为实现纯后台，现已不支持鼠标侧键\n* 钓鱼角色选择分析员，否则无法正常工作\n* 根据游戏右下角手动设置好抛竿按键、钓鱼次数和鱼饵类型后再点开始\n* 珍奇钓点系统上限25次/天； 稀有钓点上限50次/天； 普通钓点无限制\n* 一个钓点钓完后需手动移动下一个钓鱼点再启动脚本\n* 黄色块异常时请校准HSV，钓鱼出现圆环时点`校准颜色`，再点黄色区域\n"
         )
         self.BodyLabel_tip_action.setText(
             "### Tips\n* Auto-run operation from the lobby page\n* Repeats the first training stage for specified times with no stamina cost\n* Useful for weekly pass mission count"
             if self._is_non_chinese_ui else
-            "### 提示\n* 自动完成常规行动，在看板娘页面点击开始\n* 重复刷指定次数实战训练第一关，不消耗体力\n* 用于完成凭证20次常规行动周常任务"
+            "### 提示\n* 自动完成无体力常规行动\n* 重复刷指定次数实战训练第一关，不消耗体力\n* 用于完成凭证20次常规行动周常任务"
         )
         self.BodyLabel_tip_water.setText(
             self._ui_text(
@@ -119,8 +119,8 @@ class Additional(QFrame, BaseInterface):
         )
         self.BodyLabel_tip_maze.setText(
             self._ui_text(
-                "### 提示\n* 本功能只适用于增益迷宫（新迷宫），而非老迷宫\n* 运行模式中单次运行适合打前3关，重复运行则是一直刷最后一关\n* 进配队界面选好增益后再点击安卡希雅·自律姬的开始迷宫\n* 增益推荐配技能-爆电和护盾-夺取\n* 配队必须要有辰星-琼弦，且把角色放在中间位\n* 辅助有豹豹上豹豹防止暴毙",
-                "### Tips\n* This feature only supports the new Buff Maze, not the old maze\n* Single Run is suitable for first 3 stages; Repeat Run keeps farming the last stage\n* Select buffs in team setup first, then click Start Maze in SaaAutomataAcacia\n* Recommended buffs: Skill-Chain Lightning and Shield-Steal\n* Team must include Chenxing - Qiongxian in the middle slot\n* Bring a strong support unit to reduce sudden deaths"
+                "### 提示\n* 本功能只适用于增益迷宫（新迷宫），而非老迷宫\n* 运行模式中单次运行适合打前3关，重复运行则是一直刷最后一关\n* 进配队界面选好增益后再让安卡希雅的开始迷宫\n* 增益推荐配技能-爆电和护盾-夺取\n* 配队必须要有辰星-琼弦，且把角色放在中间位\n* 辅助有豹豹上豹豹防止暴毙",
+                "### Tips\n* This feature only supports the new Buff Maze, not the old maze\n* Single Run is suitable for first 3 stages; Repeat Run keeps farming the last stage\n* Select buffs in team setup first, then click Start Maze in Acacia\n* Recommended buffs: Skill-Chain Lightning and Shield-Steal\n* Team must include Chenxing - Qiongxian in the middle slot\n* Bring a strong support unit to reduce sudden deaths"
             )
         )
         self.BodyLabel_tip_card.setText(
@@ -134,20 +134,16 @@ class Additional(QFrame, BaseInterface):
             "* Auto-capture pals based on community strategy\n"
             "* Configure support skill key to C before running\n"
             "* Ensure full-screen 16:9 and stay on Partner/Adventure island selection page\n"
-            "* Both islands support Fixed-point mode and Patrol mode\n"
             "* Patrol mode exits and re-enters map each cycle to refresh targets\n"
-            "* If surrender fails repeatedly, check your location and UI page\n"
             if self._is_non_chinese_ui else
             "### 提示\n"
             "* 通过视频BV1SV8wzjEpE和BV1SV8wzjEpE的抓捕思路实现\n"
-            "* 本功能用于自动抓帕鲁，需要携带有高伤害满级召雷+碎冰冰/布防的帕鲁来秒杀敌人，比如武装会员，爆破会员等\n"
+            "* 需要携带有高伤害满级召雷+碎冰冰/布防的帕鲁如武装，爆破会员来秒杀\n"
             "* 抓帕鲁前请确保已在游戏内设置好狂猎支援技快捷键为 C 键\n"
             "* 启动前请确保当前是全屏模式16：9并且界面在选择伙伴岛/探险岛页面\n"
-            "* 伙伴岛/探险岛可分别选择：定点抓帕鲁 或 巡逻抓帕鲁\n"
             "* 定点抓帕鲁：进图后按狂猎支援技C再尝试按 F 进行抓取；按设定间隔循环\n"
             "* 巡逻抓帕鲁：每次抓完会 ESC 退出地图并重新进入，以刷新巡逻帕鲁\n"
-            "* 同步抓帕鲁：双岛同时勾选时，按“各自间隔周期”在两岛间切换；某一岛抓完后会自动只刷未完成的岛\n"
-            "* 若多次劝降失败会提示你检查抓帕鲁地点/界面是否正确\n"
+            "* 同步抓帕鲁：双岛同时勾选，按“各自周期”在两岛间切换；一岛结束会只刷另一岛\n"
         )
 
 
@@ -270,7 +266,7 @@ class Additional(QFrame, BaseInterface):
                 children.valueChanged.connect(
                     partial(self.save_changed, children))
 
-    def save_changed(self, widget):
+    def save_changed(self, widget, *args, **kwargs):
         if isinstance(widget, SpinBox):
             config.set(getattr(config, widget.objectName(), None),
                        widget.value())
@@ -326,9 +322,6 @@ class Additional(QFrame, BaseInterface):
         else:
             self.logger.error(self._ui_text("保存失败，输入不符合“int,int,int”的格式", "Save failed: input format must be int,int,int"))
         return False
-
-    def _ui_text(self, zh_text: str, en_text: str) -> str:
-        return en_text if self._is_non_chinese_ui else zh_text
 
     def _apply_static_i18n(self):
         self.TitleLabel.setText(self._ui_text("日志", "Log"))
@@ -598,3 +591,8 @@ class Additional(QFrame, BaseInterface):
             self.set_simple_card_enable(self.SimpleCardWidget_capture_pals, True)
             self.PushButton_start_capture_pals.setText(self._ui_text('开始抓帕鲁', 'Start Capture Pals'))
             self.is_running_capture_pals = False
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        # 只要切回这个页面，就强制从 config 重新读取一次最新数据覆盖 UI
+        self._load_config()

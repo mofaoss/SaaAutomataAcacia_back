@@ -1,11 +1,15 @@
+import logging
+
 import cv2
 import numpy as np
 from PySide6.QtCore import QThread, Signal
 import win32gui
 from app.common.config import config
-from app.common.logger import logger
 from app.modules.base_task.base_task import BaseTask
 from app.modules.ocr import ocr
+
+
+logger = logging.getLogger(__name__)
 
 
 class SubTask(QThread, BaseTask):
@@ -13,7 +17,7 @@ class SubTask(QThread, BaseTask):
 
     def __init__(self, module):
         super().__init__()
-        self.run = False  # 用于判断是否正常结束
+        self._is_running_flag = False  # 用于判断是否正常结束
         if not self.init_auto('game'):
             return
         self.logger = logger
@@ -23,7 +27,7 @@ class SubTask(QThread, BaseTask):
         if self.auto:
             self.auto.reset()
             self.is_running.emit(True)
-            self.run = True
+            self._is_running_flag = True
             try:
                 self.module.run()
             except Exception as e:
