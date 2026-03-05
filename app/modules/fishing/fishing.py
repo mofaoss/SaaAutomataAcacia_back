@@ -4,7 +4,7 @@ from datetime import datetime
 
 import cv2
 import numpy as np
-from fuzzywuzzy import process
+from rapidfuzz import process
 
 from app.common.config import config
 from app.common.signal_bus import signalBus
