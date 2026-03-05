@@ -234,7 +234,7 @@ class MainWindow(FluentWindow, BaseInterface):
             'table',
             self.tableInterface,
             FIF.SYNC,
-            self._ui_text('替换', 'OCR'),
+            self._ui_text('词表', 'OCR'),
             position=NavigationItemPosition.BOTTOM,
         )
 
