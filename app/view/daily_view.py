@@ -268,8 +268,23 @@ class SharedSchedulingPanel(QWidget):
 
         main_layout.addLayout(activation_row)
 
-        exec_title = "Execution Triggers (Add multiple times)" if is_non_chinese_ui else "执行策略（可添加多个时间点）"
-        main_layout.addWidget(StrongBodyLabel(exec_title, self))
+        exec_title_layout = QHBoxLayout()
+        exec_title_layout.setContentsMargins(0, 0, 0, 0)
+        exec_title_layout.setSpacing(8)
+
+        exec_title_text = "Execution Triggers" if is_non_chinese_ui else "时间范围（当天）："
+        self.exec_title_label = StrongBodyLabel(exec_title_text, self)
+
+        self.add_btn = ToolButton(FIF.ADD, self)
+        self.add_btn.setToolTip("Add Trigger" if is_non_chinese_ui else "添加时间")
+        self.add_btn.setFixedSize(28, 28)
+        self.add_btn.clicked.connect(lambda: self._add_rule({}))
+
+        exec_title_layout.addWidget(self.exec_title_label)
+        exec_title_layout.addWidget(self.add_btn)
+        exec_title_layout.addStretch(1)
+
+        main_layout.addLayout(exec_title_layout)
 
         self.rules_scroll = ScrollArea(self)
         self.rules_scroll.setWidgetResizable(True)
@@ -283,15 +298,8 @@ class SharedSchedulingPanel(QWidget):
         self.rules_layout.addStretch(1)
 
         self.rules_scroll.setWidget(self.rules_widget)
+        # 修改：滚动区域将自动填满剩余的底部空间
         main_layout.addWidget(self.rules_scroll, 1)
-
-        add_text = "Add Trigger" if is_non_chinese_ui else "添加时间"
-        self.add_btn = PushButton(FIF.ADD, add_text, self)
-        btn_font = self.add_btn.font()
-        btn_font.setPointSize(10)
-        self.add_btn.setFont(btn_font)
-        self.add_btn.clicked.connect(lambda: self._add_rule({}))
-        main_layout.addWidget(self.add_btn)
 
         self.enable_checkbox.stateChanged.connect(self._emit_change)
 
@@ -304,12 +312,8 @@ class SharedSchedulingPanel(QWidget):
 
     def _add_activation_rule(self, data):
         w = ExecutionRuleWidget(self.is_non_chinese_ui, self)
-
-        # 整体隐藏
         w.set_runs_visible(False)
-
         w.runs_edit.setText("1")
-
         w.delete_btn.setVisible(False)
         w.delete_btn.setEnabled(False)
         w.deleted.connect(self._remove_activation_rule)
