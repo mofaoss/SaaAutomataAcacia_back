@@ -1,11 +1,10 @@
 import copy
 import logging
 import os
-import re
 import sys
 import time
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import partial
 from typing import Dict, Any, List
 
@@ -1041,14 +1040,42 @@ class Daily(QFrame, BaseInterface):
             )
 
     def record_task_completed(self, task_id: str):
-        """当某个任务成功执行完毕后，更新它的 last_run 时间戳并保存"""
+        """当某个任务成功执行完毕后，更新 last_run 和 执行次数(run_count)"""
         sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
+        now = datetime.now()
+        now_ts = time.time()
+
         for task_cfg in sequence:
             if task_cfg.get("id") == task_id:
-                task_cfg["last_run"] = time.time()  # 记录当前时间戳
+                last_run_ts = task_cfg.get("last_run", 0)
+                last_run_dt = datetime.fromtimestamp(last_run_ts) if last_run_ts else datetime.min
+
+                # 取出当前任务设定的触发时间（比如 05:00）
+                execution_rules = task_cfg.get("execution_config", [{"time": "05:00"}])
+                rule = execution_rules[0] if execution_rules else {"time": "05:00"}
+                rule_time = str(rule.get("time", "05:00"))
+                try:
+                    hour, minute = map(int, rule_time.split(":"))
+                except ValueError:
+                    hour, minute = 5, 0
+
+                # 算出本周期的逻辑触发时间点
+                trigger_time = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+                if now < trigger_time:
+                    # 如果现在是凌晨 3 点，而刷新时间是 5 点，说明现在属于“昨天”的周期
+                    trigger_time -= timedelta(days=1)
+
+                # 判断是不是新的一轮
+                if last_run_dt < trigger_time:
+                    task_cfg["run_count"] = 1  # 跨过了刷新时间，重置为 1
+                else:
+                    task_cfg["run_count"] = task_cfg.get("run_count", 0) + 1  # 还在周期内，次数累加
+
+                task_cfg["last_run"] = now_ts
+                self.logger.info(f"已记录任务 [{task_id}] 完成，当前周期已执行 {task_cfg['run_count']} 次。")
                 break
+
         self._save_task_sequence(sequence)
-        self.logger.info(f"已记录任务 [{task_id}] 的最后执行时间，本轮不会再重复执行。")
 
     def handle_start(self, str_flag):
         try:
@@ -1160,9 +1187,9 @@ class Daily(QFrame, BaseInterface):
         if now is None:
             now = datetime.now()
 
-        # === 新增：提取上次执行的时间 ===
         last_run_ts = task_config.get("last_run", 0)
         last_run_dt = datetime.fromtimestamp(last_run_ts) if last_run_ts else datetime.min
+        run_count = task_config.get("run_count", 0)
 
         def _normalize_rules(value, default_rules):
             if value is None:
@@ -1196,32 +1223,38 @@ class Daily(QFrame, BaseInterface):
             if target_minutes is None:
                 return False
 
-            # === 修改逻辑：计算出“今天”设定的触发时间点 ===
+            # 1. 计算当前的周期边界 (修复凌晨执行判定bug)
             trigger_time = now.replace(hour=target_minutes // 60, minute=target_minutes % 60, second=0, microsecond=0)
-
-            # 1. 如果现在的时间还没到设定的触发时间，不执行
             if now < trigger_time:
-                return False
+                trigger_time -= timedelta(days=1)
 
-            # 2. 如果上次执行的时间，晚于或等于今天的触发时间，说明今天已经跑过了，不执行！
+            # 2. 读取 schedule 中设定的最大执行次数
+            max_runs = int(rule.get("max_runs", 1))
+
+            # 3. 如果上次执行的时间在这个周期内，判断是否达到了次数上限
             if last_run_dt >= trigger_time:
-                return False
-            # ============================================
+                if run_count >= max_runs:
+                    return False # 已经做满规定的次数了，拦住！
 
+            # 4. 星期 / 月份 的校验
             if rule_type == "weekly":
                 try:
-                    return now.weekday() == int(rule.get("day", 0))
+                    # 注意：如果 now < 设定的 trigger_time，此时逻辑上应该算“昨天”是周几
+                    logical_now = now if now >= trigger_time else now - timedelta(days=1)
+                    return logical_now.weekday() == int(rule.get("day", 0))
                 except (TypeError, ValueError):
                     return False
 
             if rule_type == "monthly":
                 try:
-                    return now.day == int(rule.get("day", 1))
+                    logical_now = now if now >= trigger_time else now - timedelta(days=1)
+                    return logical_now.day == int(rule.get("day", 1))
                 except (TypeError, ValueError):
                     return False
 
             return True
 
+        default_rules = [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}]
         default_rules = [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}]
         activation_config = task_config.get("activation_config")
         if activation_config is None:
