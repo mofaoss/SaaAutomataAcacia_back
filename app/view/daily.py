@@ -58,7 +58,7 @@ TASK_REGISTRY = {
         "module_class": CollectSuppliesModule,
         "ui_page_index": 1,
         "option_key": "CheckBox_stamina_2",
-        "zh_name": "领取物资",
+        "zh_name": "领取福利",
         "en_name": "Collect Supplies",
     },
     "task_shop": {
@@ -72,7 +72,7 @@ TASK_REGISTRY = {
         "module_class": UsePowerModule,
         "ui_page_index": 3,
         "option_key": "CheckBox_use_power_4",
-        "zh_name": "刷体力",
+        "zh_name": "体力扫荡",
         "en_name": "Use Stamina",
     },
     "task_shards": {
@@ -100,7 +100,7 @@ TASK_REGISTRY = {
         "module_class": GetRewardModule,
         "ui_page_index": 6,
         "option_key": "CheckBox_reward_7",
-        "zh_name": "领取奖励",
+        "zh_name": "收取奖励",
         "en_name": "Claim Rewards",
     },
 }
@@ -282,10 +282,10 @@ class Daily(QFrame, BaseInterface):
 
         # 定义翻译字典
         self.setting_name_list = [
-            self._ui_text('登录', 'Login'), self._ui_text('物资', 'Supplies'),
+            self._ui_text('登录', 'Login'), self._ui_text('福利', 'Supplies'),
             self._ui_text('商店', 'Shop'), self._ui_text('体力', 'Stamina'),
-            self._ui_text('碎片', 'Shards'), self._ui_text('精神拟境', 'Neural Simulation'),
-            self._ui_text('领取奖励', 'Claim Rewards'),
+            self._ui_text('碎片', 'Shards'), self._ui_text('拟境', 'Neural Simulation'),
+            self._ui_text('奖励', 'Claim Rewards'),
             self._ui_text('常规行动', 'Operation'),
         ]
 
