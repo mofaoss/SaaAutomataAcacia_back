@@ -160,6 +160,7 @@ class Config(QConfig):
     CheckBox_person_5    = ConfigItem("home_interface_option", "CheckBox_person", False, BoolValidator())
     CheckBox_chasm_6     = ConfigItem("home_interface_option", "CheckBox_chasm", False, BoolValidator())
     CheckBox_reward_7    = ConfigItem("home_interface_option", "CheckBox_reward", False, BoolValidator())
+    CheckBox_weapon_8    = ConfigItem("home_interface_option", "CheckBox_weapon_8", False, BoolValidator())
 
     ComboBox_after_use   = OptionsConfigItem("home_interface_after_use", "ComboBox_after_use", 0, OptionsValidator([-1, 0, 1, 2, 3]))
 
@@ -254,8 +255,8 @@ class Config(QConfig):
             },
             {
                 "id": "task_chasm", "enabled": False, "use_periodic": True, "last_run": 0,
-                "activation_config": [{"type": "weekly", "day": 0, "time": "05:00", "max_runs": 1}],
-                "execution_config":  [{"type": "weekly", "day": 0, "time": "05:00", "max_runs": 1}]
+                "activation_config": [{"type": "weekly", "day": 1, "time": "10:00", "max_runs": 1}],
+                "execution_config":  [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}]
             },
             {
                 "id": "task_operation", "enabled": False, "use_periodic": True, "last_run": 0,
@@ -266,6 +267,11 @@ class Config(QConfig):
                 "id": "task_reward", "enabled": False, "use_periodic": True, "last_run": 0,
                 "activation_config": [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}],
                 "execution_config":  [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}]
+            },
+            {
+                "id": "task_weapon", "enabled": False, "use_periodic": True, "last_run": 0,
+                "activation_config": [{"type": "weekly", "day": 0, "time": "05:00", "max_runs": 1}],
+                "execution_config":  [{"type": "weekly", "day": 0, "time": "05:00", "max_runs": 1}]
             }
         ]
     )

@@ -707,6 +707,19 @@ class OperationPage(BaseDailyPage):
         return line
 
 
+class WeaponUpgradePage(BaseDailyPage):
+    def __init__(self, parent=None):
+        super().__init__("page_weapon", parent=parent)
+
+        self.BodyLabel_weapon_tip = BodyLabel(self)
+        self.BodyLabel_weapon_tip.setObjectName("BodyLabel_weapon_tip")
+        self.BodyLabel_weapon_tip.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.BodyLabel_weapon_tip.setWordWrap(True)
+
+        self.main_layout.addWidget(self.BodyLabel_weapon_tip)
+        self.finalize()
+
+
 class DailyView(ScrollArea):
     def __init__(self, parent=None, is_non_chinese_ui=False):
         super().__init__(parent)
@@ -828,6 +841,7 @@ class DailyView(ScrollArea):
         self.page_chasm = ChasmPage(self.PopUpAniStackedWidget)
         self.page_reward = RewardPage(self.PopUpAniStackedWidget)
         self.page_operation = OperationPage(self.PopUpAniStackedWidget)
+        self.page_weapon = WeaponUpgradePage(self.PopUpAniStackedWidget)
 
         self.PopUpAniStackedWidget.addWidget(self.page_enter)
         self.PopUpAniStackedWidget.addWidget(self.page_collect)
@@ -837,6 +851,7 @@ class DailyView(ScrollArea):
         self.PopUpAniStackedWidget.addWidget(self.page_chasm)
         self.PopUpAniStackedWidget.addWidget(self.page_reward)
         self.PopUpAniStackedWidget.addWidget(self.page_operation)
+        self.PopUpAniStackedWidget.addWidget(self.page_weapon)
 
         layout.addWidget(self.TitleLabel_setting)
         layout.addWidget(self.PopUpAniStackedWidget, 1)
@@ -908,6 +923,9 @@ class DailyView(ScrollArea):
         self.BodyLabel_7 = self.page_operation.BodyLabel_7
         self.SpinBox_action_times = self.page_operation.SpinBox_action_times
         self.BodyLabel_tip_action = self.page_operation.BodyLabel_tip_action
+
+        # WeaponUpgradePage
+        self.BodyLabel_weapon_tip = self.page_weapon.BodyLabel_weapon_tip
 
     def _build_log_card(self):
         self.SimpleCardWidget = SimpleCardWidget(self.content_widget)
@@ -1063,3 +1081,9 @@ class DailyView(ScrollArea):
         ]
         for attr, zh, en in shop_items:
             getattr(self, attr).setText(self._ui_text(zh, en))
+
+        self.BodyLabel_weapon_tip.setText(
+            "### Tips\n* Auto-run weapon upgrade from the lobby\n* Consumes materials automatically"
+            if self.is_non_chinese_ui else
+            "### 提示\n* 自动执行武器升级流程\n* 将会自动选中并消耗背包内的经验材料"
+        )
