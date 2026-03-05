@@ -147,7 +147,7 @@ class ExecutionRuleWidget(QWidget):
             font.setPointSize(10)
             w.setFont(font)
 
-        self.label_after_time = BodyLabel("after, run" if is_non_chinese_ui else "后，执行", self)
+        self.label_after_time = BodyLabel("after, run" if is_non_chinese_ui else "后执行", self)
         self.label_times = BodyLabel("times" if is_non_chinese_ui else "次", self)
 
         layout.addWidget(self.freq_combo)

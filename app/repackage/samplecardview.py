@@ -16,23 +16,23 @@ class SampleCard(CardWidget):
         self.index = index
         self.routekey = routeKey
 
-        # 图标效果
+        # 图标效果 - 🟢 修复1：将 Effect 的 parent 绑定到 iconWidget 自身
         self.iconWidget = IconWidget(icon, self)
-        self.iconOpacityEffect = QGraphicsOpacityEffect(self)
-        self.iconOpacityEffect.setOpacity(0.8)  # 设置初始半透明度为不透明
+        self.iconOpacityEffect = QGraphicsOpacityEffect(self.iconWidget)
+        self.iconOpacityEffect.setOpacity(0.8)
         self.iconWidget.setGraphicsEffect(self.iconOpacityEffect)
 
-        # 标题文本效果
+        # 标题文本效果 - 🟢 修复1：绑定到 titleLabel
         self.titleLabel = QLabel(title, self)
         self.titleLabel.setStyleSheet("font-size: 16px; font-weight: 500;")
-        self.titleOpacityEffect = QGraphicsOpacityEffect(self)
-        self.titleOpacityEffect.setOpacity(0.8)  # 设置初始半透明度
+        self.titleOpacityEffect = QGraphicsOpacityEffect(self.titleLabel)
+        self.titleOpacityEffect.setOpacity(0.8)
         self.titleLabel.setGraphicsEffect(self.titleOpacityEffect)
 
-        # 内容文本效果
+        # 内容文本效果 - 🟢 修复1：绑定到 contentLabel
         self.contentLabel = QLabel(TextWrap.wrap(content, 45, False)[0], self)
-        self.contentOpacityEffect = QGraphicsOpacityEffect(self)
-        self.contentOpacityEffect.setOpacity(0.8)  # 设置初始半透明度
+        self.contentOpacityEffect = QGraphicsOpacityEffect(self.contentLabel)
+        self.contentOpacityEffect.setOpacity(0.8)
         self.contentLabel.setGraphicsEffect(self.contentOpacityEffect)
 
         self.hBoxLayout = QHBoxLayout(self)
@@ -60,22 +60,23 @@ class SampleCard(CardWidget):
 
     def mouseReleaseEvent(self, e):
         super().mouseReleaseEvent(e)
-        # print("触发了mouseReleaseEvent")
         signalBus.switchToSampleCard.emit(self.routekey, self.index)
 
     def enterEvent(self, event):
         super().enterEvent(event)
-        self.iconOpacityEffect.setOpacity(1)
-        self.titleOpacityEffect.setOpacity(1)
-        self.contentOpacityEffect.setOpacity(1)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)  # 设置鼠标指针为手形
+        # 🟢 修复2：悬浮时（需要100%不透明），直接禁用透明特效，切回原生渲染，彻底杜绝坐标脱节漂移！
+        self.iconOpacityEffect.setEnabled(False)
+        self.titleOpacityEffect.setEnabled(False)
+        self.contentOpacityEffect.setEnabled(False)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def leaveEvent(self, event):
         super().leaveEvent(event)
-        self.iconOpacityEffect.setOpacity(0.8)
-        self.titleOpacityEffect.setOpacity(0.8)
-        self.contentOpacityEffect.setOpacity(0.8)
-        self.setCursor(Qt.CursorShape.ArrowCursor)  # 恢复鼠标指针的默认形状
+        # 🟢 修复2：鼠标离开时，重新启用特效恢复 0.8 的半透明状态
+        self.iconOpacityEffect.setEnabled(True)
+        self.titleOpacityEffect.setEnabled(True)
+        self.contentOpacityEffect.setEnabled(True)
+        self.setCursor(Qt.CursorShape.ArrowCursor)
 
 
 class SampleCard_URL(CardWidget):
@@ -85,30 +86,26 @@ class SampleCard_URL(CardWidget):
         super().__init__(parent=parent)
         self.url = QUrl(url)
 
-        # 图标效果
         self.iconWidget = IconWidget(icon, self)
-        self.iconOpacityEffect = QGraphicsOpacityEffect(self)
-        self.iconOpacityEffect.setOpacity(0.8)  # 设置初始半透明度为不透明
+        self.iconOpacityEffect = QGraphicsOpacityEffect(self.iconWidget)
+        self.iconOpacityEffect.setOpacity(0.8)
         self.iconWidget.setGraphicsEffect(self.iconOpacityEffect)
 
-        # 标题文本效果
         self.titleLabel = QLabel(title, self)
         self.titleLabel.setStyleSheet("font-size: 16px; font-weight: 500;")
-        self.titleOpacityEffect = QGraphicsOpacityEffect(self)
-        self.titleOpacityEffect.setOpacity(0.8)  # 设置初始半透明度
+        self.titleOpacityEffect = QGraphicsOpacityEffect(self.titleLabel)
+        self.titleOpacityEffect.setOpacity(0.8)
         self.titleLabel.setGraphicsEffect(self.titleOpacityEffect)
 
-        # 内容文本效果
         self.contentLabel = QLabel(TextWrap.wrap(content, 45, False)[0], self)
-        self.contentOpacityEffect = QGraphicsOpacityEffect(self)
-        self.contentOpacityEffect.setOpacity(0.8)  # 设置初始半透明度
+        self.contentOpacityEffect = QGraphicsOpacityEffect(self.contentLabel)
+        self.contentOpacityEffect.setOpacity(0.8)
         self.contentLabel.setGraphicsEffect(self.contentOpacityEffect)
 
-        # 链接图标
         self.urlWidget = IconWidget(FluentIcon.LINK, self)
         self.urlWidget.setFixedSize(16, 16)
-        self.urlOpacityEffect = QGraphicsOpacityEffect(self)
-        self.urlOpacityEffect.setOpacity(0.8)  # 设置初始半透明度
+        self.urlOpacityEffect = QGraphicsOpacityEffect(self.urlWidget)
+        self.urlOpacityEffect.setOpacity(0.8)
         self.urlWidget.setGraphicsEffect(self.urlOpacityEffect)
 
         self.hBoxLayout = QHBoxLayout(self)
@@ -143,19 +140,19 @@ class SampleCard_URL(CardWidget):
 
     def enterEvent(self, event):
         super().enterEvent(event)
-        self.iconOpacityEffect.setOpacity(1)
-        self.titleOpacityEffect.setOpacity(1)
-        self.contentOpacityEffect.setOpacity(1)
-        self.urlOpacityEffect.setOpacity(1)
-        self.setCursor(Qt.CursorShape.PointingHandCursor)  # 设置鼠标指针为手形
+        self.iconOpacityEffect.setEnabled(False)
+        self.titleOpacityEffect.setEnabled(False)
+        self.contentOpacityEffect.setEnabled(False)
+        self.urlOpacityEffect.setEnabled(False)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def leaveEvent(self, event):
         super().leaveEvent(event)
-        self.iconOpacityEffect.setOpacity(0.8)
-        self.titleOpacityEffect.setOpacity(0.8)
-        self.contentOpacityEffect.setOpacity(0.8)
-        self.urlOpacityEffect.setOpacity(0.8)
-        self.setCursor(Qt.CursorShape.ArrowCursor)  # 恢复鼠标指针的默认形状
+        self.iconOpacityEffect.setEnabled(True)
+        self.titleOpacityEffect.setEnabled(True)
+        self.contentOpacityEffect.setEnabled(True)
+        self.urlOpacityEffect.setEnabled(True)
+        self.setCursor(Qt.CursorShape.ArrowCursor)
 
 
 class SampleCard_Switch(CardWidget):
@@ -166,18 +163,18 @@ class SampleCard_Switch(CardWidget):
         self.on_toggle = on_toggle
 
         self.iconWidget = IconWidget(icon, self)
-        self.iconOpacityEffect = QGraphicsOpacityEffect(self)
+        self.iconOpacityEffect = QGraphicsOpacityEffect(self.iconWidget)
         self.iconOpacityEffect.setOpacity(0.8)
         self.iconWidget.setGraphicsEffect(self.iconOpacityEffect)
 
         self.titleLabel = QLabel(title, self)
         self.titleLabel.setStyleSheet("font-size: 16px; font-weight: 500;")
-        self.titleOpacityEffect = QGraphicsOpacityEffect(self)
+        self.titleOpacityEffect = QGraphicsOpacityEffect(self.titleLabel)
         self.titleOpacityEffect.setOpacity(0.8)
         self.titleLabel.setGraphicsEffect(self.titleOpacityEffect)
 
         self.contentLabel = QLabel(TextWrap.wrap(content, 45, False)[0], self)
-        self.contentOpacityEffect = QGraphicsOpacityEffect(self)
+        self.contentOpacityEffect = QGraphicsOpacityEffect(self.contentLabel)
         self.contentOpacityEffect.setOpacity(0.8)
         self.contentLabel.setGraphicsEffect(self.contentOpacityEffect)
 
@@ -228,16 +225,16 @@ class SampleCard_Switch(CardWidget):
 
     def enterEvent(self, event):
         super().enterEvent(event)
-        self.iconOpacityEffect.setOpacity(1)
-        self.titleOpacityEffect.setOpacity(1)
-        self.contentOpacityEffect.setOpacity(1)
+        self.iconOpacityEffect.setEnabled(False)
+        self.titleOpacityEffect.setEnabled(False)
+        self.contentOpacityEffect.setEnabled(False)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def leaveEvent(self, event):
         super().leaveEvent(event)
-        self.iconOpacityEffect.setOpacity(0.8)
-        self.titleOpacityEffect.setOpacity(0.8)
-        self.contentOpacityEffect.setOpacity(0.8)
+        self.iconOpacityEffect.setEnabled(True)
+        self.titleOpacityEffect.setEnabled(True)
+        self.contentOpacityEffect.setEnabled(True)
         self.setCursor(Qt.CursorShape.ArrowCursor)
 
 
