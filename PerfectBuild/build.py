@@ -124,7 +124,7 @@ class PerfectBuild:
             "--include-data-file=patch/scipy.libs/.load-order-scipy-1.10.1=scipy.libs/.load-order-scipy-1.10.1",
             "--include-data-file=patch/shapely.libs/.load-order-shapely-2.0.7=shapely.libs/.load-order-shapely-2.0.7",
             "--include-data-file=AppData/ocr_replacements.json=AppData/ocr_replacements.json",
-            "--include-data-dir=app/resource/images=app/resource/images",
+            "--include-data-dir=app/resource=app/resource",
             "--include-data-file=docs/help.md=docs/help.md",
             "--include-data-file=docs/help_en.md=docs/help_en.md",
             "--include-data-file=update_data.txt=update_data.txt",
