@@ -16,7 +16,6 @@ class SignalBus(QObject):
     sendHwnd = Signal(int)
     windowTrackingStealthChanged = Signal(bool, int)
 
-    # check_ocr_progress = Signal(int, str)
 
 
 signalBus = SignalBus()
