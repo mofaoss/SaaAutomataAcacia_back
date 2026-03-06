@@ -490,7 +490,7 @@ class Daily(QFrame, BaseInterface):
 
     def _save_task_sequence(self, sequence):
         self._task_sequence_cache = sequence
-        config.set(config.daily_task_sequence, sequence)
+        config.set(config.daily_task_sequence, copy.deepcopy(sequence))
 
     def _init_task_list_widgets(self):
         sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
@@ -548,6 +548,7 @@ class Daily(QFrame, BaseInterface):
                 task_cfg["enabled"] = bool(is_checked)
                 break
         self._save_task_sequence(sequence)
+        self._on_task_settings_clicked(task_id)
 
     def _on_task_order_changed(self, task_id_order: list):
         sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
@@ -1039,44 +1040,6 @@ class Daily(QFrame, BaseInterface):
                 parent=self
             )
 
-    def record_task_completed(self, task_id: str):
-        """当某个任务成功执行完毕后，更新 last_run 和 执行次数(run_count)"""
-        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
-        now = datetime.now()
-        now_ts = time.time()
-
-        for task_cfg in sequence:
-            if task_cfg.get("id") == task_id:
-                last_run_ts = task_cfg.get("last_run", 0)
-                last_run_dt = datetime.fromtimestamp(last_run_ts) if last_run_ts else datetime.min
-
-                # 取出当前任务设定的触发时间（比如 05:00）
-                execution_rules = task_cfg.get("execution_config", [{"time": "05:00"}])
-                rule = execution_rules[0] if execution_rules else {"time": "05:00"}
-                rule_time = str(rule.get("time", "05:00"))
-                try:
-                    hour, minute = map(int, rule_time.split(":"))
-                except ValueError:
-                    hour, minute = 5, 0
-
-                # 算出本周期的逻辑触发时间点
-                trigger_time = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
-                if now < trigger_time:
-                    # 如果现在是凌晨 3 点，而刷新时间是 5 点，说明现在属于“昨天”的周期
-                    trigger_time -= timedelta(days=1)
-
-                # 判断是不是新的一轮
-                if last_run_dt < trigger_time:
-                    task_cfg["run_count"] = 1  # 跨过了刷新时间，重置为 1
-                else:
-                    task_cfg["run_count"] = task_cfg.get("run_count", 0) + 1  # 还在周期内，次数累加
-
-                task_cfg["last_run"] = now_ts
-                self.logger.info(f"已记录任务 [{task_id}] 完成，当前周期已执行 {task_cfg['run_count']} 次。")
-                break
-
-        self._save_task_sequence(sequence)
-
     def handle_start(self, str_flag):
         try:
             if str_flag == 'start':
@@ -1178,6 +1141,77 @@ class Daily(QFrame, BaseInterface):
         except Exception as e:
             self.logger.error(e)
 
+    def _parse_time(self, time_str: str, default_h=0, default_m=0):
+        """辅助方法：安全解析时间字符串"""
+        try:
+            h, m = map(int, str(time_str).split(":"))
+            return h, m
+        except Exception:
+            return default_h, default_m
+
+    def _check_activation(self, act_rule, now: datetime) -> bool:
+        """检查生效周期 (闸门机制：大于等于设定值则放行)"""
+        act_type = str(act_rule.get("type", "daily")).lower()
+        h, m = self._parse_time(act_rule.get("time", "05:00"), 5, 0)
+
+        # 兼容配置中的中文脏数据
+        if act_type == "每周": act_type = "weekly"
+        elif act_type == "每月": act_type = "monthly"
+        elif act_type == "每天": act_type = "daily"
+
+        if act_type == "weekly":
+            target_day = int(act_rule.get("day", 0)) # 0=周一
+            current_day = now.weekday()
+            if current_day < target_day: return False # 周一 < 周二，拦截
+            if current_day == target_day: # 到了周二当天，看时间
+                if now.hour < h or (now.hour == h and now.minute < m): return False
+            return True # 大于周二，比如周三周四，全部放行
+
+        elif act_type == "monthly":
+            target_day = int(act_rule.get("day", 1)) # 几号
+            current_day = now.day
+            if current_day < target_day: return False # 1号 < 10号，拦截
+            if current_day == target_day:
+                if now.hour < h or (now.hour == h and now.minute < m): return False
+            return True # 11号~31号，全部放行
+
+        else: # daily
+            if now.hour < h or (now.hour == h and now.minute < m): return False
+            return True # 大于每天设定的时间，放行
+
+    def _get_exec_cycle_start_and_match(self, rule, now: datetime):
+        """返回 (今天的刷新时间点, 是否符合执行条件, 最大执行次数)"""
+        exec_type = str(rule.get("type", "daily")).lower()
+        if exec_type == "每周": exec_type = "weekly"
+        elif exec_type == "每月": exec_type = "monthly"
+        elif exec_type == "每天": exec_type = "daily"
+
+        h, m = self._parse_time(rule.get("time", "00:00"), 0, 0)
+
+        # 今天的分割线 (例如今天的 02:01)
+        cycle_start = now.replace(hour=h, minute=m, second=0, microsecond=0)
+
+        is_matched = False
+
+        # 1. 严格检查“物理的今天”对不对
+        day_matched = False
+        if exec_type == "weekly":
+            if now.weekday() == int(rule.get("day", 0)):
+                day_matched = True
+        elif exec_type == "monthly":
+            if now.day == int(rule.get("day", 1)):
+                day_matched = True
+        else: # daily
+            day_matched = True
+
+        # 2. 如果天数对上了，再看时间有没有过闸门
+        if day_matched:
+            # “0点到设定时间”直接判定为无效(is_matched=False)，只有大于等于才放行
+            if now >= cycle_start:
+                is_matched = True
+
+        return cycle_start, is_matched, int(rule.get("max_runs", 1))
+
     def should_run_task(self, task_config: Dict[str, Any], now: datetime = None) -> bool:
         if not task_config.get("enabled", False):
             return False
@@ -1187,85 +1221,112 @@ class Daily(QFrame, BaseInterface):
         if now is None:
             now = datetime.now()
 
-        last_run_ts = task_config.get("last_run", 0)
-        last_run_dt = datetime.fromtimestamp(last_run_ts) if last_run_ts else datetime.min
-        run_count = task_config.get("run_count", 0)
+        task_id = task_config.get("id", "unknown")
 
-        def _normalize_rules(value, default_rules):
-            if value is None:
-                return copy.deepcopy(default_rules)
-            if isinstance(value, dict):
-                value = [value]
-            if not value:
-                return copy.deepcopy(default_rules)
-            return value
+        # 提取友好的任务名称
+        meta = TASK_REGISTRY.get(task_id, {})
+        task_name = meta.get("en_name", task_id) if getattr(self, '_is_non_chinese_ui', False) else meta.get("zh_name", task_id)
 
-        def _minutes_from_rule(rule):
-            rule_time = str(rule.get("time", "00:00"))
-            parts = rule_time.split(":")
-            if len(parts) != 2:
-                return None
-            try:
-                hour = int(parts[0])
-                minute = int(parts[1])
-            except ValueError:
-                return None
-            if hour < 0 or hour > 23 or minute < 0 or minute > 59:
-                return None
-            return hour * 60 + minute
-
-        def _is_rule_matched(rule):
-            rule_type = str(rule.get("type", "daily")).lower()
-            if rule_type not in {"daily", "weekly", "monthly"}:
-                rule_type = "daily"
-
-            target_minutes = _minutes_from_rule(rule)
-            if target_minutes is None:
-                return False
-
-            # 1. 计算当前的周期边界 (修复凌晨执行判定bug)
-            trigger_time = now.replace(hour=target_minutes // 60, minute=target_minutes % 60, second=0, microsecond=0)
-            if now < trigger_time:
-                trigger_time -= timedelta(days=1)
-
-            # 2. 读取 schedule 中设定的最大执行次数
-            max_runs = int(rule.get("max_runs", 1))
-
-            # 3. 如果上次执行的时间在这个周期内，判断是否达到了次数上限
-            if last_run_dt >= trigger_time:
-                if run_count >= max_runs:
-                    return False # 已经做满规定的次数了，拦住！
-
-            # 4. 星期 / 月份 的校验
-            if rule_type == "weekly":
-                try:
-                    # 注意：如果 now < 设定的 trigger_time，此时逻辑上应该算“昨天”是周几
-                    logical_now = now if now >= trigger_time else now - timedelta(days=1)
-                    return logical_now.weekday() == int(rule.get("day", 0))
-                except (TypeError, ValueError):
-                    return False
-
-            if rule_type == "monthly":
-                try:
-                    logical_now = now if now >= trigger_time else now - timedelta(days=1)
-                    return logical_now.day == int(rule.get("day", 1))
-                except (TypeError, ValueError):
-                    return False
-
-            return True
-
-        default_rules = [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}]
-        default_rules = [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}]
-        activation_config = task_config.get("activation_config")
-        if activation_config is None:
-            activation_config = task_config.get("refresh_config")
-        activation_rules = _normalize_rules(activation_config, default_rules)
-
-        if not any(_is_rule_matched(rule) for rule in activation_rules):
+        # ====================================================
+        # 1. 检查生效周期闸门 (保持绝对时间比对)
+        # ====================================================
+        act_rules = task_config.get("activation_config", [])
+        act_rule = act_rules[0] if act_rules else {"type": "daily", "time": "05:00"}
+        if not self._check_activation(act_rule, now):
+            skip_msg = f"Skipped [{task_name}]: Not yet reached the activation time." if getattr(self, '_is_non_chinese_ui', False) else f"【跳过】 {task_name}：还没到设定的生效时间哦~"
+            self.logger.info(skip_msg)
             return False
 
-        execution_rules = _normalize_rules(task_config.get("execution_config"), default_rules)
-        return any(_is_rule_matched(rule) for rule in execution_rules)
+        # ====================================================
+        # 2. 检查执行周期与独立进度 (核心重构区)
+        # ====================================================
+        exec_rules = task_config.get("execution_config", [])
+        if not exec_rules:
+            exec_rules = [{"type": "daily", "time": "00:00", "max_runs": 1}]
+
+        # 获取该任务下的独立进度条大字典
+        rule_progress = task_config.get("rule_progress", {})
+
+        can_execute = False
+        day_time_matched = False
+
+        # 遍历所有规则，只要有一个规则的专属进度没满，就放行！
+        for rule in exec_rules:
+            cycle_start, is_matched, max_runs = self._get_exec_cycle_start_and_match(rule, now)
+
+            if is_matched:
+                day_time_matched = True
+
+                # 为这条规则生成唯一指纹 ID，如 "daily_0_08:00"
+                rule_key = f"{rule.get('type', 'daily')}_{rule.get('day', 0)}_{rule.get('time', '00:00')}"
+
+                # 读取这条规则的专属进度，读不到就初始化为 0
+                prog = rule_progress.get(rule_key, {"last_run": 0, "run_count": 0})
+                last_run_dt = datetime.fromtimestamp(prog["last_run"]) if prog["last_run"] else datetime.min
+
+                if last_run_dt < cycle_start:
+                    # 跨过了这条规则的新起跑线，满血复活
+                    can_execute = True
+                    break
+                else:
+                    # 还在周期内，检查专属配额有没有用完
+                    if prog["run_count"] < max_runs:
+                        can_execute = True
+                        break
+
+        if not can_execute:
+            if not day_time_matched:
+                skip_msg = f"Skipped [{task_name}]: Not scheduled for today." if getattr(self, '_is_non_chinese_ui', False) else f"【跳过】 {task_name}：今天不在设定的执行时间范围内，休息一天~"
+            else:
+                skip_msg = f"Skipped [{task_name}]: Execution limit reached." if getattr(self, '_is_non_chinese_ui', False) else f"【完成】 {task_name}：设定的次数已经打满啦，无需重复执行~"
+
+            self.logger.info(skip_msg)
+            return False
+
+        return True
+
+    def record_task_completed(self, task_id: str):
+        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
+        now = datetime.now()
+        now_ts = time.time()
+
+        meta = TASK_REGISTRY.get(task_id, {})
+        task_name = meta.get("en_name", task_id) if getattr(self, '_is_non_chinese_ui', False) else meta.get("zh_name", task_id)
+
+        for task_cfg in sequence:
+            if task_cfg.get("id") == task_id:
+                exec_rules = task_cfg.get("execution_config", [])
+                if not exec_rules:
+                    exec_rules = [{"type": "daily", "time": "00:00", "max_runs": 1}]
+
+                rule_progress = task_cfg.get("rule_progress", {})
+
+                # 任务一旦成功，我们要把所有满足条件的规则进度都往前推一格
+                for rule in exec_rules:
+                    cycle_start, is_matched, max_runs = self._get_exec_cycle_start_and_match(rule, now)
+                    if is_matched:
+                        rule_key = f"{rule.get('type', 'daily')}_{rule.get('day', 0)}_{rule.get('time', '00:00')}"
+                        prog = rule_progress.get(rule_key, {"last_run": 0, "run_count": 0})
+                        last_run_dt = datetime.fromtimestamp(prog["last_run"]) if prog["last_run"] else datetime.min
+
+                        # 更新专属进度
+                        if last_run_dt < cycle_start:
+                            prog["run_count"] = 1
+                            prog["last_run"] = now_ts
+                            rule_progress[rule_key] = prog
+                        elif prog["run_count"] < max_runs:
+                            prog["run_count"] += 1
+                            prog["last_run"] = now_ts
+                            rule_progress[rule_key] = prog
+
+                # 将更新后的字典存回配置
+                task_cfg["rule_progress"] = rule_progress
+
+                success_msg = f"✨ Task [{task_name}] completed! Progress saved." if getattr(self, '_is_non_chinese_ui', False) else f"✨ {task_name} 执行完毕！已为您单独更新对应排期的进度。"
+                self.logger.info(success_msg)
+                break
+
+        self._save_task_sequence(sequence)
 
     def save_changed(self, widget, *args):
         config_item = getattr(config, widget.objectName(), None)

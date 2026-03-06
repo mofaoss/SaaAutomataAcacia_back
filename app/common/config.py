@@ -2,6 +2,7 @@
 import sys
 import locale as pylocale
 import ctypes
+import json
 from enum import Enum
 
 from PySide6.QtCore import QLocale
@@ -46,6 +47,28 @@ class LanguageSerializer(ConfigSerializer):
             return Language.CHINESE_SIMPLIFIED
 
         return Language.CHINESE_SIMPLIFIED
+
+
+# ========================================================
+# 新增：专门用来对付复杂列表字典的序列化器，保证数据能存进硬盘
+# ========================================================
+class TaskSequenceSerializer(ConfigSerializer):
+    def serialize(self, sequence):
+        # 存入配置时，将其转化为 JSON 字符串
+        return json.dumps(sequence, ensure_ascii=False)
+
+    def deserialize(self, value):
+        # 读取配置时，将 JSON 字符串还原为对象
+        if isinstance(value, str):
+            try:
+                return json.loads(value)
+            except Exception:
+                pass
+        elif isinstance(value, list):
+            return value
+        # 读不到就返回空列表，让业务层的 _normalize_task_sequence 去补全
+        return []
+# ========================================================
 
 
 def isWin11():
@@ -131,6 +154,9 @@ class Config(QConfig):
     CheckBox_chasm_6 = ConfigItem("home_interface_option", "CheckBox_chasm", False, BoolValidator())
     CheckBox_reward_7 = ConfigItem("home_interface_option", "CheckBox_reward", False, BoolValidator())
 
+    # ========================================================
+    # 修改：应用刚刚写好的 TaskSequenceSerializer
+    # ========================================================
     daily_task_sequence = ConfigItem("DailyTasks", "TaskSequence", [
         {"id": "task_login", "enabled": True, "use_periodic": True,
             "activation_config": [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}],
@@ -156,7 +182,8 @@ class Config(QConfig):
         {"id": "task_reward", "enabled": False, "use_periodic": True,
             "activation_config": [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}],
          "execution_config": [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}], "last_run": 0},
-    ])
+    ], serializer=TaskSequenceSerializer())
+    # ========================================================
 
     CheckBox_buy_3 = ConfigItem("home_interface_shopping", "CheckBox_buy_3", False, BoolValidator())
     CheckBox_buy_4 = ConfigItem("home_interface_shopping", "CheckBox_buy_4", False, BoolValidator())
@@ -294,78 +321,17 @@ class Config(QConfig):
     ComboBox_card_mode = OptionsConfigItem("add_drink", "ComboBox_card_mode", 0, OptionsValidator([0, 1]))
     SpinBox_drink_times = ConfigItem("add_drink", "SpinBox_drink_times", -1)
     CheckBox_is_speed_up = ConfigItem("add_drink", "CheckBox_is_speed_up", False, BoolValidator())
-    # 抓帕鲁相关（add_capture_pals）
-    # 伙伴岛抓帕鲁模式：0=定点 1=巡逻
-    ComboBox_capture_pals_partner_mode = ConfigItem(
-        "add_capture_pals", "ComboBox_capture_pals_partner_mode", 0
-    )
-
-    # 探险岛抓帕鲁模式：0=定点 1=巡逻
-    ComboBox_capture_pals_adventure_mode = ConfigItem(
-        "add_capture_pals", "ComboBox_capture_pals_adventure_mode", 1
-    )
-
-    # 选择岛：伙伴岛/探险岛
-    CheckBox_capture_pals_partner = ConfigItem(
-        "add_capture_pals",
-        "CheckBox_capture_pals_partner",
-        True,
-        BoolValidator()
-    )
-    CheckBox_capture_pals_adventure = ConfigItem(
-        "add_capture_pals",
-        "CheckBox_capture_pals_adventure",
-        False,
-        BoolValidator()
-    )
-
-    # 是否启用同步抓帕鲁（仅在双岛勾选时有效）
-    CheckBox_capture_pals_sync = ConfigItem(
-        "add_capture_pals",
-        "CheckBox_capture_pals_sync",
-        False,
-        BoolValidator()
-    )
-
-    # 同步抓帕鲁：插入探险岛的周期（分钟）
-    # 例如：伙伴岛抓帕鲁间隙每隔 N 分钟去探险岛巡逻抓一轮
-    SpinBox_capture_pals_sync_every_min = ConfigItem(
-        "add_capture_pals",
-        "SpinBox_capture_pals_sync_every_min",
-        5
-    )
-
-    # 伙伴岛：定点抓帕鲁间隔（秒）
-    # 默认 35s（30s刷新 + 5s抓捕）
-    SpinBox_capture_pals_partner_fixed_interval = ConfigItem(
-        "add_capture_pals",
-        "SpinBox_capture_pals_partner_fixed_interval",
-        35
-    )
-
-    # 伙伴岛：巡逻抓帕鲁刷新间隔（秒）
-    # 默认 10s（每次抓完退出等待刷新再进）
-    SpinBox_capture_pals_partner_patrol_interval = ConfigItem(
-        "add_capture_pals",
-        "SpinBox_capture_pals_partner_patrol_interval",
-        10
-    )
-
-    # 探险岛：定点抓帕鲁间隔（秒）
-    # 默认 300s（5min）
-    SpinBox_capture_pals_adventure_fixed_interval = ConfigItem(
-        "add_capture_pals",
-        "SpinBox_capture_pals_adventure_fixed_interval",
-        300
-    )
-
-    # 探险岛：巡逻抓帕鲁刷新间隔（秒）
-    # 默认 1200s（20min）
-    SpinBox_capture_pals_adventure_patrol_interval = ConfigItem(
-        "add_capture_pals",
-        "SpinBox_capture_pals_adventure_patrol_interval",
-        1200
-    )
+    # 抓帕鲁相关
+    ComboBox_capture_pals_partner_mode = ConfigItem("add_capture_pals", "ComboBox_capture_pals_partner_mode", 0)
+    ComboBox_capture_pals_adventure_mode = ConfigItem("add_capture_pals", "ComboBox_capture_pals_adventure_mode", 1)
+    CheckBox_capture_pals_partner = ConfigItem("add_capture_pals", "CheckBox_capture_pals_partner", True, BoolValidator())
+    CheckBox_capture_pals_adventure = ConfigItem("add_capture_pals", "CheckBox_capture_pals_adventure", False, BoolValidator())
+    CheckBox_capture_pals_sync = ConfigItem("add_capture_pals", "CheckBox_capture_pals_sync", False, BoolValidator())
+    SpinBox_capture_pals_sync_every_min = ConfigItem("add_capture_pals", "SpinBox_capture_pals_sync_every_min", 5)
+    SpinBox_capture_pals_partner_fixed_interval = ConfigItem("add_capture_pals", "SpinBox_capture_pals_partner_fixed_interval", 35)
+    SpinBox_capture_pals_partner_patrol_interval = ConfigItem("add_capture_pals", "SpinBox_capture_pals_partner_patrol_interval", 10)
+    SpinBox_capture_pals_adventure_fixed_interval = ConfigItem("add_capture_pals", "SpinBox_capture_pals_adventure_fixed_interval", 300)
+    SpinBox_capture_pals_adventure_patrol_interval = ConfigItem("add_capture_pals", "SpinBox_capture_pals_adventure_patrol_interval", 1200)
 
 config = Config()
 config.themeMode.value = Theme.AUTO

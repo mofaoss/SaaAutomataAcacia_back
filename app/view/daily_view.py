@@ -100,6 +100,14 @@ class TaskItemWidget(QWidget):
         layout.addStretch(1)
         layout.addWidget(self.btn, 0)
 
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+    def mouseReleaseEvent(self, event):
+        super().mouseReleaseEvent(event)
+        # 只要用户用鼠标左键点击了这一行的区域，就发射切换面板的信号
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.settings_clicked.emit(self.task_id)
+
 class ExecutionRuleWidget(QWidget):
     deleted = Signal(QWidget)
     changed = Signal()
@@ -173,7 +181,7 @@ class ExecutionRuleWidget(QWidget):
             w.currentIndexChanged.connect(self.changed)
 
         self.runs_edit.textChanged.connect(self.changed)
-        self.time_edit.editingFinished.connect(self.changed)
+        self.time_edit.textChanged.connect(self.changed)
 
         self._update_visibility()
 
@@ -255,7 +263,7 @@ class SharedSchedulingPanel(QWidget):
         activation_row.setContentsMargins(0, 0, 0, 0)
         activation_row.setSpacing(6)
 
-        activation_label_text = "Activation:" if is_non_chinese_ui else "生效周期："
+        activation_label_text = "Activation:" if is_non_chinese_ui else "生效起点："
         self.activation_label = StrongBodyLabel(activation_label_text, self)
         activation_row.addWidget(self.activation_label)
         activation_row.addSpacing(2)
@@ -276,7 +284,7 @@ class SharedSchedulingPanel(QWidget):
         exec_title_layout.setContentsMargins(0, 0, 0, 0)
         exec_title_layout.setSpacing(8)
 
-        exec_title_text = "Execution Triggers" if is_non_chinese_ui else "时间范围（当天）："
+        exec_title_text = "Execution Triggers (Day)" if is_non_chinese_ui else "执行节点（单位：天）："
         self.exec_title_label = StrongBodyLabel(exec_title_text, self)
 
         self.add_btn = ToolButton(FIF.ADD, self)
