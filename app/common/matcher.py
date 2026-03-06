@@ -3,7 +3,6 @@ import os
 
 import cv2
 import numpy as np
-import pyautogui
 
 from app.common.config import config
 from app.common.image_utils import ImageUtils
@@ -64,7 +63,13 @@ class Matcher:
             print(f"保存 scale_cache.json 文件时出错: {e}")
 
     def _get_max_scale(self):
-        screen_width, screen_height = pyautogui.size()
+        import ctypes
+        # 使用 Windows 原生 API 获取屏幕主显示器的宽高，纯原生、0 依赖、极速
+        user32 = ctypes.windll.user32
+        # 0 代表 SM_CXSCREEN (宽度)，1 代表 SM_CYSCREEN (高度)
+        screen_width = user32.GetSystemMetrics(0)
+        screen_height = user32.GetSystemMetrics(1)
+
         max_scale = max(1920 / screen_width, 1080 / screen_height) + 0.5
         self.max_scale = round(max_scale, 2)
         self.scale_steps = int(self.max_scale / 0.01)
