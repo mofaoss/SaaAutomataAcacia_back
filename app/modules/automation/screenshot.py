@@ -1,6 +1,7 @@
 import ctypes
 import logging
 import time
+import threading
 
 import cv2
 import numpy as np
@@ -11,8 +12,11 @@ import win32con
 from app.common.image_utils import ImageUtils
 from app.modules.automation.timer import Timer
 
-
 logger = logging.getLogger(__name__)
+
+# ====== 全局截图锁，防止多线程同时抢占窗口 DC 导致崩溃 ======
+SCREENSHOT_LOCK = threading.Lock()
+# =========================================================
 
 
 def auto_crop_image(img):
@@ -134,31 +138,40 @@ class Screenshot:
             client_offset_x = client_screen_x - left
             client_offset_y = client_screen_y - top
 
-            # 获取设备上下文
-            hwnd_dc = win32gui.GetWindowDC(hwnd)
-            mfc_dc = win32ui.CreateDCFromHandle(hwnd_dc)
-            save_dc = mfc_dc.CreateCompatibleDC()
+            # ====== 核心修复区：加锁并确保安全释放资源 ======
+            with SCREENSHOT_LOCK:
+                hwnd_dc = win32gui.GetWindowDC(hwnd)
+                mfc_dc = win32ui.CreateDCFromHandle(hwnd_dc)
+                save_dc = None
+                bitmap = None
 
-            # 创建位图对象
-            bitmap = win32ui.CreateBitmap()
-            bitmap.CreateCompatibleBitmap(mfc_dc, w, h)
-            save_dc.SelectObject(bitmap)
+                try:
+                    save_dc = mfc_dc.CreateCompatibleDC()
+                    bitmap = win32ui.CreateBitmap()
+                    bitmap.CreateCompatibleBitmap(mfc_dc, w, h)
+                    save_dc.SelectObject(bitmap)
 
-            # 进行截图
-            user32 = ctypes.windll.user32
-            # 启动器0,1,2均可以，但是游戏窗口必须要是2,0和1都是黑屏，2: 捕捉包括窗口的边框、标题栏以及整个窗口的内容
-            user32.PrintWindow(hwnd, save_dc.GetSafeHdc(), 2)  # PW_RENDERFULLCONTENT=2
-            # 转换为 numpy 数组
-            bmpinfo = bitmap.GetInfo()
-            bmpstr = bitmap.GetBitmapBits(True)
-            # img_size = np.frombuffer(bmpstr, dtype=np.uint8).size
-            img = np.frombuffer(bmpstr, dtype=np.uint8).reshape((bmpinfo['bmHeight'], bmpinfo['bmWidth'], 4))
+                    # 进行截图
+                    user32 = ctypes.windll.user32
+                    user32.PrintWindow(hwnd, save_dc.GetSafeHdc(), 2)  # PW_RENDERFULLCONTENT=2
 
-            # 释放资源
-            win32gui.DeleteObject(bitmap.GetHandle())
-            save_dc.DeleteDC()
-            mfc_dc.DeleteDC()
-            win32gui.ReleaseDC(hwnd, hwnd_dc)
+                    # 转换为 numpy 数组
+                    bmpinfo = bitmap.GetInfo()
+                    bmpstr = bitmap.GetBitmapBits(True)
+
+                    # 为了安全起见，加上 .copy() 脱离底层内存绑定
+                    img = np.frombuffer(bmpstr, dtype=np.uint8).reshape((bmpinfo['bmHeight'], bmpinfo['bmWidth'], 4)).copy()
+                finally:
+                    # 无论截图成功与否，严谨释放 GDI 资源，防止内存溢出和电脑卡顿
+                    if bitmap is not None:
+                        win32gui.DeleteObject(bitmap.GetHandle())
+                    if save_dc is not None:
+                        save_dc.DeleteDC()
+                    if mfc_dc is not None:
+                        mfc_dc.DeleteDC()
+                    if hwnd_dc is not None and hwnd_dc != 0:
+                        win32gui.ReleaseDC(hwnd, hwnd_dc)
+            # ================================================
 
             # OpenCV 处理
             img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
@@ -180,6 +193,7 @@ class Screenshot:
                 scale_y = self.base_height / max(1, client_height)
 
             return img_crop, scale_x, scale_y, relative_pos
+
         except Exception as e:
             # print(traceback.format_exc())
             self._log_error_throttled('screenshot_failed', f"截图失败：{repr(e)},窗口可以不置顶但不能最小化")
@@ -192,11 +206,6 @@ if __name__ == '__main__':
     screen = Screenshot(logger=logger)
     hwnd = screen.get_window(game_window)
     result = screen.screenshot(hwnd, (0, 0, 1, 1), False)
-
-    # game_window = "尘白禁区"
-    # screen = Screenshot(logger=logger)
-    # hwnd = screen.get_window(game_window)
-    # result = screen.take_screenshot(hwnd, (0.5, 0.5, 1, 1), False)
 
     if result is not None:
         img_resized, scale_x, scale_y, screenshot_pos = result

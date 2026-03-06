@@ -121,7 +121,7 @@ class PerfectBuild:
             "--windows-uac-admin",
             "--windows-console-mode=disable",
             # 添加文件
-            "--include-data-file=patch/scipy.libs/.load-order-scipy-1.10.1=scipy.libs/.load-order-scipy-1.10.1",
+            # "--include-data-file=patch/scipy.libs/.load-order-scipy-1.10.1=scipy.libs/.load-order-scipy-1.10.1",
             "--include-data-file=patch/shapely.libs/.load-order-shapely-2.0.7=shapely.libs/.load-order-shapely-2.0.7",
             "--include-data-file=AppData/ocr_replacements.json=AppData/ocr_replacements.json",
             "--include-data-dir=app/resource=app/resource",
@@ -130,7 +130,7 @@ class PerfectBuild:
             "--include-data-file=update_data.txt=update_data.txt",
             "--include-data-dir=asset=asset",
             "--include-data-dir=app/modules/onnxocr/models/ppocrv5=app/modules/onnxocr/models/ppocrv5",
-            "--nofollow-import-to=scipy.stats",
+            # "--nofollow-import-to=scipy.stats",
         ]
         if platform.system() == "Windows":
             cmd_args.extend((f"--windows-icon-from-ico={self.app_icon}", "--msvc=latest"))
