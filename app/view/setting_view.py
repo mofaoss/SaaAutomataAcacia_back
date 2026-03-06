@@ -26,8 +26,8 @@ from utils.updater_utils import (
     get_local_version,
     resolve_batch_dir,
     get_best_update_candidate,
-    is_remote_version_newer,
-    is_prerelease_version,
+    get_binary_path,
+    get_app_root,
 )
 from ..repackage.slider_setting_card import SliderSettingCard
 from ..repackage.text_edit_card import TextEditCard
@@ -610,9 +610,8 @@ class SettingInterface(ScrollArea, BaseInterface):
         self.progressBar.setVisible(False)
 
         # 核心路径解析
-        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-        seven_zip = os.path.join(base_dir, "app", "resource", "binary", "7za.exe")
-        app_root = base_dir
+        seven_zip = get_binary_path("7za.exe") # 使用统一适配器
+        app_root = get_app_root()
 
         # 识别文件类型
         is_exe = downloaded_path.lower().endswith('.exe')

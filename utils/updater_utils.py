@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import re
 import logging
 import threading
@@ -17,6 +18,24 @@ from packaging.version import parse as parse_version
 # Lock to prevent concurrent API calls during startup
 _fetch_lock = threading.Lock()
 logger = logging.getLogger(__name__)
+
+
+def get_app_root():
+    """获取程序运行时的根目录，兼容开发环境和 Nuitka 打包环境"""
+    # Nuitka 和 PyInstaller 在打包后通常会设置 sys.frozen 或类似标识
+    # 但最稳妥的方法是判断 sys.argv[0] 或 sys.executable
+    if getattr(sys, 'frozen', False) or hasattr(sys, '_MEIPASS'):
+        # 打包后的 exe 所在目录
+        return os.path.dirname(sys.executable)
+    # 开发环境下，假设当前文件在 utils 目录，根目录是上一级
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+def get_binary_path(bin_name):
+    """专门用于获取 binary 目录下工具的路径"""
+    root = get_app_root()
+    # 无论打包还是开发，确保路径指向 app/resource/binary/xxx.exe
+    path = os.path.join(root, "app", "resource", "binary", bin_name)
+    return path
 
 
 def _resolve_proxies(proxies: Optional[Dict[str, str]]) -> Optional[Dict[str, str]]:
@@ -309,20 +328,18 @@ class UpdateDownloadThread(QThread):
         super().__init__()
         self.download_url = download_url
 
-        # 1. 定位路径
-        self.base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-        self.aria2c_path = os.path.join(self.base_dir, "app", "resource", "binary", "aria2c.exe")
-        self.temp_dir = os.path.join(self.base_dir, "temp", "update")
+        # 使用适配函数获取路径
+        self.aria2c_path = get_binary_path("aria2c.exe")
+        self.temp_dir = os.path.join(get_app_root(), "temp", "update")
 
-        # 2. 【核心修复】解析 URL 以获取文件名
-        try:
-            parsed_url = urlparse(download_url)
-            # 从 URL 中提取文件名，如果提取不到则使用默认名
-            self.filename = os.path.basename(parsed_url.path) or "update_package.zip"
-        except Exception:
-            self.filename = "update_package.zip"
-
+        # 解析文件名 (修复之前提到的 parsed_url 报错)
+        from urllib.parse import urlparse
+        parsed_url = urlparse(download_url)
+        self.filename = os.path.basename(parsed_url.path) or "update_package.zip"
         self.filepath = os.path.join(self.temp_dir, self.filename)
+
+        # 调试用：打包后如果报错，可以在日志里打印这个路径看看它到底指向哪
+        print(f"DEBUG: aria2c path is {self.aria2c_path}")
 
     def run(self):
         process = None  # 显式初始化，避免 NameError

@@ -13,7 +13,7 @@ import os
 import platform
 import subprocess
 import sys
-import traceback
+import shutil
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 from perfect_build import Config
@@ -23,21 +23,32 @@ import uuid
 
 
 def find_iss_compiler() -> str:
-    env_candidates = [
-        os.environ.get("INNO_SETUP_COMPILER"),
-        os.environ.get("ISCC_PATH"),
+    # 1. 优先环境变量
+    for env in ("INNO_SETUP_COMPILER", "ISCC_PATH"):
+        p = os.environ.get(env)
+        if p and Path(p).exists():
+            return p
+
+    # 2. PATH 中查找
+    for exe in ("ISCC.exe", "Compil32.exe"):
+        p = shutil.which(exe)
+        if p:
+            return p
+
+    # 3. 常见安装目录
+    base_dirs = [
+        os.environ.get("ProgramFiles"),
+        os.environ.get("ProgramFiles(x86)"),
+        Path.home() / "AppData/Local/Programs",
     ]
-    path_candidates = [
-        "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe",
-        "C:\\Program Files (x86)\\Inno Setup 6\\Compil32.exe",
-        "C:\\Program Files\\Inno Setup 6\\ISCC.exe",
-        "C:\\Program Files\\Inno Setup 6\\Compil32.exe",
-        "C:\\Users\\Japhen\\AppData\\Local\\Programs\\Inno Setup 6\\Compil32.exe",
-    ]
-    candidates = [p for p in env_candidates + path_candidates if p]
-    for candidate in candidates:
-        if Path(candidate).exists():
-            return candidate
+
+    for base in filter(None, base_dirs):
+        base = Path(base)
+        for exe in ("ISCC.exe", "Compil32.exe"):
+            p = base / "Inno Setup 6" / exe
+            if p.exists():
+                return str(p)
+
     return ""
 
 
