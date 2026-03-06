@@ -333,8 +333,8 @@ class OCR:
                 cpu_support_avx2(config)
             try:
                 self.logger.debug("开始初始化OCR...")
-                if config.cpu_support_avx2.value or config.ocr_use_gpu.value:
-                    self.ocr = ONNXPaddleOcr(use_angle_cls=True, use_gpu=config.ocr_use_gpu.value)
+                if config.cpu_support_avx2.value:
+                    self.ocr = ONNXPaddleOcr(use_angle_cls=True, use_gpu=False)
                     self.logger.info("初始化OCR完成")
                     self._is_initialized = True
                 else:

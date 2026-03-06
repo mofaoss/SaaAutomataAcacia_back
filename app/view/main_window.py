@@ -401,6 +401,8 @@ class MainWindow(FluentWindow, BaseInterface):
     def initWindow(self):
         # 1. 先读取上次保存的位置
         position = config.position.value
+        if hasattr(config, "ocr_use_gpu") and config.ocr_use_gpu.value:
+            config.set(config.ocr_use_gpu, False)
         target_screen = None
 
         # 2. 探明将要打开的屏幕

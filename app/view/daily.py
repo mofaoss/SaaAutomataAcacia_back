@@ -11,10 +11,10 @@ from typing import Dict, Any, List
 import win32con
 import win32gui
 from PySide6.QtCore import QThread, Signal, Qt, QTimer
-from PySide6.QtWidgets import QFrame, QWidget, QTreeWidgetItemIterator, QFileDialog, QVBoxLayout
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QFrame, QWidget, QTreeWidgetItemIterator, QFileDialog, QVBoxLayout, QSystemTrayIcon, QApplication
 from qfluentwidgets import FluentIcon as FIF, InfoBar, InfoBarPosition, CheckBox, ComboBox, LineEdit, \
     BodyLabel, ProgressBar, FlyoutView, Flyout, SpinBox
-from win11toast import toast
 
 from app.common.config import config, is_non_chinese_ui_language
 from app.common.data_models import ApiResponse, parse_config_update_data
@@ -264,11 +264,24 @@ class StartThread(QThread):
                     normal_stop_flag = False
                     break
 
-            if config.inform_message.value or '--toast-only' in sys.argv:
-                def empty_func(args): pass
-                full_time = auto.calculate_power_time() if auto is not None else None
-                content = f'体力将在 {full_time} 完全恢复' if full_time else "体力计算出错"
-                toast('已完成勾选任务', content, on_dismissed=empty_func, icon=os.path.abspath("app/resource/images/logo.ico"))
+                if config.inform_message.value or '--toast-only' in sys.argv:
+                    full_time = auto.calculate_power_time() if auto is not None else None
+                    content = f'体力将在 {full_time} 完全恢复' if full_time else "体力计算出错"
+
+                    app = QApplication.instance()
+                    if app:
+                        # 如果你已经在 MainWindow 里创建了系统托盘，直接用你自己的 self.tray_icon
+                        tray_icon = QSystemTrayIcon(QIcon(os.path.abspath("app/resource/images/logo.ico")), app)
+                        tray_icon.show()
+
+                        # 发送系统原生通知
+                        tray_icon.showMessage(
+                            '已完成勾选任务',       # 标题
+                            content,              # 内容
+                            QIcon(os.path.abspath("app/resource/images/logo.ico")), # 图标
+                            1000
+                        )
+
         except Exception as e:
             if str(e) != '已停止':
                 self.logger.warning(e)

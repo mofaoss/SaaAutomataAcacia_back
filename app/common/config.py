@@ -157,7 +157,7 @@ class Config(QConfig):
     windowTrackingInput   = ConfigItem("setting_personal", "windowTrackingInput", True, BoolValidator())
     windowTrackingAlpha   = ConfigItem("setting_personal", "windowTrackingAlpha", 1)
     saveScaleCache        = ConfigItem("setting_personal", "saveScaleCache", False, BoolValidator(), restart=True)
-    ocr_use_gpu           = ConfigItem("setting_personal", "ocr_use_gpu", True, BoolValidator())
+    ocr_use_gpu           = ConfigItem("setting_personal", "ocr_use_gpu", False, BoolValidator())  # Abandoned, kept for config compatibility
     is_resize             = ConfigItem("setting_personal", "is_resize", None)
     auto_start_task       = ConfigItem("setting_personal", "auto_start_task", False, BoolValidator())
     auto_boot_startup     = ConfigItem("setting_personal", "auto_boot_startup", False, BoolValidator())
