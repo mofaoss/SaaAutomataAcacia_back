@@ -38,6 +38,8 @@ from app.modules.use_power.use_power import UsePowerModule
 from app.repackage.custom_message_box import CustomMessageBox
 from app.repackage.tree import TreeFrame_person, TreeFrame_weapon
 from app.modules.operation_action.operation_action import OperationModule
+from app.modules.upgrade.weapon import WeaponUpgradeModule
+from app.modules.jigsaw.shards import ShardExchangeModule
 
 # 导入视图与基类
 from app.view.daily_view import DailyView, TaskItemWidget
@@ -88,19 +90,33 @@ TASK_REGISTRY = {
         "zh_name": "精神拟境",
         "en_name": "Mental Simulation",
     },
-    "task_operation": {
-        "module_class": OperationModule,
-        "ui_page_index": 7,
-        "option_key": "CheckBox_operation_8",
-        "zh_name": "常规行动",
-        "en_name": "Operation",
-    },
     "task_reward": {
         "module_class": GetRewardModule,
         "ui_page_index": 6,
         "option_key": "CheckBox_reward_7",
         "zh_name": "收取奖励",
         "en_name": "Claim Rewards",
+    },
+    "task_operation": {
+        "module_class": OperationModule,
+        "ui_page_index": 7,
+        "option_key": "CheckBox_operation_8",
+        "zh_name": "常规训练",
+        "en_name": "Operation",
+    },
+    "task_weapon": {
+        "module_class": WeaponUpgradeModule,
+        "ui_page_index": 8,
+        "option_key": "CheckBox_weapon_8",
+        "zh_name": "武器升级",
+        "en_name": "Weapon Upgrade",
+    },
+    "task_shard_exchange": {
+        "module_class": ShardExchangeModule,
+        "ui_page_index": 9,
+        "option_key": "CheckBox_shard_exchange_9",
+        "zh_name": "信源碎片",
+        "en_name": "Shard Exchange",
     },
 }
 
@@ -293,7 +309,9 @@ class Daily(QFrame, BaseInterface):
             self._ui_text('商店', 'Shop'), self._ui_text('体力', 'Stamina'),
             self._ui_text('碎片', 'Shards'), self._ui_text('拟境', 'Mental Simulation'),
             self._ui_text('奖励', 'Claim Rewards'),
-            self._ui_text('常规行动', 'Operation'),
+            self._ui_text('常规训练', 'Operation'),
+            self._ui_text('武器培养', 'Weapon'),
+            self._ui_text('信源碎片', 'Shard Exchange'),
         ]
 
         self.person_dic = {

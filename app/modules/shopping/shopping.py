@@ -105,7 +105,7 @@ class ShoppingModule:
 
     def run(self):
         self.is_log = config.isLog.value
-
+        self.auto.back_to_home()
         self.open_store()
         self.buy()
 

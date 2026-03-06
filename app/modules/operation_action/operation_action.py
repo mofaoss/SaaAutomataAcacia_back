@@ -14,6 +14,7 @@ class OperationModule:
     def run(self):
         self.is_log = config.isLog.value
         self.times = config.SpinBox_action_times.value
+        self.auto.back_to_home()
 
         self.enter_train()
         for _ in range(self.times):
@@ -84,7 +85,7 @@ class OperationModule:
                 time.sleep(2)
 
             if timeout.reached():
-                self.logger.error("执行常规行动超时")
+                self.logger.error("执行常规训练超时")
                 break
 
     def enter_train(self):

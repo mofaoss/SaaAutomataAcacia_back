@@ -747,6 +747,43 @@ class OperationPage(BaseDailyPage):
         return line
 
 
+class WeaponUpgradePage(BaseDailyPage):
+    def __init__(self, parent=None):
+        super().__init__("page_weapon", parent=parent)
+
+        self.BodyLabel_weapon_tip = BodyLabel(self)
+        self.BodyLabel_weapon_tip.setObjectName("BodyLabel_weapon_tip")
+        self.BodyLabel_weapon_tip.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.BodyLabel_weapon_tip.setWordWrap(True)
+
+        self.main_layout.addWidget(self.BodyLabel_weapon_tip)
+        self.finalize()
+
+
+class ShardExchangePage(BaseDailyPage):
+    def __init__(self, parent=None):
+        super().__init__("page_shard_exchange", parent=parent)
+
+        self.CheckBox_receive_shards = CheckBox(self)
+        self.CheckBox_receive_shards.setObjectName("enable_receive_shards")
+
+        self.CheckBox_gift_shards = CheckBox(self)
+        self.CheckBox_gift_shards.setObjectName("enable_gift_shards")
+
+        self.CheckBox_recycle_shards = CheckBox(self)
+        self.CheckBox_recycle_shards.setObjectName("enable_recycle_shards")
+
+        self.BodyLabel_shard_tip = BodyLabel(self)
+        self.BodyLabel_shard_tip.setObjectName("BodyLabel_shard_tip")
+        self.BodyLabel_shard_tip.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.BodyLabel_shard_tip.setWordWrap(True)
+
+        self.main_layout.addWidget(self.CheckBox_receive_shards)
+        self.main_layout.addWidget(self.CheckBox_gift_shards)
+        self.main_layout.addWidget(self.CheckBox_recycle_shards)
+        self.main_layout.addWidget(self.BodyLabel_shard_tip)
+        self.finalize()
+
 class DailyView(ScrollArea):
     def __init__(self, parent=None, is_non_chinese_ui=False):
         super().__init__(parent)
@@ -868,6 +905,8 @@ class DailyView(ScrollArea):
         self.page_chasm = ChasmPage(self.PopUpAniStackedWidget)
         self.page_reward = RewardPage(self.PopUpAniStackedWidget)
         self.page_operation = OperationPage(self.PopUpAniStackedWidget)
+        self.page_weapon = WeaponUpgradePage(self.PopUpAniStackedWidget)
+        self.page_shard_exchange = ShardExchangePage(self.PopUpAniStackedWidget)
 
         self.PopUpAniStackedWidget.addWidget(self.page_enter)
         self.PopUpAniStackedWidget.addWidget(self.page_collect)
@@ -877,6 +916,8 @@ class DailyView(ScrollArea):
         self.PopUpAniStackedWidget.addWidget(self.page_chasm)
         self.PopUpAniStackedWidget.addWidget(self.page_reward)
         self.PopUpAniStackedWidget.addWidget(self.page_operation)
+        self.PopUpAniStackedWidget.addWidget(self.page_weapon)
+        self.PopUpAniStackedWidget.addWidget(self.page_shard_exchange)
 
         layout.addWidget(self.TitleLabel_setting)
         layout.addWidget(self.PopUpAniStackedWidget, 1)
@@ -948,6 +989,15 @@ class DailyView(ScrollArea):
         self.BodyLabel_7 = self.page_operation.BodyLabel_7
         self.SpinBox_action_times = self.page_operation.SpinBox_action_times
         self.BodyLabel_tip_action = self.page_operation.BodyLabel_tip_action
+
+        # WeaponUpgradePage
+        self.BodyLabel_weapon_tip = self.page_weapon.BodyLabel_weapon_tip
+
+        # ShardExchangePage
+        self.CheckBox_receive_shards = self.page_shard_exchange.CheckBox_receive_shards
+        self.CheckBox_gift_shards = self.page_shard_exchange.CheckBox_gift_shards
+        self.CheckBox_recycle_shards = self.page_shard_exchange.CheckBox_recycle_shards
+        self.BodyLabel_shard_tip = self.page_shard_exchange.BodyLabel_shard_tip
 
     def _build_log_card(self):
         self.SimpleCardWidget = SimpleCardWidget(self.content_widget)
@@ -1053,6 +1103,17 @@ class DailyView(ScrollArea):
             "### Tips\n* Claim monthly card and daily rewards" if self.is_non_chinese_ui else "### 提示\n* 领取大月卡和日常奖励"
         )
 
+        self.BodyLabel_weapon_tip.setText(
+            "### Tips\n* Auto-run weapon upgrade from the lobby\n* Consumes materials automatically"
+            if self.is_non_chinese_ui else
+            "### 提示\n* 自动执行武器升级流程\n* 将会自动选中并消耗背包内的经验材料"
+        )
+        self.BodyLabel_shard_tip.setText(
+            "### Tips\n* Auto receive, gift, and recycle puzzle shards\n* Retains at least 15 of each shard when recycling"
+            if self.is_non_chinese_ui else
+            "### 提示\n* 自动进行基地信源碎片的接收、赠送和回收\n* 回收时每种碎片默认至少保留15个"
+        )
+
         self.TitleLabel.setText(self._ui_text("日志", "Log"))
         self.PushButton_select_all.setText(self._ui_text("全选", "All"))
         self.PushButton_no_select.setText(self._ui_text("清空", "Clear"))
@@ -1067,6 +1128,9 @@ class DailyView(ScrollArea):
         self.CheckBox_fish_bait.setText(self._ui_text("领取鱼饵", "Claim Bait"))
         self.CheckBox_dormitory.setText(self._ui_text("宿舍碎片", "Dorm Shards"))
         self.CheckBox_redeem_code.setText(self._ui_text("领取兑换码", "Redeem Codes"))
+        self.CheckBox_receive_shards.setText(self._ui_text("一键接收", "Auto Receive"))
+        self.CheckBox_gift_shards.setText(self._ui_text("一键赠送", "Auto Gift"))
+        self.CheckBox_recycle_shards.setText(self._ui_text("智能回收", "Smart Recycle"))
         self.PrimaryPushButton_import_codes.setText(self._ui_text("导入", "Import"))
         self.PushButton_reset_codes.setText(self._ui_text("重置", "Reset"))
         self.StrongBodyLabel.setText(self._ui_text("选择要购买的商品", "Select items to buy"))
@@ -1083,9 +1147,9 @@ class DailyView(ScrollArea):
         self.BodyLabel_22.setText(self._ui_text("疾跑方式", "Sprint mode"))
         self.BodyLabel_7.setText(self._ui_text("刷取次数", "Run count"))
         self.BodyLabel_tip_action.setText(
-            "### Tips\n* Auto-run operation from the lobby page\n* Repeats the first training stage for specified times with no stamina cost\n* Useful for weekly pass mission count"
+            "### Tips\n* Auto-run operation \n* Repeats the first training stage for specified times with no stamina cost\n* Useful for weekly pass mission count"
             if self.is_non_chinese_ui else
-            "### 提示\n* 自动完成无体力常规行动\n* 重复刷指定次数实战训练第一关，不消耗体力\n* 用于完成凭证20次常规行动周常任务"
+            "### 提示\n* 重复刷指定次数无需体力的实战训练第一关\n* 用于完成凭证20次常规行动周常任务"
         )
 
         shop_items = [

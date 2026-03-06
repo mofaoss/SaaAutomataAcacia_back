@@ -165,11 +165,8 @@ class DisplayInterface(ScrollArea, BaseInterface):
         self.basedir = str(_resolve_display_image_dir())
         self.windowTrackingQuickSwitchCard = None
 
-        # 1. 搭建骨架
         self._setup_ui()
-        # 2. 穿上衣服（国际化翻译）
         self._apply_i18n()
-        # 3. 添加动态内容（卡片与信号绑定）
         self._load_samples()
 
     def _setup_ui(self):

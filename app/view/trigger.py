@@ -64,7 +64,6 @@ class Trigger(QFrame, BaseInterface):
             self.f_thread.is_running.connect(self.turn_off_f_switch)
             self.f_thread.start()
         else:
-            # ✅ 修复：使用官方的 isRunning() 方法判断，而不是访问自定义的属性
             if hasattr(self, 'f_thread') and self.f_thread.isRunning():
                 self.f_thread.stop()
                 InfoBar.success(
@@ -90,7 +89,6 @@ class Trigger(QFrame, BaseInterface):
             self.nita_e_thread.is_running.connect(self.turn_off_e_switch)
             self.nita_e_thread.start()
         else:
-            # ✅ 修复：同上
             if hasattr(self, 'nita_e_thread') and self.nita_e_thread.isRunning():
                 self.nita_e_thread.stop()
                 InfoBar.success(
