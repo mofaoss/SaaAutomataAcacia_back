@@ -416,7 +416,7 @@ class SharedSchedulingPanel(QWidget):
     def load_task(self, task_id, config_dict):
         self.task_id = task_id
         self.enable_checkbox.blockSignals(True)
-        self.enable_checkbox.setChecked(config_dict.get("use_periodic", True))
+        self.enable_checkbox.setChecked(config_dict.get("use_periodic", False))
         self.enable_checkbox.blockSignals(False)
 
         while self.activation_layout.count() > 1:

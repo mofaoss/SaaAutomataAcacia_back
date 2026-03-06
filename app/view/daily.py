@@ -610,7 +610,7 @@ class Daily(QFrame, BaseInterface):
             task_cfg = copy.deepcopy({
                 "id": task_id,
                 "enabled": True,
-                "use_periodic": True,
+                "use_periodic": False,
                 "activation_config": [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}],
                 "execution_config": [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}],
                 "last_run": 0,
@@ -1318,7 +1318,7 @@ class Daily(QFrame, BaseInterface):
     def should_run_task(self, task_config: Dict[str, Any], now: datetime = None) -> bool:
         if not task_config.get("enabled", False):
             return False
-        if not task_config.get("use_periodic", True):
+        if not task_config.get("use_periodic", False):
             return True
 
         if now is None:
