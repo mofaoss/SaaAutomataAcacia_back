@@ -4,7 +4,7 @@ from functools import partial
 import cv2
 import numpy as np
 from PySide6.QtWidgets import QFrame, QWidget, QLabel, QVBoxLayout
-from fuzzywuzzy import process
+from rapidfuzz import process
 from qfluentwidgets import SpinBox, CheckBox, ComboBox, LineEdit, Slider, InfoBar
 
 from app.common.config import config, is_non_chinese_ui_language
