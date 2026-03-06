@@ -24,26 +24,18 @@ from ..common.style_sheet import StyleSheet
 from .base_interface import BaseInterface
 from utils.updater_utils import (
     get_local_version,
-    get_github_release_channels,
+    resolve_batch_dir,
     get_best_update_candidate,
     is_remote_version_newer,
     is_prerelease_version,
 )
 from ..repackage.slider_setting_card import SliderSettingCard
 from ..repackage.text_edit_card import TextEditCard
+from utils.updater_utils import UpdateDownloadThread, get_best_update_candidate, get_local_version
 
 
 logger = logging.getLogger(__name__)
 
-
-class UpdatingThread(QThread):
-
-    def __init__(self, updater):
-        super().__init__()
-        self.updater = updater
-
-    def run(self):
-        self.updater.run()
 
 
 class VersionCheckThread(QThread):
@@ -118,7 +110,7 @@ class AboutHeaderWidget(QWidget, BaseInterface):
         self.qqLink.setToolTip(self._ui_text("点击复制QQ群号", "Click to copy QQ group number"))
 
         self.githubPrefix = BodyLabel("GitHub:", self)
-        self.downloadLink = HyperlinkButton("", self._ui_text("点击下载", "Click to download"), self)
+        self.downloadLink = HyperlinkButton("", self._ui_text("现在更新", "Update now"), self)
 
         self.row2Layout.addWidget(self.qqPrefix)
         self.row2Layout.addWidget(self.qqLink)
@@ -449,76 +441,12 @@ class SettingInterface(ScrollArea, BaseInterface):
         self.versionCheckThread.finishedSignal.connect(self._on_about_header_version_checked)
         self.versionCheckThread.start()
 
-    def _on_about_header_version_checked(self, payload: dict):
-        local_version = str(payload.get("local_version") or get_local_version() or "-").strip()
-        latest_version = str(payload.get("latest_version") or "").strip()
-        download_url = str(payload.get("download_url") or "").strip()
-
-        if download_url and hasattr(self.aboutHeaderWidget, "downloadLink"):
-            try:
-                self.aboutHeaderWidget.downloadLink.setUrl(download_url)
-            except Exception:
-                pass
-
-        if latest_version:
-            # Data fetched successfully - show version information
-            if hasattr(self.aboutHeaderWidget, "localVersionLabel"):
-                self.aboutHeaderWidget.localVersionLabel.setText(
-                    self._ui_text(f"当前版本：{local_version}", f"Current version: {local_version}")
-                )
-            if hasattr(self.aboutHeaderWidget, "remoteVersionLabel"):
-                self.aboutHeaderWidget.remoteVersionLabel.setText(
-                    self._ui_text(f"最新版本：{latest_version}", f"Latest version: {latest_version}")
-                )
-        else:
-            # CRITICAL: Show failure state clearly on the UI when data fetch fails
-            if hasattr(self.aboutHeaderWidget, "localVersionLabel"):
-                self.aboutHeaderWidget.localVersionLabel.setText(
-                    self._ui_text(f"当前版本：{local_version}", f"Current version: {local_version}")
-                )
-            if hasattr(self.aboutHeaderWidget, "remoteVersionLabel"):
-                self.aboutHeaderWidget.remoteVersionLabel.setText(
-                    self._ui_text("最新版本：获取失败", "Latest version: Failed to fetch")
-                )
-
     def _sync_stealth_controls(self, checked: bool, alpha: int):
         try:
             if hasattr(self, "windowTrackingAlphaCard") and self.windowTrackingAlphaCard is not None:
                 self.windowTrackingAlphaCard.sync_from_config()
         except Exception:
             pass
-
-    def _select_update_candidate(self, local_version: str, release_channels: dict):
-        stable = release_channels.get("latest") if isinstance(release_channels, dict) else None
-        prerelease = release_channels.get("prerelease") if isinstance(release_channels, dict) else None
-        should_check_prerelease = is_prerelease_version(local_version) or bool(config.checkPrereleaseForStable.value)
-
-        candidates = []
-        for channel_name, release_data in (("latest", stable), ("prerelease", prerelease)):
-            if channel_name == "prerelease" and not should_check_prerelease:
-                continue
-            if not release_data:
-                continue
-            remote_version = release_data.get("version")
-            if not remote_version:
-                continue
-            if is_remote_version_newer(local_version, remote_version):
-                candidates.append({
-                    "channel": channel_name,
-                    "version": remote_version,
-                    "download_url": release_data.get("download_url"),
-                    "is_prerelease": channel_name == "prerelease"
-                })
-
-        if not candidates:
-            return None
-
-        best = candidates[0]
-        for candidate in candidates[1:]:
-            if is_remote_version_newer(best["version"], candidate["version"]):
-                best = candidate
-
-        return best
 
     def set_windows_start(self, is_checked):
         if is_checked:
@@ -623,45 +551,122 @@ class SettingInterface(ScrollArea, BaseInterface):
                 parent=self
             )
 
-    def start_download(self, updater):
-        self.progressBar.setValue(0)
+    def _on_about_header_version_checked(self, payload: dict):
+        local_version = str(payload.get("local_version") or get_local_version() or "-").strip()
+        latest_version = str(payload.get("latest_version") or "").strip()
+        download_url = str(payload.get("download_url") or "").strip()
+
+        if download_url and hasattr(self.aboutHeaderWidget, "downloadLink"):
+            try:
+                # 清除原生超链接行为，阻断默认浏览器直接拉起
+                self.aboutHeaderWidget.downloadLink.setUrl("")
+                self.aboutHeaderWidget.downloadLink.clicked.disconnect()
+            except Exception:
+                pass
+            # 绑定内置 aria2c 下载引擎
+            self.aboutHeaderWidget.downloadLink.clicked.connect(lambda: self.start_unified_download(download_url))
+
+        if latest_version:
+            if hasattr(self.aboutHeaderWidget, "localVersionLabel"):
+                self.aboutHeaderWidget.localVersionLabel.setText(
+                    self._ui_text(f"当前版本：{local_version}", f"Current version: {local_version}")
+                )
+            if hasattr(self.aboutHeaderWidget, "remoteVersionLabel"):
+                self.aboutHeaderWidget.remoteVersionLabel.setText(
+                    self._ui_text(f"最新版本：{latest_version}", f"Latest version: {latest_version}")
+                )
+        else:
+            if hasattr(self.aboutHeaderWidget, "localVersionLabel"):
+                self.aboutHeaderWidget.localVersionLabel.setText(
+                    self._ui_text(f"当前版本：{local_version}", f"Current version: {local_version}")
+                )
+            if hasattr(self.aboutHeaderWidget, "remoteVersionLabel"):
+                self.aboutHeaderWidget.remoteVersionLabel.setText(
+                    self._ui_text("最新版本：获取失败", "Latest version: Failed to fetch")
+                )
+
+    def start_unified_download(self, download_url: str):
+        """ 统一接入的高速下载入口 """
+        self.progressBar.setRange(0, 0)  # 激活不确定进度模式 (跑马灯状态)
         self.progressBar.setVisible(True)
-        self.updating_thread = UpdatingThread(updater)
-        signalBus.checkUpdateSig.connect(self.update_progress)
-        self.updating_thread.finished.connect(partial(self.update_finished, updater.download_file_path))
-        self.updating_thread.start()
+
+        self.download_thread = UpdateDownloadThread(download_url)
+        self.download_thread.finished_signal.connect(self.update_finished)
+        self.download_thread.fallback_signal.connect(
+            lambda title, content: self.handle_download_fallback(title, content, download_url)
+        )
+        self.download_thread.start()
+
+    def handle_download_fallback(self, title: str, content: str, download_url: str):
+        """ 捕捉下载异常并提供浏览器备用方案 """
+        self.progressBar.setVisible(False)
+        message_box = MessageBox(title, content, self.parent.window())
+        if message_box.exec():
+            # 用户选择同意跳转浏览器
+            QDesktopServices.openUrl(QUrl(download_url))
+
+    def update_finished(self, downloaded_path: str):
+        """ 处理下载完成后的逻辑：向用户展示完整路径并执行后续更新步骤 """
+        self.progressBar.setVisible(False)
+
+        # 核心路径解析
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        seven_zip = os.path.join(base_dir, "app", "resource", "binary", "7za.exe")
+        app_root = base_dir
+
+        # 识别文件类型
+        is_exe = downloaded_path.lower().endswith('.exe')
+
+        # 构造提示信息
+        title = self._ui_text('下载完成', 'Update Downloaded')
+        path_info = f"<b>完整存储路径：</b><br/>{downloaded_path}"
+
+        if is_exe:
+            content = self._ui_text(
+                f"安装程序已准备就绪。<br/><br/>{path_info}<br/><br/>是否立即关闭本程序并运行安装向导？",
+                f"Installer is ready.<br/><br/><b>Full Path:</b><br/>{downloaded_path}<br/><br/>Close app and run installer?"
+            )
+        else:
+            content = self._ui_text(
+                f"更新压缩包已准备就绪。<br/><br/>{path_info}<br/><br/>是否立即关闭本程序并调用 7za 执行自动覆盖更新？",
+                f"Update package is ready.<br/><br/><b>Full Path:</b><br/>{downloaded_path}<br/><br/>Close app and extract using 7za?"
+            )
+
+        message_box = MessageBox(title, content, self.parent.window())
+        if message_box.exec():
+            try:
+                batch_dir = resolve_batch_dir(downloaded_path)
+                os.makedirs(batch_dir, exist_ok=True)
+                batch_path = os.path.join(batch_dir, "apply_update.bat")
+
+                with open(batch_path, "w", encoding="gbk") as f:
+                    f.write('@echo off\n')
+                    f.write('echo 正在等待主程序关闭...\n')
+                    f.write('timeout /t 1 /nobreak > nul\n')
+
+                    if is_exe:
+                        f.write(f'start "" "{downloaded_path}"\n')
+                    else:
+                        f.write(f'"{seven_zip}" x "{downloaded_path}" -o"{app_root}" -y\n')
+                        f.write(f'start "" "{sys.executable}"\n')
+
+                    f.write('del "%~f0"\n')
+
+                subprocess.Popen(batch_path, shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
+                from PySide6.QtWidgets import QApplication
+                QApplication.quit()
+
+            except Exception as e:
+                self.handle_download_fallback(
+                    self._ui_text("应用更新失败", "Update Failed"),
+                    f"脚本启动异常：{str(e)}。请根据路径手动操作。",
+                    REPO_URL
+                )
+
 
     def update_progress(self, value):
         """ Update the progress bar """
         self.progressBar.setValue(value)
-
-    def update_finished(self, zip_path):
-        """ Hide progress bar and show completion message """
-        self.progressBar.setVisible(False)
-        if os.path.exists(zip_path):
-            if self._is_dialog_open:
-                return
-            title = self._ui_text('更新完成', 'Update ready')
-            content = self._ui_text(f'压缩包已下载至{zip_path}，即将重启更新',
-                                    f'Package downloaded to {zip_path}. Restarting to update')
-            self._is_dialog_open = True
-            try:
-                message_box = MessageBox(title, content, self.parent.window())
-                message_box.cancelButton.setVisible(False)
-                if message_box.exec():
-                    subprocess.Popen([sys.executable, 'update.py', zip_path])
-                    self.parent.close()
-            finally:
-                self._is_dialog_open = False
-        else:
-            InfoBar.error(
-                self._ui_text('更新下载失败', 'Update download failed'),
-                self._ui_text(f'请前往 {REPO_URL}/releases或者{QQ} 群下载更新包',
-                              f'Please download update package from {REPO_URL}/releases or QQ group {QQ}'),
-                isClosable=True,
-                duration=-1,
-                parent=self
-            )
 
     def scrollToAboutCard(self):
         """ scroll to example card """
