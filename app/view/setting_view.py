@@ -585,18 +585,6 @@ class SettingInterface(ScrollArea, BaseInterface):
                     self._ui_text("最新版本：获取失败", "Latest version: Failed to fetch")
                 )
 
-    def start_unified_download(self, download_url: str):
-        """ 统一接入的高速下载入口 """
-        self.progressBar.setRange(0, 0)  # 激活不确定进度模式 (跑马灯状态)
-        self.progressBar.setVisible(True)
-
-        self.download_thread = UpdateDownloadThread(download_url)
-        self.download_thread.finished_signal.connect(self.update_finished)
-        self.download_thread.fallback_signal.connect(
-            lambda title, content: self.handle_download_fallback(title, content, download_url)
-        )
-        self.download_thread.start()
-
     def handle_download_fallback(self, title: str, content: str, download_url: str):
         """ 捕捉下载异常并提供浏览器备用方案 """
         self.progressBar.setVisible(False)
@@ -605,30 +593,41 @@ class SettingInterface(ScrollArea, BaseInterface):
             # 用户选择同意跳转浏览器
             QDesktopServices.openUrl(QUrl(download_url))
 
-    def update_finished(self, downloaded_path: str):
-        """ 处理下载完成后的逻辑：向用户展示完整路径并执行后续更新步骤 """
-        self.progressBar.setVisible(False)
+    def start_unified_download(self, download_url: str):
+        """ 统一接入的高速下载入口 """
+        # 改为真实的进度条 (从 0 到 100)
+        self.progressBar.setRange(0, 100)
+        self.progressBar.setValue(0)
+        self.progressBar.setVisible(True)
 
-        # 核心路径解析
-        seven_zip = get_binary_path("7za.exe") # 使用统一适配器
+        self.download_thread = UpdateDownloadThread(download_url)
+        # 绑定进度条刷新事件
+        self.download_thread.progress_signal.connect(self.update_progress)
+        self.download_thread.finished_signal.connect(self.update_finished)
+        self.download_thread.fallback_signal.connect(
+            lambda title, content: self.handle_download_fallback(title, content, download_url)
+        )
+        self.download_thread.start()
+
+    def update_finished(self, downloaded_path: str):
+        """ 处理下载完成后的逻辑 """
+        self.progressBar.setVisible(False)
         app_root = get_app_root()
 
-        # 识别文件类型
-        is_exe = downloaded_path.lower().endswith('.exe')
+        # 如果是 EXE 安装包，传过来的是文件；如果是 ZIP，传过来的是解压好的临时文件夹
+        is_exe = os.path.isfile(downloaded_path) and downloaded_path.lower().endswith('.exe')
 
-        # 构造提示信息
-        title = self._ui_text('下载完成', 'Update Downloaded')
-        path_info = f"<b>完整存储路径：</b><br/>{downloaded_path}"
+        title = self._ui_text('更新准备就绪', 'Update Ready')
 
         if is_exe:
             content = self._ui_text(
-                f"安装程序已准备就绪。<br/><br/>{path_info}<br/><br/>是否立即关闭本程序并运行安装向导？",
-                f"Installer is ready.<br/><br/><b>Full Path:</b><br/>{downloaded_path}<br/><br/>Close app and run installer?"
+                "安装程序已下载完毕。<br/><br/>是否立即关闭本程序并运行安装向导？",
+                "Installer downloaded.<br/><br/>Close app and run installer?"
             )
         else:
             content = self._ui_text(
-                f"更新压缩包已准备就绪。<br/><br/>{path_info}<br/><br/>是否立即关闭本程序并调用 7za 执行自动覆盖更新？",
-                f"Update package is ready.<br/><br/><b>Full Path:</b><br/>{downloaded_path}<br/><br/>Close app and extract using 7za?"
+                "新版本文件已解压准备就绪。<br/><br/>是否立即重启程序自动完成静默更新？",
+                "Update files extracted.<br/><br/>Restart app to apply updates?"
             )
 
         message_box = MessageBox(title, content, self.parent.window())
@@ -640,15 +639,20 @@ class SettingInterface(ScrollArea, BaseInterface):
 
                 with open(batch_path, "w", encoding="gbk") as f:
                     f.write('@echo off\n')
-                    f.write('echo 正在等待主程序关闭...\n')
-                    f.write('timeout /t 1 /nobreak > nul\n')
+                    f.write('echo 正在等待主程序关闭 (Waiting for app to close)...\n')
+                    # 等待 2 秒，确保 PySide6 完全释放文件占用锁
+                    f.write('timeout /t 2 /nobreak > nul\n')
 
                     if is_exe:
                         f.write(f'start "" "{downloaded_path}"\n')
                     else:
-                        f.write(f'"{seven_zip}" x "{downloaded_path}" -o"{app_root}" -y\n')
+                        # 核心魔法：使用 Windows 原生 xcopy 静默覆盖更新
+                        # /E: 包含所有子目录，/Y: 不提示直接覆盖，/C: 出错也继续
+                        f.write(f'xcopy "{downloaded_path}\\*" "{app_root}\\" /E /Y /C > nul\n')
+                        # 覆盖完成后自动拉起主程序
                         f.write(f'start "" "{sys.executable}"\n')
 
+                    # 阅后即焚
                     f.write('del "%~f0"\n')
 
                 subprocess.Popen(batch_path, shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
@@ -658,10 +662,9 @@ class SettingInterface(ScrollArea, BaseInterface):
             except Exception as e:
                 self.handle_download_fallback(
                     self._ui_text("应用更新失败", "Update Failed"),
-                    f"脚本启动异常：{str(e)}。请根据路径手动操作。",
+                    f"覆盖脚本启动异常：{str(e)}",
                     REPO_URL
                 )
-
 
     def update_progress(self, value):
         """ Update the progress bar """

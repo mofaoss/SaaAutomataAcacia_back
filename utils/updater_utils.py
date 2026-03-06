@@ -7,7 +7,8 @@ import logging
 import threading
 import time
 from typing import Any, Dict, Optional, Tuple
-import subprocess
+import shutil
+import zipfile
 import requests
 from PySide6.QtCore import QThread, Signal
 from urllib.parse import urlparse
@@ -327,80 +328,66 @@ class UpdateDownloadThread(QThread):
     def __init__(self, download_url: str):
         super().__init__()
         self.download_url = download_url
-
-        # 使用适配函数获取路径
-        self.aria2c_path = get_binary_path("aria2c.exe")
         self.temp_dir = os.path.join(get_app_root(), "temp", "update")
 
-        # 解析文件名 (修复之前提到的 parsed_url 报错)
-        from urllib.parse import urlparse
         parsed_url = urlparse(download_url)
         self.filename = os.path.basename(parsed_url.path) or "update_package.zip"
         self.filepath = os.path.join(self.temp_dir, self.filename)
-
-        # 调试用：打包后如果报错，可以在日志里打印这个路径看看它到底指向哪
-        print(f"DEBUG: aria2c path is {self.aria2c_path}")
+        self.extract_dir = os.path.join(self.temp_dir, "extracted")
 
     def run(self):
-        process = None  # 显式初始化，避免 NameError
         try:
-            # 确保临时目录存在
             os.makedirs(self.temp_dir, exist_ok=True)
-
-            # 如果旧文件存在，先尝试删除
             if os.path.exists(self.filepath):
-                try:
-                    os.remove(self.filepath)
-                except Exception:
-                    pass
+                try: os.remove(self.filepath)
+                except: pass
 
-            # 构建 aria2c 命令
-            aria2c_cmd = [
-                self.aria2c_path,
-                "-d", self.temp_dir,
-                "-o", self.filename,
-                "-x", "8",
-                "-s", "8",
-                "--lowest-speed-limit=100K",
-                "--allow-overwrite=true",
-                self.download_url
-            ]
+            # === 1. 原生高速下载 (支持 125MB 大文件流式写入和代理) ===
+            proxies = _resolve_proxies(None)
+            response = requests.get(self.download_url, stream=True, proxies=proxies, timeout=15)
+            response.raise_for_status()
 
-            # 启动进程
-            process = subprocess.Popen(
-                aria2c_cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                creationflags=subprocess.CREATE_NO_WINDOW
-            )
+            total_size = int(response.headers.get('content-length', 0))
+            downloaded_size = 0
 
-            # 读取输出（用于以后扩展进度条）
-            if process.stdout:
-                for line in process.stdout:
-                    # TODO: 在这里解析 line 提取百分比并 emit(progress_signal)
-                    pass
+            with open(self.filepath, 'wb') as f:
+                # 每次读取 8KB
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+                        downloaded_size += len(chunk)
+                        if total_size > 0:
+                            progress = int((downloaded_size / total_size) * 100)
+                            # 进度条走到 95%，留出最后 5% 的时间给解压
+                            self.progress_signal.emit(int(progress * 0.95))
 
-            process.wait()
+            # === 2. 原生解压 (无需 7za.exe) ===
+            is_exe = self.download_url.lower().endswith('.exe')
+            if not is_exe:
+                if os.path.exists(self.extract_dir):
+                    shutil.rmtree(self.extract_dir, ignore_errors=True)
+                os.makedirs(self.extract_dir, exist_ok=True)
 
-            # 检查下载状态
-            if process.returncode != 0:
-                self.fallback_signal.emit("下载中断", "下载器异常退出，可尝试浏览器下载")
-                return
+                # 使用 Python 内置 zipfile 解压到临时文件夹
+                with zipfile.ZipFile(self.filepath, 'r') as zip_ref:
+                    zip_ref.extractall(self.extract_dir)
 
-            # 校验文件大小（防止下载到错误的 HTML 页面）
-            if not os.path.exists(self.filepath) or os.path.getsize(self.filepath) < 5000:
-                self.fallback_signal.emit("无效文件", "下载的文件过小，可能是链接失效或网络拦截。")
-                return
+                # 智能识别 Nuitka 打包出的单层嵌套结构 (防止复制后多嵌套一层)
+                extracted_items = os.listdir(self.extract_dir)
+                if len(extracted_items) == 1 and os.path.isdir(os.path.join(self.extract_dir, extracted_items[0])):
+                    self.extract_dir = os.path.join(self.extract_dir, extracted_items[0])
 
-            # 下载成功
-            self.finished_signal.emit(self.filepath)
+                self.progress_signal.emit(100)
+                # 传递解压后的【文件夹】路径
+                self.finished_signal.emit(self.extract_dir)
+            else:
+                self.progress_signal.emit(100)
+                # EXE 直接传递文件路径
+                self.finished_signal.emit(self.filepath)
 
+        except requests.exceptions.RequestException as e:
+            self.fallback_signal.emit("下载网络错误", f"无法连接服务器，请检查代理：{str(e)}")
+        except zipfile.BadZipFile:
+            self.fallback_signal.emit("文件损坏", "下载的压缩包不完整，请重试。")
         except Exception as e:
-            self.fallback_signal.emit("下载引擎错误", str(e))
-        finally:
-            if process:
-                try:
-                    process.kill() # 确保释放资源
-                except:
-                    pass
+            self.fallback_signal.emit("更新异常", str(e))
