@@ -466,6 +466,7 @@ class Daily(QFrame, BaseInterface):
             task_item.settings_clicked.connect(self._on_task_settings_clicked)
             task_item.checkbox_state_changed.connect(self._on_task_checkbox_changed)
             task_item.play_clicked.connect(self._on_task_play_clicked)
+            task_item.play_from_here_clicked.connect(self._on_task_play_from_here_clicked)
 
         self.ui.taskListWidget.orderChanged.connect(self._on_task_order_changed)
         self.ui.shared_scheduling_panel.config_changed.connect(self._on_shared_config_changed)
@@ -978,12 +979,14 @@ class Daily(QFrame, BaseInterface):
     def handle_start(self, str_flag):
         try:
             if str_flag == 'start':
-                # ====== 核心修复 3：必须先设为 True，再清空 pending，彻底防闪烁！ ======
                 self.is_running = True
                 self._set_launch_pending_state(False)
                 self.set_checkbox_enable(False)
                 self.ui.PushButton_start.setText(self._ui_text("停止", "Stop"))
-                # (不要在这里改图标了，交给刚才写的 _on_task_actually_started 动态去改)
+
+                for task_item in self.task_widget_map.values():
+                    if hasattr(task_item, 'set_running'):
+                        task_item.set_running('hidden')
 
                 if not self.running_game_guard_timer.isActive():
                     self.running_game_guard_timer.start(1000)
@@ -995,10 +998,9 @@ class Daily(QFrame, BaseInterface):
                 self.set_checkbox_enable(True)
                 self.ui.PushButton_start.setText(self._ui_text("开始", "Start"))
 
-                # 任务彻底结束，所有图标切回 Play
                 for task_item in self.task_widget_map.values():
                     if hasattr(task_item, 'set_running'):
-                        task_item.set_running(False)
+                        task_item.set_running('idle')
 
                 if str_flag == 'end':
                     self.after_finish()
@@ -1021,18 +1023,22 @@ class Daily(QFrame, BaseInterface):
             self.ui.PushButton_start.setText(self._ui_text("开始", "Start"))
             for task_item in self.task_widget_map.values():
                 if hasattr(task_item, 'set_running'):
-                    task_item.set_running(False)
+                    task_item.set_running('idle')
 
     def _set_launch_pending_state(self, pending: bool):
         self.is_launch_pending = bool(pending)
         if self.is_launch_pending:
             self.set_checkbox_enable(False)
             self.ui.PushButton_start.setText(self._ui_text("停止", "Stop"))
-            # 等待启动游戏时，如果是针对某一个特定任务点的，让它转圈圈(Pause)
+
+            for task_item in self.task_widget_map.values():
+                if hasattr(task_item, 'set_running'):
+                    task_item.set_running('hidden')
+
             if hasattr(self, 'tasks_to_run') and len(self.tasks_to_run) == 1:
                 item = self.task_widget_map.get(self.tasks_to_run[0])
                 if item and hasattr(item, 'set_running'):
-                    item.set_running(True)
+                    item.set_running('running')
             return
 
         if not self.is_running:
@@ -1040,7 +1046,7 @@ class Daily(QFrame, BaseInterface):
             self.ui.PushButton_start.setText(self._ui_text("开始", "Start"))
             for task_item in self.task_widget_map.values():
                 if hasattr(task_item, 'set_running'):
-                    task_item.set_running(False)
+                    task_item.set_running('idle')
 
     def _on_task_play_clicked(self, task_id: str):
         if self.is_running or self.is_launch_pending:
@@ -1064,17 +1070,63 @@ class Daily(QFrame, BaseInterface):
 
             tasks_to_run = [task_id]
 
-            # ====== 核心修复 4：只把点下去的这一个任务切成 Pause ======
-            item = self.task_widget_map.get(task_id)
-            if item and hasattr(item, 'set_running'):
-                item.set_running(True)
-            # =========================================================
+            for tid, item in self.task_widget_map.items():
+                if hasattr(item, 'set_running'):
+                    if tid == task_id:
+                        item.set_running('running')
+                    else:
+                        item.set_running('hidden')
 
             if config.CheckBox_open_game_directly.value and not is_exist_snowbreak() and task_id == "task_login":
                 self.tasks_to_run = tasks_to_run
                 self.open_game_directly()
             else:
                 self.after_start_button_click(tasks_to_run)
+
+    def _on_task_play_from_here_clicked(self, start_task_id: str):
+        if self.is_running or self.is_launch_pending:
+            self._on_task_play_clicked(start_task_id)
+            return
+
+        self.logger.info(self._ui_text(f"⏬ 开始从指定位置向下批量执行已勾选任务", f"⏬ Force running checked tasks from here"))
+
+        if getattr(self, 'is_loop_waiting', False):
+            self.loop_timer.stop()
+            self.is_loop_waiting = False
+            self.set_checkbox_enable(True)
+            self.ui.PushButton_start.setText(self._ui_text("开始", "Start"))
+
+        tasks_to_run = []
+        start_adding = False
+        login_task_checked = False
+
+        ordered_task_ids = self.ui.taskListWidget.get_task_order()
+
+        for task_id in ordered_task_ids:
+            if task_id == start_task_id:
+                start_adding = True
+
+            if start_adding:
+                task_item = self.task_widget_map.get(task_id)
+                is_checked = bool(task_item.checkbox.isChecked()) if task_item else False
+                if is_checked:
+                    tasks_to_run.append(task_id)
+                    if task_id == "task_login":
+                        login_task_checked = True
+
+        if not tasks_to_run:
+            self.logger.warning(self._ui_text("⚠️ 下方没有已勾选的任务可执行！", "⚠️ No checked tasks found below!"))
+            return
+
+        for item in self.task_widget_map.values():
+            if hasattr(item, 'set_running'):
+                item.set_running('hidden')
+
+        if config.CheckBox_open_game_directly.value and not is_exist_snowbreak() and login_task_checked:
+            self.tasks_to_run = tasks_to_run
+            self.open_game_directly()
+        else:
+            self.after_start_button_click(tasks_to_run)
 
     def check_game_open(self):
         try:
@@ -1179,14 +1231,13 @@ class Daily(QFrame, BaseInterface):
             )
 
     def _on_task_actually_started(self, task_id: str):
-        """当某个任务真正开始跑的时候，把它切成暂停图标，其他的重置为播放"""
+        """当某个任务真正开始跑的时候，把它切成暂停图标，其他的全部隐藏"""
         for tid, item in self.task_widget_map.items():
             if hasattr(item, 'set_running'):
-                item.set_running(False)
-
-        current_item = self.task_widget_map.get(task_id)
-        if current_item and hasattr(current_item, 'set_running'):
-            current_item.set_running(True)
+                if tid == task_id:
+                    item.set_running('running')
+                else:
+                    item.set_running('hidden')
 
     def after_start_button_click(self, tasks_to_run):
         if tasks_to_run:

@@ -67,7 +67,8 @@ class TaskListView(ListWidget):
 class TaskItemWidget(QWidget):
     checkbox_state_changed = Signal(str, bool)
     settings_clicked = Signal(str)
-    play_clicked = Signal(str)  # 新增：独立执行信号
+    play_clicked = Signal(str)  # 单独执行信号
+    play_from_here_clicked = Signal(str) # 新增：从此处向下执行的信号
 
     def __init__(self, task_id, zh_name, en_name, is_enabled, is_non_chinese_ui, parent=None):
         super().__init__(parent)
@@ -77,8 +78,16 @@ class TaskItemWidget(QWidget):
         layout.setContentsMargins(4, 4, 4, 4)
         layout.setSpacing(6)
 
+        # 构造左侧复选框与文本的紧凑布局
+        left_layout = QHBoxLayout()
+        left_layout.setContentsMargins(0, 0, 0, 0)
+        left_layout.setSpacing(4)
+
         self.checkbox = CheckBox(parent=self)
         self.checkbox.setChecked(is_enabled)
+
+        # 限制复选框最大宽度，消除默认文本预留空间
+        self.checkbox.setFixedWidth(28)
         self.checkbox.stateChanged.connect(
             lambda: self.checkbox_state_changed.emit(self.task_id, self.checkbox.isChecked())
         )
@@ -86,43 +95,70 @@ class TaskItemWidget(QWidget):
         self.label = BodyLabel(en_name if is_non_chinese_ui else zh_name, self)
         self.label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
-        # ====== 更改为 Play 按钮 ======
-        self.btn = ToolButton(self)
-        self.btn.setIcon(FIF.PLAY) # 默认 Play 图标
-        self.btn.setToolTip("立刻执行" if not is_non_chinese_ui else "Run Immediately")
-        btn_font = self.btn.font()
-        btn_font.setPointSize(10)
-        self.btn.setFont(btn_font)
-        # 点击按钮现在触发 play_clicked 信号
-        self.btn.clicked.connect(lambda: self.play_clicked.emit(self.task_id))
-        # ==============================
+        # 设置文本标签穿透鼠标事件，实现整行点击聚焦
+        self.label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 
-        layout.addWidget(self.checkbox, 0)
-        layout.addWidget(self.label, 0)
+        left_layout.addWidget(self.checkbox, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        left_layout.addWidget(self.label, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+
+        # 初始化“向下执行”按钮并固定尺寸
+        self.btn_play_from_here = ToolButton(self)
+        self.btn_play_from_here.setIcon(FIF.DOWN)
+        self.btn_play_from_here.setToolTip("此处开始" if not is_non_chinese_ui else "Run checked tasks from here")
+        self.btn_play_from_here.setFixedSize(28, 28)
+
+        btn_font = self.btn_play_from_here.font()
+        btn_font.setPointSize(10)
+        self.btn_play_from_here.setFont(btn_font)
+        self.btn_play_from_here.clicked.connect(lambda: self.play_from_here_clicked.emit(self.task_id))
+
+        # 初始化“单独执行”按钮并固定尺寸
+        self.btn = ToolButton(self)
+        self.btn.setIcon(FIF.PLAY)
+        self.btn.setToolTip("单独任务" if not is_non_chinese_ui else "Run only this task")
+        self.btn.setFixedSize(28, 28)
+        self.btn.setFont(btn_font)
+        self.btn.clicked.connect(lambda: self.play_clicked.emit(self.task_id))
+
+        layout.addLayout(left_layout, 0)
         layout.addStretch(1)
+        layout.addWidget(self.btn_play_from_here, 0)
         layout.addWidget(self.btn, 0)
 
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def mouseReleaseEvent(self, event):
         super().mouseReleaseEvent(event)
+        # 只要点击了这一行（非复选框和按钮的区域），就发射聚焦信号
         if event.button() == Qt.MouseButton.LeftButton:
             self.settings_clicked.emit(self.task_id)
 
-    def set_running(self, running: bool):
-        """切换执行/停止的图标与提示状态"""
+    def set_running(self, state: str):
+        """
+        切换执行/停止的图标与状态：
+        - 'idle': 系统空闲，显示“单独执行”和“向下执行”按钮
+        - 'running': 当前任务执行中，只显示“手动终止(Pause)”按钮
+        - 'hidden': 其他任务正在执行中，隐藏当前任务的所有按钮
+        """
         try:
-            # 安全获取图标，防止某些版本的 qfluentwidgets 没有 PAUSE
-            icon = getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)) if running else FIF.PLAY
-            self.btn.setIcon(icon)
-            tooltip = ("手动终止" if running else "立刻执行")
-            self.btn.setToolTip(tooltip)
+            if state == 'running':
+                self.btn.setVisible(True)
+                self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
+                self.btn.setToolTip("手动终止")
+                self.btn_play_from_here.setVisible(False)
+            elif state == 'idle':
+                self.btn.setVisible(True)
+                self.btn.setIcon(FIF.PLAY)
+                self.btn.setToolTip("单独执行")
+                self.btn_play_from_here.setVisible(True)
+            elif state == 'hidden':
+                self.btn.setVisible(False)
+                self.btn_play_from_here.setVisible(False)
 
-            # 强制 UI 立刻重绘，防止被主线程阻塞
             self.btn.repaint()
+            self.btn_play_from_here.repaint()
         except Exception:
             pass
-
 
 class ExecutionRuleWidget(QWidget):
     deleted = Signal(QWidget)
