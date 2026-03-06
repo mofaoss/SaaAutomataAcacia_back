@@ -443,6 +443,7 @@ class Daily(QFrame, BaseInterface):
         self.ui.PushButton_select_directory.clicked.connect(self.on_select_directory_click)
         self.ui.PrimaryPushButton_import_codes.clicked.connect(self.on_import_codes_click)
         self.ui.PushButton_reset_codes.clicked.connect(self.on_reset_codes_click)
+        self.ui.shared_scheduling_panel.toggle_all_cycles.connect(self._on_toggle_all_cycles_clicked)
 
         for task_id, task_item in self.task_widget_map.items():
             task_item.settings_clicked.connect(self._on_task_settings_clicked)
@@ -544,6 +545,36 @@ class Daily(QFrame, BaseInterface):
             if task_id in TASK_REGISTRY:
                 self._on_task_settings_clicked(task_id)
                 break
+
+    def _on_toggle_all_cycles_clicked(self, enable: bool):
+        """一键开启或关闭所有任务的周期执行"""
+        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
+
+        # 遍历所有任务，强行修改 use_periodic 状态
+        for task_cfg in sequence:
+            task_cfg["use_periodic"] = enable
+
+        self._save_task_sequence(sequence)
+        if getattr(self.ui, 'shared_scheduling_panel', None):
+            self.ui.shared_scheduling_panel.enable_checkbox.blockSignals(True)
+            self.ui.shared_scheduling_panel.enable_checkbox.setChecked(enable)
+            self.ui.shared_scheduling_panel.enable_checkbox.blockSignals(False)
+
+        # 弹个窗给用户一个友好的反馈
+        action_text_zh = "开启" if enable else "关闭"
+        action_text_en = "enabled" if enable else "disabled"
+
+        InfoBar.success(
+            title=self._ui_text('批量设置成功', 'Batch Set Success'),
+            content=self._ui_text(f'已将所有任务的周期计划{action_text_zh}！', f'All task cycles have been {action_text_en}.'),
+            orient=Qt.Orientation.Horizontal,
+            isClosable=True,
+            position=InfoBarPosition.TOP_RIGHT,
+            duration=2500,
+            parent=self
+        )
+
+        self.logger.info(self._ui_text(f"已一键{action_text_zh}所有任务的周期执行", f"Batch {action_text_en} all task cycles"))
 
     def _on_task_checkbox_changed(self, task_id: str, is_checked: bool):
         sequence = self._normalize_task_sequence(config.daily_task_sequence.value)

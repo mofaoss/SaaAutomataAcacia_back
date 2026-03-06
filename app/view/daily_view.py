@@ -248,6 +248,7 @@ class ExecutionRuleWidget(QWidget):
 
 class SharedSchedulingPanel(QWidget):
     config_changed = Signal(str, dict)
+    toggle_all_cycles = Signal(bool)
 
     def __init__(self, is_non_chinese_ui=False, parent=None):
         super().__init__(parent)
@@ -270,7 +271,22 @@ class SharedSchedulingPanel(QWidget):
         font = self.enable_checkbox.font()
         font.setPointSize(10)
         self.enable_checkbox.setFont(font)
+
         checkbox_row.addWidget(self.enable_checkbox)
+
+        # ====== 新增：开启全部 / 关闭全部 按钮 ======
+        self.btn_enable_all = PushButton("Enable All" if is_non_chinese_ui else "开启全部", self)
+        self.btn_disable_all = PushButton("Disable All" if is_non_chinese_ui else "关闭全部", self)
+
+        self.btn_enable_all.setFixedHeight(28)
+        self.btn_disable_all.setFixedHeight(28)
+
+        self.btn_enable_all.clicked.connect(lambda: self.toggle_all_cycles.emit(True))
+        self.btn_disable_all.clicked.connect(lambda: self.toggle_all_cycles.emit(False))
+
+        checkbox_row.addSpacing(15)
+        checkbox_row.addWidget(self.btn_enable_all)
+        checkbox_row.addWidget(self.btn_disable_all)
         checkbox_row.addStretch(1)
 
         main_layout.addLayout(checkbox_row)
