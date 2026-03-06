@@ -480,6 +480,7 @@ class SettingInterface(ScrollArea, BaseInterface):
                 self.aboutHeaderWidget.remoteVersionLabel.setText(
                     self._ui_text("最新版本：获取失败", "Latest version: Failed to fetch")
                 )
+
     def _sync_stealth_controls(self, checked: bool, alpha: int):
         try:
             if hasattr(self, "windowTrackingAlphaCard") and self.windowTrackingAlphaCard is not None:
@@ -518,28 +519,6 @@ class SettingInterface(ScrollArea, BaseInterface):
                 best = candidate
 
         return best
-
-    def _log_clickable_update_links(self, best: dict, local_version: str):
-        download_url = str(best.get("download_url") or "").strip()
-        update_tag_zh = "测试版" if best.get("is_prerelease") else "新版本"
-        update_tag_en = "pre-release" if best.get("is_prerelease") else "update"
-
-        if download_url:
-            download_anchor = f"<a href=\"{html.escape(download_url, quote=True)}\">{self._ui_text('点击下载最新', 'Click to download latest')}</a>"
-            logger.warning(self._ui_text(
-                f"【检查更新】发现{update_tag_zh} {local_version} → {best['version']}\n"
-                f"{download_anchor}",
-                f"[Check Update] New {update_tag_en} found {local_version} -> {best['version']}\n"
-                f"{download_anchor}"
-            ))
-            return
-
-        logger.warning(self._ui_text(
-            f"【检查更新】发现{update_tag_zh} {local_version} → {best['version']}\n"
-            f"暂未找到可直接下载的安装包链接",
-            f"[Check Update] New {update_tag_en} found {local_version} -> {best['version']}\n"
-            f"No direct downloadable installer URL found"
-        ))
 
     def set_windows_start(self, is_checked):
         if is_checked:
@@ -644,53 +623,6 @@ class SettingInterface(ScrollArea, BaseInterface):
                 parent=self
             )
 
-    def check_update(self, is_silent: bool = False):
-        local_version = get_local_version()
-        release_channels = get_github_release_channels(REPO_URL)
-        stable = release_channels.get("latest") if isinstance(release_channels, dict) else None
-        prerelease = release_channels.get("prerelease") if isinstance(release_channels, dict) else None
-
-        # 1. Absolute Failure Check (No API data AND No Cache)
-        if not stable and not prerelease:
-            logger.warning("【检查更新】获取数据失败：网络异常或被限流，且无本地缓存。")
-            # Only show UI error if it's a manual check
-            if not is_silent:
-                InfoBar.error(
-                    self._ui_text('获取数据失败', 'Failed to fetch data'),
-                    self._ui_text('网络请求失败或被限流，且无可用缓存，请稍后再试。',
-                                  'Network request failed or rate-limited. Please try again later.'),
-                    isClosable=True,
-                    duration=5000,
-                    parent=self
-                )
-            return
-
-        # 2. Proceed with normal comparison if data exists
-        best = self._select_update_candidate(local_version, release_channels)
-
-        if best is None:
-            # Data was fetched successfully, but no newer version was found
-            if not is_silent:
-                InfoBar.success(
-                    self._ui_text('已经是最新版', 'Up to date'),
-                    self._ui_text(f'当前已经是最新版本 ({local_version})', f'You are using the latest version ({local_version})'),
-                    isClosable=True,
-                    duration=3000,
-                    parent=self
-                )
-            return
-
-        # 3. Newer version found (Always show this, even if silent)
-        self._log_clickable_update_links(best, local_version)
-        InfoBar.warning(
-            self._ui_text('发现测试版' if best.get("is_prerelease") else '发现新版本',
-                          'Pre-release available' if best.get("is_prerelease") else 'Update available'),
-            self._ui_text('请在日志中点击"点击下载最新"以下载安装包',
-                          'Click "Click to download latest" in log to download installer'),
-            isClosable=True,
-            duration=8000,
-            parent=self
-        )
     def start_download(self, updater):
         self.progressBar.setValue(0)
         self.progressBar.setVisible(True)
