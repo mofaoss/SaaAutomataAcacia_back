@@ -396,7 +396,6 @@ class Daily(QFrame, BaseInterface):
     def _check_and_run_loop_tasks(self):
         """后台循环定时器触发：检查是否有到达计划时间的任务需要执行"""
         tasks_to_run = []
-        login_task_checked = False
 
         sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
         for task_cfg in sequence:
@@ -404,29 +403,29 @@ class Daily(QFrame, BaseInterface):
             task_item = self.task_widget_map.get(task_id)
             is_checked = bool(task_item.checkbox.isChecked()) if task_item else False
 
-            if task_id == "task_login":
-                login_task_checked = is_checked
-            else:
-                # 判断当前任务是否被勾选 且 满足 schedule 计划时间和次数要求
-                if is_checked and self.should_run_task(task_cfg):
-                    tasks_to_run.append(task_id)
+            if is_checked and self.should_run_task(task_cfg):
+                tasks_to_run.append(task_id)
 
         # 如果发现有任务需要执行了
         if tasks_to_run:
             self.loop_timer.stop()  # 暂停检查
             self.is_loop_waiting = False
-
-            # 如果勾选了自动登录，把它塞在最前面
-            if login_task_checked:
-                tasks_to_run.insert(0, "task_login")
-
             self.logger.info(f"到达计划时间，触发循环自动执行: {tasks_to_run}")
 
-            # 走常规的启动流程（带游戏启动检测）
-            if config.CheckBox_open_game_directly.value and not is_exist_snowbreak() and login_task_checked:
+            # 同样判断是否需要强行拉起并过图
+            if config.CheckBox_open_game_directly.value and not is_exist_snowbreak():
+                if "task_login" not in tasks_to_run:
+                    tasks_to_run.insert(0, "task_login")
+                    self.logger.info(self._ui_text("💡检测到游戏未运行，已强行前置【自动登录】任务以完成进游戏流程",
+                                                   "Game is closed. Forcefully prepended [Auto Login] to handle startup."))
+
                 self.tasks_to_run = tasks_to_run
                 self.open_game_directly()
             else:
+                if "task_login" in tasks_to_run and tasks_to_run[0] != "task_login":
+                    tasks_to_run.remove("task_login")
+                    tasks_to_run.insert(0, "task_login")
+
                 self.after_start_button_click(tasks_to_run)
 
     def _initWidget(self):
@@ -1136,9 +1135,7 @@ class Daily(QFrame, BaseInterface):
             self.logger.info(self._ui_text("已取消等待游戏启动", "Cancelled waiting for game launch"))
             return
 
-        # 变更为一个有序的任务列表
         tasks_to_run = []
-        login_task_checked = False
 
         sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
         for task_cfg in sequence:
@@ -1146,20 +1143,40 @@ class Daily(QFrame, BaseInterface):
             task_item = self.task_widget_map.get(task_id)
             is_checked = bool(task_item.checkbox.isChecked()) if task_item else False
 
-            if task_id == "task_login":
-                login_task_checked = is_checked
-                if is_checked:
-                    tasks_to_run.append(task_id)
-            else:
-                # 只有被勾选且满足周期执行条件的，才加入待执行列表
-                if is_checked and self.should_run_task(task_cfg):
-                    tasks_to_run.append(task_id)
+            # 统一审查，只把合规的任务放进队列
+            if is_checked and self.should_run_task(task_cfg):
+                tasks_to_run.append(task_id)
 
-        if config.CheckBox_open_game_directly.value and not is_exist_snowbreak() and login_task_checked:
-            self.tasks_to_run = tasks_to_run  # 存入实例变量，供检测到窗口后调用
-            self.open_game_directly()
+        # ====== 核心联动逻辑：判断是否需要强行拉起游戏 ======
+        if tasks_to_run:
+            # 如果勾选了“自动打开游戏”，且系统检测到游戏根本没运行
+            if config.CheckBox_open_game_directly.value and not is_exist_snowbreak():
+                # 无论[自动登录]有没有被排期，都必须强行把它塞到队列第一位去跑过场动画！
+                if "task_login" not in tasks_to_run:
+                    tasks_to_run.insert(0, "task_login")
+                    self.logger.info(self._ui_text("💡检测到游戏未运行，已强行前置【自动登录】任务以完成进游戏流程",
+                                                   "Game is closed. Forcefully prepended [Auto Login] to handle startup."))
+
+                self.tasks_to_run = tasks_to_run
+                self.open_game_directly()
+            else:
+                # 游戏已经开了，或者没勾选自动启动，按部就班执行
+                # 确保 task_login 如果在队列里，一定排在第一个，防止乱序
+                if "task_login" in tasks_to_run and tasks_to_run[0] != "task_login":
+                    tasks_to_run.remove("task_login")
+                    tasks_to_run.insert(0, "task_login")
+
+                self.after_start_button_click(tasks_to_run)
         else:
-            self.after_start_button_click(tasks_to_run)
+            InfoBar.error(
+                title=self._ui_text('无执行任务', 'No task selected'),
+                content=self._ui_text("没有勾选任务，或当前不在任务的生效周期内", "No task is selected or within valid schedule"),
+                orient=Qt.Orientation.Horizontal,
+                isClosable=False,
+                position=InfoBarPosition.TOP_RIGHT,
+                duration=2000,
+                parent=self
+            )
 
     def _on_task_actually_started(self, task_id: str):
         """当某个任务真正开始跑的时候，把它切成暂停图标，其他的重置为播放"""
@@ -1336,12 +1353,21 @@ class Daily(QFrame, BaseInterface):
     def should_run_task(self, task_config: Dict[str, Any], now: datetime = None) -> bool:
         if not task_config.get("enabled", False):
             return False
+
+        task_id = task_config.get("id", "unknown")
+        meta = TASK_REGISTRY.get(task_id, {})
+        task_name = meta.get("en_name", task_id) if getattr(self, '_is_non_chinese_ui', False) else meta.get("zh_name", task_id)
+
         if not task_config.get("use_periodic", False):
-            return True
+            skip_msg = f"Skipped [{task_name}]: Schedule disabled. Use Play button to force run." if getattr(self, '_is_non_chinese_ui', False) else f"【跳过】 {task_name}：未启用排期周期，不参与全局自动执行（若需单次执行请点击右侧 Play 按钮）"
+            self.logger.info(skip_msg)
+            return False
+        # ==============================================================
 
         if now is None:
             now = datetime.now()
 
+        act_rules = task_config.get("activation_config", [])
         task_id = task_config.get("id", "unknown")
 
         # 提取友好的任务名称
