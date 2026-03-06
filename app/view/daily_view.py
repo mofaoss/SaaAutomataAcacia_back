@@ -846,7 +846,7 @@ class DailyView(ScrollArea):
         self.gridLayout_2.setRowStretch(0, 1)
         self.gridLayout_2.setRowStretch(1, 0)
 
-        self.gridLayout_2.setColumnStretch(0, 1)
+        self.gridLayout_2.setColumnStretch(0, 2)
         self.gridLayout_2.setColumnStretch(1, 3)
         self.gridLayout_2.setColumnStretch(2, 2)
 
