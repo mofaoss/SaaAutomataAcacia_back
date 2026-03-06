@@ -22,8 +22,7 @@ from ..common.setting import REPO_URL
 from ..common.signal_bus import signalBus
 from .base_interface import BaseInterface
 from utils.game_launcher import launch_game_with_guard
-from utils.updater_utils import get_local_version, get_github_release_channels, is_remote_version_newer, \
-    is_prerelease_version
+from utils.updater_utils import get_local_version, get_best_update_candidate
 from ..repackage.custom_message_box import CustomMessageBox
 from ..common import resource  # don't delete
 
@@ -269,38 +268,6 @@ class MainWindow(FluentWindow, BaseInterface):
             QTimer.singleShot(0, self._show_update_popup_if_needed)
         self._defer_load_remaining_interfaces()
 
-    def _select_update_candidate(self, local_version: str, release_channels: dict):
-        stable = release_channels.get("latest") if isinstance(release_channels, dict) else None
-        prerelease = release_channels.get("prerelease") if isinstance(release_channels, dict) else None
-        should_check_prerelease = is_prerelease_version(local_version) or bool(config.checkPrereleaseForStable.value)
-
-        candidates = []
-        for channel_name, release_data in (("latest", stable), ("prerelease", prerelease)):
-            if channel_name == "prerelease" and not should_check_prerelease:
-                continue
-            if not release_data:
-                continue
-            remote_version = release_data.get("version")
-            if not remote_version:
-                continue
-            if is_remote_version_newer(local_version, remote_version):
-                candidates.append({
-                    "channel": channel_name,
-                    "version": remote_version,
-                    "download_url": release_data.get("download_url"),
-                    "is_prerelease": channel_name == "prerelease"
-                })
-
-        if not candidates:
-            return None
-
-        best = candidates[0]
-        for candidate in candidates[1:]:
-            if is_remote_version_newer(best["version"], candidate["version"]):
-                best = candidate
-
-        return best
-
     def _show_update_popup_if_needed(self):
         if not config.checkUpdateAtStartUp.value:
             return
@@ -310,8 +277,8 @@ class MainWindow(FluentWindow, BaseInterface):
         self._has_shown_update_popup = True
 
         local_version = get_local_version() or "N/A"
-        release_channels = get_github_release_channels(REPO_URL)
-        best = self._select_update_candidate(local_version, release_channels)
+        # 直接调用 updater_utils.py 中的集中化验证逻辑
+        best = get_best_update_candidate(REPO_URL, local_version)
 
         if not best:
             InfoBar.success(
@@ -326,11 +293,12 @@ class MainWindow(FluentWindow, BaseInterface):
             return
 
         download_url = str((best or {}).get("download_url") or "").strip()
-        download_link_text = self._ui_text("点击下载", "Click to download")
+        download_link_text = self._ui_text("现在更新", "Update now")
+
         if download_url:
             content_html = self._ui_text(
-                f"检测到新版本，<a href=\"{html.escape(download_url, quote=True)}\">{download_link_text}</a>",
-                f"New version detected, <a href=\"{html.escape(download_url, quote=True)}\">{download_link_text}</a>"
+                f"检测到新版本，<a href=\"#\">{download_link_text}</a>",
+                f"New version detected, <a href=\"#\">{download_link_text}</a>"
             )
         else:
             content_html = self._ui_text("检测到新版本", "New version detected")
@@ -351,7 +319,12 @@ class MainWindow(FluentWindow, BaseInterface):
 
             def _on_link_activated(_):
                 if download_url:
-                    QDesktopServices.openUrl(QUrl(download_url))
+                    # 将视图切换至设置页并启动统一化的高速下载机制
+                    if self.settingInterface is None:
+                        self._create_setting_and_add_nav()
+                    self.stackedWidget.setCurrentWidget(self.settingInterface, False)
+                    self.settingInterface.scrollToAboutCard()
+                    self.settingInterface.start_unified_download(download_url)
 
             info_bar.contentLabel.linkActivated.connect(_on_link_activated)
             info_bar.contentLabel.setText(content_html)

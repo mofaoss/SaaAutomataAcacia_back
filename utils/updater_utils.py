@@ -1,13 +1,18 @@
 from __future__ import annotations
 
-import logging
+import os
 import re
+import logging
 import threading
 import time
 from typing import Any, Dict, Optional, Tuple
-
+import subprocess
 import requests
+from PySide6.QtCore import QThread, Signal
+from urllib.parse import urlparse
+
 from packaging.version import parse as parse_version
+
 
 # Lock to prevent concurrent API calls during startup
 _fetch_lock = threading.Lock()
@@ -264,3 +269,121 @@ def get_best_update_candidate(repo_url: str, local_version: str, check_prereleas
             best = candidate
 
     return best
+
+
+def resolve_batch_dir(downloaded_path: str) -> str:
+    """
+    判断 downloaded_path 是否位于受保护目录（如 Program Files、系统盘根目录等），
+    若是则将批处理脚本写入用户可写的 AppData 目录，否则沿用文件所在目录。
+    """
+    # 受保护的前缀目录（统一转小写比较）
+    protected_prefixes = (
+        os.environ.get("ProgramFiles", r"C:\Program Files").lower(),
+        os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)").lower(),
+        os.environ.get("ProgramW6432", r"C:\Program Files").lower(),
+        os.environ.get("SystemRoot", r"C:\Windows").lower(),
+        os.environ.get("SystemDrive", "c:").lower() + os.sep,  # 仅 C:\ 根目录本身
+    )
+
+    download_dir = os.path.dirname(os.path.abspath(downloaded_path)).lower()
+
+    is_protected = any(download_dir.startswith(p) for p in protected_prefixes)
+
+    if is_protected:
+        app_name = "SaaAutomataAcacia"
+        return os.path.join(
+            os.environ.get("LOCALAPPDATA", os.path.expanduser("~")),
+            app_name
+        )
+
+    # 非受保护目录：直接使用下载文件所在目录
+    return os.path.dirname(downloaded_path)
+
+
+class UpdateDownloadThread(QThread):
+    progress_signal = Signal(int)
+    finished_signal = Signal(str)
+    fallback_signal = Signal(str, str)
+
+    def __init__(self, download_url: str):
+        super().__init__()
+        self.download_url = download_url
+
+        # 1. 定位路径
+        self.base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        self.aria2c_path = os.path.join(self.base_dir, "app", "resource", "binary", "aria2c.exe")
+        self.temp_dir = os.path.join(self.base_dir, "temp", "update")
+
+        # 2. 【核心修复】解析 URL 以获取文件名
+        try:
+            parsed_url = urlparse(download_url)
+            # 从 URL 中提取文件名，如果提取不到则使用默认名
+            self.filename = os.path.basename(parsed_url.path) or "update_package.zip"
+        except Exception:
+            self.filename = "update_package.zip"
+
+        self.filepath = os.path.join(self.temp_dir, self.filename)
+
+    def run(self):
+        process = None  # 显式初始化，避免 NameError
+        try:
+            # 确保临时目录存在
+            os.makedirs(self.temp_dir, exist_ok=True)
+
+            # 如果旧文件存在，先尝试删除
+            if os.path.exists(self.filepath):
+                try:
+                    os.remove(self.filepath)
+                except Exception:
+                    pass
+
+            # 构建 aria2c 命令
+            aria2c_cmd = [
+                self.aria2c_path,
+                "-d", self.temp_dir,
+                "-o", self.filename,
+                "-x", "8",
+                "-s", "8",
+                "--lowest-speed-limit=100K",
+                "--allow-overwrite=true",
+                self.download_url
+            ]
+
+            # 启动进程
+            process = subprocess.Popen(
+                aria2c_cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                creationflags=subprocess.CREATE_NO_WINDOW
+            )
+
+            # 读取输出（用于以后扩展进度条）
+            if process.stdout:
+                for line in process.stdout:
+                    # TODO: 在这里解析 line 提取百分比并 emit(progress_signal)
+                    pass
+
+            process.wait()
+
+            # 检查下载状态
+            if process.returncode != 0:
+                self.fallback_signal.emit("下载中断", "下载器异常退出，可尝试浏览器下载")
+                return
+
+            # 校验文件大小（防止下载到错误的 HTML 页面）
+            if not os.path.exists(self.filepath) or os.path.getsize(self.filepath) < 5000:
+                self.fallback_signal.emit("无效文件", "下载的文件过小，可能是链接失效或网络拦截。")
+                return
+
+            # 下载成功
+            self.finished_signal.emit(self.filepath)
+
+        except Exception as e:
+            self.fallback_signal.emit("下载引擎错误", str(e))
+        finally:
+            if process:
+                try:
+                    process.kill() # 确保释放资源
+                except:
+                    pass
