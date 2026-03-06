@@ -7,7 +7,7 @@ import html
 from functools import partial
 
 from PySide6.QtCore import Qt, QUrl, QThread, Signal
-from PySide6.QtGui import QDesktopServices, QFont, QPixmap
+from PySide6.QtGui import QDesktopServices, QFont, QPixmap, QMovie
 from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QApplication, QSizePolicy
 from qfluentwidgets import FluentIcon as FIF
 from qfluentwidgets import InfoBar
@@ -79,7 +79,7 @@ class AboutHeaderWidget(QWidget, BaseInterface):
 
         self.logoLabel = QLabel(self)
         self.logoLabel.setFixedSize(80, 80)
-        pixmap = QPixmap("app/resource/images/logo.png")
+        pixmap = QPixmap("app/resource/images/sun.png")
         if not pixmap.isNull():
             self.logoLabel.setPixmap(pixmap.scaled(80, 80, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
         else:
