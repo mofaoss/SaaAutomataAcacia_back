@@ -311,7 +311,7 @@ class Config(QConfig):
                 "activation_config": [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}],
                 "execution_config":  [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}]
             },
-        ]
+        ], serializer=TaskSequenceSerializer()
     )
 
     # =========================================================
