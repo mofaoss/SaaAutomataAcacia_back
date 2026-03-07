@@ -231,10 +231,10 @@ class DisplayInterface(ScrollArea, BaseInterface):
             index=0,
         )
 
-        # 2. 自律卡片
+        # 2. 日常卡片
         quick_jump.addSampleCard(
             icon=os.path.join(self.basedir, "play.svg"),
-            title="Start Daily" if self._is_non_chinese_ui else "开始自律",
+            title="Start Daily" if self._is_non_chinese_ui else "开始日常",
             content="Acacia, Let's go!" if self._is_non_chinese_ui else self.tr("安卡希雅，Let's go!"),
             routeKey="Home-Start-Now",
             index=0,
