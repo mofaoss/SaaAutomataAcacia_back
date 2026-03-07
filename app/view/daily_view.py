@@ -297,7 +297,9 @@ class TaskItemWidget(QWidget):
             else:
                 self.checkbox.setEnabled(True)
 
+            # 恢复默认图标，并【新增】恢复默认悬浮提示
             self.btn.setIcon(self.solo_play_btns)
+            self.btn.setToolTip("单独执行" if not self._is_non_chinese_ui else "Run only")
 
             # 【核心修改 2】：移除 scheduled 状态，调整其他状态颜色
             colors = {
@@ -315,6 +317,7 @@ class TaskItemWidget(QWidget):
             # 【核心修改 3】：将状态文本和图标转移到后缀
             if state == 'running_queue':
                 self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
+                self.btn.setToolTip("停止执行" if not self._is_non_chinese_ui else "Stop") # 【新增】修改悬浮提示
                 self.btn_play_from_here.setVisible(False)
                 if not self.is_mandatory: self.checkbox.setEnabled(False)
                 font.setBold(True)
@@ -322,6 +325,7 @@ class TaskItemWidget(QWidget):
 
             elif state == 'running_solo':
                 self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
+                self.btn.setToolTip("停止执行" if not self._is_non_chinese_ui else "Stop") # 【新增】修改悬浮提示
                 self.btn_play_from_here.setVisible(False)
                 if not self.is_mandatory: self.checkbox.setEnabled(False)
                 font.setBold(True)
@@ -329,6 +333,7 @@ class TaskItemWidget(QWidget):
 
             elif state == 'running_scheduled':
                 self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
+                self.btn.setToolTip("停止执行" if not self._is_non_chinese_ui else "Stop") # 【新增】修改悬浮提示
                 self.btn_play_from_here.setVisible(False)
                 if not self.is_mandatory: self.checkbox.setEnabled(False)
                 font.setBold(True)

@@ -1586,7 +1586,7 @@ class Daily(QFrame, BaseInterface):
 
     def after_finish(self):
         if getattr(self, '_is_running_solo_flag', False):
-            self.logger.info("单独执行完毕，不触发全局后置动作。")
+            self.logger.info("单独执行完毕，已返回空闲状态...")
             return
 
         run_mode_idx = self.ui.ComboBox_run_mode.currentIndex()
