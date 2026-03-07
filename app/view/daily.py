@@ -126,41 +126,28 @@ TASK_REGISTRY = {
 class DailyModel:
     @staticmethod
     def calculate_time_difference(date_due: str):
-        """
-        通过给入终止时间获取剩余时间差和状态
-        :param date_due: 持续时间，格式'03.06-04.17'
-        :return: (days, total_day, status)
-                 status: 0 正在进行, 1 未开始, -1 已结束
-                 days: 正在进行返回剩余天数，未开始返回距离开始的天数，已结束返回0
-                 total_day: 该活动的总持续天数（用于统一标尺）
-        """
         current_year = datetime.now().year
         start_date_str, end_date_str = date_due.split('-')
         start_time = datetime.strptime(f"{current_year}.{start_date_str}", "%Y.%m.%d")
         end_time = datetime.strptime(f"{current_year}.{end_date_str}", "%Y.%m.%d")
 
-        # 跨年处理
         if end_time < start_time:
             end_time = datetime.strptime(f"{current_year + 1}.{end_date_str}", "%Y.%m.%d")
 
-        # 抹平具体的时分秒，避免时间差因为小时原因少算一天
         now = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         total_day = (end_time - start_time).days + 1
 
         if now < start_time:
-            # 未开始
             days_to_start = (start_time - now).days
             return days_to_start, total_day, 1
         elif now > end_time:
-            # 已结束
             return 0, total_day, -1
         else:
-            # 正在进行
             days_remaining = (end_time - now).days + 1
             return days_remaining, total_day, 0
 
 # ==========================================
-# 线程与后台任务类保持不变
+# 线程与后台任务类
 # ==========================================
 class CloudflareUpdateThread(QThread):
     update_finished = Signal(dict)
@@ -206,7 +193,6 @@ class StartThread(QThread):
     task_completed_signal = Signal(str)
     task_started_signal = Signal(str)
 
-    # 1. 接收的参数改为 tasks_to_run 列表
     def __init__(self, tasks_to_run: list, parent=None):
         super().__init__(parent)
         self.tasks_to_run = tasks_to_run
@@ -249,9 +235,7 @@ class StartThread(QThread):
                 task_name = meta["en_name"] if is_non_chinese_ui_language() else meta["zh_name"]
                 self.logger.info(f"当前任务：{task_name}")
 
-                # ====== 核心修复 1：在执行前，发射正在执行的任务 ID ======
                 self.task_started_signal.emit(task_id)
-                # ========================================================
 
                 module_class = meta["module_class"]
                 module = module_class(auto, self.logger)
@@ -270,15 +254,12 @@ class StartThread(QThread):
 
                     app = QApplication.instance()
                     if app:
-                        # 如果你已经在 MainWindow 里创建了系统托盘，直接用你自己的 self.tray_icon
                         tray_icon = QSystemTrayIcon(QIcon(os.path.abspath("app/resource/images/logo.ico")), app)
                         tray_icon.show()
-
-                        # 发送系统原生通知
                         tray_icon.showMessage(
-                            '已完成勾选任务',       # 标题
-                            content,              # 内容
-                            QIcon(os.path.abspath("app/resource/images/logo.ico")), # 图标
+                            '已完成勾选任务',
+                            content,
+                            QIcon(os.path.abspath("app/resource/images/logo.ico")),
                             1000
                         )
 
@@ -306,17 +287,16 @@ def no_select(widget):
         checkbox.setChecked(False)
 
 # ==========================================
-# Controller 层：负责连接视图与模型，处理用户交互和业务逻辑
+# Controller 层
 # ==========================================
 class Daily(QFrame, BaseInterface):
 
     def __init__(self, text: str, parent=None):
         super().__init__(parent)
-        BaseInterface.__init__(self)  # 正确初始化 BaseInterface
+        BaseInterface.__init__(self)
 
         self._is_non_chinese_ui = is_non_chinese_ui_language()
 
-        # 定义翻译字典
         self.setting_name_list = [
             self._ui_text('登录', 'Login'),
             self._ui_text('福利', 'Supplies'),
@@ -377,7 +357,6 @@ class Daily(QFrame, BaseInterface):
         self.person_text_to_key = {**self.person_dic, **self.person_dic_en}
         self.weapon_text_to_key = {**self.weapon_dic, **self.weapon_dic_en}
 
-        # 挂载 View 视图层
         self.ui = DailyView(self, is_non_chinese_ui=self._is_non_chinese_ui)
         root_layout = QVBoxLayout(self)
         root_layout.setContentsMargins(0, 0, 0, 0)
@@ -408,10 +387,12 @@ class Daily(QFrame, BaseInterface):
         self.is_launch_pending = False
         self._is_dialog_open = False
 
+        self._is_running_solo_flag = False
+        self._is_scheduled_run_flag = False
+
         self._initWidget()
         self._connect_to_slot()
 
-        # 继承自 BaseInterface 的日志重定向
         self.redirectOutput(self.ui.textBrowser_log)
 
         self.check_game_window_timer = QTimer()
@@ -419,10 +400,11 @@ class Daily(QFrame, BaseInterface):
         self.running_game_guard_timer = QTimer()
         self.running_game_guard_timer.timeout.connect(
             self._guard_running_game_window)
-        # === 新增：循环守护定时器 ===
+
+        # 核心：常驻后台心跳，每30秒检查一次
         self.loop_timer = QTimer(self)
         self.loop_timer.timeout.connect(self._check_and_run_loop_tasks)
-        self.is_loop_waiting = False  # 标记当前是否处于循环挂机等待状态
+        self.loop_timer.start(30000)
 
         self.checkbox_dic = None
 
@@ -434,51 +416,110 @@ class Daily(QFrame, BaseInterface):
             self.get_tips()
 
     def _on_init_sync(self):
-        # 1. 同步视觉与模式联动
         self._auto_adjust_after_use_action()
-        # 2. 如果存在激活的计划，输出日程日志
         self._output_schedule_log()
 
     def __getattr__(self, item):
-        """过渡方案：允许 Controller 暂时像以前一样直接访问 View 里的 UI 控件"""
         ui = self.__dict__.get('ui')
         if ui is not None and hasattr(ui, item):
             return getattr(ui, item)
         raise AttributeError(
             f"'{self.__class__.__name__}' object has no attribute '{item}'")
 
+    def _is_rule_day_matched(self, rule: dict, now: datetime) -> bool:
+        """极简日期匹配器：检查今天是否符合执行规则"""
+        exec_type = str(rule.get("type", "daily")).lower()
+
+        if exec_type == "每周": exec_type = "weekly"
+        elif exec_type == "每月": exec_type = "monthly"
+        elif exec_type == "每天": exec_type = "daily"
+
+        if exec_type == "weekly":
+            return now.weekday() == int(rule.get("day", 0))
+        elif exec_type == "monthly":
+            return now.day == int(rule.get("day", 1))
+
+        return True  # 每天都匹配
+
     def _check_and_run_loop_tasks(self):
+        # 注意：这里我们移除了对 self.is_running 的粗暴 return，允许在运行时继续监控时间
+
+        if self.ui.ComboBox_run_mode.currentIndex() != 2:
+            return
+
         now = datetime.now()
         current_time_str = now.strftime("%H:%M")
-        tasks_to_run = []
+        new_tasks_found = []
+        sequence_updated = False
 
         sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
         for task_cfg in sequence:
             task_id = task_cfg.get("id")
 
-            # 【核心修改】即使任务列表没有勾选，只要启用了计划，到点一样执行！
             if not task_cfg.get("use_periodic"):
                 continue
 
             exec_rules = task_cfg.get("execution_config", [])
             for rule in exec_rules:
                 if rule.get("time") == current_time_str:
-                    _, is_matched, _ = self._get_exec_cycle_start_and_match(rule, now)
-                    if is_matched:
+                    if self._is_rule_day_matched(rule, now):
                         rule_progress = task_cfg.get("rule_progress", {})
                         rule_key = f"{rule.get('type')}_{rule.get('day')}_{current_time_str}"
-                        prog = rule_progress.get(rule_key, {"last_run": 0})
+                        prog = rule_progress.get(rule_key, 0)
+                        last_trigger_ts = prog.get("last_run", 0) if isinstance(prog, dict) else prog
 
-                        if int(prog["last_run"]) < int(now.timestamp() - 59):
-                            tasks_to_run.append(task_id)
+                        if int(now.timestamp()) - int(last_trigger_ts) > 60:
+                            new_tasks_found.append(task_id)
+
+                            if isinstance(prog, dict):
+                                prog["last_run"] = int(now.timestamp())
+                                rule_progress[rule_key] = prog
+                            else:
+                                rule_progress[rule_key] = int(now.timestamp())
+
+                            task_cfg["rule_progress"] = rule_progress
+                            sequence_updated = True
                             break
 
-        if tasks_to_run:
-            self.logger.info(f"⏰ 到点触发计划: {current_time_str}，执行列表: {tasks_to_run}")
-            if config.CheckBox_open_game_directly.value and not is_exist_snowbreak():
+        if not new_tasks_found:
+            return
+
+        if sequence_updated:
+            self._save_task_sequence(sequence)
+
+        # 【核心修复2】：动态排队系统。如果已经有任务在跑，把新触发的追加进去排队！
+        if getattr(self, 'is_running', False) or getattr(self, 'is_launch_pending', False):
+            self.logger.info(f"⏰ 到点触发计划: {current_time_str}，正在执行其他任务，已加入队列排队: {new_tasks_found}")
+            for tid in new_tasks_found:
+                if tid not in self.tasks_to_run:
+                    # 追加到当前正在运行的队列列表末尾，线程会自动按顺序消化它们
+                    self.tasks_to_run.append(tid)
+                    task_item = self.task_widget_map.get(tid)
+                    if task_item and hasattr(task_item, 'set_task_state'):
+                        task_item.set_task_state('queued') # 视觉变紫，排队等候
+            return
+
+        # 如果当前空闲，则启动全新一轮的执行
+        self.logger.info(f"⏰ 到点触发计划: {current_time_str}，执行列表: {new_tasks_found}")
+        self._is_scheduled_run_flag = True
+        tasks_to_run = new_tasks_found
+
+        if "task_login" in tasks_to_run and tasks_to_run[0] != "task_login":
+            tasks_to_run.remove("task_login")
+            tasks_to_run.insert(0, "task_login")
+
+        game_opened = is_exist_snowbreak()
+        if not game_opened:
+            if config.CheckBox_open_game_directly.value:
                 if "task_login" not in tasks_to_run:
                     tasks_to_run.insert(0, "task_login")
-
+                self.tasks_to_run = tasks_to_run
+                self.open_game_directly()
+            else:
+                self.logger.warning(self._ui_text("⚠️ 检测到游戏未运行，且未开启【自动打开游戏】！若稍后报错未找到句柄，请勾选该功能或手动启动游戏。", "⚠️ Game is not running and 'Auto open game' is OFF. This may cause handle errors!"))
+                self.tasks_to_run = tasks_to_run
+                self.after_start_button_click(tasks_to_run)
+        else:
             self.tasks_to_run = tasks_to_run
             self.after_start_button_click(tasks_to_run)
 
@@ -503,7 +544,6 @@ class Daily(QFrame, BaseInterface):
         self.ui.ScrollArea.enableTransparentBackground()
         self.ui.ScrollArea_tips.enableTransparentBackground()
 
-        # 调整日程面板布局
         self.ui.gridLayout_2.removeWidget(self.ui.SimpleCardWidget)
         self.ui.gridLayout_2.removeWidget(self.ui.SimpleCardWidget_tips)
         self.ui.gridLayout_2.addWidget(self.ui.SimpleCardWidget, 0, 2, 1, 1)
@@ -511,16 +551,19 @@ class Daily(QFrame, BaseInterface):
                                        1)
 
     def _output_schedule_log(self):
-        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
+        sequence = self._normalize_task_sequence(
+            config.daily_task_sequence.value)
         schedule_logs = []
         color_task, color_type, color_time = "#00BFFF", "#32CD32", "#FFA500"
 
         for task_cfg in sequence:
             task_id = task_cfg.get("id")
-            # 只看计划是否启用，彻底与 checkbox 解耦
             if task_cfg.get("use_periodic", False):
                 meta = TASK_REGISTRY.get(task_id, {})
-                task_name = meta.get("en_name", task_id) if self._is_non_chinese_ui else meta.get("zh_name", task_id)
+                task_name = meta.get(
+                    "en_name",
+                    task_id) if self._is_non_chinese_ui else meta.get(
+                        "zh_name", task_id)
                 rules = task_cfg.get("execution_config", [])
                 rule_strs = []
                 for r in rules:
@@ -531,22 +574,35 @@ class Daily(QFrame, BaseInterface):
 
                     if r_type in ["daily", "每天"]:
                         t_str = "Daily" if self._is_non_chinese_ui else "每天"
-                        rule_strs.append(f'<span style="color: {color_type};">{t_str}</span> {colored_time}')
+                        rule_strs.append(
+                            f'<span style="color: {color_type};">{t_str}</span> {colored_time}'
+                        )
                     elif r_type in ["weekly", "每周"]:
-                        days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] if self._is_non_chinese_ui else ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
-                        rule_strs.append(f'<span style="color: {color_type};">{days[r_day]}</span> {colored_time}')
+                        days = [
+                            "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
+                        ] if self._is_non_chinese_ui else [
+                            "周一", "周二", "周三", "周四", "周五", "周六", "周日"
+                        ]
+                        rule_strs.append(
+                            f'<span style="color: {color_type};">{days[r_day]}</span> {colored_time}'
+                        )
                     elif r_type in ["monthly", "每月"]:
                         t_str = f"Day {r_day}" if self._is_non_chinese_ui else f"每月{r_day}日"
-                        rule_strs.append(f'<span style="color: {color_type};">{t_str}</span> {colored_time}')
+                        rule_strs.append(
+                            f'<span style="color: {color_type};">{t_str}</span> {colored_time}'
+                        )
 
                 if rule_strs:
-                    schedule_logs.append(f"&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: {color_task};'><b>[{task_name}]</b></span> ➔ {', '.join(rule_strs)}")
+                    schedule_logs.append(
+                        f"&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: {color_task};'><b>[{task_name}]</b></span> ➔ {', '.join(rule_strs)}"
+                    )
 
         if schedule_logs:
             header = "<b>📅 当前已激活的自动执行日程表：</b>" if not self._is_non_chinese_ui else "<b>📅 Active Schedules:</b>"
             self.logger.info(f"{header}<br/>" + "<br/>".join(schedule_logs))
         else:
-            self.logger.info("📅 当前未启用任何周期任务。" if not self._is_non_chinese_ui else "📅 No active schedules.")
+            self.logger.info("📅 当前未启用任何计划任务。" if not self._is_non_chinese_ui
+                             else "📅 No active schedules.")
 
     def _normalize_task_sequence(self, sequence):
         defaults = copy.deepcopy(config.daily_task_sequence.defaultValue)
@@ -596,7 +652,12 @@ class Daily(QFrame, BaseInterface):
         return normalized
 
     def _auto_adjust_after_use_action(self):
-        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
+        # 【核心修复1】：防火墙！如果任务正在执行或正在等游戏启动，绝对不允许任何事件去重置 UI 状态！
+        if getattr(self, 'is_running', False) or getattr(self, 'is_launch_pending', False):
+            return
+
+        sequence = self._normalize_task_sequence(
+            config.daily_task_sequence.value)
         has_any_periodic = False
 
         for task_cfg in sequence:
@@ -611,11 +672,11 @@ class Daily(QFrame, BaseInterface):
                 task_item.set_task_state('scheduled', is_enabled=is_checked)
                 has_any_periodic = True
             else:
-                # 【核心修改】如果刚刚执行完，它是 completed 状态，不要强行把它覆盖回 idle，保留成就感
                 if getattr(task_item, 'current_state', 'idle') != 'completed':
                     task_item.set_task_state('idle', is_enabled=is_checked)
                 else:
-                    task_item.set_task_state('completed', is_enabled=is_checked)
+                    task_item.set_task_state('completed',
+                                             is_enabled=is_checked)
 
         current_idx = self.ui.ComboBox_run_mode.currentIndex()
         if has_any_periodic:
@@ -734,7 +795,6 @@ class Daily(QFrame, BaseInterface):
         self.ui.shared_scheduling_panel.load_task(task_id, task_cfg)
 
     def _load_config(self):
-        # 此时可以用 findChildren 安全地查找 ui 中的控件
         for widget in self.ui.findChildren(QWidget):
             config_item = getattr(config, widget.objectName(), None)
             if config_item:
@@ -1072,33 +1132,45 @@ class Daily(QFrame, BaseInterface):
         self.running_game_guard_timer.stop()
 
     def _connect_to_slot(self):
-        # 原有的绑定
         self.ui.PushButton_start.clicked.connect(self.on_start_button_click)
-        self.ui.PrimaryPushButton_path_tutorial.clicked.connect(self.on_path_tutorial_click)
-        self.ui.PushButton_select_all.clicked.connect(lambda: select_all(self.ui.SimpleCardWidget_option))
-        self.ui.PushButton_no_select.clicked.connect(lambda: no_select(self.ui.SimpleCardWidget_option))
-        self.ui.PushButton_select_directory.clicked.connect(self.on_select_directory_click)
-        self.ui.PrimaryPushButton_import_codes.clicked.connect(self.on_import_codes_click)
-        self.ui.PushButton_reset_codes.clicked.connect(self.on_reset_codes_click)
+        self.ui.PrimaryPushButton_path_tutorial.clicked.connect(
+            self.on_path_tutorial_click)
+        self.ui.PushButton_select_all.clicked.connect(
+            lambda: select_all(self.ui.SimpleCardWidget_option))
+        self.ui.PushButton_no_select.clicked.connect(
+            lambda: no_select(self.ui.SimpleCardWidget_option))
+        self.ui.PushButton_select_directory.clicked.connect(
+            self.on_select_directory_click)
+        self.ui.PrimaryPushButton_import_codes.clicked.connect(
+            self.on_import_codes_click)
+        self.ui.PushButton_reset_codes.clicked.connect(
+            self.on_reset_codes_click)
 
-        self.ui.shared_scheduling_panel.toggle_all_cycles.connect(self._on_toggle_all_cycles_clicked)
-        # 绑定“查看日程”按钮
-        self.ui.shared_scheduling_panel.view_schedule_clicked.connect(self._output_schedule_log)
+        self.ui.shared_scheduling_panel.toggle_all_cycles.connect(
+            self._on_toggle_all_cycles_clicked)
+        self.ui.shared_scheduling_panel.view_schedule_clicked.connect(
+            self._output_schedule_log)
 
         for task_id, task_item in self.task_widget_map.items():
             task_item.settings_clicked.connect(self._on_task_settings_clicked)
-            task_item.checkbox_state_changed.connect(self._on_task_checkbox_changed)
+            task_item.checkbox_state_changed.connect(
+                self._on_task_checkbox_changed)
             task_item.play_clicked.connect(self._on_task_play_clicked)
-            task_item.play_from_here_clicked.connect(self._on_task_play_from_here_clicked)
+            task_item.play_from_here_clicked.connect(
+                self._on_task_play_from_here_clicked)
 
-        self.ui.taskListWidget.orderChanged.connect(self._on_task_order_changed)
-        self.ui.shared_scheduling_panel.config_changed.connect(self._on_shared_config_changed)
-        self.ui.CheckBox_open_game_directly.stateChanged.connect(self.change_auto_open)
+        self.ui.taskListWidget.orderChanged.connect(
+            self._on_task_order_changed)
+        self.ui.shared_scheduling_panel.config_changed.connect(
+            self._on_shared_config_changed)
+        self.ui.CheckBox_open_game_directly.stateChanged.connect(
+            self.change_auto_open)
         signalBus.sendHwnd.connect(self.set_hwnd)
         self._connect_to_save_changed()
 
     def _on_task_checkbox_changed(self, task_id: str, is_checked: bool):
-        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
+        sequence = self._normalize_task_sequence(
+            config.daily_task_sequence.value)
         for task_cfg in sequence:
             if task_cfg.get("id") == task_id:
                 task_cfg["enabled"] = bool(is_checked)
@@ -1106,10 +1178,10 @@ class Daily(QFrame, BaseInterface):
         self._save_task_sequence(sequence)
         self._on_task_settings_clicked(task_id)
         self._auto_adjust_after_use_action()
-        # 移除了输出日志
 
     def _on_shared_config_changed(self, task_id: str, new_config: dict):
-        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
+        sequence = self._normalize_task_sequence(
+            config.daily_task_sequence.value)
         updated = False
         for task_cfg in sequence:
             if task_cfg.get("id") == task_id:
@@ -1124,10 +1196,10 @@ class Daily(QFrame, BaseInterface):
 
         self._save_task_sequence(sequence)
         self._auto_adjust_after_use_action()
-        # 移除了输出日志
 
     def _on_toggle_all_cycles_clicked(self, enable: bool):
-        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
+        sequence = self._normalize_task_sequence(
+            config.daily_task_sequence.value)
         for task_cfg in sequence:
             task_cfg["use_periodic"] = enable
 
@@ -1138,7 +1210,6 @@ class Daily(QFrame, BaseInterface):
             self.ui.shared_scheduling_panel.enable_checkbox.blockSignals(False)
 
         self._auto_adjust_after_use_action()
-        # 移除了输出日志
 
     def _set_launch_pending_state(self, pending: bool):
         self.is_launch_pending = bool(pending)
@@ -1146,7 +1217,6 @@ class Daily(QFrame, BaseInterface):
             self.set_checkbox_enable(False)
             self.ui.PushButton_start.setText(self._ui_text("停止", "Stop"))
 
-            # 启动游戏时，仅为当前队列分配 queued，其余保留原状态仅锁死UI
             for tid, task_item in self.task_widget_map.items():
                 if tid in getattr(self, 'tasks_to_run', []):
                     if hasattr(task_item, 'set_task_state'):
@@ -1158,7 +1228,8 @@ class Daily(QFrame, BaseInterface):
 
         if not self.is_running:
             self.set_checkbox_enable(True)
-            self.ui.PushButton_start.setText(self._ui_text("立即执行", "Execute Now"))
+            self.ui.PushButton_start.setText(
+                self._ui_text("立即执行", "Execute Now"))
             self._auto_adjust_after_use_action()
 
     def handle_start(self, str_flag):
@@ -1168,14 +1239,11 @@ class Daily(QFrame, BaseInterface):
                 self._set_launch_pending_state(False)
                 self.ui.PushButton_start.setText(self._ui_text("停止", "Stop"))
 
-                # ====== 执行前置分配 ======
                 for tid, task_item in self.task_widget_map.items():
-                    # 只有真正在本轮名单里的，才给紫色的 [队列中]
                     if tid in getattr(self, 'tasks_to_run', []):
                         if hasattr(task_item, 'set_task_state'):
                             task_item.set_task_state('queued')
                     else:
-                        # 不参与执行的旁观者，仅软锁定并隐藏按钮，不破坏原有颜色
                         if hasattr(task_item, 'lock_ui_for_execution'):
                             task_item.lock_ui_for_execution()
 
@@ -1189,13 +1257,15 @@ class Daily(QFrame, BaseInterface):
                 self.set_checkbox_enable(True)
 
                 if getattr(self, 'is_loop_waiting', False):
-                    self.ui.PushButton_start.setText(self._ui_text("停止挂机", "Stop Waiting"))
+                    self.ui.PushButton_start.setText(
+                        self._ui_text("停止挂机", "Stop Waiting"))
                 else:
-                    self.ui.PushButton_start.setText(self._ui_text("立即执行", "Execute Now"))
+                    self.ui.PushButton_start.setText(
+                        self._ui_text("立即执行", "Execute Now"))
 
                 self._is_running_solo_flag = False
+                self._is_scheduled_run_flag = False
 
-                # 恢复常态 UI
                 self._auto_adjust_after_use_action()
 
                 if str_flag == 'end':
@@ -1208,33 +1278,50 @@ class Daily(QFrame, BaseInterface):
 
     def _on_task_play_clicked(self, task_id: str):
         if self.is_running or self.is_launch_pending:
-            self.logger.info(self._ui_text("已手动中止当前任务", "Task manually stopped"))
+            self.logger.info(
+                self._ui_text("已手动中止当前任务", "Task manually stopped"))
             if self.is_launch_pending:
                 self._clear_launch_watch_state()
                 self._set_launch_pending_state(False)
 
             if self.start_thread is not None and self.start_thread.isRunning():
-                self.start_thread.stop(reason=self._ui_text('用户点击了手动终止按钮', 'User clicked stop button'))
+                self.start_thread.stop(reason=self._ui_text(
+                    '用户点击了手动终止按钮', 'User clicked stop button'))
         else:
             meta = TASK_REGISTRY.get(task_id, {})
-            task_name = meta.get("en_name", task_id) if getattr(self, '_is_non_chinese_ui', False) else meta.get("zh_name", task_id)
-            self.logger.info(self._ui_text(f"▶️ 开始单独执行任务: {task_name}", f"▶️ Force running task: {task_name}"))
+            task_name = meta.get("en_name", task_id) if getattr(
+                self, '_is_non_chinese_ui', False) else meta.get(
+                    "zh_name", task_id)
+            self.logger.info(
+                self._ui_text(f"▶️ 开始单独执行任务: {task_name}",
+                              f"▶️ Force running task: {task_name}"))
 
-            if getattr(self, 'is_loop_waiting', False):
-                self.loop_timer.stop()
-                self.is_loop_waiting = False
-                self.set_checkbox_enable(True)
-                self.ui.PushButton_start.setText(self._ui_text("立即执行", "Execute Now"))
+            self.ui.ComboBox_run_mode.setCurrentIndex(0)
+            self.ui.PushButton_start.setText(
+                self._ui_text("立即执行", "Execute Now"))
 
             tasks_to_run = [task_id]
             self._is_running_solo_flag = True
-
-            # 【核心修复】：必须覆写全局执行名单，否则 handle_start 会读取上一次的旧名单导致全员变紫
             self.tasks_to_run = tasks_to_run
 
-            if config.CheckBox_open_game_directly.value and not is_exist_snowbreak() and task_id == "task_login":
-                self.open_game_directly()
+            # 【智能拉起决策】
+            game_opened = is_exist_snowbreak()
+            if not game_opened:
+                if config.CheckBox_open_game_directly.value:
+                    if "task_login" not in tasks_to_run:
+                        tasks_to_run.insert(0, "task_login")
+                    self.tasks_to_run = tasks_to_run
+                    self.open_game_directly()
+                else:
+                    self.logger.warning(
+                        self._ui_text(
+                            "⚠️ 检测到游戏未运行，且未开启【自动打开游戏】！若稍后报错未找到句柄，请勾选该功能或手动启动游戏。",
+                            "⚠️ Game is not running and 'Auto open game' is OFF. This may cause handle errors!"
+                        ))
+                    self.tasks_to_run = tasks_to_run
+                    self.after_start_button_click(tasks_to_run)
             else:
+                self.tasks_to_run = tasks_to_run
                 self.after_start_button_click(tasks_to_run)
 
     def _on_task_play_from_here_clicked(self, start_task_id: str):
@@ -1242,17 +1329,15 @@ class Daily(QFrame, BaseInterface):
             self._on_task_play_clicked(start_task_id)
             return
 
-        self.logger.info(self._ui_text(f"⏬ 开始从指定位置向下批量执行已勾选任务", f"⏬ Force running checked tasks from here"))
+        self.logger.info(
+            self._ui_text(f"⏬ 开始从指定位置向下批量执行已勾选任务",
+                          f"⏬ Force running checked tasks from here"))
 
-        if getattr(self, 'is_loop_waiting', False):
-            self.loop_timer.stop()
-            self.is_loop_waiting = False
-            self.set_checkbox_enable(True)
-            self.ui.PushButton_start.setText(self._ui_text("立即执行", "Execute Now"))
+        self.ui.ComboBox_run_mode.setCurrentIndex(0)
+        self.ui.PushButton_start.setText(self._ui_text("立即执行", "Execute Now"))
 
         tasks_to_run = []
         start_adding = False
-        login_task_checked = False
 
         ordered_task_ids = self.ui.taskListWidget.get_task_order()
 
@@ -1262,22 +1347,41 @@ class Daily(QFrame, BaseInterface):
 
             if start_adding:
                 task_item = self.task_widget_map.get(task_id)
-                is_checked = bool(task_item.checkbox.isChecked()) if task_item else False
+                is_checked = bool(
+                    task_item.checkbox.isChecked()) if task_item else False
                 if is_checked:
                     tasks_to_run.append(task_id)
-                    if task_id == "task_login":
-                        login_task_checked = True
 
         if not tasks_to_run:
-            self.logger.warning(self._ui_text("⚠️ 下方没有已勾选的任务可执行！", "⚠️ No checked tasks found below!"))
+            self.logger.warning(
+                self._ui_text("⚠️ 下方没有已勾选的任务可执行！",
+                              "⚠️ No checked tasks found below!"))
             return
 
-        # 【核心修复】：同上，覆写全局名单
         self.tasks_to_run = tasks_to_run
 
-        if config.CheckBox_open_game_directly.value and not is_exist_snowbreak() and login_task_checked:
-            self.open_game_directly()
+        if "task_login" in tasks_to_run and tasks_to_run[0] != "task_login":
+            tasks_to_run.remove("task_login")
+            tasks_to_run.insert(0, "task_login")
+
+        # 【智能拉起决策】
+        game_opened = is_exist_snowbreak()
+        if not game_opened:
+            if config.CheckBox_open_game_directly.value:
+                if "task_login" not in tasks_to_run:
+                    tasks_to_run.insert(0, "task_login")
+                self.tasks_to_run = tasks_to_run
+                self.open_game_directly()
+            else:
+                self.logger.warning(
+                    self._ui_text(
+                        "⚠️ 检测到游戏未运行，且未开启【自动打开游戏】！若稍后报错未找到句柄，请勾选该功能或手动启动游戏。",
+                        "⚠️ Game is not running and 'Auto open game' is OFF. This may cause handle errors!"
+                    ))
+                self.tasks_to_run = tasks_to_run
+                self.after_start_button_click(tasks_to_run)
         else:
+            self.tasks_to_run = tasks_to_run
             self.after_start_button_click(tasks_to_run)
 
     def check_game_open(self):
@@ -1287,7 +1391,6 @@ class Daily(QFrame, BaseInterface):
                 self._clear_launch_watch_state()
                 self._set_launch_pending_state(False)
                 self.logger.info(f'已检测到游戏窗口：{hwnd}')
-                # 这里改为传入刚才存下来的 tasks_to_run
                 self.after_start_button_click(getattr(self, 'tasks_to_run',
                                                       []))
                 return
@@ -1326,27 +1429,29 @@ class Daily(QFrame, BaseInterface):
             self._set_launch_pending_state(False)
 
     def _on_task_actually_started(self, task_id: str):
-        """当某个任务真正开始跑的时候，把它切成对应的运行状态"""
         is_solo_run = getattr(self, '_is_running_solo_flag', False)
+        is_scheduled_run = getattr(self, '_is_scheduled_run_flag', False)
 
         for tid, item in self.task_widget_map.items():
             if hasattr(item, 'set_task_state'):
                 if tid == task_id:
-                    state = 'running_solo' if is_solo_run else 'running_queue'
+                    if is_scheduled_run:
+                        state = 'running_scheduled'
+                    elif is_solo_run:
+                        state = 'running_solo'
+                    else:
+                        state = 'running_queue'
                     item.set_task_state(state)
                 else:
-                    # 保持非当前任务的UI状态不变（队列中的保持 queued，没选的保持 idle）
                     pass
 
     def after_start_button_click(self, tasks_to_run):
-        # 如果不是由单独点击 Play 触发的，则确保标志位为 False
         if len(tasks_to_run) > 1 or (
                 tasks_to_run and not hasattr(self, '_is_running_solo_flag')):
             self._is_running_solo_flag = False
 
         if tasks_to_run:
             if not self.is_running:
-                # （已删除 ocr_release_timer 的干预逻辑）
                 self.start_thread = StartThread(tasks_to_run, self)
                 self.start_thread.is_running_signal.connect(self.handle_start)
                 self.start_thread.task_completed_signal.connect(
@@ -1392,16 +1497,14 @@ class Daily(QFrame, BaseInterface):
                 self.start_thread.stop(reason="User Stop")
             return
 
-        # 处理停止挂机逻辑
-        if getattr(self, 'is_loop_waiting', False):
-            self.loop_timer.stop()
-            self.is_loop_waiting = False
+        if self.ui.PushButton_start.text() == self._ui_text(
+                "停止挂机", "Stop Waiting"):
+            self.ui.ComboBox_run_mode.setCurrentIndex(0)
             self.ui.PushButton_start.setText(
                 self._ui_text("立即执行", "Execute Now"))
-            self._auto_adjust_after_use_action()
+            self.logger.info("已手动退出挂机监控状态。")
             return
 
-        # 组装立即执行队列
         tasks_to_run = []
         ordered_ids = self.ui.taskListWidget.get_task_order()
         for tid in ordered_ids:
@@ -1410,39 +1513,52 @@ class Daily(QFrame, BaseInterface):
                 tasks_to_run.append(tid)
 
         if tasks_to_run:
-            if config.CheckBox_open_game_directly.value and not is_exist_snowbreak(
-            ):
-                if "task_login" not in tasks_to_run:
-                    tasks_to_run.insert(0, "task_login")
+            if "task_login" in tasks_to_run and tasks_to_run[0] != "task_login":
+                tasks_to_run.remove("task_login")
+                tasks_to_run.insert(0, "task_login")
 
-            self.tasks_to_run = tasks_to_run
-            self.after_start_button_click(tasks_to_run)
+            # 【智能拉起决策】
+            game_opened = is_exist_snowbreak()
+            if not game_opened:
+                if config.CheckBox_open_game_directly.value:
+                    if "task_login" not in tasks_to_run:
+                        tasks_to_run.insert(0, "task_login")
+                    self.tasks_to_run = tasks_to_run
+                    self.open_game_directly()
+                else:
+                    self.logger.warning(
+                        self._ui_text(
+                            "⚠️ 检测到游戏未运行，且未开启【自动打开游戏】！若稍后报错未找到句柄，请勾选该功能或手动启动游戏。",
+                            "⚠️ Game is not running and 'Auto open game' is OFF. This may cause handle errors!"
+                        ))
+                    self.tasks_to_run = tasks_to_run
+                    self.after_start_button_click(tasks_to_run)
+            else:
+                self.tasks_to_run = tasks_to_run
+                self.after_start_button_click(tasks_to_run)
         else:
             InfoBar.error(title="队列为空", content="请至少勾选一个任务进行立即执行", parent=self)
 
     def after_finish(self):
+        if getattr(self, '_is_running_solo_flag', False):
+            self.logger.info("单独执行完毕，不触发全局后置动作。")
+            return
+
         run_mode_idx = self.ui.ComboBox_run_mode.currentIndex()
         end_action_idx = self.ui.ComboBox_end_action.currentIndex()
 
-        # 1. 执行游戏动作
         if end_action_idx in [1, 3] and self.game_hwnd:
             win32gui.SendMessage(self.game_hwnd, win32con.WM_CLOSE, 0, 0)
 
-        # 2. 执行程序模式
-        if run_mode_idx == 0:  # 无动作
+        if run_mode_idx == 0:
             return
-        elif run_mode_idx == 1:  # 关闭程序
+        elif run_mode_idx == 1:
             if end_action_idx in [2, 3]: self.parent.close()
             return
-        elif run_mode_idx == 2:  # 挂机等待
-            self.is_loop_waiting = True
-            self.ui.PushButton_start.setText(
-                self._ui_text("停止挂机", "Stop Waiting"))
+        elif run_mode_idx == 2:
             self._auto_adjust_after_use_action()
-            if not self.loop_timer.isActive():
-                self.loop_timer.start(60000)
-            self.logger.info("轮次结束，已进入挂机监控模式...")
-        elif run_mode_idx == 3:  # 关闭电脑
+            self.logger.info("轮次执行完毕，后台持续监控计划时间点中...")
+        elif run_mode_idx == 3:
             os.system('shutdown -s -t 60')
             self.parent.close()
 
@@ -1461,242 +1577,35 @@ class Daily(QFrame, BaseInterface):
         except Exception as e:
             self.logger.error(e)
 
-    def _parse_time(self, time_str: str, default_h=0, default_m=0):
-        """辅助方法：安全解析时间字符串"""
-        try:
-            h, m = map(int, str(time_str).split(":"))
-            return h, m
-        except Exception:
-            return default_h, default_m
-
-    def _check_activation(self, act_rule, now: datetime) -> bool:
-        """检查生效周期 (闸门机制：大于等于设定值则放行)"""
-        act_type = str(act_rule.get("type", "daily")).lower()
-        h, m = self._parse_time(act_rule.get("time", "00:00"), 5, 0)
-
-        # 兼容配置中的中文脏数据
-        if act_type == "每周": act_type = "weekly"
-        elif act_type == "每月": act_type = "monthly"
-        elif act_type == "每天": act_type = "daily"
-
-        if act_type == "weekly":
-            target_day = int(act_rule.get("day", 0))  # 0=周一
-            current_day = now.weekday()
-            if current_day < target_day: return False  # 周一 < 周二，拦截
-            if current_day == target_day:  # 到了周二当天，看时间
-                if now.hour < h or (now.hour == h and now.minute < m):
-                    return False
-            return True  # 大于周二，比如周三周四，全部放行
-
-        elif act_type == "monthly":
-            target_day = int(act_rule.get("day", 1))  # 几号
-            current_day = now.day
-            if current_day < target_day: return False  # 1号 < 10号，拦截
-            if current_day == target_day:
-                if now.hour < h or (now.hour == h and now.minute < m):
-                    return False
-            return True  # 11号~31号，全部放行
-
-        else:  # daily
-            if now.hour < h or (now.hour == h and now.minute < m): return False
-            return True  # 大于每天设定的时间，放行
-
-    def _get_exec_cycle_start_and_match(self, rule, now: datetime):
-        """返回 (今天的刷新时间点, 是否符合执行条件, 最大执行次数)"""
-        exec_type = str(rule.get("type", "daily")).lower()
-        if exec_type == "每周": exec_type = "weekly"
-        elif exec_type == "每月": exec_type = "monthly"
-        elif exec_type == "每天": exec_type = "daily"
-
-        h, m = self._parse_time(rule.get("time", "00:00"), 0, 0)
-
-        # 今天的分割线 (例如今天的 02:01)
-        cycle_start = now.replace(hour=h, minute=m, second=0, microsecond=0)
-
-        is_matched = False
-
-        # 1. 严格检查“物理的今天”对不对
-        day_matched = False
-        if exec_type == "weekly":
-            if now.weekday() == int(rule.get("day", 0)):
-                day_matched = True
-        elif exec_type == "monthly":
-            if now.day == int(rule.get("day", 1)):
-                day_matched = True
-        else:  # daily
-            day_matched = True
-
-        # 2. 如果天数对上了，再看时间有没有过闸门
-        if day_matched:
-            # “0点到设定时间”直接判定为无效(is_matched=False)，只有大于等于才放行
-            if now >= cycle_start:
-                is_matched = True
-
-        return cycle_start, is_matched, int(rule.get("max_runs", 1))
-
-    def should_run_task(self,
-                        task_config: Dict[str, Any],
-                        now: datetime = None) -> bool:
-        if not task_config.get("enabled", False):
-            return False
-
-        task_id = task_config.get("id", "unknown")
-        meta = TASK_REGISTRY.get(task_id, {})
-        task_name = meta.get("en_name", task_id) if getattr(
-            self, '_is_non_chinese_ui', False) else meta.get(
-                "zh_name", task_id)
-
-        if not task_config.get("use_periodic", False):
-            skip_msg = f"Skipped [{task_name}]: Schedule disabled. Use Play button to force run." if getattr(
-                self, '_is_non_chinese_ui',
-                False) else f"【跳过】 {task_name}：未启用计划周期，若需单次执行请点击右侧 Play 按钮"
-            self.logger.info(skip_msg)
-            return False
-        # ==============================================================
-
-        if now is None:
-            now = datetime.now()
-
-        act_rules = task_config.get("activation_config", [])
-        task_id = task_config.get("id", "unknown")
-
-        # 提取友好的任务名称
-        meta = TASK_REGISTRY.get(task_id, {})
-        task_name = meta.get("en_name", task_id) if getattr(
-            self, '_is_non_chinese_ui', False) else meta.get(
-                "zh_name", task_id)
-
-        # ====================================================
-        # 1. 检查生效周期闸门 (保持绝对时间比对)
-        # ====================================================
-        act_rules = task_config.get("activation_config", [])
-        act_rule = act_rules[0] if act_rules else {
-            "type": "daily",
-            "time": "00:00"
-        }
-        if not self._check_activation(act_rule, now):
-            skip_msg = f"Skipped [{task_name}]: Not yet reached the activation time." if getattr(
-                self, '_is_non_chinese_ui',
-                False) else f"【跳过】 {task_name}：还没到设定的生效时间哦~"
-            self.logger.info(skip_msg)
-            return False
-
-        # ====================================================
-        # 2. 检查执行周期与独立进度 (核心重构区)
-        # ====================================================
-        exec_rules = task_config.get("execution_config", [])
-        if not exec_rules:
-            exec_rules = [{"type": "daily", "time": "00:00", "max_runs": 1}]
-
-        # 获取该任务下的独立进度条大字典
-        rule_progress = task_config.get("rule_progress", {})
-
-        can_execute = False
-        day_time_matched = False
-
-        # 遍历所有规则，只要有一个规则的专属进度没满，就放行！
-        for rule in exec_rules:
-            cycle_start, is_matched, max_runs = self._get_exec_cycle_start_and_match(
-                rule, now)
-
-            if is_matched:
-                day_time_matched = True
-
-                # 为这条规则生成唯一指纹 ID，如 "daily_0_08:00"
-                rule_key = f"{rule.get('type', 'daily')}_{rule.get('day', 0)}_{rule.get('time', '00:00')}"
-
-                # 读取这条规则的专属进度，读不到就初始化为 0
-                prog = rule_progress.get(rule_key, {
-                    "last_run": 0,
-                    "run_count": 0
-                })
-                last_run_dt = datetime.fromtimestamp(
-                    prog["last_run"]) if prog["last_run"] else datetime.min
-
-                if last_run_dt < cycle_start:
-                    # 跨过了这条规则的新起跑线，满血复活
-                    can_execute = True
-                    break
-                else:
-                    # 还在周期内，检查专属配额有没有用完
-                    if prog["run_count"] < max_runs:
-                        can_execute = True
-                        break
-
-        if not can_execute:
-            if not day_time_matched:
-                skip_msg = f"Skipped [{task_name}]: Not scheduled for today." if getattr(
-                    self, '_is_non_chinese_ui',
-                    False) else f"【跳过】 {task_name}：今天不在设定的执行时间范围内，休息一天~"
-            else:
-                skip_msg = f"Skipped [{task_name}]: Execution limit reached." if getattr(
-                    self, '_is_non_chinese_ui',
-                    False) else f"【完成】 {task_name}：设定的次数已经打满啦，无需重复执行~"
-
-            self.logger.info(skip_msg)
-            return False
-
-        return True
-
     def record_task_completed(self, task_id: str):
         sequence = self._normalize_task_sequence(
             config.daily_task_sequence.value)
-        now = datetime.now()
-        now_ts = time.time()
 
         meta = TASK_REGISTRY.get(task_id, {})
         task_name = meta.get("en_name", task_id) if getattr(
             self, '_is_non_chinese_ui', False) else meta.get(
                 "zh_name", task_id)
 
+        # 简单更新该任务的总体最后完成时间戳
         for task_cfg in sequence:
             if task_cfg.get("id") == task_id:
-                exec_rules = task_cfg.get("execution_config", [])
-                if not exec_rules:
-                    exec_rules = [{
-                        "type": "daily",
-                        "time": "00:00",
-                        "max_runs": 1
-                    }]
-
-                rule_progress = task_cfg.get("rule_progress", {})
-
-                # 任务一旦成功，我们要把所有满足条件的规则进度都往前推一格
-                for rule in exec_rules:
-                    cycle_start, is_matched, max_runs = self._get_exec_cycle_start_and_match(
-                        rule, now)
-                    if is_matched:
-                        rule_key = f"{rule.get('type', 'daily')}_{rule.get('day', 0)}_{rule.get('time', '00:00')}"
-                        prog = rule_progress.get(rule_key, {
-                            "last_run": 0,
-                            "run_count": 0
-                        })
-                        last_run_dt = datetime.fromtimestamp(
-                            prog["last_run"]
-                        ) if prog["last_run"] else datetime.min
-
-                        # 更新专属进度
-                        if last_run_dt < cycle_start:
-                            prog["run_count"] = 1
-                            prog["last_run"] = now_ts
-                            rule_progress[rule_key] = prog
-                        elif prog["run_count"] < max_runs:
-                            prog["run_count"] += 1
-                            prog["last_run"] = now_ts
-                            rule_progress[rule_key] = prog
-
-                # 将更新后的字典存回配置
-                task_cfg["rule_progress"] = rule_progress
-
-                success_msg = f"✨ Task [{task_name}] completed! Progress saved." if getattr(
-                    self, '_is_non_chinese_ui',
-                    False) else f"✨ {task_name} 执行完毕！已为您单独更新对应周期的进度"
-                self.logger.info(success_msg)
+                task_cfg["last_run"] = int(time.time())
                 break
 
+        success_msg = f"✨ Task [{task_name}] completed!" if getattr(
+            self, '_is_non_chinese_ui', False) else f"✨ {task_name} 执行完毕！"
+        self.logger.info(success_msg)
+
+        # UI 状态机置为已完成（绿色打勾）
         task_item = self.task_widget_map.get(task_id)
         if task_item and hasattr(task_item, 'set_task_state'):
             task_item.set_task_state('completed')
+
+            # 【系统级检查修复】：如果全局队列还在运行（其他任务还在排队或执行），必须立刻把刚完成的任务重新软锁定！
+            if getattr(self, 'is_running', False) or getattr(self, 'is_launch_pending', False):
+                if hasattr(task_item, 'lock_ui_for_execution'):
+                    task_item.lock_ui_for_execution()
+
         self._save_task_sequence(sequence)
 
     def save_changed(self, widget, *args):
@@ -1708,8 +1617,6 @@ class Daily(QFrame, BaseInterface):
             config.set(config_item, widget.isChecked())
             if widget.objectName() == 'CheckBox_is_use_power':
                 self.ui.ComboBox_power_day.setEnabled(widget.isChecked())
-            # elif widget.objectName() == 'CheckBox_open_game_directly':
-            #     self.ui.PushButton_select_directory.setEnabled(widget.isChecked())
         elif isinstance(widget, ComboBox):
             config.set(config_item, widget.currentIndex())
         elif isinstance(widget, SpinBox):
@@ -1783,21 +1690,20 @@ class Daily(QFrame, BaseInterface):
                     ProgressBar_tip.setObjectName(
                         f"ProgressBar_tip{index + 1}")
 
-                # 接收修改后的返回值
                 days, total_day, status = value
 
-                if status == -1:  # 已结束
+                if status == -1:
                     BodyLabel_tip.setText(
                         f"{key} {self._ui_text('已结束', 'finished')}")
                     sort_weight = 99999
                     ProgressBar_tip.setValue(0)
-                elif status == 1:  # 未开始
+                elif status == 1:
                     BodyLabel_tip.setText(
                         self._ui_text(f"{key} 还有 {days} 天开始",
                                       f"{key} in {days}d(s)"))
                     sort_weight = 10000 + days
                     ProgressBar_tip.setValue(0)
-                else:  # 正在进行
+                else:
                     BodyLabel_tip.setText(
                         self._ui_text(f"{key}剩：{days}天",
                                       f"{key}: {days}d(s) left"))
@@ -1826,5 +1732,4 @@ class Daily(QFrame, BaseInterface):
 
     def showEvent(self, event):
         super().showEvent(event)
-        # 只要切回这个页面，就强制从 config 重新读取一次最新数据覆盖 UI
         self._load_config()
