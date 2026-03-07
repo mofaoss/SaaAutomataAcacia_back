@@ -1431,7 +1431,7 @@ class Daily(QFrame, BaseInterface):
         # 2. 执行程序模式
         if run_mode_idx == 0:  # 无动作
             return
-        elif run_mode_idx == 1:  # 终止程序
+        elif run_mode_idx == 1:  # 关闭程序
             if end_action_idx in [2, 3]: self.parent.close()
             return
         elif run_mode_idx == 2:  # 挂机等待
@@ -1442,7 +1442,7 @@ class Daily(QFrame, BaseInterface):
             if not self.loop_timer.isActive():
                 self.loop_timer.start(60000)
             self.logger.info("轮次结束，已进入挂机监控模式...")
-        elif run_mode_idx == 3:  # 结束后关机
+        elif run_mode_idx == 3:  # 关闭电脑
             os.system('shutdown -s -t 60')
             self.parent.close()
 
