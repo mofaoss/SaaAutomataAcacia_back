@@ -1,11 +1,14 @@
 import json
 import os
+import logging
 
 import cv2
 import numpy as np
 
 from app.common.config import config
 from app.common.image_utils import ImageUtils
+
+logger = logging.getLogger(__name__)
 
 
 class Matcher:
@@ -35,7 +38,6 @@ class Matcher:
                     # 打开并读取 JSON 文件
                     with open(file_path, 'r', encoding='utf-8') as file:
                         self.scales = json.load(file)  # 将 JSON 数据加载到 self.scales
-                    # print("scale_cache.json 文件已加载，数据已赋值给 self.scales。")
                 except Exception as e:
                     print(f"读取 scale_cache.json 文件时出错: {e}")
         else:
@@ -43,7 +45,6 @@ class Matcher:
                 try:
                     # 删除文件
                     os.remove(file_path)
-                    # print("scale_cache.json 文件已成功删除。")
                 except Exception as e:
                     print(f"删除 scale_cache.json 文件时出错: {e}")
 
@@ -58,7 +59,6 @@ class Matcher:
             # 将 self.scales 写入 JSON 文件
             with open(file_path, 'w', encoding='utf-8') as file:
                 json.dump(self.scales, file, indent=4)  # 使用 indent 参数格式化 JSON
-            # print("self.scales 已成功保存到 scale_cache.json 文件。")
         except Exception as e:
             print(f"保存 scale_cache.json 文件时出错: {e}")
 
@@ -88,12 +88,17 @@ class Matcher:
         # 执行图像缩放
         resized = cv2.resize(target, (resized_w, resized_h))
 
-        # 模板匹配（使用归一化相关系数法）
-        result = cv2.matchTemplate(
-            resized,
-            template,
-            cv2.TM_CCOEFF_NORMED,
-            mask=mask)
+        # =================【终极防崩溃方案】=================
+        try:
+            if mask is not None:
+                # 优先尝试带 mask 的高精度匹配
+                result = cv2.matchTemplate(resized, template, cv2.TM_CCOEFF_NORMED, mask=mask)
+            else:
+                result = cv2.matchTemplate(resized, template, cv2.TM_CCOEFF_NORMED)
+        except cv2.error:
+            # 如果 OpenCV 触发了内部 Bug，放弃 mask 参数，强行裸跑
+            result = cv2.matchTemplate(resized, template, cv2.TM_CCOEFF_NORMED)
+        # ==================================================
 
         # 获取所有超过阈值的匹配位置
         loc = np.where(result >= self.match_threshold)
@@ -118,97 +123,99 @@ class Matcher:
         return step_confidences, step_boxes
 
     def match(self, template_path: str, target: cv2.typing.MatLike):
-        template = cv2.imread(template_path, cv2.IMREAD_UNCHANGED)
-        if template is None:
-            raise FileNotFoundError(f"模板图片读取失败: {template_path}")
+        # 【核心拦截】：使用 try-except 包裹整个识别流程
+        try:
+            template = cv2.imread(template_path, cv2.IMREAD_UNCHANGED)
+            if template is None:
+                if config.isLog.value:
+                    logger.warning(f"模板图片读取失败: {template_path}")
+                return []
 
-        if template.ndim == 3 and template.shape[-1] == 4:
-            mask = template[:, :, 3].copy()  # 提取alpha通道
-            template = template[:, :, :3]
-        else:
-            mask = None
+            if template.ndim == 3 and template.shape[-1] == 4:
+                mask = template[:, :, 3].copy()  # 提取alpha通道
+                template = template[:, :, :3]
+            else:
+                mask = None
 
-        # 统一数据类型，避免 matchTemplate 内部算术操作类型不一致
-        if template.dtype != np.uint8:
-            template = cv2.normalize(template, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-        if target.dtype != np.uint8:
-            target = cv2.normalize(target, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-        if mask is not None and mask.dtype != np.uint8:
-            mask = cv2.normalize(mask, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+            # 统一数据类型 (恢复为最稳定的 uint8)
+            if template.dtype != np.uint8:
+                template = cv2.normalize(template, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+            if target.dtype != np.uint8:
+                target = cv2.normalize(target, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+            if mask is not None and mask.dtype != np.uint8:
+                mask = cv2.normalize(mask, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
 
-        # 预处理：锐化 + 边缘增强
-        kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
-        template = cv2.filter2D(template, -1, kernel)
-        target = cv2.filter2D(target, -1, kernel)
-        # 转换为灰度图
-        if template.ndim == 3:
-            template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
-        if target.ndim == 3:
-            target = cv2.cvtColor(target, cv2.COLOR_BGR2GRAY)
-        # 获取模板尺寸
-        tpl_h, tpl_w = template.shape[:2]
-        orig_h, orig_w = target.shape[:2]
-        # print(f"{template_path=},{template.shape=},{target.shape=}")
+            # 预处理：锐化 + 边缘增强 (强制核为 float32 避免 arithm_op 坑)
+            kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]], dtype=np.float32)
+            template = cv2.filter2D(template, -1, kernel)
+            target = cv2.filter2D(target, -1, kernel)
 
-        if config.saveScaleCache.value:
-            scale = self.scales.get(template_path, None)
-        else:
-            scale = None
-        if scale is None:
-            boxes = []
-            confidences = [0]
-            for i in range(self.scale_steps):
-                scale = self.max_scale - i * self.scale_factor
-                step_confidences, step_boxes = self.step(
-                    scale,
-                    orig_w,
-                    orig_h,
-                    tpl_w,
-                    tpl_h,
-                    template,
-                    target,
-                    mask
+            # 转换为灰度图
+            if template.ndim == 3:
+                template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+            if target.ndim == 3:
+                if target.shape[-1] == 4:
+                    target = cv2.cvtColor(target, cv2.COLOR_BGRA2GRAY)
+                else:
+                    target = cv2.cvtColor(target, cv2.COLOR_BGR2GRAY)
+
+            # 获取模板尺寸
+            tpl_h, tpl_w = template.shape[:2]
+            orig_h, orig_w = target.shape[:2]
+
+            if config.saveScaleCache.value:
+                scale = self.scales.get(template_path, None)
+            else:
+                scale = None
+
+            if scale is None:
+                boxes = []
+                confidences = [0]
+                for i in range(self.scale_steps):
+                    scale = self.max_scale - i * self.scale_factor
+                    step_confidences, step_boxes = self.step(
+                        scale, orig_w, orig_h, tpl_w, tpl_h, template, target, mask
+                    )
+                    if len(step_confidences) == 0:
+                        continue
+                    if max(step_confidences) > max(confidences):
+                        confidences = step_confidences
+                        boxes = step_boxes
+                        self.scales[template_path] = scale
+                        if min(confidences) > self.early_stop_threshold:
+                            break
+            else:
+                confidences, boxes = self.step(
+                    scale, orig_w, orig_h, tpl_w, tpl_h, template, target, mask
                 )
-                if len(step_confidences) == 0:
-                    continue
-                if max(step_confidences) > max(confidences):
-                    confidences = step_confidences
-                    boxes = step_boxes
-                    self.scales[template_path] = scale
-                    # print(f"if的scale：{self.scales[template_path]}")
-                    if min(confidences) > self.early_stop_threshold:
-                        break
-        else:
-            # print(f'else的scale:{self.scales[template_path]}')
-            confidences, boxes = self.step(
-                scale,
-                orig_w,
-                orig_h,
-                tpl_w,
-                tpl_h,
-                template,
-                target,
-                mask
+
+            if len(boxes) == 0:
+                return []
+
+            # 非极大值抑制（在原始图像坐标系进行）
+            indices = cv2.dnn.NMSBoxes(
+                boxes, confidences,
+                score_threshold=self.match_threshold,
+                nms_threshold=self.nms_threshold
             )
 
-        if len(boxes) == 0:
+            # 收集检测框
+            results = []
+            if len(indices) > 0:
+                for i in indices.flatten():
+                    x, y, w, h = boxes[i]
+                    confidence = confidences[i]
+                    results.append((x, y, w, h, confidence))
+            return results
+
+        except Exception as e:
+            # 出现任何图像处理错误，直接吃掉异常并返回空列表（假装没找到图片）
+            # 外层调用者就不会再报 "寻找图片出错：" 了
+            if config.isLog.value:
+                # 只有用户开了日志开关，才把这个底层报错打印出来
+                file_name = os.path.basename(template_path)
+                logger.error(f"图像识别底层异常({file_name})：{str(e)}")
             return []
-
-        # 非极大值抑制（在原始图像坐标系进行）
-        indices = cv2.dnn.NMSBoxes(
-            boxes, confidences,
-            score_threshold=self.match_threshold,
-            nms_threshold=self.nms_threshold
-        )
-
-        # 收集检测框
-        results = []
-        if len(indices) > 0:
-            for i in indices.flatten():
-                x, y, w, h = boxes[i]
-                confidence = confidences[i]
-                results.append((x, y, w, h, confidence))
-        return results
 
 
 matcher = Matcher()

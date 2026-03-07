@@ -408,6 +408,14 @@ class Daily(QFrame, BaseInterface):
         self.loop_timer.timeout.connect(self._check_and_run_loop_tasks)
         self.loop_timer.start(30000)
 
+        # 全局热键 F8 监听器 (100毫秒轮询一次，极其轻量)
+        self.hotkey_timer = QTimer(self)
+        self.hotkey_timer.timeout.connect(self._check_global_hotkey)
+        self.hotkey_timer.start(100)
+        self._f8_pressed = False
+
+        self.checkbox_dic = None
+
         self.checkbox_dic = None
 
         QTimer.singleShot(500, self._on_init_sync)
@@ -519,6 +527,25 @@ class Daily(QFrame, BaseInterface):
         else:
             self.tasks_to_run = tasks_to_run
             self.after_start_button_click(tasks_to_run)
+
+    def _check_global_hotkey(self):
+        """调用 Windows 底层 API 实现全局快捷键拦截，无视窗口焦点"""
+        try:
+            import ctypes
+            # 0x77 是键盘上 F8 的虚拟键码
+            state = ctypes.windll.user32.GetAsyncKeyState(0x77)
+            # 如果最高位为 1，代表当前按键正处于按下状态
+            is_pressed = (state & 0x8000) != 0
+
+            if is_pressed:
+                if not getattr(self, '_f8_pressed', False):
+                    self._f8_pressed = True
+                    self.logger.info("检测到全局快捷键 F8 被按下")
+                    self.on_start_button_click()
+            else:
+                self._f8_pressed = False
+        except Exception:
+            pass
 
     def _initWidget(self):
 
@@ -1219,7 +1246,7 @@ class Daily(QFrame, BaseInterface):
         self.is_launch_pending = bool(pending)
         if self.is_launch_pending:
             self.set_checkbox_enable(False)
-            self.ui.PushButton_start.setText(self._ui_text("停止", "Stop"))
+            self.ui.PushButton_start.setText(self._ui_text("停止 (F8)", "Stop (F8)"))
 
             for tid, task_item in self.task_widget_map.items():
                 if tid in getattr(self, 'tasks_to_run', []):
@@ -1232,8 +1259,7 @@ class Daily(QFrame, BaseInterface):
 
         if not self.is_running:
             self.set_checkbox_enable(True)
-            self.ui.PushButton_start.setText(
-                self._ui_text("立即执行", "Execute Now"))
+            self.ui.PushButton_start.setText(self._ui_text("立即执行 (F8)", "Execute Now (F8)"))
             self._auto_adjust_after_use_action()
 
     def handle_start(self, str_flag):
@@ -1241,7 +1267,7 @@ class Daily(QFrame, BaseInterface):
             if str_flag == 'start':
                 self.is_running = True
                 self._set_launch_pending_state(False)
-                self.ui.PushButton_start.setText(self._ui_text("停止", "Stop"))
+                self.ui.PushButton_start.setText(self._ui_text("停止 (F8)", "Stop (F8)"))
 
                 for tid, task_item in self.task_widget_map.items():
                     if tid in getattr(self, 'tasks_to_run', []):
@@ -1261,7 +1287,7 @@ class Daily(QFrame, BaseInterface):
                 self.set_checkbox_enable(True)
 
                 # 【核心修改】不论任何情况，停止后按钮直接回到“立即执行”，因为挂机是隐形的
-                self.ui.PushButton_start.setText(self._ui_text("立即执行", "Execute Now"))
+                self.ui.PushButton_start.setText(self._ui_text("立即执行 (F8)", "Execute Now (F8)"))
 
                 self._is_running_solo_flag = False
                 self._is_scheduled_run_flag = False
