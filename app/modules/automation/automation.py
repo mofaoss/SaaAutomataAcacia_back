@@ -162,7 +162,7 @@ class Automation:
             if self.find_element('基地', 'text', crop=(
                     1598 / 1920, 678 / 1080, 1661 / 1920, 736 / 1080)) and self.find_element('任务', 'text', crop=(
                     1452 / 1920, 327 / 1080, 1529 / 1920, 376 / 1080)):
-                break
+                return True
             elif self.find_element('app/resource/images/reward/home.png', 'image', threshold=0.5,
                                     crop=(1580 / 1920, 18 / 1080, 1701 / 1920, 120 / 1080)):
                 self.press_key('esc')
@@ -177,7 +177,7 @@ class Automation:
 
             if timeout.reached():
                 self.logger.error("返回主页面超时")
-                break
+                return False
 
     @atoms
     def take_screenshot(self, crop=(0, 0, 1, 1), is_interval=True):

@@ -192,6 +192,7 @@ class StartThread(QThread):
     stop_signal = Signal()
     task_completed_signal = Signal(str)
     task_started_signal = Signal(str)
+    task_failed_signal = Signal(str)  # 【新增】任务失败/跳过信号
 
     def __init__(self, tasks_to_run: list, parent=None):
         super().__init__(parent)
@@ -234,15 +235,39 @@ class StartThread(QThread):
 
                 task_name = meta["en_name"] if is_non_chinese_ui_language() else meta["zh_name"]
                 self.logger.info(f"当前任务：{task_name}")
-
                 self.task_started_signal.emit(task_id)
 
-                module_class = meta["module_class"]
-                module = module_class(auto, self.logger)
-                module.run()
+                # =================【核心新增：前置校验】=================
+                task_success = True
+                if task_id != "task_login":
+                    msg = f"Preparing {task_name}, returning to home..." if is_non_chinese_ui_language() else f"正在准备 {task_name}，尝试返回主界面..."
+                    self.logger.info(msg)
 
+                    if not auto.back_to_home():
+                        err_msg = f"[{task_name}] Failed to return to home before start, skipping." if is_non_chinese_ui_language() else f"[{task_name}] 开始前返回主界面失败，跳过该任务"
+                        self.logger.error(err_msg)
+                        task_success = False
+                # ========================================================
+
+                # 只有前置校验通过，才执行业务逻辑
+                if task_success:
+                    module_class = meta["module_class"]
+                    module = module_class(auto, self.logger)
+                    module.run()
+
+                    # =================【核心新增：后置复位】=================
+                    if task_id != "task_login" and self._is_running:
+                        msg = f"{task_name} finished, returning to home..." if is_non_chinese_ui_language() else f"{task_name} 执行完毕，正在返回主界面..."
+                        self.logger.info(msg)
+                        auto.back_to_home()
+                    # ========================================================
+
+                # 根据是否成功发射不同的信号
                 if self._is_running:
-                    self.task_completed_signal.emit(task_id)
+                    if task_success:
+                        self.task_completed_signal.emit(task_id)
+                    else:
+                        self.task_failed_signal.emit(task_id)
 
                 if not self._is_running:
                     normal_stop_flag = False
@@ -257,10 +282,8 @@ class StartThread(QThread):
                         tray_icon = QSystemTrayIcon(QIcon(os.path.abspath("app/resource/images/logo.ico")), app)
                         tray_icon.show()
                         tray_icon.showMessage(
-                            '已完成勾选任务',
-                            content,
-                            QIcon(os.path.abspath("app/resource/images/logo.ico")),
-                            1000
+                            '已完成勾选任务', content,
+                            QIcon(os.path.abspath("app/resource/images/logo.ico")), 1000
                         )
 
         except Exception as e:
@@ -698,10 +721,13 @@ class Daily(QFrame, BaseInterface):
             if use_periodic:
                 task_item.set_task_state('scheduled', is_enabled=is_checked)
             else:
-                if getattr(task_item, 'current_state', 'idle') != 'completed':
+                # =================【核心修复】=================
+                # 将 failed 状态加入保护名单，防止整个队列跑完后被强行刷回普通的 idle 黑字
+                curr_state = getattr(task_item, 'current_state', 'idle')
+                if curr_state not in ['completed', 'failed']:
                     task_item.set_task_state('idle', is_enabled=is_checked)
                 else:
-                    task_item.set_task_state('completed', is_enabled=is_checked)
+                    task_item.set_task_state(curr_state, is_enabled=is_checked)
 
     def _save_task_sequence(self, sequence):
         self._task_sequence_cache = sequence
@@ -1477,6 +1503,7 @@ class Daily(QFrame, BaseInterface):
                     self.record_task_completed)
                 self.start_thread.task_started_signal.connect(
                     self._on_task_actually_started)
+                self.start_thread.task_failed_signal.connect(self.record_task_failed)
 
                 self.start_thread.start()
             else:
@@ -1618,6 +1645,23 @@ class Daily(QFrame, BaseInterface):
             self.ui.PopUpAniStackedWidget.setCurrentIndex(index)
         except Exception as e:
             self.logger.error(e)
+
+    def record_task_failed(self, task_id: str):
+        meta = TASK_REGISTRY.get(task_id, {})
+        task_name = meta.get("en_name", task_id) if getattr(self, '_is_non_chinese_ui', False) else meta.get("zh_name", task_id)
+
+        fail_msg = f"⚠️ Task [{task_name}] skipped!" if getattr(self, '_is_non_chinese_ui', False) else f"⚠️ {task_name} 未能成功执行，已跳过！"
+        self.logger.warning(fail_msg)
+
+        # UI 状态机置为未成功（红色红叉），并且不更新它的 last_run 时间，下次触发还能重试
+        task_item = self.task_widget_map.get(task_id)
+        if task_item and hasattr(task_item, 'set_task_state'):
+            task_item.set_task_state('failed')
+
+            # 如果还在连跑队列里，立刻把这个失败的任务重新软锁定，防止 UI 被用户误点
+            if getattr(self, 'is_running', False) or getattr(self, 'is_launch_pending', False):
+                if hasattr(task_item, 'lock_ui_for_execution'):
+                    task_item.lock_ui_for_execution()
 
     def record_task_completed(self, task_id: str):
         sequence = self._normalize_task_sequence(

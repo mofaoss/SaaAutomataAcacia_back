@@ -302,7 +302,8 @@ class TaskItemWidget(QWidget):
                 'running_scheduled': "#FF8C00",
                 'completed': "#107C10",
                 'scheduled': "#0078D4",
-                'queued': "#9370DB"
+                'queued': "#9370DB",
+                'failed': "#D32F2F",
             }
 
             color = colors.get(state, "")
@@ -333,6 +334,10 @@ class TaskItemWidget(QWidget):
 
             elif state == 'completed':
                 prefix = "✓ " if self._is_non_chinese_ui else "✓ [已完成] "
+                display_text = f"{prefix}{self._original_text}"
+
+            elif state == 'failed':
+                prefix = "❌ " if self._is_non_chinese_ui else "❌ [未成功] "
                 display_text = f"{prefix}{self._original_text}"
 
             elif state == 'scheduled':
