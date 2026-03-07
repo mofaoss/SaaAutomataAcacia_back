@@ -96,13 +96,12 @@ class ExecutionRuleWidget(QWidget):
 
         self.time_edit = LineEdit(self)
         self.time_edit.setText("00:00")
-        # 文字居中，并固定在刚好能完整显示的最小宽度
         self.time_edit.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.time_edit.setFixedWidth(64)
 
         self.runs_edit = LineEdit(self)
-        self.runs_edit.setValidator(QIntValidator(1, 99, self))  # 只能输入 1-99 的数字
-        self.runs_edit.setText("1")                              # 默认值
+        self.runs_edit.setValidator(QIntValidator(1, 99, self))
+        self.runs_edit.setText("1")
         self.runs_edit.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.runs_edit.setMinimumWidth(40)
         self.runs_edit.setMaximumWidth(60)
@@ -125,7 +124,7 @@ class ExecutionRuleWidget(QWidget):
         layout.addWidget(self.time_edit)
 
         layout.addWidget(self.label_after_time)
-        layout.addWidget(self.runs_edit)  # 换成了 runs_edit
+        layout.addWidget(self.runs_edit)
         layout.addWidget(self.label_times)
         layout.addWidget(self.delete_btn)
         layout.addStretch(1)
@@ -143,7 +142,7 @@ class ExecutionRuleWidget(QWidget):
 
     def set_runs_visible(self, visible: bool):
         self.label_after_time.setVisible(visible)
-        self.runs_edit.setVisible(visible)  # 换成了 runs_edit
+        self.runs_edit.setVisible(visible)
         self.label_times.setVisible(visible)
 
     def _update_visibility(self):
@@ -164,7 +163,6 @@ class ExecutionRuleWidget(QWidget):
                 month_day = max(1, min(31, month_day))
                 self.month_combo.setCurrentIndex(month_day - 1)
             self.time_edit.setText(data.get("time", "00:00"))
-            # 转换为字符串填入 LineEdit
             self.runs_edit.setText(str(data.get("max_runs", 1)))
         except Exception:
             pass
@@ -174,8 +172,6 @@ class ExecutionRuleWidget(QWidget):
         t = ["daily", "weekly", "monthly"]
         idx = self.freq_combo.currentIndex()
         day = self.week_combo.currentIndex() if idx == 1 else (self.month_combo.currentIndex() + 1)
-
-        # 获取文本并转换为数字，如果是空字符串就默认回退到 1
         runs_text = self.runs_edit.text()
         runs_val = int(runs_text) if runs_text.isdigit() else 1
 
@@ -193,13 +189,7 @@ class TaskItemWidget(QWidget):
     play_clicked = Signal(str)
     play_from_here_clicked = Signal(str)
 
-    def __init__(self,
-                 task_id,
-                 zh_name,
-                 en_name,
-                 is_enabled,
-                 is_non_chinese_ui,
-                 parent=None):
+    def __init__(self, task_id, zh_name, en_name, is_enabled, is_non_chinese_ui, parent=None):
         super().__init__(parent)
         self.task_id = task_id
         self._is_non_chinese_ui = is_non_chinese_ui
@@ -218,33 +208,25 @@ class TaskItemWidget(QWidget):
         self.checkbox.setChecked(is_enabled)
         self.checkbox.setFixedWidth(28)
         self.checkbox.stateChanged.connect(
-            lambda: self.checkbox_state_changed.emit(
-                self.task_id, self.checkbox.isChecked()))
+            lambda: self.checkbox_state_changed.emit(self.task_id, self.checkbox.isChecked())
+        )
 
         self.label = BodyLabel(self._original_text, self)
-        self.label.setAlignment(Qt.AlignmentFlag.AlignLeft
-                                | Qt.AlignmentFlag.AlignVCenter)
-        self.label.setAttribute(
-            Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        self.label.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
 
-        left_layout.addWidget(
-            self.checkbox, 0,
-            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        left_layout.addWidget(
-            self.label, 0,
-            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        left_layout.addWidget(self.checkbox, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        left_layout.addWidget(self.label, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
         self.btn_play_from_here = ToolButton(self)
         self.btn_play_from_here.setIcon(FIF.DOWN)
-        self.btn_play_from_here.setToolTip(
-            "此处开始" if not is_non_chinese_ui else "Run from here")
+        self.btn_play_from_here.setToolTip("此处开始" if not is_non_chinese_ui else "Run from here")
         self.btn_play_from_here.setFixedSize(28, 28)
 
         btn_font = self.btn_play_from_here.font()
         btn_font.setPointSize(10)
         self.btn_play_from_here.setFont(btn_font)
-        self.btn_play_from_here.clicked.connect(
-            lambda: self.play_from_here_clicked.emit(self.task_id))
+        self.btn_play_from_here.clicked.connect(lambda: self.play_from_here_clicked.emit(self.task_id))
 
         self.btn = ToolButton(self)
         self.btn.setIcon(FIF.PLAY)
@@ -267,7 +249,6 @@ class TaskItemWidget(QWidget):
             font.setBold(False)
             display_text = self._original_text
 
-            # 默认常态：按钮全显，可勾选
             self.btn.setVisible(True)
             self.btn_play_from_here.setVisible(True)
             self.checkbox.setEnabled(True)
@@ -278,6 +259,7 @@ class TaskItemWidget(QWidget):
                 'idle': "",
                 'running_queue': "#FF8C00",
                 'running_solo': "#FF8C00",
+                'running_scheduled': "#FF8C00",
                 'completed': "#107C10",
                 'scheduled': "#00BFFF",
                 'queued': "#9370DB"
@@ -286,21 +268,27 @@ class TaskItemWidget(QWidget):
             color = colors.get(state, "")
 
             if state == 'running_queue':
-                self.btn.setIcon(
-                    getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
-                self.btn_play_from_here.setVisible(False)  # 只要执行，立刻隐藏“从此开始”
+                self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
+                self.btn_play_from_here.setVisible(False)
                 self.checkbox.setEnabled(False)
                 font.setBold(True)
                 prefix = "⏬ " if self._is_non_chinese_ui else "⏬ [执行中] "
                 display_text = f"{prefix}{self._original_text}"
 
             elif state == 'running_solo':
-                self.btn.setIcon(
-                    getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
-                self.btn_play_from_here.setVisible(False)  # 只要执行，立刻隐藏“从此开始”
+                self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
+                self.btn_play_from_here.setVisible(False)
                 self.checkbox.setEnabled(False)
                 font.setBold(True)
                 prefix = "▶️ " if self._is_non_chinese_ui else "▶️ [执行中] "
+                display_text = f"{prefix}{self._original_text}"
+
+            elif state == 'running_scheduled':
+                self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
+                self.btn_play_from_here.setVisible(False)
+                self.checkbox.setEnabled(False)
+                font.setBold(True)
+                prefix = "📅 " if self._is_non_chinese_ui else "📅 [执行中] "
                 display_text = f"{prefix}{self._original_text}"
 
             elif state == 'completed':
@@ -308,7 +296,7 @@ class TaskItemWidget(QWidget):
                 display_text = f"{prefix}{self._original_text}"
 
             elif state == 'scheduled':
-                prefix = "📅 " if self._is_non_chinese_ui else "📅 [计划内] "
+                prefix = "⌛ " if self._is_non_chinese_ui else "⌛ [计划内] "
                 display_text = f"{prefix}{self._original_text}"
 
             elif state == 'queued':
@@ -318,7 +306,7 @@ class TaskItemWidget(QWidget):
                 prefix = "⏳ " if self._is_non_chinese_ui else "⏳ [队列中] "
                 display_text = f"{prefix}{self._original_text}"
 
-            # 彻底解耦：如果是闲置状态且未勾选，才变灰。计划内(scheduled)无视勾选强制蓝！
+            # 彻底解耦：如果是闲置状态且未勾选，才变灰。计划内/已完成无视勾选强制保色！
             if state == 'idle' and not is_enabled:
                 color = "#888888"
 
@@ -927,7 +915,7 @@ class DailyView(ScrollArea):
         self.SimpleCardWidget_option = SimpleCardWidget(self.content_widget)
         self.SimpleCardWidget_option.setObjectName("SimpleCardWidget_option")
         self.SimpleCardWidget_option.setMinimumWidth(200)
-        self.SimpleCardWidget_option.setMaximumWidth(350)
+        # self.SimpleCardWidget_option.setMaximumWidth(350)
         self.SimpleCardWidget_option.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
@@ -993,7 +981,7 @@ class DailyView(ScrollArea):
         self.SimpleCardWidget_2 = SimpleCardWidget(self.content_widget)
         self.SimpleCardWidget_2.setObjectName("SimpleCardWidget_2")
         self.SimpleCardWidget_2.setMinimumWidth(300)
-        self.SimpleCardWidget_2.setMaximumWidth(700)
+        # self.SimpleCardWidget_2.setMaximumWidth(700)
         self.SimpleCardWidget_2.setSizePolicy(QSizePolicy.Policy.Expanding,
                                               QSizePolicy.Policy.Expanding)
 
@@ -1116,7 +1104,7 @@ class DailyView(ScrollArea):
         self.SimpleCardWidget = SimpleCardWidget(self.content_widget)
         self.SimpleCardWidget.setObjectName("SimpleCardWidget")
         self.SimpleCardWidget.setMinimumWidth(246)
-        self.SimpleCardWidget.setMaximumWidth(450)
+        # self.SimpleCardWidget.setMaximumWidth(450)
         self.SimpleCardWidget.setSizePolicy(QSizePolicy.Policy.Expanding,
                                             QSizePolicy.Policy.Expanding)
 
@@ -1139,7 +1127,7 @@ class DailyView(ScrollArea):
         self.SimpleCardWidget_tips = SimpleCardWidget(self.content_widget)
         self.SimpleCardWidget_tips.setObjectName("SimpleCardWidget_tips")
         self.SimpleCardWidget_tips.setMinimumWidth(237)
-        self.SimpleCardWidget_tips.setMaximumWidth(450)
+        # self.SimpleCardWidget_tips.setMaximumWidth(450)
         self.SimpleCardWidget_tips.setMinimumHeight(150)
         self.SimpleCardWidget_tips.setMaximumHeight(250)
         self.SimpleCardWidget_tips.setSizePolicy(QSizePolicy.Policy.Expanding,
@@ -1188,8 +1176,10 @@ class DailyView(ScrollArea):
             self._ui_text('退出游戏和代理', 'Exit Game and Assistant'),
         ])
 
-        self.BodyLabel_run_mode.setText(self._ui_text("执行结束后，安卡希雅会:", "After Execution, Acacia Action:"))
-        self.BodyLabel_end_action.setText(self._ui_text("执行结束后，尘白禁区将:", "After Execution, Game Action:"))
+        self.BodyLabel_run_mode.setText(
+            self._ui_text("执行结束后，安卡希雅会:", "After Execution, Acacia Action:"))
+        self.BodyLabel_end_action.setText(
+            self._ui_text("执行结束后，尘白禁区将:", "After Execution, Game Action:"))
         self.PushButton_start.setText(self._ui_text("立即执行", "Execute Now"))
 
         self.ComboBox_power_day.addItems(['1', '2', '3', '4', '5', '6'])
