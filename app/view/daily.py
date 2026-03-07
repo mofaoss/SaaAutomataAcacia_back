@@ -1817,3 +1817,6 @@ class Daily(QFrame, BaseInterface):
     def showEvent(self, event):
         super().showEvent(event)
         self._load_config()
+
+        if hasattr(self, 'redirectOutput'):
+            self.redirectOutput(self.ui.textBrowser_log)
