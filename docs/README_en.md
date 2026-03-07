@@ -16,10 +16,10 @@
 > [!Tip]
 > **Update**
 > 1. **Stealth Mode**, allowing the game to run completely hidden in the background
-> 2. Acacia now has a **fully redesigned UI**
+> 2. SaaAssistantAca is now fully refactored: the installer size is reduced by 40%, with better compatibility, faster speed, and a more concise UI.
 > 3. Added **custom task lists** and **periodic/scheduled execution** features
 > 4. Added support for **Traditional Chinese and English**, including compatibility with Traditional Chinese game clients
-> 5. Added **standard logistics** and **Pals capturing** functions
+> 5. Added **standard logistics**, **Pals capturing**, and more new features
 > 6. Enhanced OCR accuracy; fixed Steam login issues and stamina potion duration recognition; optimized memory shard usage; **removed the windowed‑mode restriction**
 
 > [!Warning]
