@@ -116,7 +116,7 @@ class ExecutionRuleWidget(QWidget):
             w.setFont(font)
 
         self.label_after_time = BodyLabel("run" if is_non_chinese_ui else "执行", self)
-        self.label_times = BodyLabel("times" if is_non_chinese_ui else "次", self)
+        self.label_times = BodyLabel("time(s)" if is_non_chinese_ui else "次", self)
 
         layout.addWidget(self.freq_combo)
         layout.addWidget(self.week_combo)
@@ -291,7 +291,7 @@ class TaskItemWidget(QWidget):
                 self.btn_play_from_here.setVisible(False)  # 只要执行，立刻隐藏“从此开始”
                 self.checkbox.setEnabled(False)
                 font.setBold(True)
-                prefix = "▼ " if self._is_non_chinese_ui else "▼ [执行中] "
+                prefix = "⏬ " if self._is_non_chinese_ui else "⏬ [执行中] "
                 display_text = f"{prefix}{self._original_text}"
 
             elif state == 'running_solo':
@@ -300,7 +300,7 @@ class TaskItemWidget(QWidget):
                 self.btn_play_from_here.setVisible(False)  # 只要执行，立刻隐藏“从此开始”
                 self.checkbox.setEnabled(False)
                 font.setBold(True)
-                prefix = "▶ " if self._is_non_chinese_ui else "▶ [执行中] "
+                prefix = "▶️ " if self._is_non_chinese_ui else "▶️ [执行中] "
                 display_text = f"{prefix}{self._original_text}"
 
             elif state == 'completed':
@@ -308,7 +308,7 @@ class TaskItemWidget(QWidget):
                 display_text = f"{prefix}{self._original_text}"
 
             elif state == 'scheduled':
-                prefix = "⌛ " if self._is_non_chinese_ui else "⌛ [计划内] "
+                prefix = "📅 " if self._is_non_chinese_ui else "📅 [计划内] "
                 display_text = f"{prefix}{self._original_text}"
 
             elif state == 'queued':
@@ -365,7 +365,7 @@ class SharedSchedulingPanel(QWidget):
         main_layout.setSpacing(6)
 
         checkbox_row = QHBoxLayout()
-        enable_text = "Enable Cycle" if is_non_chinese_ui else "启用计划"
+        enable_text = "Cycle" if is_non_chinese_ui else "启用计划"
         self.enable_checkbox = CheckBox(enable_text, self)
         font = self.enable_checkbox.font()
         font.setPointSize(10)
@@ -373,8 +373,8 @@ class SharedSchedulingPanel(QWidget):
 
         checkbox_row.addWidget(self.enable_checkbox)
 
-        self.btn_enable_all = PushButton("Enable All" if is_non_chinese_ui else "开启全部", self)
-        self.btn_disable_all = PushButton("Disable All" if is_non_chinese_ui else "关闭全部", self)
+        self.btn_enable_all = PushButton("All On" if is_non_chinese_ui else "开启全部", self)
+        self.btn_disable_all = PushButton("All Off" if is_non_chinese_ui else "关闭全部", self)
         self.btn_view_schedule = PushButton("View Schedule" if is_non_chinese_ui else "查看日程", self)
 
         self.btn_enable_all.setFixedHeight(28)
@@ -418,7 +418,7 @@ class SharedSchedulingPanel(QWidget):
         exec_title_layout.setContentsMargins(0, 0, 0, 0)
         exec_title_layout.setSpacing(8)
 
-        exec_title_text = "Execution Triggers (Day)" if is_non_chinese_ui else "执行节点（单位：天）："
+        exec_title_text = "Execution Triggers" if is_non_chinese_ui else "执行节点："
         self.exec_title_label = StrongBodyLabel(exec_title_text, self)
 
         self.add_btn = ToolButton(FIF.ADD, self)
@@ -1175,9 +1175,9 @@ class DailyView(ScrollArea):
         # 程序模式
         self.ComboBox_run_mode.addItems([
             self._ui_text('无动作', 'No Action'),
-            self._ui_text('终止程序', 'Exit Program'),
+            self._ui_text('关闭程序', 'Exit Program'),
             self._ui_text('挂机等待', 'Loop & Wait'),
-            self._ui_text('结束后关机', 'Shutdown'),
+            self._ui_text('关闭电脑', 'Shutdown'),
         ])
 
         # 游戏动作
@@ -1188,8 +1188,8 @@ class DailyView(ScrollArea):
             self._ui_text('退出游戏和代理', 'Exit Game and Assistant'),
         ])
 
-        self.BodyLabel_run_mode.setText(self._ui_text("执行结束后，程序模式:", "After Execution, Program Action:"))
-        self.BodyLabel_end_action.setText(self._ui_text("执行结束后，游戏动作:", "After Execution, Game Action:"))
+        self.BodyLabel_run_mode.setText(self._ui_text("执行结束后，安卡希雅会:", "After Execution, Acacia Action:"))
+        self.BodyLabel_end_action.setText(self._ui_text("执行结束后，尘白禁区将:", "After Execution, Game Action:"))
         self.PushButton_start.setText(self._ui_text("立即执行", "Execute Now"))
 
         self.ComboBox_power_day.addItems(['1', '2', '3', '4', '5', '6'])
