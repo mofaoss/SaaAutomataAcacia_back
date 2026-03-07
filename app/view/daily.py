@@ -1605,14 +1605,10 @@ class Daily(QFrame, BaseInterface):
             self.loop_timer.stop()
             self.hotkey_timer.stop()
 
-            # 【核心复用】：获取顶层主窗口 (MainWindow)，直接调用它的完美退出机制
             main_window = self.window()
             if hasattr(main_window, 'quit_app'):
                 main_window.quit_app()
             else:
-                # 备用方案（防万一找不到 MainWindow）
-                from PySide6.QtWidgets import QApplication
-                import os
                 QApplication.quit()
                 os._exit(0)
 
@@ -1623,9 +1619,12 @@ class Daily(QFrame, BaseInterface):
             self.loop_timer.stop()
             self.hotkey_timer.stop()
 
-            main_window = self.window()
-            if hasattr(main_window, 'quit_app'):
-                main_window.quit_app()
+            # main_window = self.window()
+            # if hasattr(main_window, 'quit_app'):
+            #     main_window.quit_app()
+            # else:
+            #     QApplication.quit()
+            #     os._exit(0)
 
     def set_checkbox_enable(self, enable: bool):
         for checkbox in self.ui.findChildren(CheckBox):
