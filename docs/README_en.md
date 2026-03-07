@@ -23,7 +23,7 @@
 > [!Tip]
 > **Update**
 > 1. **Stealth Mode** is now available, allowing the game to run completely hidden in the background
-> 2. SaaAssistantAca is now fully refactored, installer size reduced by 40%, better compatibility, faster speed, and a more concise UI
+> 2. SaaAssistantAca is now fully refactored, installer size reduced by 25%, better compatibility, faster speed, and a more concise UI
 > 3. Added **custom task lists and scheduled/periodic execution**
 > 4. Added support for Traditional Chinese and English, including Traditional Chinese game client
 > 5. Added regular logistics farming, Star Exploration Pal Capture, and more new features
