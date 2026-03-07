@@ -705,8 +705,8 @@ class Daily(QFrame, BaseInterface):
         return normalized
 
     def _auto_adjust_after_use_action(self):
-        if getattr(self, 'is_running', False) or getattr(self, 'is_launch_pending', False):
-            return
+        # 检查当前是否在全局执行状态
+        is_globally_running = getattr(self, 'is_running', False) or getattr(self, 'is_launch_pending', False)
 
         sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
 
@@ -718,15 +718,18 @@ class Daily(QFrame, BaseInterface):
             is_checked = bool(task_item.checkbox.isChecked())
             use_periodic = bool(task_cfg.get("use_periodic", False))
 
-            # 【修改】：更新组件的计划属性，使其与执行状态解耦
-            task_item.is_scheduled = use_periodic
-
-            # 保留 failed 和 completed 状态，如果是排队或执行状态，重置回 idle
-            curr_state = getattr(task_item, 'current_state', 'idle')
-            if curr_state not in ['completed', 'failed']:
-                task_item.set_task_state('idle', is_enabled=is_checked)
+            if is_globally_running:
+                # 【核心修改】：任务执行期间，仅使用无痕方法刷新 📅 图标，绝对不触发状态机和解锁逻辑！
+                if hasattr(task_item, 'update_schedule_status'):
+                    task_item.update_schedule_status(use_periodic)
             else:
-                task_item.set_task_state(curr_state, is_enabled=is_checked)
+                # 非执行期间，正常走状态机更新
+                task_item.is_scheduled = use_periodic
+                curr_state = getattr(task_item, 'current_state', 'idle')
+                if curr_state not in ['completed', 'failed']:
+                    task_item.set_task_state('idle', is_enabled=is_checked)
+                else:
+                    task_item.set_task_state(curr_state, is_enabled=is_checked)
 
     def _save_task_sequence(self, sequence):
         self._task_sequence_cache = sequence

@@ -698,8 +698,8 @@ class SettingInterface(ScrollArea, BaseInterface):
 
         if is_exe:
             content = self._ui_text(
-                "安卡希雅的新版本已下载完毕。<br/><br/>是否立即关闭并运行安装向导？",
-                "New version of Acacia has been downloaded.<br/><br/>Close app and run installer now?"
+                "安卡小助手的新版本已下载完毕。<br/><br/>是否立即关闭并运行安装向导？",
+                "New version of SaaAssistantAca has been downloaded.<br/><br/>Close app and run installer now?"
             )
         else:
             content = self._ui_text(

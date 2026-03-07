@@ -281,14 +281,11 @@ class TaskItemWidget(QWidget):
             font = self.label.font()
             font.setBold(False)
 
-            # 【核心修改 1】：构建基础文本，根据计划状态独立添加前缀图标
             base_text = f"📅 {self._original_text}" if self.is_scheduled else self._original_text
-            display_text = base_text
 
             self.btn.setVisible(True)
             self.btn_play_from_here.setVisible(True)
 
-            # 【物理锁死状态机】：确保强制任务无论如何刷新，都是打钩且禁用的
             if self.is_mandatory:
                 self.checkbox.blockSignals(True)
                 self.checkbox.setChecked(True)
@@ -297,11 +294,9 @@ class TaskItemWidget(QWidget):
             else:
                 self.checkbox.setEnabled(True)
 
-            # 恢复默认图标，并【新增】恢复默认悬浮提示
             self.btn.setIcon(self.solo_play_btns)
             self.btn.setToolTip("单独执行" if not self._is_non_chinese_ui else "Run only")
 
-            # 【核心修改 2】：移除 scheduled 状态，调整其他状态颜色
             colors = {
                 'running_queue': "#FF8C00",
                 'running_solo': "#FF8C00",
@@ -310,48 +305,24 @@ class TaskItemWidget(QWidget):
                 'queued': "#9370DB",
                 'failed': "#D32F2F",
             }
-
             color = colors.get(state, "")
-            suffix = ""
 
-            # 【核心修改 3】：将状态文本和图标转移到后缀
-            if state == 'running_queue':
+            # 【优化】：直接获取后缀，不再写一堆 if-elif
+            suffix = self._get_state_suffix(state)
+
+            # 只保留按钮和字体加粗的控制逻辑
+            if state in ['running_queue', 'running_solo', 'running_scheduled']:
                 self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
-                self.btn.setToolTip("停止执行" if not self._is_non_chinese_ui else "Stop") # 【新增】修改悬浮提示
+                self.btn.setToolTip("停止执行" if not self._is_non_chinese_ui else "Stop")
                 self.btn_play_from_here.setVisible(False)
                 if not self.is_mandatory: self.checkbox.setEnabled(False)
                 font.setBold(True)
-                suffix = " ▶️" if self._is_non_chinese_ui else " [执行]▶️"
-
-            elif state == 'running_solo':
-                self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
-                self.btn.setToolTip("停止执行" if not self._is_non_chinese_ui else "Stop") # 【新增】修改悬浮提示
-                self.btn_play_from_here.setVisible(False)
-                if not self.is_mandatory: self.checkbox.setEnabled(False)
-                font.setBold(True)
-                suffix = " 🔁" if self._is_non_chinese_ui else " [单跑]🔁"
-
-            elif state == 'running_scheduled':
-                self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
-                self.btn.setToolTip("停止执行" if not self._is_non_chinese_ui else "Stop") # 【新增】修改悬浮提示
-                self.btn_play_from_here.setVisible(False)
-                if not self.is_mandatory: self.checkbox.setEnabled(False)
-                font.setBold(True)
-                suffix = " ⏰" if self._is_non_chinese_ui else " [到点]⏰"
-
-            elif state == 'completed':
-                suffix = " ✅" if self._is_non_chinese_ui else " [完成]✅"
-
-            elif state == 'failed':
-                suffix = " ❌" if self._is_non_chinese_ui else " [失败]❌"
-
             elif state == 'queued':
                 self.btn.setVisible(False)
                 self.btn_play_from_here.setVisible(False)
                 if not self.is_mandatory: self.checkbox.setEnabled(False)
-                suffix = " ⏳" if self._is_non_chinese_ui else " [队列]⏳"
 
-            # 【核心修复】：闲置状态的颜色显式设定
+            # 闲置状态的颜色显式设定
             if state == 'idle':
                 if not is_enabled and not self.is_mandatory:
                     color = "#888888" # 未勾选一律变灰
@@ -379,6 +350,35 @@ class TaskItemWidget(QWidget):
         super().mouseReleaseEvent(event)
         if event.button() == Qt.MouseButton.LeftButton:
             self.settings_clicked.emit(self.task_id)
+
+    def update_schedule_status(self, is_scheduled: bool):
+        """在任务执行期间无感刷新计划图标📅，绝不触碰任何锁和按钮状态"""
+        self.is_scheduled = is_scheduled
+
+        base_text = f"📅 {self._original_text}" if self.is_scheduled else self._original_text
+
+        suffix = self._get_state_suffix(self.current_state)
+
+        display_text = f"{base_text}{suffix}"
+        self.label.setText(display_text)
+        self.label.repaint()
+
+    def _get_state_suffix(self, state: str) -> str:
+        """获取任务状态对应的文本后缀"""
+        suffixes = {
+            'running_queue': (" ▶️", "[执行]▶️"),
+            'running_solo': (" 🔁", "[单跑]🔁"),
+            'running_scheduled': (" ⏰", "[到点]⏰"),
+            'completed': (" ✅", "[完成]✅"),
+            'failed': (" ❌", "[失败]❌"),
+            'queued': (" ⏳", "[队列]⏳")
+        }
+
+        if state in suffixes:
+            en_suffix, zh_suffix = suffixes[state]
+            return en_suffix if self._is_non_chinese_ui else zh_suffix
+
+        return ""
 
 class SharedSchedulingPanel(QWidget):
     config_changed = Signal(str, dict)
