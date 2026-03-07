@@ -12,15 +12,15 @@ class ChasmModule:
         self.is_log = False
 
     def run(self):
-        if not self.is_in_time_range():
-            self.logger.warning('当前未开放拟境')
-        else:
-            self.is_log = config.isLog.value
+        # if not self.is_in_time_range():
+        #     self.logger.warning('当前未开放拟境')
+        # else:
+        self.is_log = config.isLog.value
+        self.auto.back_to_home()
+        if not self.chasm():
             self.auto.back_to_home()
-            if not self.chasm():
-                self.auto.back_to_home()
-                return
-            self.receive_reward()
+            return
+        self.receive_reward()
 
     def chasm(self):
         timeout = Timer(50).start()
@@ -93,6 +93,10 @@ class ChasmModule:
             if not self.auto.find_element("app/resource/images/chasm/reward.png", "image",
                                               threshold=0.65, crop=(62 / 1920, 857 / 1080, 193 / 1920, 973 / 1080),
                                               is_log=self.is_log):
+                self.logger.warning('当前未开放拟境')
+                break
+            if self.auto.find_element(['拟境重构'], 'text', crop=(1516 / 1920, 145 / 1080, 1620 / 1920, 174 / 1080),
+                                       is_log=self.is_log):
                 self.logger.warning('当前未开放拟境')
                 break
 

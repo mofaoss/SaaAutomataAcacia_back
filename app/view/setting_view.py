@@ -34,9 +34,7 @@ from ..repackage.slider_setting_card import SliderSettingCard
 from ..repackage.text_edit_card import TextEditCard
 from utils.updater_utils import UpdateDownloadThread, get_best_update_candidate, get_local_version
 
-
 logger = logging.getLogger(__name__)
-
 
 
 class VersionCheckThread(QThread):
@@ -127,7 +125,6 @@ class AboutHeaderWidget(QWidget, BaseInterface):
         local_version = get_local_version() or "-"
         self.localVersionLabel = BodyLabel(self._ui_text(f"当前版本：{local_version}", f"Current version: {local_version}"), self)
 
-        # 2. 远端版本依然保持“正在检查...”，因为它需要联网
         self.remoteVersionLabel = BodyLabel(self._ui_text("最新版本：正在检查...", "Latest version: checking..."), self)
 
         self.checkUpdateBtn = PushButton(FIF.UPDATE, self._ui_text("检查更新", "Check for updates"), self)
@@ -167,12 +164,9 @@ class SettingInterface(ScrollArea, BaseInterface):
 
         self.app_name = "SaaAutomataAcacia"
         self.startup_task_name = f"{self.app_name} {self._ui_text('开机自启', 'Startup')}"
-        # 获取当前应用路径
         if getattr(sys, 'frozen', False):
-            # 打包后的可执行文件
             self.app_path = sys.executable
         else:
-            # 脚本运行模式
             self.app_path = sys.argv[0]
 
         # setting label
@@ -236,7 +230,7 @@ class SettingInterface(ScrollArea, BaseInterface):
             parent=self.personalGroup
         )
 
-        # update software
+        # about software
         self.aboutSoftwareGroup = SettingCardGroup(
             self._ui_text("功能相关", "About Software"), self.scrollWidget)
         self.updateOnStartUpCard = SwitchSettingCard(
@@ -281,22 +275,7 @@ class SettingInterface(ScrollArea, BaseInterface):
             texts=['简体中文 / Simplified Chinese', '繁體中文 / Traditional Chinese'],
             parent=self.coreSettingsGroup
         )
-        self.isLogCard = SwitchSettingCard(
-            FIF.DEVELOPER_TOOLS,
-            self._ui_text('展示OCR识别结果', 'Show OCR results'),
-            self._ui_text('打开将在日志中显示ocr识别结果，获得更详细的日志信息',
-                          'Show OCR recognition results in logs for more detailed diagnostics'),
-            configItem=config.isLog,
-            parent=self.aboutSoftwareGroup
-        )
-        self.showScreenshotCard = SwitchSettingCard(
-            FIF.PHOTO,
-            self._ui_text('展示运行时的窗口截图', 'Show runtime screenshots'),
-            self._ui_text('用于在查错时查看是否正确截取了游戏对应位置的画面，截取的所有画面会保存在SaaAutomataAcacia/temp下，需要手动删除',
-                          'Used for troubleshooting capture regions. Screenshots are saved in SaaAutomataAcacia/temp and should be deleted manually'),
-            configItem=config.showScreenshot,
-            parent=self.aboutSoftwareGroup
-        )
+
         self.windowTrackingAlphaCard = SliderSettingCard(
             configItem=config.windowTrackingAlpha,
             icon=FIF.HIDE,
@@ -337,8 +316,6 @@ class SettingInterface(ScrollArea, BaseInterface):
             configItem=config.inform_message,
             parent=self.aboutSoftwareGroup
         )
-
-        # application
         self.proxyCard = TextEditCard(
             config.update_proxies,
             FIF.GLOBE,
@@ -347,6 +324,35 @@ class SettingInterface(ScrollArea, BaseInterface):
             self._ui_text('如果选择开代理则需要填入代理端口，不开代理则置空',
                           'Fill proxy port when using proxy; leave empty when not using proxy'),
             self.aboutSoftwareGroup
+        )
+
+        # Developer Options (开发者选项)
+        self.developerOptionsGroup = SettingCardGroup(
+            self._ui_text("开发者选项", "Developer Options"), self.scrollWidget)
+
+        self.isLogCard = SwitchSettingCard(
+            FIF.DEVELOPER_TOOLS,
+            self._ui_text('展示OCR识别结果', 'Show OCR results'),
+            self._ui_text('打开将在日志中显示ocr识别结果，获得更详细的日志信息',
+                          'Show OCR recognition results in logs for more detailed diagnostics'),
+            configItem=config.isLog,
+            parent=self.developerOptionsGroup
+        )
+        self.showScreenshotCard = SwitchSettingCard(
+            FIF.PHOTO,
+            self._ui_text('展示运行时的窗口截图', 'Show runtime screenshots'),
+            self._ui_text('用于在查错时查看是否正确截取了游戏对应位置的画面，截取的所有画面会保存在SaaAutomataAcacia/temp下，需要手动删除',
+                          'Used for troubleshooting capture regions. Screenshots are saved in SaaAutomataAcacia/temp and should be deleted manually'),
+            configItem=config.showScreenshot,
+            parent=self.developerOptionsGroup
+        )
+        self.isInputLogCard = SwitchSettingCard(
+            FIF.COMMAND_PROMPT,
+            self._ui_text('展示模拟输入日志', 'Show input action logs'),
+            self._ui_text('打开将在日志中显示鼠标移动、点击、按键等模拟输入操作的详细信息',
+                          'Show detailed logs of simulated mouse clicks and keystrokes'),
+            configItem=config.isInputLog,
+            parent=self.developerOptionsGroup
         )
 
         self.__initWidget()
@@ -389,13 +395,16 @@ class SettingInterface(ScrollArea, BaseInterface):
         self.aboutSoftwareGroup.addSettingCard(self.windowTrackingAlphaCard)
         self.aboutSoftwareGroup.addSettingCard(self.updateOnStartUpCard)
         self.aboutSoftwareGroup.addSettingCard(self.checkPrereleaseForStableCard)
-        self.aboutSoftwareGroup.addSettingCard(self.isLogCard)
-        self.aboutSoftwareGroup.addSettingCard(self.showScreenshotCard)
         self.aboutSoftwareGroup.addSettingCard(self.saveScaleCacheCard)
         self.aboutSoftwareGroup.addSettingCard(self.autoStartTask)
         self.aboutSoftwareGroup.addSettingCard(self.autoBootStartup)
         self.aboutSoftwareGroup.addSettingCard(self.informMessage)
         self.aboutSoftwareGroup.addSettingCard(self.proxyCard)
+
+        # Add Developer Options cards
+        self.developerOptionsGroup.addSettingCard(self.isLogCard)
+        self.developerOptionsGroup.addSettingCard(self.showScreenshotCard)
+        self.developerOptionsGroup.addSettingCard(self.isInputLogCard)
 
         # add setting card group to layout
         self.expandLayout.setSpacing(28)
@@ -408,6 +417,7 @@ class SettingInterface(ScrollArea, BaseInterface):
         self.expandLayout.addWidget(self.coreSettingsGroup)
         self.expandLayout.addWidget(self.personalGroup)
         self.expandLayout.addWidget(self.aboutSoftwareGroup)
+        self.expandLayout.addWidget(self.developerOptionsGroup)
 
     def _showRestartTooltip(self):
         """ show restart tooltip """
@@ -445,24 +455,18 @@ class SettingInterface(ScrollArea, BaseInterface):
         if not hasattr(self, 'aboutHeaderWidget') or not hasattr(self.aboutHeaderWidget, 'checkUpdateBtn'):
             return
 
-        # 1. 禁用按钮变灰，文字提示检查中
         self.aboutHeaderWidget.checkUpdateBtn.setEnabled(False)
-
-        # 2. 启动检测线程
         self.manualCheckThread = VersionCheckThread(self)
         self.manualCheckThread.finishedSignal.connect(self._on_manual_check_finished)
         self.manualCheckThread.start()
 
     def _on_manual_check_finished(self, payload: dict):
-        # 1. 恢复按钮状态和原本的“更新”文字
         if hasattr(self, 'aboutHeaderWidget') and hasattr(self.aboutHeaderWidget, 'checkUpdateBtn'):
             self.aboutHeaderWidget.checkUpdateBtn.setEnabled(True)
             self.aboutHeaderWidget.checkUpdateBtn.setText(self._ui_text("检查更新", "Check for updates"))
 
-        # 2. 同步更新头部的 Label 和 超链接状态
         self._on_about_header_version_checked(payload)
 
-        # 3. 弹窗反馈
         download_url = str(payload.get("download_url") or "").strip()
         if download_url:
             InfoBar.warning(
@@ -507,31 +511,25 @@ class SettingInterface(ScrollArea, BaseInterface):
             self._disable_windows()
 
     def _enable_windows(self):
-        """Windows 启用自启"""
         try:
-            # 获取应用程序所在目录
             app_dir = os.path.dirname(self.app_path)
             cmd_file_path = os.path.join(app_dir, "saa_startup.cmd")
-
-            # 创建 cmd 文件内容
             cmd_content = f'@echo off\ncd "{app_dir}"\nstart "" "{self.app_path}"'
 
-            # 写入 cmd 文件
             with open(cmd_file_path, 'w', encoding='utf-8') as f:
                 f.write(cmd_content)
 
-            # 创建计划任务
             task_command = [
                 'schtasks', '/create',
                 '/tn', self.startup_task_name,
-                '/tr', f'cmd.exe /c "{cmd_file_path}"',  # 要执行的命令
-                '/sc', 'onlogon',  # 触发条件：用户登录时
-                '/rl', 'highest',  # 使用最高权限
-                '/f'  # 强制创建（如果已存在则覆盖）
+                '/tr', f'cmd.exe /c "{cmd_file_path}"',
+                '/sc', 'onlogon',
+                '/rl', 'highest',
+                '/f'
             ]
 
-            result = subprocess.run(task_command, shell=True, check=True,
-                                  capture_output=True, text=True)
+            subprocess.run(task_command, shell=True, check=True,
+                           capture_output=True, text=True)
 
             InfoBar.success(
                 self._ui_text('添加自启成功', 'Startup task added'),
@@ -558,13 +556,10 @@ class SettingInterface(ScrollArea, BaseInterface):
             )
 
     def _disable_windows(self):
-        """Windows 禁用自启"""
         try:
-            # 删除计划任务
-            result = subprocess.run(['schtasks', '/delete', '/tn', self.startup_task_name, '/f'],
-                                  shell=True, check=True, capture_output=True, text=True)
+            subprocess.run(['schtasks', '/delete', '/tn', self.startup_task_name, '/f'],
+                           shell=True, check=True, capture_output=True, text=True)
 
-            # 删除 cmd 文件
             app_dir = os.path.dirname(self.app_path)
             cmd_file_path = os.path.join(app_dir, "saa_startup.cmd")
             if os.path.exists(cmd_file_path):
@@ -608,9 +603,7 @@ class SettingInterface(ScrollArea, BaseInterface):
         latest_version = str(payload.get("latest_version") or "").strip()
         download_url = str(payload.get("download_url") or "").strip()
 
-        # 如果没有 download_url，说明当前已经是最新版（或者获取失败）
         if not download_url:
-            # 去掉超链接，显示“已是最新”
             if hasattr(self.aboutHeaderWidget, "downloadLink"):
                 try:
                     self.aboutHeaderWidget.downloadLink.clicked.disconnect()
@@ -618,7 +611,6 @@ class SettingInterface(ScrollArea, BaseInterface):
                     pass
                 self.aboutHeaderWidget.downloadLink.setText(self._ui_text("已是最新", "Up to date"))
                 self.aboutHeaderWidget.downloadLink.setUrl("")
-
                 self.aboutHeaderWidget.downloadLink.clicked.connect(
                     lambda: InfoBar.success(
                         self._ui_text("已是最新", "Up to date"),
@@ -628,7 +620,6 @@ class SettingInterface(ScrollArea, BaseInterface):
                     )
                 )
         else:
-            # 如果有 download_url，说明有新版本，绑定下载事件
             if hasattr(self.aboutHeaderWidget, "downloadLink"):
                 try:
                     self.aboutHeaderWidget.downloadLink.setUrl("")
@@ -638,7 +629,6 @@ class SettingInterface(ScrollArea, BaseInterface):
                 self.aboutHeaderWidget.downloadLink.setText(self._ui_text("现在更新", "Update now"))
                 self.aboutHeaderWidget.downloadLink.clicked.connect(lambda: self.start_unified_download(download_url))
 
-        # 更新版本号 Label 显示
         if hasattr(self.aboutHeaderWidget, "localVersionLabel"):
             self.aboutHeaderWidget.localVersionLabel.setText(
                 self._ui_text(f"当前版本：{local_version}", f"Current version: {local_version}")
@@ -656,22 +646,17 @@ class SettingInterface(ScrollArea, BaseInterface):
                 )
 
     def handle_download_fallback(self, title: str, content: str, download_url: str):
-        """ 捕捉下载异常并提供浏览器备用方案 """
         self.progressBar.setVisible(False)
         message_box = MessageBox(title, content, self.parent.window())
         if message_box.exec():
-            # 用户选择同意跳转浏览器
             QDesktopServices.openUrl(QUrl(download_url))
 
     def start_unified_download(self, download_url: str):
-        """ 统一接入的高速下载入口 """
-        # 改为真实的进度条 (从 0 到 100)
         self.progressBar.setRange(0, 100)
         self.progressBar.setValue(0)
         self.progressBar.setVisible(True)
 
         self.download_thread = UpdateDownloadThread(download_url)
-        # 绑定进度条刷新事件
         self.download_thread.progress_signal.connect(self.update_progress)
         self.download_thread.finished_signal.connect(self.update_finished)
         self.download_thread.fallback_signal.connect(
@@ -680,11 +665,9 @@ class SettingInterface(ScrollArea, BaseInterface):
         self.download_thread.start()
 
     def update_finished(self, downloaded_path: str):
-        """ 处理下载完成后的逻辑 """
         self.progressBar.setVisible(False)
         app_root = get_app_root()
 
-        # 如果是 EXE 安装包，传过来的是文件；如果是 ZIP，传过来的是解压好的临时文件夹
         is_exe = os.path.isfile(downloaded_path) and downloaded_path.lower().endswith('.exe')
 
         title = self._ui_text('更新准备就绪', 'Update Ready')
@@ -710,19 +693,14 @@ class SettingInterface(ScrollArea, BaseInterface):
                 with open(batch_path, "w", encoding="gbk") as f:
                     f.write('@echo off\n')
                     f.write('echo 正在等待主程序关闭 (Waiting for app to close)...\n')
-                    # 等待 2 秒，确保 PySide6 完全释放文件占用锁
                     f.write('timeout /t 2 /nobreak > nul\n')
 
                     if is_exe:
                         f.write(f'start "" "{downloaded_path}"\n')
                     else:
-                        # 核心魔法：使用 Windows 原生 xcopy 静默覆盖更新
-                        # /E: 包含所有子目录，/Y: 不提示直接覆盖，/C: 出错也继续
                         f.write(f'xcopy "{downloaded_path}\\*" "{app_root}\\" /E /Y /C > nul\n')
-                        # 覆盖完成后自动拉起主程序
                         f.write(f'start "" "{sys.executable}"\n')
 
-                    # 阅后即焚
                     f.write('del "%~f0"\n')
 
                 subprocess.Popen(batch_path, shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE)
@@ -737,11 +715,9 @@ class SettingInterface(ScrollArea, BaseInterface):
                 )
 
     def update_progress(self, value):
-        """ Update the progress bar """
         self.progressBar.setValue(value)
 
     def scrollToAboutCard(self):
-        """ scroll to example card """
         try:
             w = self.aboutHeaderWidget
             self.verticalScrollBar().setValue(w.y())

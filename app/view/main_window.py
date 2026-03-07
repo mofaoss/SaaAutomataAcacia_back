@@ -505,7 +505,7 @@ class MainWindow(FluentWindow, BaseInterface):
             if self.homeInterface is None:
                 self._create_home_and_add_nav()
             self.stackedWidget.setCurrentWidget(self.homeInterface, False)
-            QTimer.singleShot(0, self.homeInterface.on_start_button_click)
+            QTimer.singleShot(0, self.homeInterface.start_from_homepage)
             return
 
         interfaces = self.findChildren(QFrame)

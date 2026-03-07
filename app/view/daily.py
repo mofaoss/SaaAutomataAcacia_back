@@ -1484,6 +1484,15 @@ class Daily(QFrame, BaseInterface):
             self.logger.error(f'运行中窗口守护检测异常：{e}')
             self._stop_running_guard()
 
+    def start_from_homepage(self):
+        """专供首页快捷卡片调用：如果已经在运行，则什么都不做，绝不终止任务"""
+        if self.is_running or self.is_launch_pending:
+            self.logger.info("任务已在运行，忽略首页启动请求。")
+            return
+
+        # 如果空闲，则复用普通的立即执行逻辑
+        self.on_start_button_click()
+
     def on_start_button_click(self):
         if self.is_running:
             if self.start_thread and self.start_thread.isRunning():

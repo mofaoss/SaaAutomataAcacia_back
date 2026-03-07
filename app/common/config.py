@@ -153,6 +153,7 @@ class Config(QConfig):
     enter_interface       = OptionsConfigItem("setting_personal", "enter_interface", 0, OptionsValidator([0, 1, 2]))
     server_interface      = OptionsConfigItem("setting_personal", "server_interface", 0, OptionsValidator([0, 1, 2, 3]))
     isLog                 = ConfigItem("setting_personal", "isLog", False, BoolValidator())
+    isInputLog            = ConfigItem("setting_personal", "isInputLog", False, BoolValidator())
     showScreenshot        = ConfigItem("setting_personal", "showScreenshot", False, BoolValidator())
     windowTrackingInput   = ConfigItem("setting_personal", "windowTrackingInput", True, BoolValidator())
     windowTrackingAlpha   = ConfigItem("setting_personal", "windowTrackingAlpha", 1)
