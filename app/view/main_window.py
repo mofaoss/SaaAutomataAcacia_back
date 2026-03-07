@@ -282,8 +282,8 @@ class MainWindow(FluentWindow, BaseInterface):
 
         if not best:
             InfoBar.success(
-                title=self._ui_text("更新提示", "Update"),
-                content=self._ui_text("已是最新", "Already up to date"),
+                title=self._ui_text("已是最新", "Up to date"),
+                content=self._ui_text("", ""),
                 orient=Qt.Orientation.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP,
@@ -294,17 +294,12 @@ class MainWindow(FluentWindow, BaseInterface):
 
         download_url = str((best or {}).get("download_url") or "").strip()
         download_link_text = self._ui_text("现在更新", "Update now")
-
-        if download_url:
-            content_html = self._ui_text(
-                f"检测到新版本，<a href=\"#\">{download_link_text}</a>",
-                f"New version detected, <a href=\"#\">{download_link_text}</a>"
-            )
-        else:
-            content_html = self._ui_text("检测到新版本", "New version detected")
-
+        content_html = self._ui_text(
+            f"<a href=\"#\">{download_link_text}</a>",
+            f"<a href=\"#\">{download_link_text}</a>"
+        )
         info_bar = InfoBar.warning(
-            title=self._ui_text("更新提示", "Update"),
+            title=self._ui_text("检测到新版本", "New version available"),
             content=content_html,
             orient=Qt.Orientation.Horizontal,
             isClosable=True,

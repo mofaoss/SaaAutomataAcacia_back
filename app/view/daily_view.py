@@ -53,6 +53,11 @@ class TaskListView(ListWidget):
         item = QListWidgetItem(self)
         item.setSizeHint(QSize(200, 38))
         item.setData(Qt.ItemDataRole.UserRole, task_item_widget.task_id)
+
+        # 【新增】：彻底剥夺“启动游戏”项的被拖拽能力
+        if task_item_widget.task_id == "task_login":
+            item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsDragEnabled)
+
         self.addItem(item)
         self.setItemWidget(item, task_item_widget)
 
@@ -196,6 +201,9 @@ class TaskItemWidget(QWidget):
         self._original_text = en_name if is_non_chinese_ui else zh_name
         self.current_state = 'idle'  # 记录内部状态
 
+        # 【新增】：标记当前任务是否为强制底座（登录）
+        self.is_mandatory = (self.task_id == "task_login")
+
         layout = QHBoxLayout(self)
         layout.setContentsMargins(4, 4, 4, 4)
         layout.setSpacing(6)
@@ -205,7 +213,14 @@ class TaskItemWidget(QWidget):
         left_layout.setSpacing(4)
 
         self.checkbox = CheckBox(parent=self)
-        self.checkbox.setChecked(is_enabled)
+
+        # 【物理锁死初始化】：如果是强制任务，永远为True；普通任务读配置
+        self.checkbox.setChecked(True if self.is_mandatory else is_enabled)
+
+        # 【物理锁死交互】：强制任务永远禁用点击（变灰）
+        if self.is_mandatory:
+            self.checkbox.setEnabled(False)
+
         self.checkbox.setFixedWidth(28)
         self.checkbox.stateChanged.connect(
             lambda: self.checkbox_state_changed.emit(self.task_id, self.checkbox.isChecked())
@@ -251,7 +266,16 @@ class TaskItemWidget(QWidget):
 
             self.btn.setVisible(True)
             self.btn_play_from_here.setVisible(True)
-            self.checkbox.setEnabled(True)
+
+            # 【物理锁死状态机】：确保强制任务无论如何刷新，都是打钩且禁用的
+            if self.is_mandatory:
+                self.checkbox.blockSignals(True)
+                self.checkbox.setChecked(True)
+                self.checkbox.setEnabled(False)
+                self.checkbox.blockSignals(False)
+            else:
+                self.checkbox.setEnabled(True)
+
             self.btn.setIcon(FIF.PLAY)
 
             # 颜色体系：执行中一律橙黄，队列中一律紫灰
@@ -270,7 +294,7 @@ class TaskItemWidget(QWidget):
             if state == 'running_queue':
                 self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
                 self.btn_play_from_here.setVisible(False)
-                self.checkbox.setEnabled(False)
+                if not self.is_mandatory: self.checkbox.setEnabled(False)
                 font.setBold(True)
                 prefix = "⏬ " if self._is_non_chinese_ui else "⏬ [执行中] "
                 display_text = f"{prefix}{self._original_text}"
@@ -278,7 +302,7 @@ class TaskItemWidget(QWidget):
             elif state == 'running_solo':
                 self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
                 self.btn_play_from_here.setVisible(False)
-                self.checkbox.setEnabled(False)
+                if not self.is_mandatory: self.checkbox.setEnabled(False)
                 font.setBold(True)
                 prefix = "▶️ " if self._is_non_chinese_ui else "▶️ [执行中] "
                 display_text = f"{prefix}{self._original_text}"
@@ -286,7 +310,7 @@ class TaskItemWidget(QWidget):
             elif state == 'running_scheduled':
                 self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
                 self.btn_play_from_here.setVisible(False)
-                self.checkbox.setEnabled(False)
+                if not self.is_mandatory: self.checkbox.setEnabled(False)
                 font.setBold(True)
                 prefix = "⏰ " if self._is_non_chinese_ui else "⏰ [执行中] "
                 display_text = f"{prefix}{self._original_text}"
@@ -302,12 +326,12 @@ class TaskItemWidget(QWidget):
             elif state == 'queued':
                 self.btn.setVisible(False)
                 self.btn_play_from_here.setVisible(False)
-                self.checkbox.setEnabled(False)
+                if not self.is_mandatory: self.checkbox.setEnabled(False)
                 prefix = "⏳ " if self._is_non_chinese_ui else "⏳ [队列中] "
                 display_text = f"{prefix}{self._original_text}"
 
-            # 彻底解耦：如果是闲置状态且未勾选，才变灰。计划内/已完成无视勾选强制保色！
-            if state == 'idle' and not is_enabled:
+            # 只有未勾选且非强制任务时，才将文字变灰。登录任务的字永不变灰（只灰勾选框）！
+            if state == 'idle' and not is_enabled and not self.is_mandatory:
                 color = "#888888"
 
             self.label.setText(display_text)
@@ -361,9 +385,9 @@ class SharedSchedulingPanel(QWidget):
 
         checkbox_row.addWidget(self.enable_checkbox)
 
-        self.btn_enable_all = PushButton("All On" if is_non_chinese_ui else "开启全部", self)
-        self.btn_disable_all = PushButton("All Off" if is_non_chinese_ui else "关闭全部", self)
-        self.btn_view_schedule = PushButton("View Schedule" if is_non_chinese_ui else "查看日程", self)
+        self.btn_enable_all = PushButton("All On" if is_non_chinese_ui else "全部启用", self)
+        self.btn_disable_all = PushButton("All Off" if is_non_chinese_ui else "全部关闭", self)
+        self.btn_view_schedule = PushButton("Schedule" if is_non_chinese_ui else "日程表", self)
 
         self.btn_enable_all.setFixedHeight(28)
         self.btn_disable_all.setFixedHeight(28)

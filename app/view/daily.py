@@ -284,7 +284,9 @@ def select_all(widget):
 
 def no_select(widget):
     for checkbox in widget.findChildren(CheckBox):
-        checkbox.setChecked(False)
+        # 保护机制：如果是“自动登录”对应的 checkbox 选项名，绝对不执行取消勾选
+        if checkbox.objectName() != "CheckBox_entry_1":
+            checkbox.setChecked(False)
 
 # ==========================================
 # Controller 层
@@ -644,6 +646,12 @@ class Daily(QFrame, BaseInterface):
             if item["id"] not in seen:
                 normalized.append(copy.deepcopy(item))
 
+        login_task = next((t for t in normalized if t["id"] == "task_login"), None)
+        if login_task:
+            normalized.remove(login_task)
+            login_task["enabled"] = True
+            normalized.insert(0, login_task)
+
         return normalized
 
     def _auto_adjust_after_use_action(self):
@@ -725,15 +733,21 @@ class Daily(QFrame, BaseInterface):
                 break
 
     def _on_task_order_changed(self, task_id_order: list):
-        sequence = self._normalize_task_sequence(
-            config.daily_task_sequence.value)
+        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
         task_by_id = {item["id"]: item for item in sequence}
         ordered = []
         for task_id in task_id_order:
             if task_id in task_by_id:
                 ordered.append(task_by_id.pop(task_id))
         ordered.extend(task_by_id.values())
-        self._save_task_sequence(ordered)
+
+        # 经过 normalized 格式化，login 会被自动置顶修复
+        final_ordered = self._normalize_task_sequence(ordered)
+        self._save_task_sequence(final_ordered)
+
+        # 【防御机制】：如果用户硬是把别的任务拖到了第一个，直接刷新列表 UI 让它弹回原位
+        if task_id_order and task_id_order[0] != "task_login":
+            self._init_task_list_widgets()
 
     def _on_task_settings_clicked(self, task_id: str):
         meta = TASK_REGISTRY.get(task_id)
@@ -1529,7 +1543,11 @@ class Daily(QFrame, BaseInterface):
 
     def set_checkbox_enable(self, enable: bool):
         for checkbox in self.ui.findChildren(CheckBox):
-            checkbox.setEnabled(enable)
+            # 保护机制：全局 UI 解锁时，永远不要解锁“登录”选项
+            if checkbox.objectName() == "CheckBox_entry_1":
+                checkbox.setEnabled(False)
+            else:
+                checkbox.setEnabled(enable)
 
     def set_current_index(self, index):
         try:

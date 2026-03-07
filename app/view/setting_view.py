@@ -465,15 +465,15 @@ class SettingInterface(ScrollArea, BaseInterface):
         # 3. 弹窗反馈
         download_url = str(payload.get("download_url") or "").strip()
         if download_url:
-            InfoBar.success(
+            InfoBar.warning(
                 self._ui_text("发现新版本", "New version available"),
-                self._ui_text("请点击上方【现在更新】", "Please click 'Update now' above"),
+                self._ui_text("请点击【现在更新】或前往QQ群获取", "Please click [Update now] or go to QQ group for update"),
                 duration=3000,
                 parent=self
             )
         else:
             InfoBar.success(
-                self._ui_text("已是最新本", "Up to date"),
+                self._ui_text("已是最新", "Up to date"),
                 self._ui_text("", ""),
                 duration=3000,
                 parent=self
@@ -618,11 +618,11 @@ class SettingInterface(ScrollArea, BaseInterface):
                     pass
                 self.aboutHeaderWidget.downloadLink.setText(self._ui_text("已是最新", "Up to date"))
                 self.aboutHeaderWidget.downloadLink.setUrl("")
-                # 如果你想让他点的时候弹窗提示：
+
                 self.aboutHeaderWidget.downloadLink.clicked.connect(
                     lambda: InfoBar.success(
-                        self._ui_text("更新提示", "Update"),
-                        self._ui_text("已是最新", "You are using the latest version"),
+                        self._ui_text("已是最新", "Up to date"),
+                        self._ui_text("", ""),
                         duration=2000,
                         parent=self
                     )
@@ -691,8 +691,8 @@ class SettingInterface(ScrollArea, BaseInterface):
 
         if is_exe:
             content = self._ui_text(
-                "安装程序已下载完毕。<br/><br/>是否立即关闭本程序并运行安装向导？",
-                "Installer downloaded.<br/><br/>Close app and run installer?"
+                "安卡希雅的新版本已下载完毕。<br/><br/>是否立即关闭并运行安装向导？",
+                "New version of Acacia has been downloaded.<br/><br/>Close app and run installer now?"
             )
         else:
             content = self._ui_text(
