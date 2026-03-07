@@ -214,6 +214,7 @@ class TaskItemWidget(QWidget):
         self._is_non_chinese_ui = is_non_chinese_ui
         self._original_text = en_name if is_non_chinese_ui else zh_name
         self.current_state = 'idle'  # 记录内部状态
+        self.is_scheduled = False    # 【新增】：独立记录是否启用了计划
 
         # 【新增】：标记当前任务是否为强制底座（登录）
         self.is_mandatory = (self.task_id == "task_login")
@@ -247,7 +248,6 @@ class TaskItemWidget(QWidget):
         left_layout.addWidget(self.checkbox, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         left_layout.addWidget(self.label, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
-
         self.solo_play_btns = FIF.SYNC
         self.btn = ToolButton(self)
         self.btn.setIcon(self.solo_play_btns)
@@ -280,7 +280,10 @@ class TaskItemWidget(QWidget):
             self.current_state = state
             font = self.label.font()
             font.setBold(False)
-            display_text = self._original_text
+
+            # 【核心修改 1】：构建基础文本，根据计划状态独立添加前缀图标
+            base_text = f"📅 {self._original_text}" if self.is_scheduled else self._original_text
+            display_text = base_text
 
             self.btn.setVisible(True)
             self.btn_play_from_here.setVisible(True)
@@ -296,60 +299,52 @@ class TaskItemWidget(QWidget):
 
             self.btn.setIcon(self.solo_play_btns)
 
+            # 【核心修改 2】：移除 scheduled 状态，调整其他状态颜色
             colors = {
                 'running_queue': "#FF8C00",
                 'running_solo': "#FF8C00",
                 'running_scheduled': "#FF8C00",
                 'completed': "#107C10",
-                'scheduled': "#0078D4",
                 'queued': "#9370DB",
                 'failed': "#D32F2F",
             }
 
             color = colors.get(state, "")
+            suffix = ""
 
+            # 【核心修改 3】：将状态文本和图标转移到后缀
             if state == 'running_queue':
                 self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
                 self.btn_play_from_here.setVisible(False)
                 if not self.is_mandatory: self.checkbox.setEnabled(False)
                 font.setBold(True)
-                prefix = "▶️ " if self._is_non_chinese_ui else "▶️ [执行中] "
-                display_text = f"{prefix}{self._original_text}"
+                suffix = " ▶️" if self._is_non_chinese_ui else " [执行]▶️"
 
             elif state == 'running_solo':
                 self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
                 self.btn_play_from_here.setVisible(False)
                 if not self.is_mandatory: self.checkbox.setEnabled(False)
                 font.setBold(True)
-                prefix = "🔁 " if self._is_non_chinese_ui else "🔁 [单独跑] "
-                display_text = f"{prefix}{self._original_text}"
+                suffix = " 🔁" if self._is_non_chinese_ui else " [单跑]🔁"
 
             elif state == 'running_scheduled':
                 self.btn.setIcon(getattr(FIF, "PAUSE", getattr(FIF, "CLOSE", FIF.PLAY)))
                 self.btn_play_from_here.setVisible(False)
                 if not self.is_mandatory: self.checkbox.setEnabled(False)
                 font.setBold(True)
-                prefix = "⏰ " if self._is_non_chinese_ui else "⏰ [执行中] "
-                display_text = f"{prefix}{self._original_text}"
+                suffix = " ⏰" if self._is_non_chinese_ui else " [到点]⏰"
 
             elif state == 'completed':
-                prefix = "✓ " if self._is_non_chinese_ui else "✓ [已完成] "
-                display_text = f"{prefix}{self._original_text}"
+                suffix = " ✅" if self._is_non_chinese_ui else " [完成]✅"
 
             elif state == 'failed':
-                prefix = "❌ " if self._is_non_chinese_ui else "❌ [未成功] "
-                display_text = f"{prefix}{self._original_text}"
-
-            elif state == 'scheduled':
-                prefix = "📅 " if self._is_non_chinese_ui else "📅 [计划内] "
-                display_text = f"{prefix}{self._original_text}"
+                suffix = " ❌" if self._is_non_chinese_ui else " [失败]❌"
 
             elif state == 'queued':
                 self.btn.setVisible(False)
                 self.btn_play_from_here.setVisible(False)
                 if not self.is_mandatory: self.checkbox.setEnabled(False)
-                prefix = "⏳ " if self._is_non_chinese_ui else "⏳ [队列中] "
-                display_text = f"{prefix}{self._original_text}"
+                suffix = " ⏳" if self._is_non_chinese_ui else " [队列]⏳"
 
             # 【核心修复】：闲置状态的颜色显式设定
             if state == 'idle':
@@ -358,6 +353,7 @@ class TaskItemWidget(QWidget):
                 else:
                     color = "white" if isDarkTheme() else "black"
 
+            display_text = f"{base_text}{suffix}"
             self.label.setText(display_text)
             self.label.setStyleSheet(f"color: {color};" if color else "")
             self.label.setFont(font)

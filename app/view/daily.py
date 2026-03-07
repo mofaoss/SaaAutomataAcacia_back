@@ -718,16 +718,15 @@ class Daily(QFrame, BaseInterface):
             is_checked = bool(task_item.checkbox.isChecked())
             use_periodic = bool(task_cfg.get("use_periodic", False))
 
-            if use_periodic:
-                task_item.set_task_state('scheduled', is_enabled=is_checked)
+            # 【修改】：更新组件的计划属性，使其与执行状态解耦
+            task_item.is_scheduled = use_periodic
+
+            # 保留 failed 和 completed 状态，如果是排队或执行状态，重置回 idle
+            curr_state = getattr(task_item, 'current_state', 'idle')
+            if curr_state not in ['completed', 'failed']:
+                task_item.set_task_state('idle', is_enabled=is_checked)
             else:
-                # =================【核心修复】=================
-                # 将 failed 状态加入保护名单，防止整个队列跑完后被强行刷回普通的 idle 黑字
-                curr_state = getattr(task_item, 'current_state', 'idle')
-                if curr_state not in ['completed', 'failed']:
-                    task_item.set_task_state('idle', is_enabled=is_checked)
-                else:
-                    task_item.set_task_state(curr_state, is_enabled=is_checked)
+                task_item.set_task_state(curr_state, is_enabled=is_checked)
 
     def _save_task_sequence(self, sequence):
         self._task_sequence_cache = sequence
@@ -755,6 +754,10 @@ class Daily(QFrame, BaseInterface):
                 is_non_chinese_ui=self._is_non_chinese_ui,
                 parent=self.ui.taskListWidget,
             )
+
+            # 【新增】：初始化时传入任务的调度状态
+            task_item.is_scheduled = bool(task_cfg.get("use_periodic", False))
+
             task_item.checkbox.setObjectName(meta["option_key"])
             self.ui.taskListWidget.add_task_item(task_item)
             self.task_widget_map[task_id] = task_item
@@ -1618,13 +1621,6 @@ class Daily(QFrame, BaseInterface):
 
             self.loop_timer.stop()
             self.hotkey_timer.stop()
-
-            # main_window = self.window()
-            # if hasattr(main_window, 'quit_app'):
-            #     main_window.quit_app()
-            # else:
-            #     QApplication.quit()
-            #     os._exit(0)
 
     def set_checkbox_enable(self, enable: bool):
         for checkbox in self.ui.findChildren(CheckBox):
