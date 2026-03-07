@@ -86,6 +86,16 @@ class MainWindow(FluentWindow, BaseInterface):
             'setting': False,
         }
 
+        # 【新增】全局任务运行状态
+        self.global_is_running = False
+        signalBus.globalTaskStateChanged.connect(self._on_global_task_state_changed)
+
+        # 【新增】将 F8 监听提升到主窗口 (100ms轮询)
+        self.hotkey_timer = QTimer(self)
+        self.hotkey_timer.timeout.connect(self._check_global_hotkey)
+        self.hotkey_timer.start(100)
+        self._f8_pressed = False
+
         self.initWindow()
         self.initSystemTray()  # 初始化系统托盘
 
@@ -154,6 +164,36 @@ class MainWindow(FluentWindow, BaseInterface):
         # 针对 VSCode 等调试环境的终极保险，强杀残留的 Python 守护线程
         import sys
         sys.exit(0)
+
+    def _on_global_task_state_changed(self, is_running, zh_name, en_name, source):
+        self.global_is_running = is_running
+
+    # 【新增】全局热键分发逻辑
+    def _check_global_hotkey(self):
+        try:
+            import ctypes
+            state = ctypes.windll.user32.GetAsyncKeyState(0x77) # F8
+            is_pressed = (state & 0x8000) != 0
+
+            if is_pressed:
+                if not getattr(self, '_f8_pressed', False):
+                    self._f8_pressed = True
+                    logger.info("MainWindow: 检测到全局快捷键 F8 被按下")
+
+                    if self.global_is_running:
+                        # 1. 如果有任务在运行，无论在哪个界面，全局广播停止
+                        signalBus.globalStopRequest.emit()
+                    else:
+                        # 2. 如果空闲，根据当前显示的页面，启动对应的任务
+                        current_widget = self.stackedWidget.currentWidget()
+                        if current_widget == self.homeInterface:
+                            self.homeInterface.on_start_button_click()
+                        elif current_widget == self.additionalInterface:
+                            self.additionalInterface.start_current_visible_task()
+            else:
+                self._f8_pressed = False
+        except Exception:
+            pass
 
     def _to_traditional_if_needed(self, text):
         if not isinstance(text, str) or not is_traditional_ui_language():

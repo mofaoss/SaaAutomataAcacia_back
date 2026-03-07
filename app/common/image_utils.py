@@ -217,10 +217,10 @@ class ImageUtils:
 
     @staticmethod
     def show_ndarray(image, title="show_ndarray"):
-        ctypes.windll.user32.SetProcessDPIAware()
-        cv2.imshow(title, image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        # 彻底移除 cv2.imshow 依赖，转交 PySide6 统一呈现
+        from app.common.signal_bus import signalBus
+        # 触发全局图片展示总线 (主窗口已挂载该信号)
+        signalBus.showScreenshot.emit(image)
 
     @staticmethod
     def show_extract(path: str, extract: list):

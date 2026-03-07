@@ -13,9 +13,10 @@ def count_color_blocks(image, lower_color, upper_color, preview=False):
     mask = cv2.inRange(hsv, lower_color, upper_color)
 
     if preview:
+        from app.common.signal_bus import signalBus
         masked_img = cv2.bitwise_and(image, image, mask=mask)
-        cv2.imshow("Mask Preview", masked_img)
-        cv2.waitKey(0)
+        # 移除 imshow，用总线发射
+        signalBus.showScreenshot.emit(masked_img)
 
     contours, _ = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     return len(contours)

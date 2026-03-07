@@ -184,7 +184,7 @@ class Additional(QFrame, BaseInterface):
         self.ComboBox_capture_pals_adventure_mode.addItems(capture_pals_mode_items)
 
         self.PushButton_start_fishing.setText(self._ui_text('开始钓鱼', 'Start Fishing'))
-        self.PushButton_start_action.setText(self._ui_text('开始行动', 'Start Operation'))
+        self.PushButton_start_action.setText(self._ui_text('开始常规训练', 'Start Operation'))
         self.PushButton_start_water_bomb.setText(self._ui_text('开始心动水弹', 'Start Water Bomb'))
         self.PushButton_start_alien_guardian.setText(self._ui_text('开始异星守护', 'Start Alien Guardian'))
         self.PushButton_start_maze.setText(self._ui_text('开始迷宫', 'Start Maze'))
@@ -201,7 +201,7 @@ class Additional(QFrame, BaseInterface):
         """配置每种任务对应的 模块类、参数卡片、日志框 和 文本翻译"""
         return {
             'fishing': (FishingModule, self.SimpleCardWidget_fish, self.textBrowser_log_fishing, "钓鱼", "Fishing"),
-            'action': (OperationModule, self.SimpleCardWidget_action, self.textBrowser_log_action, "行动", "Operation"),
+            'action': (OperationModule, self.SimpleCardWidget_action, self.textBrowser_log_action, "常规训练", "Operation"),
             'water_bomb': (WaterBombModule, self.SimpleCardWidget_water_bomb, self.textBrowser_log_water_bomb, "心动水弹", "Water Bomb"),
             'alien_guardian': (AlienGuardianModule, self.SimpleCardWidget_alien_guardian, self.textBrowser_log_alien_guardian, "异星守护", "Alien Guardian"),
             'maze': (MazeModule, self.SimpleCardWidget_maze, self.textBrowser_log_maze, "迷宫", "Maze"),
@@ -210,24 +210,23 @@ class Additional(QFrame, BaseInterface):
         }
 
     def _handle_universal_start_stop(self, clicked_task_id: str):
-        """
-        中枢控制逻辑：
-        1. 如果当前没有任务运行，则启动请求的任务。
-        2. 如果当前已有任务运行，无论点哪个页面的按钮，都执行【停止当前任务】操作。
-        """
-        # 停止逻辑：如果有任务在跑，一律停止
+        # 【新增的核心拦截】：如果全局有外部任务在跑，按钮的作用只有发出停止请求！
+        if getattr(self, 'is_global_running', False):
+            signalBus.globalStopRequest.emit()
+            return
+
+        # 停止逻辑：如果是内部任务在跑，直接停止
         if self.current_running_task_id is not None:
             if self.current_task_thread and self.current_task_thread.isRunning():
                 self.current_task_thread.stop()
-            return # 等待线程发回 is_running(False) 的信号来收尾
+            return
 
-        # 启动逻辑：启动指定的任务
+        # ---------------- 下面是原有的启动逻辑 ----------------
         meta = self._get_task_metadata().get(clicked_task_id)
         if not meta: return
 
         module_class, card_widget, log_browser, zh_name, en_name = meta
 
-        # 动态绑定日志输出权到当前启动任务的页面
         if hasattr(self, 'redirectOutput'):
             self.redirectOutput(log_browser)
 
@@ -237,36 +236,78 @@ class Additional(QFrame, BaseInterface):
         self.current_task_thread.start()
 
     def _sync_all_ui_state(self, is_running: bool):
-        """统一同步所有页面的 UI 状态（锁控件 + 改按钮字）"""
-        if not is_running:
-            # 任务结束，清空记录
-            self.current_running_task_id = None
-            self.current_task_thread = None
-
+        """统一同步所有页面的 UI 状态（锁控件 + 改按钮字）并广播全局状态"""
         meta_dict = self._get_task_metadata()
 
-        # 遍历所有任务，刷新它们各自页面的按钮和控件禁用状态
+        # 1. 刷新各自页面的按钮和控件禁用状态
         for task_id, (mod, card, log, zh, en) in meta_dict.items():
             btn = getattr(self, f"PushButton_start_{task_id}", None)
             if not btn: continue
 
-            if self.current_running_task_id is not None:
-                # 有任务在运行！
+            if is_running and self.current_running_task_id is not None:
+                # 运行期间：所有按钮都变成 "停止 [当前运行任务]"
                 running_zh = meta_dict[self.current_running_task_id][3]
                 running_en = meta_dict[self.current_running_task_id][4]
-
-                # 所有按钮都变成 "停止 [正在运行的任务名]"
-                btn.setText(self._ui_text(f'停止{running_zh}', f'Stop {running_en}'))
-
-                # 锁死所有任务的参数面板，防止在运行期间被修改
+                btn.setText(self._ui_text(f'停止 {running_zh} (F8)', f'Stop {running_en} (F8)'))
                 self.set_simple_card_enable(card, False)
             else:
-                # 全局空闲，恢复各个按钮的默认名字
+                # 空闲期间：恢复默认名字，解锁面板
                 btn.setText(self._ui_text(f'开始{zh}', f'Start {en}'))
-                # 解锁所有面板
                 self.set_simple_card_enable(card, True)
 
+        # 2. 广播全局信号，并在停止时清理内存引用 (采用你优化的写法)
+        if is_running:
+            zh = meta_dict[self.current_running_task_id][3]
+            en = meta_dict[self.current_running_task_id][4]
+            signalBus.globalTaskStateChanged.emit(True, zh, en, "additional")
+        else:
+            signalBus.globalTaskStateChanged.emit(False, "", "", "additional")
+            self.current_running_task_id = None
+            self.current_task_thread = None
+
+    def start_current_visible_task(self):
+        # 如果在 trigger 页面，不处理 F8 启动（因为 trigger 是被动开关）
+        if self.stackedWidget.currentWidget() == self.page_trigger:
+            return
+
+        # 根据当前显示的页面，推断出需要启动的任务 ID
+        current_page_name = self.stackedWidget.currentWidget().objectName()
+        task_id = current_page_name.replace("page_", "")
+
+        # 对于猜心对局映射做一下特殊处理
+        if task_id == "card": task_id = "drink"
+
+        if task_id in self._get_task_metadata():
+            self._handle_universal_start_stop(task_id)
+
+    # 【新增】响应日常(daily)任务的运行状态
+    def _on_global_state_changed(self, is_running: bool, zh_name: str, en_name: str, source: str):
+        if source == "additional": return # 忽略自己
+
+        # 【新增】记录是否有外部任务在运行
+        self.is_global_running = is_running
+
+        meta_dict = self._get_task_metadata()
+        for task_id, (mod, card, log, zh, en) in meta_dict.items():
+            btn = getattr(self, f"PushButton_start_{task_id}", None)
+            if not btn: continue
+
+            if is_running:
+                btn.setText(self._ui_text(f'停止 {zh_name} (F8)', f'Stop {en_name} (F8)'))
+                self.set_simple_card_enable(card, False)
+            else:
+                btn.setText(self._ui_text(f'开始{zh}', f'Start {en}'))
+                self.set_simple_card_enable(card, True)
+
+    # 【新增】响应全局的停止请求 (F8)
+    def _on_global_stop_request(self):
+        if self.current_running_task_id is not None:
+            # 相当于点击了当前正在运行的任务的停止按钮
+            self._handle_universal_start_stop(self.current_running_task_id)
+
     def _connect_to_slot(self):
+        signalBus.globalTaskStateChanged.connect(self._on_global_state_changed)
+        signalBus.globalStopRequest.connect(self._on_global_stop_request)
         self.SwitchButton_f.checkedChanged.connect(self.on_f_toggled)
         self.SwitchButton_e.checkedChanged.connect(self.on_e_toggled)
         # 反向链接

@@ -198,19 +198,3 @@ class Screenshot:
             # print(traceback.format_exc())
             self._log_error_throttled('screenshot_failed', f"截图失败：{repr(e)},窗口可以不置顶但不能最小化")
             return None
-
-
-if __name__ == '__main__':
-    # 替换成你的游戏窗口标题
-    game_window = "尘白禁区"
-    screen = Screenshot(logger=logger)
-    hwnd = screen.get_window(game_window)
-    result = screen.screenshot(hwnd, (0, 0, 1, 1), False)
-
-    if result is not None:
-        img_resized, scale_x, scale_y, screenshot_pos = result
-        # print(scale_x, scale_y, screenshot_pos)
-        img_resized = auto_crop_image(img_resized)
-        cv2.imshow("Game Screenshot", img_resized)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()

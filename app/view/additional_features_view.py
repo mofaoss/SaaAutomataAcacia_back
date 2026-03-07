@@ -824,7 +824,7 @@ class Additional(QFrame, BaseInterface):
         self.ComboBox_capture_pals_adventure_mode.addItems(capture_pals_mode_items)
 
         self.PushButton_start_fishing.setText(self._ui_text('开始钓鱼', 'Start Fishing'))
-        self.PushButton_start_action.setText(self._ui_text('开始行动', 'Start Operation'))
+        self.PushButton_start_action.setText(self._ui_text('开始常规训练', 'Start Operation'))
         self.PushButton_start_water_bomb.setText(self._ui_text('开始心动水弹', 'Start Water Bomb'))
         self.PushButton_start_alien_guardian.setText(self._ui_text('开始异星守护', 'Start Alien Guardian'))
         self.PushButton_start_maze.setText(self._ui_text('开始迷宫', 'Start Maze'))
@@ -841,7 +841,7 @@ class Additional(QFrame, BaseInterface):
         """配置每种任务对应的 模块类、参数卡片、日志框 和 文本翻译"""
         return {
             'fishing': (FishingModule, self.SimpleCardWidget_fish, self.textBrowser_log_fishing, "钓鱼", "Fishing"),
-            'action': (OperationModule, self.SimpleCardWidget_action, self.textBrowser_log_action, "行动", "Operation"),
+            'action': (OperationModule, self.SimpleCardWidget_action, self.textBrowser_log_action, "常规训练", "Operation"),
             'water_bomb': (WaterBombModule, self.SimpleCardWidget_water_bomb, self.textBrowser_log_water_bomb, "心动水弹", "Water Bomb"),
             'alien_guardian': (AlienGuardianModule, self.SimpleCardWidget_alien_guardian, self.textBrowser_log_alien_guardian, "异星守护", "Alien Guardian"),
             'maze': (MazeModule, self.SimpleCardWidget_maze, self.textBrowser_log_maze, "迷宫", "Maze"),
@@ -908,7 +908,6 @@ class Additional(QFrame, BaseInterface):
                 btn.setText(self._ui_text(f'开始{zh}', f'Start {en}'))
                 # 解锁所有面板
                 self.set_simple_card_enable(card, True)
-
 
     def _connect_to_slot(self):
         self.SwitchButton_f.checkedChanged.connect(self.on_f_toggled)

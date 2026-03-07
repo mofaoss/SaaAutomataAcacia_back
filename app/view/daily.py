@@ -431,10 +431,6 @@ class Daily(QFrame, BaseInterface):
         self.loop_timer.timeout.connect(self._check_and_run_loop_tasks)
         self.loop_timer.start(30000)
 
-        # 全局热键 F8 监听器 (100毫秒轮询一次，极其轻量)
-        self.hotkey_timer = QTimer(self)
-        self.hotkey_timer.timeout.connect(self._check_global_hotkey)
-        self.hotkey_timer.start(100)
         self._f8_pressed = False
 
         self.checkbox_dic = None
@@ -550,25 +546,6 @@ class Daily(QFrame, BaseInterface):
         else:
             self.tasks_to_run = tasks_to_run
             self.after_start_button_click(tasks_to_run)
-
-    def _check_global_hotkey(self):
-        """调用 Windows 底层 API 实现全局快捷键拦截，无视窗口焦点"""
-        try:
-            import ctypes
-            # 0x77 是键盘上 F8 的虚拟键码
-            state = ctypes.windll.user32.GetAsyncKeyState(0x77)
-            # 如果最高位为 1，代表当前按键正处于按下状态
-            is_pressed = (state & 0x8000) != 0
-
-            if is_pressed:
-                if not getattr(self, '_f8_pressed', False):
-                    self._f8_pressed = True
-                    self.logger.info("检测到全局快捷键 F8 被按下")
-                    self.on_start_button_click()
-            else:
-                self._f8_pressed = False
-        except Exception:
-            pass
 
     def _initWidget(self):
 
@@ -1228,7 +1205,29 @@ class Daily(QFrame, BaseInterface):
         self.ui.CheckBox_open_game_directly.stateChanged.connect(
             self.change_auto_open)
         signalBus.sendHwnd.connect(self.set_hwnd)
+
+        signalBus.globalTaskStateChanged.connect(self._on_global_state_changed)
+        signalBus.globalStopRequest.connect(self._on_global_stop_request)
         self._connect_to_save_changed()
+
+    def _on_global_state_changed(self, is_running: bool, zh_name: str, en_name: str, source: str):
+        if source == "daily": return # 忽略自己发出的信号
+
+        # 【新增】记录是否有外部任务在运行
+        self.is_global_running = is_running
+
+        if is_running:
+            self.set_checkbox_enable(False)
+            btn_text = f"停止 {zh_name} (F8)" if not self._is_non_chinese_ui else f"Stop {en_name} (F8)"
+            self.ui.PushButton_start.setText(btn_text)
+        else:
+            self.set_checkbox_enable(True)
+            self.ui.PushButton_start.setText(self._ui_text("立即执行 (F8)", "Execute Now (F8)"))
+
+    # 【新增】响应全局的停止请求 (F8)
+    def _on_global_stop_request(self):
+        if self.is_running or self.is_launch_pending:
+            self.on_start_button_click() # 复用现有的停止逻辑
 
     def _on_task_checkbox_changed(self, task_id: str, is_checked: bool):
         sequence = self._normalize_task_sequence(
@@ -1299,6 +1298,7 @@ class Daily(QFrame, BaseInterface):
                 self.is_running = True
                 self._set_launch_pending_state(False)
                 self.ui.PushButton_start.setText(self._ui_text("停止 (F8)", "Stop (F8)"))
+                signalBus.globalTaskStateChanged.emit(True, "日常任务", "Daily Tasks", "daily")
 
                 for tid, task_item in self.task_widget_map.items():
                     if tid in getattr(self, 'tasks_to_run', []):
@@ -1325,6 +1325,8 @@ class Daily(QFrame, BaseInterface):
 
                 self._auto_adjust_after_use_action()
 
+                signalBus.globalTaskStateChanged.emit(False, "", "", "daily")
+
                 if str_flag == 'end':
                     self.after_finish()
         except Exception as e:
@@ -1332,6 +1334,8 @@ class Daily(QFrame, BaseInterface):
             self.is_running = False
             self.set_checkbox_enable(True)
             self._auto_adjust_after_use_action()
+            # 异常时也要广播释放
+            signalBus.globalTaskStateChanged.emit(False, "", "", "daily")
 
     def _on_task_play_clicked(self, task_id: str):
         if self.is_running or self.is_launch_pending:
@@ -1552,6 +1556,10 @@ class Daily(QFrame, BaseInterface):
         self.on_start_button_click()
 
     def on_start_button_click(self):
+        if getattr(self, 'is_global_running', False):
+            signalBus.globalStopRequest.emit()
+            return
+
         if self.is_running:
             if self.start_thread and self.start_thread.isRunning():
                 self.start_thread.stop(reason="User Stop")
@@ -1608,7 +1616,6 @@ class Daily(QFrame, BaseInterface):
         elif run_mode_idx == 1:  # 关闭程序
             self.logger.info("执行完毕，正在退出安卡小助手...")
             self.loop_timer.stop()
-            self.hotkey_timer.stop()
 
             main_window = self.window()
             if hasattr(main_window, 'quit_app'):
@@ -1622,7 +1629,6 @@ class Daily(QFrame, BaseInterface):
             os.system('shutdown -s -t 60')
 
             self.loop_timer.stop()
-            self.hotkey_timer.stop()
 
     def set_checkbox_enable(self, enable: bool):
         for checkbox in self.ui.findChildren(CheckBox):
