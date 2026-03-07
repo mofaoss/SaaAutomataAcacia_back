@@ -94,10 +94,12 @@ class AboutHeaderWidget(QWidget, BaseInterface):
         self.row1Layout = QHBoxLayout()
         self.row1Layout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         self.titleLabel = SubtitleLabel(self._ui_text("作者：Dr. Sun", "Author: mofaoss"), self)
-        # 在按钮文本后加上星星符号，吸引用户点击
-        star_text = self._ui_text("前往 GitHub \u2B50", "Visit GitHub \u2B50")
-        self.githubBtn = PushButton(star_text, self)
-        self.githubBtn.setFixedSize(125, 28)
+
+        star_text = self._ui_text(" 前往 GitHub \u2B50", " Visit GitHub \u2B50")
+
+        self.githubBtn = PushButton(FIF.GITHUB, star_text, self)
+
+        self.githubBtn.setFixedSize(145, 28)
         self.githubBtn.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self.row1Layout.addWidget(self.titleLabel)
@@ -353,9 +355,9 @@ class SettingInterface(ScrollArea, BaseInterface):
 
         self.isLogCard = SwitchSettingCard(
             FIF.DEVELOPER_TOOLS,
-            self._ui_text('展示OCR识别结果', 'Show OCR results'),
-            self._ui_text('打开将在日志中显示ocr识别结果，获得更详细的日志信息',
-                          'Show OCR recognition results in logs for more detailed diagnostics'),
+            self._ui_text('展示图像识别日志', 'Show Image Recognition Log'),
+            self._ui_text('打开将在日志中显示OCR识别结果及OpenCV底层报错，获得更详细的诊断信息',
+                          'Show OCR results and OpenCV errors in logs for detailed diagnostics'),
             configItem=config.isLog,
             parent=self.developerOptionsGroup
         )

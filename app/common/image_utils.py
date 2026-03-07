@@ -42,22 +42,16 @@ class ImageUtils:
 
     @staticmethod
     def get_template_mask(target):
-        """
-        读取模板图片，并根据需要生成掩码。
-        :param target: 目标图片路径。
-        :return: 如果图片包含透明通道，并且存在部分透明的像素，就返回 mask，即 alpha 通道；否则，返回 None，表示没有生成掩码。
-        """
-        template = cv2.imread(target, cv2.IMREAD_UNCHANGED)  # 保留图片的透明通道
+        template = cv2.imread(target, cv2.IMREAD_UNCHANGED)
         if template is None:
-            raise ValueError(f"读取图片失败：{target}")
+            return None
 
-        mask = None
-        if template.shape[-1] == 4:  # 检查通道数是否为4（含有透明通道）
+        if template.shape[-1] == 4:
             alpha_channel = template[:, :, 3]
-            if np.any(alpha_channel < 255):  # 检查是否存在非完全透明的像素
-                mask = alpha_channel
-
-        return mask
+            # 只有当 alpha 通道不是全白（255）时，mask 才有意义
+            if not np.all(alpha_channel == 255):
+                return alpha_channel.astype(np.uint8)
+        return None
 
     @staticmethod
     def calculate_ssim(image1, image2) -> float:
@@ -85,59 +79,84 @@ class ImageUtils:
         if len(image2.shape) == 3:
             image2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
 
-        # 检查图像形状是否一致，如果不一致，将 image2 调整为 image1 的大小
+        # 强制类型转换防止 arithm_op 报错
+        image1 = image1.astype(np.uint8)
+        image2 = image2.astype(np.uint8)
+
         if image1.shape != image2.shape:
             image2 = cv2.resize(image2, (image1.shape[1], image1.shape[0]))
 
-        # 使用 OpenCV 的归一化相关系数匹配计算相似度
         result = cv2.matchTemplate(image1, image2, cv2.TM_CCOEFF_NORMED)
-
-        # minMaxLoc 返回 (min_val, max_val, min_loc, max_loc)
-        # 归一化相关系数匹配中，最大值即为最佳匹配分数
         _, max_val, _, _ = cv2.minMaxLoc(result)
-
         return max_val
 
+
     @staticmethod
-    def match_template(screenshot, template, mask=None, scale=(1, 1), match_method=cv2.TM_SQDIFF_NORMED, extract=None):
+    def match_template(screenshot, template, mask=None, scale=(1, 1), match_method=cv2.TM_CCOEFF_NORMED, extract=None):
         """
         对模版与截图进行匹配，找出匹配位置
-        :param extract: 对传过来的图像进行提取
-        :param match_method: 模版匹配的方法
-        :param scale: 缩放比例：base_width/w
-        :param screenshot:待匹配的截图图像
-        :param template:用于匹配的模板图像，通常是一个较小的图像片段
-        :param mask:掩码，用于图像匹配中的区域选择。
-        :return:
         """
-        if scale != (1, 1):
-            screenshot = ImageUtils.resize_image(screenshot, scale)
+        from app.common.config import config # 局部导入避免循环引用
+        import logging
+        logger = logging.getLogger(__name__)
 
-        if extract:
-            letter = extract[0]
-            threshold = extract[1]
-            screenshot = ImageUtils.extract_letters(screenshot, letter, threshold)
+        try:
+            # 1. 缩放处理
+            if scale != (1, 1):
+                screenshot = ImageUtils.resize_image(screenshot, scale)
 
-        # ImageUtils.show_ndarray(screenshot)
-        if mask is not None:
-            # cv2.TM_CCOEFF_NORMED 是针对缩放情况下最推荐的模板匹配方法，因为它对亮度和对比度的变化更具有鲁棒性。
-            result = cv2.matchTemplate(screenshot, template, match_method, mask=mask)
-        else:
-            result = cv2.matchTemplate(screenshot, template, match_method)
+            # 2. 特殊特征提取（如文字提取）
+            if extract:
+                letter = extract[0]
+                threshold = extract[1]
+                screenshot = ImageUtils.extract_letters(screenshot, letter, threshold)
 
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-        if match_method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
-            val = 1 - min_val
-            loc = min_loc
-        elif match_method in [cv2.TM_CCOEFF_NORMED, cv2.TM_CCORR_NORMED]:
-            val = max_val
-            loc = max_loc
-        else:
-            val = max_val
-            loc = max_loc
-        # 转换回相对用户的坐标
-        relative_loc = (loc[0] / scale[0], loc[1] / scale[1])
-        return val, relative_loc
+            # 3. 数据类型强制检查 (OpenCV arithm.cpp 报错的根源)
+            # 确保三者都是 uint8 类型，且通道数匹配
+            if screenshot.dtype != np.uint8:
+                screenshot = screenshot.astype(np.uint8)
+            if template.dtype != np.uint8:
+                template = template.astype(np.uint8)
+
+            # 灰度转换检查：如果使用了 CCOEFF_NORMED，建议统一为单通道
+            if screenshot.ndim == 3 and template.ndim == 2:
+                screenshot = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
+            elif screenshot.ndim == 2 and template.ndim == 3:
+                template = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+
+            # 4. 执行匹配
+            if mask is not None:
+                if mask.dtype != np.uint8:
+                    mask = mask.astype(np.uint8)
+                # 兼容性处理：如果 CCOEFF_NORMED 带 mask 依然崩溃（某些OpenCV版本Bug）
+                try:
+                    result = cv2.matchTemplate(screenshot, template, match_method, mask=mask)
+                except cv2.error:
+                    #  fallback: 丢弃 mask 裸跑，保证不崩溃
+                    result = cv2.matchTemplate(screenshot, template, match_method)
+            else:
+                result = cv2.matchTemplate(screenshot, template, match_method)
+
+            # 5. 解析结果
+            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+
+            if match_method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
+                val = 1 - min_val
+                loc = min_loc
+            else:
+                val = max_val
+                loc = max_loc
+
+            # 转换回相对用户的坐标
+            relative_loc = (loc[0] / scale[0], loc[1] / scale[1])
+            return val, relative_loc
+
+        except Exception as e:
+            # 根据设置决定是否显示图像识别日志
+            if config.isLog.value:
+                logger.error(f"图像匹配过程出现异常: {e}")
+            # 出错时返回最低相似度和零原点，确保业务逻辑能继续走下去而不闪退
+            return 0.0, (0, 0)
 
     @staticmethod
     def crop_image(screenshot, crop, hwnd):

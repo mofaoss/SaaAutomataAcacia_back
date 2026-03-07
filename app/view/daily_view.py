@@ -247,27 +247,31 @@ class TaskItemWidget(QWidget):
         left_layout.addWidget(self.checkbox, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         left_layout.addWidget(self.label, 0, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
-        self.btn_play_from_here = ToolButton(self)
-        self.btn_play_from_here.setIcon(FIF.DOWN)
-        self.btn_play_from_here.setToolTip("此处开始" if not is_non_chinese_ui else "Run from here")
-        self.btn_play_from_here.setFixedSize(28, 28)
 
-        btn_font = self.btn_play_from_here.font()
-        btn_font.setPointSize(10)
-        self.btn_play_from_here.setFont(btn_font)
-        self.btn_play_from_here.clicked.connect(lambda: self.play_from_here_clicked.emit(self.task_id))
-
+        self.solo_play_btns = FIF.SYNC
         self.btn = ToolButton(self)
-        self.btn.setIcon(FIF.PLAY)
+        self.btn.setIcon(self.solo_play_btns)
         self.btn.setToolTip("单独执行" if not is_non_chinese_ui else "Run only")
         self.btn.setFixedSize(28, 28)
+
+        btn_font = self.btn.font()
+        btn_font.setPointSize(10)
         self.btn.setFont(btn_font)
         self.btn.clicked.connect(lambda: self.play_clicked.emit(self.task_id))
 
+        self.btn_play_from_here = ToolButton(self)
+        self.btn_play_from_here.setIcon(FIF.PLAY)
+        self.btn_play_from_here.setToolTip("此处开始" if not is_non_chinese_ui else "Run from here")
+        self.btn_play_from_here.setFixedSize(28, 28)
+        self.btn_play_from_here.setFont(btn_font)
+        self.btn_play_from_here.clicked.connect(lambda: self.play_from_here_clicked.emit(self.task_id))
+
         layout.addLayout(left_layout, 0)
         layout.addStretch(1)
-        layout.addWidget(self.btn_play_from_here, 0)
+        # 保持视觉位置不变：先加左边的 btn (倒三角)，再加右边的 btn_play_from_here (PLAY)
         layout.addWidget(self.btn, 0)
+        layout.addWidget(self.btn_play_from_here, 0)
+        # ============================================
 
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
@@ -290,15 +294,14 @@ class TaskItemWidget(QWidget):
             else:
                 self.checkbox.setEnabled(True)
 
-            self.btn.setIcon(FIF.PLAY)
+            self.btn.setIcon(self.solo_play_btns)
 
-            # 颜色体系：执行中一律橙黄，队列中一律紫灰
             colors = {
                 'running_queue': "#FF8C00",
                 'running_solo': "#FF8C00",
                 'running_scheduled': "#FF8C00",
                 'completed': "#107C10",
-                'scheduled': "#0078D4",  # 【修复】：调深了蓝色，大幅增强在 Light 模式下的对比度
+                'scheduled': "#0078D4",
                 'queued': "#9370DB"
             }
 
@@ -309,7 +312,7 @@ class TaskItemWidget(QWidget):
                 self.btn_play_from_here.setVisible(False)
                 if not self.is_mandatory: self.checkbox.setEnabled(False)
                 font.setBold(True)
-                prefix = "⏬ " if self._is_non_chinese_ui else "⏬ [执行中] "
+                prefix = "▶️ " if self._is_non_chinese_ui else "▶️ [执行中] "
                 display_text = f"{prefix}{self._original_text}"
 
             elif state == 'running_solo':
@@ -317,7 +320,7 @@ class TaskItemWidget(QWidget):
                 self.btn_play_from_here.setVisible(False)
                 if not self.is_mandatory: self.checkbox.setEnabled(False)
                 font.setBold(True)
-                prefix = "▶️ " if self._is_non_chinese_ui else "▶️ [执行中] "
+                prefix = "🔁 " if self._is_non_chinese_ui else "🔁 [单独跑] "
                 display_text = f"{prefix}{self._original_text}"
 
             elif state == 'running_scheduled':
@@ -348,7 +351,6 @@ class TaskItemWidget(QWidget):
                 if not is_enabled and not self.is_mandatory:
                     color = "#888888" # 未勾选一律变灰
                 else:
-                    # 已勾选正常状态下显式指定黑白，强行拦截 QListWidget 在 Light 模式下把字染白的隐形 Bug
                     color = "white" if isDarkTheme() else "black"
 
             self.label.setText(display_text)
@@ -371,7 +373,6 @@ class TaskItemWidget(QWidget):
         super().mouseReleaseEvent(event)
         if event.button() == Qt.MouseButton.LeftButton:
             self.settings_clicked.emit(self.task_id)
-
 
 class SharedSchedulingPanel(QWidget):
     config_changed = Signal(str, dict)
@@ -1218,7 +1219,7 @@ class DailyView(ScrollArea):
             self._ui_text("执行结束后，安卡小助手:", "After Execution, Acacia Action:"))
         self.BodyLabel_end_action.setText(
             self._ui_text("执行结束后，尘白禁区将:", "After Execution, Game Action:"))
-        self.PushButton_start.setText(self._ui_text("立即执行", "Execute Now"))
+        self.PushButton_start.setText(self._ui_text("立即执行 (F8)", "Execute Now (F8)"))
 
         self.ComboBox_power_day.addItems(['1', '2', '3', '4', '5', '6'])
         self.ComboBox_power_usage.addItems([
@@ -1234,9 +1235,8 @@ class DailyView(ScrollArea):
         ]:
             line_edit.setPlaceholderText(self._ui_text("未输入", "Not set"))
 
-        self.PushButton_start.setShortcut("F1")
         self.PushButton_start.setToolTip(
-            self._ui_text("快捷键：F1", "Shortcut: F1"))
+            self._ui_text("快捷键：F8", "Shortcut: F8"))
 
         self.BodyLabel_enter_tip.setText(
             "### Tips\n* Select your server in Settings\n* Enable \"Auto open game\" and select the correct game path by the tutorial above\n* Click \"Start\" to launch and run automatically"
