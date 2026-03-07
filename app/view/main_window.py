@@ -280,7 +280,7 @@ class MainWindow(FluentWindow, BaseInterface):
         self._register_nav_item(
             'table',
             self.tableInterface,
-            FIF.SYNC,
+            FIF.BOOK_SHELF,
             self._ui_text('词表', 'OCR'),
             position=NavigationItemPosition.BOTTOM,
         )
