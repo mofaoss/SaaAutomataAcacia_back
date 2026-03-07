@@ -21,6 +21,7 @@ class ChasmModule:
             self.auto.back_to_home()
             return
         self.receive_reward()
+        self.auto.back_to_home()
 
     def chasm(self):
         timeout = Timer(50).start()
@@ -123,7 +124,6 @@ class ChasmModule:
             if timeout.reached():
                 self.logger.error("领取拟境奖励超时")
                 break
-        self.auto.back_to_home()
 
     @staticmethod
     def is_after_wednesday_4am():
