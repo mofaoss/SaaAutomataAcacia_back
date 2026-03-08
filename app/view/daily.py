@@ -40,6 +40,7 @@ from app.repackage.tree import TreeFrame_person, TreeFrame_weapon
 from app.modules.operation_action.operation_action import OperationModule
 from app.modules.upgrade.weapon import WeaponUpgradeModule
 from app.modules.jigsaw.shards import ShardExchangeModule
+from app.common.constants import get_person_text_to_key_map, get_weapon_text_to_key_map
 from app.common.gui_logger import setup_ui_logger
 
 # 导入视图与基类
@@ -333,52 +334,8 @@ class Daily(QFrame, BaseInterface):
             self._ui_text('信源碎片', 'Shard Exchange'),
         ]
 
-        self.person_dic = {
-            "角色碎片": "item_person_0",
-            "肴": "item_person_1",
-            "安卡希雅": "item_person_2",
-            "里芙": "item_person_3",
-            "辰星": "item_person_4",
-            "茉莉安": "item_person_5",
-            "芬妮": "item_person_6",
-            "芙提雅": "item_person_7",
-            "瑟瑞斯": "item_person_8",
-            "琴诺": "item_person_9",
-            "猫汐尔": "item_person_10",
-            "晴": "item_person_11",
-            "恩雅": "item_person_12",
-            "妮塔": "item_person_13",
-        }
-        self.person_dic_en = {
-            "Character Shards": "item_person_0",
-            "Yao": "item_person_1",
-            "Acacia": "item_person_2",
-            "Lyfe": "item_person_3",
-            "Chenxing": "item_person_4",
-            "Marian": "item_person_5",
-            "Fenny": "item_person_6",
-            "Fritia": "item_person_7",
-            "Siris": "item_person_8",
-            "Cherno": "item_person_9",
-            "Mauxir": "item_person_10",
-            "Haru": "item_person_11",
-            "Enya": "item_person_12",
-            "Nita": "item_person_13",
-        }
-        self.weapon_dic = {
-            "武器": "item_weapon_0",
-            "彩虹打火机": "item_weapon_1",
-            "草莓蛋糕": "item_weapon_2",
-            "深海呼唤": "item_weapon_3",
-        }
-        self.weapon_dic_en = {
-            "Weapon": "item_weapon_0",
-            "Prismatic Igniter": "item_weapon_1",
-            "Strawberry Shortcake": "item_weapon_2",
-            "Deep Sea's Call": "item_weapon_3",
-        }
-        self.person_text_to_key = {**self.person_dic, **self.person_dic_en}
-        self.weapon_text_to_key = {**self.weapon_dic, **self.weapon_dic_en}
+        self.person_text_to_key = get_person_text_to_key_map(self._is_non_chinese_ui)
+        self.weapon_text_to_key = get_weapon_text_to_key_map(self._is_non_chinese_ui)
 
         self.ui = DailyView(self, is_non_chinese_ui=self._is_non_chinese_ui)
         root_layout = QVBoxLayout(self)

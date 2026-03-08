@@ -2,6 +2,8 @@ import time
 
 from app.common.config import config
 from app.common.config import is_non_chinese_ui_language
+from app.common.constants import get_item_key_to_name_map, get_shop_item_key_to_name_map, \
+    get_shop_item_zh_name_to_display_name_map
 from app.modules.automation.timer import Timer
 
 
@@ -15,84 +17,18 @@ class ShoppingModule:
         self.commodity_dic = self.config_data["home_interface_shopping"]
         self.person_dic = self.config_data["home_interface_shopping_person"]
         self.weapon_dic = self.config_data["home_interface_shopping_weapon"]
-        self.name_dic_zh = {
-            'CheckBox_buy_3': '通用强化套件',
-            'CheckBox_buy_4': '优选强化套件',
-            'CheckBox_buy_5': '精致强化套件',
-            'CheckBox_buy_6': '新手战斗记录',
-            'CheckBox_buy_7': '普通战斗记录',
-            'CheckBox_buy_8': '优秀战斗记录',
-            'CheckBox_buy_9': '初级职级认证',
-            'CheckBox_buy_10': '中级职级认证',
-            'CheckBox_buy_11': '高级职级认证',
-            'CheckBox_buy_12': '合成颗粒',
-            'CheckBox_buy_13': '芳烃塑料',
-            'CheckBox_buy_14': '单极纤维',
-            'CheckBox_buy_15': '光纤轴突',
-        }
-        self.name_dic_en = {
-            'CheckBox_buy_3': 'Universal Enhancement Kit',
-            'CheckBox_buy_4': 'Premium Enhancement Kit',
-            'CheckBox_buy_5': 'Exquisite Enhancement Kit',
-            'CheckBox_buy_6': 'Beginner Battle Record',
-            'CheckBox_buy_7': 'Standard Battle Record',
-            'CheckBox_buy_8': 'Advanced Battle Record',
-            'CheckBox_buy_9': 'Junior Rank Certification',
-            'CheckBox_buy_10': 'Intermediate Rank Certification',
-            'CheckBox_buy_11': 'Senior Rank Certification',
-            'CheckBox_buy_12': 'Synthetic Particles',
-            'CheckBox_buy_13': 'Hydrocarbon Plastic',
-            'CheckBox_buy_14': 'Monopolar Fibers',
-            'CheckBox_buy_15': 'Fiber Axon',
-        }
-        self.person_dic_re_zh = {
-            "item_person_0": "角色碎片",
-            "item_person_1": "肴",
-            "item_person_2": "安卡希雅",
-            "item_person_3": "里芙",
-            "item_person_4": "晨星",
-            "item_person_5": "茉莉安",
-            "item_person_6": "芬妮",
-            "item_person_7": "芙提雅",
-            "item_person_8": "瑟瑞斯",
-            "item_person_9": "琴诺",
-            "item_person_10": "猫汐尔",
-            "item_person_11": "晴",
-            "item_person_12": "恩雅",
-            "item_person_13": "妮塔",
-        }
-        self.person_dic_re_en = {
-            "item_person_0": "Character Shard",
-            "item_person_1": "Yao",
-            "item_person_2": "Acacia",
-            "item_person_3": "Lyfe",
-            "item_person_4": "Chenxing",
-            "item_person_5": "Marian",
-            "item_person_6": "Fenny",
-            "item_person_7": "Fritia",
-            "item_person_8": "Siris",
-            "item_person_9": "Cherno",
-            "item_person_10": "Mauxir",
-            "item_person_11": "Haru",
-            "item_person_12": "Enya",
-            "item_person_13": "Nita",
-        }
-        self.weapon_dic_re_zh = {
-            "item_weapon_0": "武器",
-            "item_weapon_1": "彩虹打火机",
-            "item_weapon_2": "草莓蛋糕",
-            "item_weapon_3": "深海呼唤",
-        }
-        self.weapon_dic_re_en = {
-            "item_weapon_0": "Weapon",
-            "item_weapon_1": "Prismatic Igniter",
-            "item_weapon_2": "Strawberry Shortcake",
-            "item_weapon_3": "Deep Sea's Call",
-        }
-        self.person_key_to_display = self.person_dic_re_en if self.is_non_chinese_ui else self.person_dic_re_zh
-        self.weapon_key_to_display = self.weapon_dic_re_en if self.is_non_chinese_ui else self.weapon_dic_re_zh
-        self.commodity_key_to_display = self.name_dic_en if self.is_non_chinese_ui else self.name_dic_zh
-        self.target_to_display = {}
+
+        # 统一从 constants 获取数据，避免硬编码
+        person_map, weapon_map = get_item_key_to_name_map(is_non_chinese=False)
+        self.person_dic_re_zh = person_map
+        self.weapon_dic_re_zh = weapon_map
+
+        # 商城物品同样从 constants 获取
+        self.name_dic_zh = get_shop_item_key_to_name_map(is_non_chinese=False)
+
+        # 用于UI显示的多语言映射
+        self.target_to_display = get_shop_item_zh_name_to_display_name_map(self.is_non_chinese_ui)
+
         self.scroll_fallback_points = [
             (960, 540),
             (1552, 537),
@@ -217,33 +153,22 @@ class ShoppingModule:
         收集所有要购买的商品
         :return: list
         """
-        # 收集勾选的角色碎片
-        first_flag = True
         result_list = []
+        # 收集勾选的角色碎片
         for key, value in self.person_dic.items():
-            if first_flag:
-                first_flag = False
-                continue
-            if value:
-                target_name = self.person_dic_re_zh[key]
-                result_list.append(target_name)
-                self.target_to_display[target_name] = self.person_key_to_display[key]
+            if value and key in self.person_dic_re_zh:
+                result_list.append(self.person_dic_re_zh[key])
+
         # 收集勾选的武器
-        first_flag = True
         for key, value in self.weapon_dic.items():
-            if first_flag:
-                first_flag = False
-                continue
-            if value:
-                target_name = self.weapon_dic_re_zh[key]
-                result_list.append(target_name)
-                self.target_to_display[target_name] = self.weapon_key_to_display[key]
+            if value and key in self.weapon_dic_re_zh:
+                result_list.append(self.weapon_dic_re_zh[key])
+
         # 收集商品
         for key, value in self.commodity_dic.items():
-            if value:
-                target_name = self.name_dic_zh[key]
-                result_list.append(target_name)
-                self.target_to_display[target_name] = self.commodity_key_to_display[key]
+            if value and key in self.name_dic_zh:
+                result_list.append(self.name_dic_zh[key])
+                
         return result_list
 
     def _display_name(self, target_name):
