@@ -508,7 +508,7 @@ class Daily(QFrame, BaseInterface):
             if not task_item: continue
 
             is_checked = bool(task_item.checkbox.isChecked())
-            use_periodic = bool(task_cfg.get("use_periodic", False))
+            use_periodic = bool(task_cfg.get("use_periodic", False)) and bool(task_cfg.get("execution_config"))
 
             if is_globally_running:
                 # 任务执行期间，仅使用无痕方法刷新 📅 图标，绝对不触发状态机和解锁逻辑！
@@ -819,6 +819,8 @@ class Daily(QFrame, BaseInterface):
 
         self.ui.shared_scheduling_panel.copy_single_rule_clicked.connect(
             self._on_copy_single_rule_to_checked)
+        self.ui.shared_scheduling_panel.withdraw_single_rule_clicked.connect(
+            self._on_withdraw_single_rule_from_checked)
 
         self.ui.PushButton_save_preset.clicked.connect(self._save_current_preset)
         self.ui.PushButton_delete_preset.clicked.connect(self._delete_current_preset)
@@ -1064,6 +1066,8 @@ class Daily(QFrame, BaseInterface):
         checked_task_ids = []
         ordered_ids = self.ui.taskListWidget.get_task_order()
         for tid in ordered_ids:
+            if tid == "task_login":
+                continue
             item = self.task_widget_map.get(tid)
             if item and item.checkbox.isChecked():
                 checked_task_ids.append(tid)
@@ -1126,8 +1130,80 @@ class Daily(QFrame, BaseInterface):
         rule_desc = f"{rule_data['type']} {rule_data['time']} ({rule_data['max_runs']}次)"
         InfoBar.success(
             title=ui_text("规则下发成功", "Rule Copied Successfully"),
-            content=ui_text(f"已将此时间节点追加给 {len(checked_task_ids)} 个已勾选任务\n并自动启用了它们的计划",
-                            f"Added this trigger to {len(checked_task_ids)} checked tasks and enabled their schedules"),
+            content=ui_text(f"已追加给 {len(checked_task_ids)} 个已勾选任务\n并启用了它们的计划",
+                            f"Rule added to {len(checked_task_ids)} checked tasks\nand enabled their scheduling"),
+            orient=Qt.Orientation.Horizontal,
+            isClosable=True,
+            position=InfoBarPosition.TOP_RIGHT,
+            duration=3500,
+            parent=self
+        )
+
+    def _on_withdraw_single_rule_from_checked(self, rule_data: dict):
+        if not rule_data:
+            return
+
+        # 1. 找出所有已勾选的任务 ID
+        checked_task_ids = []
+        ordered_ids = self.ui.taskListWidget.get_task_order()
+        for tid in ordered_ids:
+            if tid == "task_login":
+                continue
+            item = self.task_widget_map.get(tid)
+            if item and item.checkbox.isChecked():
+                checked_task_ids.append(tid)
+
+        if not checked_task_ids:
+            InfoBar.warning(
+                title=ui_text("无生效目标", "No Target Selected"),
+                content=ui_text("请先在左侧列表中勾选需要撤回规则的任务", "Please check tasks in the left list first"),
+                orient=Qt.Orientation.Horizontal,
+                isClosable=True,
+                position=InfoBarPosition.TOP_RIGHT,
+                duration=3000,
+                parent=self
+            )
+            return
+
+        # 2. 遍历移除规则
+        sequence = self.scheduler.get_task_sequence()
+        modified_count = 0
+
+        for task_cfg in sequence:
+            if task_cfg["id"] in checked_task_ids and task_cfg["id"] != "task_login":
+                existing_rules = task_cfg.get("execution_config", [])
+                if not isinstance(existing_rules, list):
+                    continue
+
+                # 过滤掉匹配的规则 (类型、天数、时间相同)
+                original_len = len(existing_rules)
+                new_rules = [
+                    r for r in existing_rules
+                    if not (r.get("type") == rule_data["type"] and
+                            r.get("day") == rule_data["day"] and
+                            r.get("time") == rule_data["time"])
+                ]
+
+                if len(new_rules) < original_len:
+                    task_cfg["execution_config"] = new_rules
+                    modified_count += 1
+
+        # 3. 保存并刷新
+        self.scheduler.save_task_sequence(sequence)
+
+        # 刷新当前面板（如果当前查看的任务也被修改了）
+        current_task_id = self.ui.shared_scheduling_panel.task_id
+        if current_task_id:
+            task_cfg = next((item for item in sequence if item.get("id") == current_task_id), None)
+            if task_cfg:
+                self.ui.shared_scheduling_panel.load_task(current_task_id, task_cfg)
+
+        self._auto_adjust_after_use_action()
+
+        InfoBar.success(
+            title=ui_text("撤回成功", "Withdraw Successful"),
+            content=ui_text(f"已从 {modified_count} 个任务中移除该时间节点",
+                            f"Removed trigger from {modified_count} tasks"),
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
             position=InfoBarPosition.TOP_RIGHT,

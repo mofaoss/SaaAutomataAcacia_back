@@ -67,3 +67,19 @@ Traceback (most recent call last):
     from app.modules.close_game.close_game import CloseGameModule
 ModuleNotFoundError: No module named 'app.modules.close_game'
 
+
+[2026-03-08 20:01:42.706029] 
+Traceback (most recent call last):
+  File "D:\Workspace\SaaAssistantAca\app\view\main_window.py", line 274, in _run_next_init_task
+    task()
+  File "D:\Workspace\SaaAssistantAca\app\view\main_window.py", line 353, in _finalize_startup
+    self._create_home_interface()
+  File "D:\Workspace\SaaAssistantAca\app\view\main_window.py", line 246, in _create_home_interface
+    from .daily import Daily
+  File "D:\Workspace\SaaAssistantAca\app\view\daily.py", line 48, in <module>
+    from app.view.daily_view import DailyView, TaskItemWidget
+  File "D:\Workspace\SaaAssistantAca\app\view\daily_view.py", line 592
+    while self.activation_layout.count() > 1:
+    ^^^^^
+SyntaxError: expected 'except' or 'finally' block
+

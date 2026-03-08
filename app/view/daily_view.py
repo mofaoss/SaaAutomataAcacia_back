@@ -89,6 +89,7 @@ class ExecutionRuleWidget(QWidget):
     changed = Signal()
     # 【新增】复制该条规则的信号，传递当前规则的字典数据
     copy_rule_clicked = Signal(dict)
+    withdraw_rule_clicked = Signal(dict)
 
     def __init__(self, is_non_chinese_ui=False, parent=None):
         super().__init__(parent)
@@ -96,7 +97,7 @@ class ExecutionRuleWidget(QWidget):
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(6)
+        layout.setSpacing(3)
 
         self.freq_combo = ComboBox(self)
         self.freq_combo.addItems(
@@ -114,29 +115,40 @@ class ExecutionRuleWidget(QWidget):
             if is_non_chinese_ui
             else [f"{day}日" for day in range(1, 32)]
         )
-        self.month_combo.setFixedWidth(72)
+        self.month_combo.setFixedWidth(68)
 
         self.time_edit = LineEdit(self)
         self.time_edit.setText("00:00")
         self.time_edit.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.time_edit.setFixedWidth(64)
+        self.time_edit.setFixedWidth(58)
 
         self.runs_edit = LineEdit(self)
         self.runs_edit.setValidator(QIntValidator(1, 99, self))
         self.runs_edit.setText("1")
         self.runs_edit.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.runs_edit.setMinimumWidth(40)
-        self.runs_edit.setMaximumWidth(60)
+        self.runs_edit.setMinimumWidth(35)
+        self.runs_edit.setMaximumWidth(55)
 
         self.delete_btn = ToolButton(self)
         self.delete_btn.setIcon(FIF.DELETE)
+        self.delete_btn.setFixedSize(26, 26)
+        self.delete_btn.setIconSize(QSize(14, 14))
 
         # 【新增】单条规则的复制按钮
         self.copy_btn = ToolButton(self)
         self.copy_btn.setIcon(FIF.COPY)
         self.copy_btn.setToolTip("Copy to checked tasks" if is_non_chinese_ui else "将此时间复制给已勾选任务")
+        self.copy_btn.setFixedSize(26, 26)
+        self.copy_btn.setIconSize(QSize(14, 14))
 
-        for w in [self.freq_combo, self.week_combo, self.month_combo, self.time_edit, self.runs_edit, self.delete_btn, self.copy_btn]:
+        # 【新增】撤回按钮
+        self.withdraw_btn = ToolButton(self)
+        self.withdraw_btn.setIcon(FIF.CANCEL)
+        self.withdraw_btn.setToolTip("Remove from checked tasks" if is_non_chinese_ui else "从已勾选任务中撤回此时间")
+        self.withdraw_btn.setFixedSize(26, 26)
+        self.withdraw_btn.setIconSize(QSize(14, 14))
+
+        for w in [self.freq_combo, self.week_combo, self.month_combo, self.time_edit, self.runs_edit, self.delete_btn, self.copy_btn, self.withdraw_btn]:
             font = w.font()
             font.setPointSize(10)
             w.setFont(font)
@@ -155,12 +167,14 @@ class ExecutionRuleWidget(QWidget):
         layout.addWidget(self.label_times)
         layout.addWidget(self.delete_btn)
         layout.addWidget(self.copy_btn) # 【新增】添加到布局
+        layout.addWidget(self.withdraw_btn)
         layout.addStretch(1)
 
         self.freq_combo.currentIndexChanged.connect(self._update_visibility)
         self.delete_btn.clicked.connect(lambda: self.deleted.emit(self))
         # 【新增】绑定复制按钮点击事件
         self.copy_btn.clicked.connect(lambda: self.copy_rule_clicked.emit(self.get_data()))
+        self.withdraw_btn.clicked.connect(lambda: self.withdraw_rule_clicked.emit(self.get_data()))
 
         for w in [self.freq_combo, self.week_combo, self.month_combo]:
             w.currentIndexChanged.connect(self.changed)
@@ -176,6 +190,7 @@ class ExecutionRuleWidget(QWidget):
         self.label_times.setVisible(visible)
         # 【优化】如果隐藏了执行次数（比如生效起点），通常也不需要复制功能，一并隐藏
         self.copy_btn.setVisible(visible)
+        self.withdraw_btn.setVisible(visible)
 
     def _update_visibility(self):
         idx = self.freq_combo.currentIndex()
@@ -398,11 +413,13 @@ class SharedSchedulingPanel(QWidget):
     view_schedule_clicked = Signal()
     # 传递单条规则字典的信号
     copy_single_rule_clicked = Signal(dict)
+    withdraw_single_rule_clicked = Signal(dict)
 
     def __init__(self, is_non_chinese_ui=False, parent=None):
         super().__init__(parent)
         self.task_id = None
         self.is_non_chinese_ui = is_non_chinese_ui
+        self._is_loading = False
 
         self.setMinimumHeight(200)
         self.setMaximumHeight(400)
@@ -554,6 +571,7 @@ class SharedSchedulingPanel(QWidget):
         w.changed.connect(self._emit_change)
         # 将子控件的复制信号透传给 Panel，Panel再通过 copy_single_rule_clicked 往外抛
         w.copy_rule_clicked.connect(lambda rule_data: self.copy_single_rule_clicked.emit(rule_data))
+        w.withdraw_rule_clicked.connect(lambda rule_data: self.withdraw_single_rule_clicked.emit(rule_data))
 
         if data:
             w.set_data(data)
@@ -576,48 +594,52 @@ class SharedSchedulingPanel(QWidget):
             w.delete_btn.setVisible(True)
 
     def load_task(self, task_id, config_dict):
-        self.task_id = task_id
-        self.enable_checkbox.blockSignals(True)
-        self.enable_checkbox.setChecked(config_dict.get("use_periodic", False))
-        self.enable_checkbox.blockSignals(False)
+        self._is_loading = True
+        try:
+            self.task_id = task_id
+            self.enable_checkbox.blockSignals(True)
+            self.enable_checkbox.setChecked(config_dict.get("use_periodic", False))
+            self.enable_checkbox.blockSignals(False)
 
-        # 清空现有的生效起点规则 (保留末尾的Stretch)
-        while self.activation_layout.count() > 1:
-            item = self.activation_layout.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.deleteLater()
+            # 清空现有的生效起点规则 (保留末尾的Stretch)
+            while self.activation_layout.count() > 1:
+                item = self.activation_layout.takeAt(0)
+                widget = item.widget()
+                if widget:
+                    widget.deleteLater()
 
-        activation_rules = config_dict.get("activation_config")
-        if activation_rules is None:
-            activation_rules = config_dict.get("refresh_config", {}) or {}
-        if isinstance(activation_rules, dict):
-            activation_rules = [activation_rules]
-        if not activation_rules:
-            activation_rules = [{"type": "daily", "time": "00:00", "max_runs": 1}]
+            activation_rules = config_dict.get("activation_config")
+            if activation_rules is None:
+                activation_rules = config_dict.get("refresh_config", {}) or {}
+            if isinstance(activation_rules, dict):
+                activation_rules = [activation_rules]
+            if not activation_rules:
+                activation_rules = [{"type": "daily", "time": "00:00", "max_runs": 1}]
 
-        self._add_activation_rule(activation_rules[0])
-        self._update_activation_delete_btns()
+            self._add_activation_rule(activation_rules[0])
+            self._update_activation_delete_btns()
 
-        # 清空现有的执行节点规则 (保留末尾的Stretch)
-        while self.rules_layout.count() > 1:
-            item = self.rules_layout.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.deleteLater()
+            # 清空现有的执行节点规则 (保留末尾的Stretch)
+            while self.rules_layout.count() > 1:
+                item = self.rules_layout.takeAt(0)
+                widget = item.widget()
+                if widget:
+                    widget.deleteLater()
 
-        # 【修改点】：移除了执行节点原来强制读不到就兜底生成一个 00:00 的行为
-        rules = config_dict.get("execution_config", [])
-        if isinstance(rules, dict):
-            rules = [rules]
+            # 【修改点】：移除了执行节点原来强制读不到就兜底生成一个 00:00 的行为
+            rules = config_dict.get("execution_config", [])
+            if isinstance(rules, dict):
+                rules = [rules]
 
-        for rule in rules:
-            self._add_rule(rule)
+            for rule in rules:
+                self._add_rule(rule)
 
-        self._update_delete_btns()
+            self._update_delete_btns()
+        finally:
+            self._is_loading = False
 
     def _emit_change(self):
-        if not self.task_id:
+        if not self.task_id or self._is_loading:
             return
 
         activation_rules = [w.get_data() for w in self._iter_activation_rule_widgets()]
@@ -1282,9 +1304,9 @@ class DailyView(ScrollArea):
             self._ui_text("快捷键：F8", "Shortcut: F8"))
 
         self.BodyLabel_enter_tip.setText(
-            "### Tips\n* Select your server in Settings\n* Enable \"Auto open game\" and select the correct game path by the tutorial above\n* Click \"Start\" to launch and run automatically"
+            "### Tips\n* Select your server in Settings\n* Enable \"Auto open game\" and select the correct game path by the tutorial above\n* Game will be launched automatically when you click start or when a task needs to execute, no need to set schedule"
             if self.is_non_chinese_ui else
-            "### 提示\n* 去设置里选择你的区服\n* 建议勾选“自动打开游戏”，勾选后根据上方教程选择好对应的路径\n* 点击“开始”按钮会自动打开游戏"
+            "### 提示\n* 去设置里选择你的区服\n* 建议勾选“自动打开游戏”，勾选后根据上方教程选择好对应的路径\n* 点击开始或有任务需要执行时会自动拉起游戏，无需设置计划"
         )
         self.BodyLabel_person_tip.setText(
             "### Tips\n* Enter codename instead of full name, e.g. use \"朝翼\" (Dawnwing) for \"凯茜娅-朝翼\" (Katya-Dawnwing)"
