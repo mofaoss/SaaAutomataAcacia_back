@@ -661,6 +661,7 @@ class Daily(QFrame, BaseInterface):
                 continue
             merged = copy.deepcopy(default_by_id[task_id])
             merged.update(item)
+
             activation_rules = merged.get("activation_config")
             if activation_rules is None:
                 activation_rules = merged.get("refresh_config", {}) or {}
@@ -676,22 +677,31 @@ class Daily(QFrame, BaseInterface):
             merged["activation_config"] = activation_rules
             merged.pop("refresh_config", None)
 
-            execution_rules = merged.get("execution_config") or []
-            if isinstance(execution_rules, dict):
+            # 【修改点】：直接获取或设为空列表，去掉了强塞 00:00 的兜底逻辑
+            execution_rules = merged.get("execution_config")
+            if execution_rules is None:
+                execution_rules = []
+            elif isinstance(execution_rules, dict):
                 execution_rules = [execution_rules]
-            if not execution_rules:
-                execution_rules = [{
-                    "type": "daily",
-                    "day": 0,
-                    "time": "00:00",
-                    "max_runs": 1
-                }]
+
             merged["execution_config"] = execution_rules
             normalized.append(merged)
             seen.add(task_id)
 
         for item in defaults:
             if item["id"] not in seen:
+                # 【修改点】：如果是全新初始化的默认任务，强制将执行节点置空
+                item["execution_config"] = []
+
+                # 生效起点依然保留默认兜底
+                activation_rules = item.get("activation_config")
+                if not activation_rules:
+                    item["activation_config"] = [{
+                        "type": "daily",
+                        "day": 0,
+                        "time": "00:00",
+                        "max_runs": 1
+                    }]
                 normalized.append(copy.deepcopy(item))
 
         login_task = next((t for t in normalized if t["id"] == "task_login"), None)
@@ -833,12 +843,8 @@ class Daily(QFrame, BaseInterface):
                     "time": "00:00",
                     "max_runs": 1
                 }],
-                "execution_config": [{
-                    "type": "daily",
-                    "day": 0,
-                    "time": "00:00",
-                    "max_runs": 1
-                }],
+                # 【修改点】：新建任务时，执行节点初始化为空列表
+                "execution_config": [],
                 "last_run":
                 0,
             })

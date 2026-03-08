@@ -562,8 +562,7 @@ class SharedSchedulingPanel(QWidget):
         self._emit_change()
 
     def _remove_rule(self, w):
-        if len(list(self._iter_rule_widgets())) <= 1:
-            return
+        # 【修复】：移除数量小于等于1时拒绝删除的限制，允许彻底清空
         self.rules_layout.removeWidget(w)
         w.deleteLater()
         self._update_delete_btns()
@@ -571,9 +570,9 @@ class SharedSchedulingPanel(QWidget):
 
     def _update_delete_btns(self):
         rules = list(self._iter_rule_widgets())
-        can_delete = len(rules) > 1
+        # 【修复】：不论剩下几条规则，都允许显示删除按钮
         for w in rules:
-            w.delete_btn.setVisible(can_delete)
+            w.delete_btn.setVisible(True)
 
     def load_task(self, task_id, config_dict):
         self.task_id = task_id
@@ -606,11 +605,10 @@ class SharedSchedulingPanel(QWidget):
             if widget:
                 widget.deleteLater()
 
-        rules = config_dict.get("execution_config", [{"type": "daily", "time": "00:00", "max_runs": 1}])
+        # 【修改点】：移除了执行节点原来强制读不到就兜底生成一个 00:00 的行为
+        rules = config_dict.get("execution_config", [])
         if isinstance(rules, dict):
             rules = [rules]
-        if not rules:
-            rules = [{"type": "daily", "time": "00:00", "max_runs": 1}]
 
         for rule in rules:
             self._add_rule(rule)

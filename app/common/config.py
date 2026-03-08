@@ -263,52 +263,52 @@ class Config(QConfig):
             {
                 "id": "task_login", "enabled": False, "use_periodic": False, "last_run": 0,
                 "activation_config": [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}],
-                "execution_config":  [{"type": "daily", "day": 0, "time": "05:00", "max_runs": 1}]
+                "execution_config":  []
             },
             {
                 "id": "task_supplies", "enabled": False, "use_periodic": False, "last_run": 0,
                 "activation_config": [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}],
-                "execution_config":  [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}]
+                "execution_config":  []
             },
             {
                 "id": "task_shop", "enabled": False, "use_periodic": False, "last_run": 0,
                 "activation_config": [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}],
-                "execution_config":  [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}]
+                "execution_config":  []
             },
             {
                 "id": "task_stamina", "enabled": False, "use_periodic": False, "last_run": 0,
                 "activation_config": [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}],
-                "execution_config":  [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}]
+                "execution_config":  []
             },
             {
                 "id": "task_shards", "enabled": False, "use_periodic": False, "last_run": 0,
                 "activation_config": [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}],
-                "execution_config":  [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}]
+                "execution_config":  []
             },
             {
                 "id": "task_chasm", "enabled": False, "use_periodic": False, "last_run": 0,
                 "activation_config": [{"type": "weekly", "day": 1, "time": "10:00", "max_runs": 1}],
-                "execution_config":  [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}]
+                "execution_config":  []
             },
             {
                 "id": "task_operation", "enabled": False, "use_periodic": False, "last_run": 0,
                 "activation_config": [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}],
-                "execution_config":  [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}]
+                "execution_config":  []
             },
             {
                 "id": "task_reward", "enabled": False, "use_periodic": False, "last_run": 0,
                 "activation_config": [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}],
-                "execution_config":  [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}]
+                "execution_config":  []
             },
             {
                 "id": "task_weapon", "enabled": False, "use_periodic": False, "last_run": 0,
                 "activation_config": [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}],
-                "execution_config":  [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}]
+                "execution_config":  []
             },
             {
                 "id": "task_shard_exchange", "enabled": False, "use_periodic": False, "last_run": 0,
                 "activation_config": [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}],
-                "execution_config":  [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}]
+                "execution_config":  []
             },
         ], serializer=TaskSequenceSerializer()
     )
