@@ -1,0 +1,17 @@
+
+[2026-03-08 18:49:25.088173] 
+Traceback (most recent call last):
+  File "D:\Workspace\SaaAssistantAca\app\view\main_window.py", line 274, in _run_next_init_task
+    task()
+  File "D:\Workspace\SaaAssistantAca\app\view\main_window.py", line 353, in _finalize_startup
+    self._create_home_interface()
+  File "D:\Workspace\SaaAssistantAca\app\view\main_window.py", line 247, in _create_home_interface
+    self.homeInterface = Daily('Daily Interface', self)
+  File "D:\Workspace\SaaAssistantAca\app\view\daily.py", line 350, in __init__
+    self._init_task_list_widgets()
+  File "D:\Workspace\SaaAssistantAca\app\view\daily.py", line 556, in _init_task_list_widgets
+    sequence = self.scheduler.get_task_sequence()
+  File "D:\Workspace\SaaAssistantAca\app\view\daily.py", line 406, in __getattr__
+    raise AttributeError(
+AttributeError: 'Daily' object has no attribute 'scheduler'
+

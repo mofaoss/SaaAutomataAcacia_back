@@ -41,6 +41,7 @@ from app.modules.operation_action.operation_action import OperationModule
 from app.modules.upgrade.weapon import WeaponUpgradeModule
 from app.modules.jigsaw.shards import ShardExchangeModule
 from app.common.constants import get_person_text_to_key_map, get_weapon_text_to_key_map
+from app.common.scheduler import Scheduler
 from app.common.gui_logger import setup_ui_logger
 
 # 导入视图与基类
@@ -345,8 +346,9 @@ class Daily(QFrame, BaseInterface):
         self.setObjectName(text.replace(' ', '-'))
         self.parent = parent
 
+        self.scheduler = Scheduler(self)
+
         self.task_widget_map: Dict[str, TaskItemWidget] = {}
-        self._task_sequence_cache: List[Dict[str, Any]] = []
         self._init_task_list_widgets()
 
         self.is_running = False
@@ -381,14 +383,7 @@ class Daily(QFrame, BaseInterface):
         self.running_game_guard_timer.timeout.connect(
             self._guard_running_game_window)
 
-        # 核心：常驻后台心跳，每30秒检查一次
-        self.loop_timer = QTimer(self)
-        self.loop_timer.timeout.connect(self._check_and_run_loop_tasks)
-        self.loop_timer.start(30000)
-
         self._f8_pressed = False
-
-        self.checkbox_dic = None
 
         self.checkbox_dic = None
 
@@ -398,6 +393,8 @@ class Daily(QFrame, BaseInterface):
             self.update_online_cloudflare()
         else:
             self.get_tips()
+
+        self.scheduler.start()
 
     def _on_init_sync(self):
         self._auto_adjust_after_use_action()
@@ -410,75 +407,20 @@ class Daily(QFrame, BaseInterface):
         raise AttributeError(
             f"'{self.__class__.__name__}' object has no attribute '{item}'")
 
-    def _is_rule_day_matched(self, rule: dict, now: datetime) -> bool:
-        """极简日期匹配器：检查今天是否符合执行规则"""
-        exec_type = str(rule.get("type", "daily")).lower()
-
-        if exec_type == "每周": exec_type = "weekly"
-        elif exec_type == "每月": exec_type = "monthly"
-        elif exec_type == "每天": exec_type = "daily"
-
-        if exec_type == "weekly":
-            return now.weekday() == int(rule.get("day", 0))
-        elif exec_type == "monthly":
-            return now.day == int(rule.get("day", 1))
-
-        return True  # 每天都匹配
-
-    def _check_and_run_loop_tasks(self):
-        # 如果游戏正在启动中，直接跳过本次检查，等下次循环
+    def _on_scheduled_tasks_due(self, new_tasks_found: List[str]):
+        """
+        Slot for the scheduler's `tasks_due` signal.
+        Handles queuing or immediate execution of scheduled tasks.
+        """
+        # If the game is in the process of launching, do nothing and wait for the next cycle.
         if getattr(self, 'is_launch_pending', False):
             return
 
-        now = datetime.now()
-        current_time_str = now.strftime("%H:%M")
-        new_tasks_found = []
-        sequence_updated = False
-
-        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
-        for task_cfg in sequence:
-            task_id = task_cfg.get("id")
-
-            if not task_cfg.get("use_periodic"):
-                continue
-
-            exec_rules = task_cfg.get("execution_config", [])
-            for rule in exec_rules:
-                if rule.get("time") == current_time_str:
-                    if self._is_rule_day_matched(rule, now):
-                        rule_progress = task_cfg.get("rule_progress", {})
-                        rule_key = f"{rule.get('type')}_{rule.get('day')}_{current_time_str}"
-                        prog = rule_progress.get(rule_key, 0)
-                        last_trigger_ts = prog.get("last_run", 0) if isinstance(prog, dict) else prog
-
-                        # 防止一分钟内重复触发
-                        if int(now.timestamp()) - int(last_trigger_ts) > 60:
-
-                            # 【核心新增】：读取 max_runs 属性，支持同一任务一次性排队多次
-                            max_runs = int(rule.get("max_runs", 1))
-                            if max_runs > 0:
-                                new_tasks_found.extend([task_id] * max_runs)
-
-                            if isinstance(prog, dict):
-                                prog["last_run"] = int(now.timestamp())
-                                rule_progress[rule_key] = prog
-                            else:
-                                rule_progress[rule_key] = int(now.timestamp())
-
-                            task_cfg["rule_progress"] = rule_progress
-                            sequence_updated = True
-                            break
-
-        if not new_tasks_found:
-            return
-
-        if sequence_updated:
-            self._save_task_sequence(sequence)
-
+        current_time_str = datetime.now().strftime("%H:%M")
         is_self_running = getattr(self, 'is_running', False)
         is_external_running = getattr(self, 'is_global_running', False)
 
-        # 如果自身在跑，或者外部有任务在跑，都必须进入排队逻辑
+        # If the system is busy (either this module or another is running), queue the tasks.
         if is_self_running or is_external_running:
             self.logger.info(ui_text(f"⏰ 到点触发计划: {current_time_str}，系统正忙，已加入队列排队: {new_tasks_found}",
                                      f"⏰ Scheduled task triggered at {current_time_str}, system is busy, added to queue: {new_tasks_found}"))
@@ -487,19 +429,17 @@ class Daily(QFrame, BaseInterface):
                 self.tasks_to_run = []
 
             for tid in new_tasks_found:
-                # 【核心修改】：移除了去重判定，允许相同任务反复 append 追加进队列
                 self.tasks_to_run.append(tid)
                 task_item = self.task_widget_map.get(tid)
                 if task_item and hasattr(task_item, 'set_task_state'):
                     task_item.set_task_state('queued')
 
-            # 如果是外部在跑，打个标记，等外部结束时自动唤醒日常
+            # If an external task is running, set a flag to auto-run queued tasks when it finishes.
             if is_external_running and not is_self_running:
                 self._waiting_for_external_to_finish = True
-
             return
 
-        # 如果完全空闲，直接执行
+        # If the system is idle, execute the tasks immediately.
         self.logger.info(ui_text(f"⏰ 到点触发计划: {current_time_str}，执行列表: {new_tasks_found}",
                                  f"⏰ Scheduled task triggered at {current_time_str}, executing tasks: {new_tasks_found}"))
         self._is_scheduled_run_flag = True
@@ -533,8 +473,7 @@ class Daily(QFrame, BaseInterface):
                                        1)
 
     def _output_schedule_log(self):
-        sequence = self._normalize_task_sequence(
-            config.daily_task_sequence.value)
+        sequence = self.scheduler.get_task_sequence()
         schedule_logs = []
         color_task, color_type, color_time = "#00BFFF", "#32CD32", "#FFA500"
 
@@ -586,74 +525,12 @@ class Daily(QFrame, BaseInterface):
             self.logger.info("📅 当前未启用任何计划任务。" if not self._is_non_chinese_ui
                              else "📅 No active schedules.")
 
-    def _normalize_task_sequence(self, sequence):
-        defaults = copy.deepcopy(config.daily_task_sequence.defaultValue)
-        default_by_id = {item["id"]: item for item in defaults}
-        normalized = []
-        seen = set()
-
-        for item in sequence or []:
-            task_id = item.get("id")
-            if task_id not in default_by_id:
-                continue
-            merged = copy.deepcopy(default_by_id[task_id])
-            merged.update(item)
-
-            activation_rules = merged.get("activation_config")
-            if activation_rules is None:
-                activation_rules = merged.get("refresh_config", {}) or {}
-            if isinstance(activation_rules, dict):
-                activation_rules = [activation_rules]
-            if not activation_rules:
-                activation_rules = [{
-                    "type": "daily",
-                    "day": 0,
-                    "time": "00:00",
-                    "max_runs": 1
-                }]
-            merged["activation_config"] = activation_rules
-            merged.pop("refresh_config", None)
-
-            # 【修改点】：直接获取或设为空列表，去掉了强塞 00:00 的兜底逻辑
-            execution_rules = merged.get("execution_config")
-            if execution_rules is None:
-                execution_rules = []
-            elif isinstance(execution_rules, dict):
-                execution_rules = [execution_rules]
-
-            merged["execution_config"] = execution_rules
-            normalized.append(merged)
-            seen.add(task_id)
-
-        for item in defaults:
-            if item["id"] not in seen:
-                # 【修改点】：如果是全新初始化的默认任务，强制将执行节点置空
-                item["execution_config"] = []
-
-                # 生效起点依然保留默认兜底
-                activation_rules = item.get("activation_config")
-                if not activation_rules:
-                    item["activation_config"] = [{
-                        "type": "daily",
-                        "day": 0,
-                        "time": "00:00",
-                        "max_runs": 1
-                    }]
-                normalized.append(copy.deepcopy(item))
-
-        login_task = next((t for t in normalized if t["id"] == "task_login"), None)
-        if login_task:
-            normalized.remove(login_task)
-            login_task["enabled"] = True
-            normalized.insert(0, login_task)
-
-        return normalized
-
-    def _auto_adjust_after_use_action(self):
+    def _auto_adjust_after_use_action(self, sequence=None):
         # 检查当前是否在全局执行状态
         is_globally_running = getattr(self, 'is_running', False) or getattr(self, 'is_launch_pending', False)
 
-        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
+        if sequence is None:
+            sequence = self.scheduler.get_task_sequence()
 
         for task_cfg in sequence:
             task_id = task_cfg.get("id")
@@ -676,15 +553,8 @@ class Daily(QFrame, BaseInterface):
                 else:
                     task_item.set_task_state(curr_state, is_enabled=is_checked)
 
-    def _save_task_sequence(self, sequence):
-        self._task_sequence_cache = sequence
-        config.set(config.daily_task_sequence, copy.deepcopy(sequence))
-
     def _init_task_list_widgets(self):
-        sequence = self._normalize_task_sequence(
-            config.daily_task_sequence.value)
-        self._save_task_sequence(sequence)
-
+        sequence = self.scheduler.get_task_sequence()
         self.ui.taskListWidget.clear()
         self.task_widget_map.clear()
 
@@ -712,8 +582,7 @@ class Daily(QFrame, BaseInterface):
             setattr(self, meta["option_key"], task_item.checkbox)
 
     def _sync_task_sequence_from_ui(self):
-        sequence = self._normalize_task_sequence(
-            config.daily_task_sequence.value)
+        sequence = self.scheduler.get_task_sequence()
         task_by_id = {item["id"]: item for item in sequence}
 
         for task_id, task_item in self.task_widget_map.items():
@@ -725,11 +594,10 @@ class Daily(QFrame, BaseInterface):
             if task_id in task_by_id:
                 ordered.append(task_by_id.pop(task_id))
         ordered.extend(task_by_id.values())
-        self._save_task_sequence(ordered)
+        self.scheduler.save_task_sequence(ordered)
 
     def _load_initial_task_panel(self):
-        sequence = self._normalize_task_sequence(
-            config.daily_task_sequence.value)
+        sequence = self.scheduler.get_task_sequence()
         for task_cfg in sequence:
             task_id = task_cfg.get("id")
             if task_id in TASK_REGISTRY:
@@ -737,7 +605,7 @@ class Daily(QFrame, BaseInterface):
                 break
 
     def _on_task_order_changed(self, task_id_order: list):
-        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
+        sequence = self.scheduler.get_task_sequence()
         task_by_id = {item["id"]: item for item in sequence}
         ordered = []
         for task_id in task_id_order:
@@ -745,11 +613,10 @@ class Daily(QFrame, BaseInterface):
                 ordered.append(task_by_id.pop(task_id))
         ordered.extend(task_by_id.values())
 
-        # 经过 normalized 格式化，login 会被自动置顶修复
-        final_ordered = self._normalize_task_sequence(ordered)
-        self._save_task_sequence(final_ordered)
+        final_ordered = self.scheduler.normalize_task_sequence(ordered)
+        self.scheduler.save_task_sequence(final_ordered)
 
-        # 如果用户硬是把别的任务拖到了第一个，直接刷新列表 UI 让它弹回原位
+        # If a task other than 'task_login' is dragged to the top, refresh the UI to correct its position.
         if task_id_order and task_id_order[0] != "task_login":
             self._init_task_list_widgets()
 
@@ -762,31 +629,14 @@ class Daily(QFrame, BaseInterface):
         if page_index is not None:
             self.set_current_index(page_index)
 
-        sequence = self._normalize_task_sequence(
-            config.daily_task_sequence.value)
-        task_cfg = next(
-            (item for item in sequence if item.get("id") == task_id), None)
+        sequence = self.scheduler.get_task_sequence()
+        task_cfg = next((item for item in sequence if item.get("id") == task_id), None)
+
+        # This should theoretically not happen after the scheduler normalization, but as a fallback:
         if task_cfg is None:
-            task_cfg = copy.deepcopy({
-                "id":
-                task_id,
-                "enabled":
-                True,
-                "use_periodic":
-                False,
-                "activation_config": [{
-                    "type": "daily",
-                    "day": 0,
-                    "time": "00:00",
-                    "max_runs": 1
-                }],
-                # 【修改点】：新建任务时，执行节点初始化为空列表
-                "execution_config": [],
-                "last_run":
-                0,
-            })
-            sequence.append(task_cfg)
-            self._save_task_sequence(sequence)
+            normalized = self.scheduler.normalize_task_sequence(sequence)
+            self.scheduler.save_task_sequence(normalized)
+            task_cfg = next((item for item in normalized if item.get("id") == task_id), {})
 
         self.ui.shared_scheduling_panel.load_task(task_id, task_cfg)
 
@@ -1169,9 +1019,11 @@ class Daily(QFrame, BaseInterface):
         self.ui.CheckBox_open_game_directly.stateChanged.connect(
             self.change_auto_open)
 
-        # 【修改】绑定新的单条规则复制信号
         self.ui.shared_scheduling_panel.copy_single_rule_clicked.connect(
             self._on_copy_single_rule_to_checked)
+
+        self.scheduler.tasks_due.connect(self._on_scheduled_tasks_due)
+        self.scheduler.sequence_updated.connect(self._auto_adjust_after_use_action)
 
         signalBus.sendHwnd.connect(self.set_hwnd)
 
@@ -1211,19 +1063,17 @@ class Daily(QFrame, BaseInterface):
             self.on_start_button_click() # 复用现有的停止逻辑
 
     def _on_task_checkbox_changed(self, task_id: str, is_checked: bool):
-        sequence = self._normalize_task_sequence(
-            config.daily_task_sequence.value)
+        sequence = self.scheduler.get_task_sequence()
         for task_cfg in sequence:
             if task_cfg.get("id") == task_id:
                 task_cfg["enabled"] = bool(is_checked)
                 break
-        self._save_task_sequence(sequence)
+        self.scheduler.save_task_sequence(sequence)
         self._on_task_settings_clicked(task_id)
         self._auto_adjust_after_use_action()
 
     def _on_shared_config_changed(self, task_id: str, new_config: dict):
-        sequence = self._normalize_task_sequence(
-            config.daily_task_sequence.value)
+        sequence = self.scheduler.get_task_sequence()
         updated = False
         for task_cfg in sequence:
             if task_cfg.get("id") == task_id:
@@ -1236,16 +1086,15 @@ class Daily(QFrame, BaseInterface):
             task_cfg.update(new_config)
             sequence.append(task_cfg)
 
-        self._save_task_sequence(sequence)
+        self.scheduler.save_task_sequence(sequence)
         self._auto_adjust_after_use_action()
 
     def _on_toggle_all_cycles_clicked(self, enable: bool):
-        sequence = self._normalize_task_sequence(
-            config.daily_task_sequence.value)
+        sequence = self.scheduler.get_task_sequence()
         for task_cfg in sequence:
             task_cfg["use_periodic"] = enable
 
-        self._save_task_sequence(sequence)
+        self.scheduler.save_task_sequence(sequence)
         if getattr(self.ui, 'shared_scheduling_panel', None):
             self.ui.shared_scheduling_panel.enable_checkbox.blockSignals(True)
             self.ui.shared_scheduling_panel.enable_checkbox.setChecked(enable)
@@ -1291,7 +1140,7 @@ class Daily(QFrame, BaseInterface):
             final_tasks.insert(0, "task_login")
 
         self.tasks_to_run = final_tasks
-        
+
         if not self.tasks_to_run:
             return
 
@@ -1430,7 +1279,7 @@ class Daily(QFrame, BaseInterface):
             return
 
         # 2. 读取当前序列
-        sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
+        sequence = self.scheduler.get_task_sequence()
 
         # 3. 遍历覆盖（仅针对勾选的任务，并确保不给 task_login 加计划）
         for task_cfg in sequence:
@@ -1460,7 +1309,7 @@ class Daily(QFrame, BaseInterface):
                 task_cfg["execution_config"] = existing_rules
 
         # 4. 保存配置
-        self._save_task_sequence(sequence)
+        self.scheduler.save_task_sequence(sequence)
 
         # 5. 重新加载当前正在查看的任务的UI（以防当前任务刚好是被勾选的任务，UI需要刷新显示新追加的规则）
         current_task_id = self.ui.shared_scheduling_panel.task_id
@@ -1667,7 +1516,7 @@ class Daily(QFrame, BaseInterface):
 
         elif run_mode_idx == 1:  # 关闭程序
             self.logger.info(self._ui_text("执行完毕，正在退出安卡小助手...", "Execution completed, exiting Anka Assistant..."))
-            self.loop_timer.stop()
+            self.scheduler.stop()
 
             main_window = self.window()
             if hasattr(main_window, 'quit_app'):
@@ -1680,7 +1529,7 @@ class Daily(QFrame, BaseInterface):
             self.logger.info(self._ui_text("执行完毕，系统将于60秒后关机...", "Execution completed, system will shut down in 60 seconds..."))
             os.system('shutdown -s -t 60')
 
-            self.loop_timer.stop()
+            self.scheduler.stop()
 
     def set_checkbox_enable(self, enable: bool):
         for checkbox in self.ui.findChildren(CheckBox):
@@ -1719,8 +1568,7 @@ class Daily(QFrame, BaseInterface):
                     task_item.lock_ui_for_execution()
 
     def record_task_completed(self, task_id: str):
-        sequence = self._normalize_task_sequence(
-            config.daily_task_sequence.value)
+        sequence = self.scheduler.get_task_sequence()
 
         meta = TASK_REGISTRY.get(task_id, {})
         task_name = meta.get("en_name", task_id) if getattr(
@@ -1732,6 +1580,7 @@ class Daily(QFrame, BaseInterface):
             if task_cfg.get("id") == task_id:
                 task_cfg["last_run"] = int(time.time())
                 break
+        self.scheduler.save_task_sequence(sequence)
 
         success_msg = f"✨ Task [{task_name}] completed!" if getattr(
             self, '_is_non_chinese_ui', False) else f"✨ {task_name} 执行完毕！"
@@ -1746,8 +1595,6 @@ class Daily(QFrame, BaseInterface):
             if getattr(self, 'is_running', False) or getattr(self, 'is_launch_pending', False):
                 if hasattr(task_item, 'lock_ui_for_execution'):
                     task_item.lock_ui_for_execution()
-
-        self._save_task_sequence(sequence)
 
     def save_changed(self, widget, *args):
         config_item = getattr(config, widget.objectName(), None)
@@ -1870,6 +1717,7 @@ class Daily(QFrame, BaseInterface):
 
     def closeEvent(self, event):
         super().closeEvent(event)
+        self.scheduler.stop()
 
     def showEvent(self, event):
         super().showEvent(event)
