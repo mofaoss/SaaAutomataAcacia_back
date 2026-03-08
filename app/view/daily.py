@@ -1225,8 +1225,10 @@ class Daily(QFrame, BaseInterface):
             self._on_shared_config_changed)
         self.ui.CheckBox_open_game_directly.stateChanged.connect(
             self.change_auto_open)
-        self.ui.shared_scheduling_panel.copy_to_all_clicked.connect(
-            self._on_copy_config_to_all)
+
+        # 【修改】绑定新的单条规则复制信号
+        self.ui.shared_scheduling_panel.copy_single_rule_clicked.connect(
+            self._on_copy_single_rule_to_checked)
 
         signalBus.sendHwnd.connect(self.set_hwnd)
 
@@ -1474,37 +1476,82 @@ class Daily(QFrame, BaseInterface):
             self.tasks_to_run = tasks_to_run
             self.after_start_button_click(tasks_to_run)
 
-    def _on_copy_config_to_all(self, source_task_id: str):
-        if not source_task_id:
+    def _on_copy_single_rule_to_checked(self, rule_data: dict):
+        if not rule_data:
             return
 
-        # 1. 获取源任务当前的配置（从 UI 实时获取最新的）
-        activation_rules = [w.get_data() for w in self.ui.shared_scheduling_panel._iter_activation_rule_widgets()]
-        execution_rules = [w.get_data() for w in self.ui.shared_scheduling_panel._iter_rule_widgets()]
-        is_periodic = self.ui.shared_scheduling_panel.enable_checkbox.isChecked()
+        # 1. 找出所有已勾选的任务 ID
+        checked_task_ids = []
+        ordered_ids = self.ui.taskListWidget.get_task_order()
+        for tid in ordered_ids:
+            item = self.task_widget_map.get(tid)
+            if item and item.checkbox.isChecked():
+                checked_task_ids.append(tid)
+
+        if not checked_task_ids:
+            InfoBar.warning(
+                title=ui_text("无生效目标", "No Target Selected"),
+                content=ui_text("请先在左侧列表中勾选需要应用此规则的任务", "Please check tasks in the left list first"),
+                orient=Qt.Orientation.Horizontal,
+                isClosable=True,
+                position=InfoBarPosition.TOP_RIGHT,
+                duration=3000,
+                parent=self
+            )
+            return
 
         # 2. 读取当前序列
         sequence = self._normalize_task_sequence(config.daily_task_sequence.value)
 
-        # 3. 遍历并覆盖
+        # 3. 遍历覆盖（仅针对勾选的任务，并确保不给 task_login 加计划）
         for task_cfg in sequence:
-            # “自动登录”通常不建议跟随批量计划，如果你想排除它，可以加 if task_cfg["id"] == "task_login": continue
-            task_cfg["use_periodic"] = is_periodic
-            task_cfg["activation_config"] = copy.deepcopy(activation_rules)
-            task_cfg["execution_config"] = copy.deepcopy(execution_rules)
+            if task_cfg["id"] in checked_task_ids and task_cfg["id"] != "task_login":
+                # 开启任务的计划使能开关
+                task_cfg["use_periodic"] = True
 
-        # 4. 保存并刷新
+                # 获取该任务原有的执行规则列表
+                existing_rules = task_cfg.get("execution_config", [])
+                if not isinstance(existing_rules, list):
+                    existing_rules = []
+
+                # 检查是否已经存在完全一模一样的规则，避免重复添加
+                is_duplicate = False
+                for er in existing_rules:
+                    if er.get("type") == rule_data["type"] and \
+                       er.get("day") == rule_data["day"] and \
+                       er.get("time") == rule_data["time"]:
+                        # 如果类型、天数、时间都一样，只更新执行次数
+                        er["max_runs"] = rule_data["max_runs"]
+                        is_duplicate = True
+                        break
+
+                if not is_duplicate:
+                    existing_rules.append(copy.deepcopy(rule_data))
+
+                task_cfg["execution_config"] = existing_rules
+
+        # 4. 保存配置
         self._save_task_sequence(sequence)
+
+        # 5. 重新加载当前正在查看的任务的UI（以防当前任务刚好是被勾选的任务，UI需要刷新显示新追加的规则）
+        current_task_id = self.ui.shared_scheduling_panel.task_id
+        if current_task_id:
+            task_cfg = next((item for item in sequence if item.get("id") == current_task_id), None)
+            if task_cfg:
+                self.ui.shared_scheduling_panel.load_task(current_task_id, task_cfg)
+
         self._auto_adjust_after_use_action()
 
-        # 5. 提示用户
+        # 6. 成功提示
+        rule_desc = f"{rule_data['type']} {rule_data['time']} ({rule_data['max_runs']}次)"
         InfoBar.success(
-            title=ui_text("复制成功", "Copy Successful"),
-            content=ui_text("已将当前计划应用到所有任务", "Applied current schedule to all tasks"),
+            title=ui_text("规则下发成功", "Rule Copied Successfully"),
+            content=ui_text(f"已将此时间节点追加给 {len(checked_task_ids)} 个已勾选任务\n并自动启用了它们的计划",
+                            f"Added this trigger to {len(checked_task_ids)} checked tasks and enabled their schedules"),
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
             position=InfoBarPosition.TOP_RIGHT,
-            duration=2000,
+            duration=3000,
             parent=self
         )
 

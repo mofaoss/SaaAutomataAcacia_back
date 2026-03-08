@@ -86,6 +86,8 @@ class TaskListView(ListWidget):
 class ExecutionRuleWidget(QWidget):
     deleted = Signal(QWidget)
     changed = Signal()
+    # 【新增】复制该条规则的信号，传递当前规则的字典数据
+    copy_rule_clicked = Signal(dict)
 
     def __init__(self, is_non_chinese_ui=False, parent=None):
         super().__init__(parent)
@@ -128,7 +130,12 @@ class ExecutionRuleWidget(QWidget):
         self.delete_btn = ToolButton(self)
         self.delete_btn.setIcon(FIF.DELETE)
 
-        for w in [self.freq_combo, self.week_combo, self.month_combo, self.time_edit, self.runs_edit, self.delete_btn]:
+        # 【新增】单条规则的复制按钮
+        self.copy_btn = ToolButton(self)
+        self.copy_btn.setIcon(FIF.COPY)
+        self.copy_btn.setToolTip("Copy to checked tasks" if is_non_chinese_ui else "将此时间复制给已勾选任务")
+
+        for w in [self.freq_combo, self.week_combo, self.month_combo, self.time_edit, self.runs_edit, self.delete_btn, self.copy_btn]:
             font = w.font()
             font.setPointSize(10)
             w.setFont(font)
@@ -146,10 +153,13 @@ class ExecutionRuleWidget(QWidget):
         layout.addWidget(self.runs_edit)
         layout.addWidget(self.label_times)
         layout.addWidget(self.delete_btn)
+        layout.addWidget(self.copy_btn) # 【新增】添加到布局
         layout.addStretch(1)
 
         self.freq_combo.currentIndexChanged.connect(self._update_visibility)
         self.delete_btn.clicked.connect(lambda: self.deleted.emit(self))
+        # 【新增】绑定复制按钮点击事件
+        self.copy_btn.clicked.connect(lambda: self.copy_rule_clicked.emit(self.get_data()))
 
         for w in [self.freq_combo, self.week_combo, self.month_combo]:
             w.currentIndexChanged.connect(self.changed)
@@ -163,6 +173,8 @@ class ExecutionRuleWidget(QWidget):
         self.label_after_time.setVisible(visible)
         self.runs_edit.setVisible(visible)
         self.label_times.setVisible(visible)
+        # 【优化】如果隐藏了执行次数（比如生效起点），通常也不需要复制功能，一并隐藏
+        self.copy_btn.setVisible(visible)
 
     def _update_visibility(self):
         idx = self.freq_combo.currentIndex()
@@ -383,7 +395,8 @@ class SharedSchedulingPanel(QWidget):
     config_changed = Signal(str, dict)
     toggle_all_cycles = Signal(bool)
     view_schedule_clicked = Signal()
-    copy_to_all_clicked = Signal(str)  # 【新增】信号：传递当前任务ID
+    # 传递单条规则字典的信号
+    copy_single_rule_clicked = Signal(dict)
 
     def __init__(self, is_non_chinese_ui=False, parent=None):
         super().__init__(parent)
@@ -400,6 +413,7 @@ class SharedSchedulingPanel(QWidget):
         main_layout.setContentsMargins(8, 8, 8, 8)
         main_layout.setSpacing(6)
 
+        # 1. 顶部：全局控制按钮行
         checkbox_row = QHBoxLayout()
         enable_text = "Cycle" if is_non_chinese_ui else "启用计划"
         self.enable_checkbox = CheckBox(enable_text, self)
@@ -429,6 +443,7 @@ class SharedSchedulingPanel(QWidget):
 
         main_layout.addLayout(checkbox_row)
 
+        # 2. 中间：生效起点设置行
         activation_row = QHBoxLayout()
         activation_row.setContentsMargins(0, 0, 0, 0)
         activation_row.setSpacing(6)
@@ -442,14 +457,16 @@ class SharedSchedulingPanel(QWidget):
         self.activation_widget.setStyleSheet("background: transparent;")
         self.activation_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.activation_widget.setMaximumHeight(42)
+
         self.activation_layout = QVBoxLayout(self.activation_widget)
         self.activation_layout.setContentsMargins(0, 0, 0, 0)
         self.activation_layout.setSpacing(0)
         self.activation_layout.addStretch(1)
-        activation_row.addWidget(self.activation_widget, 1)
 
+        activation_row.addWidget(self.activation_widget, 1)
         main_layout.addLayout(activation_row)
 
+        # 3. 执行节点标题行
         exec_title_layout = QHBoxLayout()
         exec_title_layout.setContentsMargins(0, 0, 0, 0)
         exec_title_layout.setSpacing(8)
@@ -462,31 +479,26 @@ class SharedSchedulingPanel(QWidget):
         self.add_btn.setFixedSize(28, 28)
         self.add_btn.clicked.connect(lambda: self._add_rule({}))
 
-        self.copy_all_btn = ToolButton(FIF.COPY, self)
-        self.copy_all_btn.setToolTip("Copy to all tasks" if is_non_chinese_ui else "复制到全部任务")
-        self.copy_all_btn.setFixedSize(28, 28)
-        self.copy_all_btn.clicked.connect(lambda: self.copy_to_all_clicked.emit(self.task_id))
-
         exec_title_layout.addWidget(self.exec_title_label)
         exec_title_layout.addWidget(self.add_btn)
-        exec_title_layout.addWidget(self.copy_all_btn) # 添加到布局
         exec_title_layout.addStretch(1)
 
         main_layout.addLayout(exec_title_layout)
 
+        # 4. 底部：执行节点滚动区域
         self.rules_scroll = ScrollArea(self)
         self.rules_scroll.setWidgetResizable(True)
         self.rules_scroll.setStyleSheet("QScrollArea { background: transparent; border: none; }")
 
         self.rules_widget = QWidget(self.rules_scroll)
         self.rules_widget.setStyleSheet("background: transparent;")
+
         self.rules_layout = QVBoxLayout(self.rules_widget)
         self.rules_layout.setContentsMargins(0, 0, 0, 0)
         self.rules_layout.setSpacing(6)
         self.rules_layout.addStretch(1)
 
         self.rules_scroll.setWidget(self.rules_widget)
-
         main_layout.addWidget(self.rules_scroll, 1)
 
         self.enable_checkbox.stateChanged.connect(self._emit_change)
@@ -500,14 +512,16 @@ class SharedSchedulingPanel(QWidget):
 
     def _add_activation_rule(self, data):
         w = ExecutionRuleWidget(self.is_non_chinese_ui, self)
-        w.set_runs_visible(False)
+        w.set_runs_visible(False) # 隐藏次数和复制按钮
         w.runs_edit.setText("1")
         w.delete_btn.setVisible(False)
         w.delete_btn.setEnabled(False)
         w.deleted.connect(self._remove_activation_rule)
         w.changed.connect(self._emit_change)
+
         if data:
             w.set_data(data)
+
         self.activation_layout.insertWidget(self.activation_layout.count() - 1, w)
         self._update_activation_delete_btns()
         self._emit_change()
@@ -537,8 +551,12 @@ class SharedSchedulingPanel(QWidget):
         w = ExecutionRuleWidget(self.is_non_chinese_ui, self)
         w.deleted.connect(self._remove_rule)
         w.changed.connect(self._emit_change)
+        # 将子控件的复制信号透传给 Panel，Panel再通过 copy_single_rule_clicked 往外抛
+        w.copy_rule_clicked.connect(lambda rule_data: self.copy_single_rule_clicked.emit(rule_data))
+
         if data:
             w.set_data(data)
+
         self.rules_layout.insertWidget(self.rules_layout.count() - 1, w)
         self._update_delete_btns()
         self._emit_change()
@@ -563,6 +581,7 @@ class SharedSchedulingPanel(QWidget):
         self.enable_checkbox.setChecked(config_dict.get("use_periodic", False))
         self.enable_checkbox.blockSignals(False)
 
+        # 清空现有的生效起点规则 (保留末尾的Stretch)
         while self.activation_layout.count() > 1:
             item = self.activation_layout.takeAt(0)
             widget = item.widget()
@@ -580,6 +599,7 @@ class SharedSchedulingPanel(QWidget):
         self._add_activation_rule(activation_rules[0])
         self._update_activation_delete_btns()
 
+        # 清空现有的执行节点规则 (保留末尾的Stretch)
         while self.rules_layout.count() > 1:
             item = self.rules_layout.takeAt(0)
             widget = item.widget()
