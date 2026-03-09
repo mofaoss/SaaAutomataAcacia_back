@@ -776,6 +776,7 @@ class PeriodicTasksView(ScrollArea):
         self.PopUpAniStackedWidget.setObjectName("PopUpAniStackedWidget")
         self.periodic_module_specs = get_periodic_module_specs()
         self.periodic_pages_by_task_id = {}
+        self._module_widget_cache = {}
         for spec in self.periodic_module_specs:
             page = spec.ui_factory(self.PopUpAniStackedWidget, HostContext.PERIODIC)
             if hasattr(page, "bind_host_context"):
@@ -795,82 +796,26 @@ class PeriodicTasksView(ScrollArea):
         layout.addWidget(self.shared_scheduling_panel, 0)
 
         self.gridLayout_2.addWidget(self.SimpleCardWidget_2, 0, 1, 2, 1)
-        self._alias_page_widgets()
 
-    def _alias_page_widgets(self):
-        # EnterGamePage
-        self.StrongBodyLabel_4 = self.page_enter.StrongBodyLabel_4
-        self.PrimaryPushButton_path_tutorial = self.page_enter.PrimaryPushButton_path_tutorial
-        self.CheckBox_open_game_directly = self.page_enter.CheckBox_open_game_directly
-        self.LineEdit_game_directory = self.page_enter.LineEdit_game_directory
-        self.PushButton_select_directory = self.page_enter.PushButton_select_directory
-        self.BodyLabel_enter_tip = self.page_enter.BodyLabel_enter_tip
+    def get_periodic_page(self, task_id: str):
+        return self.periodic_pages_by_task_id.get(task_id)
 
-        # CollectSuppliesPage
-        self.CheckBox_mail = self.page_collect.CheckBox_mail
-        self.CheckBox_redeem_code = self.page_collect.CheckBox_redeem_code
-        self.CheckBox_dormitory = self.page_collect.CheckBox_dormitory
-        self.CheckBox_fish_bait = self.page_collect.CheckBox_fish_bait
-        self.PushButton_reset_codes = self.page_collect.PushButton_reset_codes
-        self.PrimaryPushButton_import_codes = self.page_collect.PrimaryPushButton_import_codes
-        self.TextEdit_import_codes = self.page_collect.TextEdit_import_codes
-        self.BodyLabel_collect_supplies = self.page_collect.BodyLabel_collect_supplies
+    def get_module_widget(self, widget_attr: str):
+        if widget_attr in self._module_widget_cache:
+            return self._module_widget_cache[widget_attr]
 
-        # ShopPage
-        self.ScrollArea = self.page_shop.ScrollArea
-        self.scrollAreaWidgetContents = self.page_shop.scrollAreaWidgetContents
-        self.gridLayout = self.page_shop.gridLayout
-        self.StrongBodyLabel = self.page_shop.StrongBodyLabel
-        self.select_person = self.page_shop.select_person
-        self.select_weapon = self.page_shop.select_weapon
-        for i in range(3, 16):
-            name = f"CheckBox_buy_{i}"
-            setattr(self, name, getattr(self.page_shop, name))
+        for page in self.periodic_pages_by_task_id.values():
+            widget = getattr(page, widget_attr, None)
+            if widget is not None:
+                self._module_widget_cache[widget_attr] = widget
+                return widget
+        return None
 
-        # UsePowerPage
-        self.ComboBox_power_usage = self.page_use_power.ComboBox_power_usage
-        self.StrongBodyLabel_2 = self.page_use_power.StrongBodyLabel_2
-        self.CheckBox_is_use_power = self.page_use_power.CheckBox_is_use_power
-        self.ComboBox_power_day = self.page_use_power.ComboBox_power_day
-        self.BodyLabel_6 = self.page_use_power.BodyLabel_6
-
-        # PersonPage
-        self.BodyLabel_8 = self.page_person.BodyLabel_8
-        self.LineEdit_c4 = self.page_person.LineEdit_c4
-        self.BodyLabel_person_tip = self.page_person.BodyLabel_person_tip
-        self.BodyLabel_5 = self.page_person.BodyLabel_5
-        self.LineEdit_c3 = self.page_person.LineEdit_c3
-        self.CheckBox_is_use_chip = self.page_person.CheckBox_is_use_chip
-        self.BodyLabel_3 = self.page_person.BodyLabel_3
-        self.LineEdit_c1 = self.page_person.LineEdit_c1
-        self.StrongBodyLabel_3 = self.page_person.StrongBodyLabel_3
-        self.BodyLabel_4 = self.page_person.BodyLabel_4
-        self.LineEdit_c2 = self.page_person.LineEdit_c2
-
-        # ChasmPage & RewardPage
-        self.BodyLabel_chasm_tip = self.page_chasm.BodyLabel_chasm_tip
-        self.BodyLabel_reward_tip = self.page_reward.BodyLabel_reward_tip
-
-        # OperationPage
-        self.BodyLabel_22 = self.page_operation.BodyLabel_22
-        self.ComboBox_run = self.page_operation.ComboBox_run
-        self.BodyLabel_7 = self.page_operation.BodyLabel_7
-        self.SpinBox_action_times = self.page_operation.SpinBox_action_times
-        self.BodyLabel_tip_action = self.page_operation.BodyLabel_tip_action
-
-        # WeaponUpgradePage
-        self.BodyLabel_weapon_tip = self.page_weapon.BodyLabel_weapon_tip
-
-        # ShardExchangePage
-        self.CheckBox_receive_shards = self.page_shard_exchange.CheckBox_receive_shards
-        self.CheckBox_gift_shards = self.page_shard_exchange.CheckBox_gift_shards
-        self.CheckBox_recycle_shards = self.page_shard_exchange.CheckBox_recycle_shards
-        self.BodyLabel_shard_tip = self.page_shard_exchange.BodyLabel_shard_tip
-
-        # CloseGamePage
-        self.CheckBox_close_game = self.page_close_game.CheckBox_close_game
-        self.CheckBox_close_proxy = self.page_close_game.CheckBox_close_proxy
-        self.CheckBox_shutdown = self.page_close_game.CheckBox_shutdown
+    def require_module_widget(self, widget_attr: str):
+        widget = self.get_module_widget(widget_attr)
+        if widget is None:
+            raise AttributeError(f"Module widget '{widget_attr}' was not found in periodic pages")
+        return widget
 
     def _build_log_card(self):
         self.SimpleCardWidget = SimpleCardWidget(self.content_widget)

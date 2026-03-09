@@ -54,7 +54,7 @@ class EnterGameActions:
         view = FlyoutView(
             title=tutorial_title,
             content=tutorial_content,
-            image="asset/path_tutorial.png",
+            image="app/features/assets/enter_game/path_tutorial.png",
             isClosable=True,
         )
         view.widgetLayout.insertSpacing(1, 5)

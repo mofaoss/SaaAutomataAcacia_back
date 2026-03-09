@@ -218,6 +218,10 @@ class PeriodicTasksPage(QFrame, BaseInterface):
         ui = self.__dict__.get('ui')
         if ui is not None and hasattr(ui, item):
             return getattr(ui, item)
+        if ui is not None and hasattr(ui, "get_module_widget"):
+            widget = ui.get_module_widget(item)
+            if widget is not None:
+                return widget
         raise AttributeError(
             f"'{self.__class__.__name__}' object has no attribute '{item}'")
 
@@ -333,11 +337,14 @@ class PeriodicTasksPage(QFrame, BaseInterface):
         self._sync_task_sequence_from_ui()
         self._load_initial_task_panel()
 
-        self.ui.ComboBox_power_day.setEnabled(
-            self.ui.CheckBox_is_use_power.isChecked())
+        combo_power_day = self.ui.require_module_widget("ComboBox_power_day")
+        check_use_power = self.ui.require_module_widget("CheckBox_is_use_power")
+        combo_power_day.setEnabled(check_use_power.isChecked())
 
         StyleSheet.PERIODIC_TASKS_INTERFACE.apply(self)
-        self.ui.ScrollArea.enableTransparentBackground()
+        shop_scroll_area = self.ui.get_module_widget("ScrollArea")
+        if shop_scroll_area is not None and hasattr(shop_scroll_area, "enableTransparentBackground"):
+            shop_scroll_area.enableTransparentBackground()
         self.ui.ScrollArea_tips.enableTransparentBackground()
 
         self.ui.gridLayout_2.removeWidget(self.ui.SimpleCardWidget)
@@ -522,31 +529,39 @@ class PeriodicTasksPage(QFrame, BaseInterface):
         self.running_game_guard_timer.stop()
 
     def _connect_to_slot(self):
+        tutorial_button = self.ui.require_module_widget("PrimaryPushButton_path_tutorial")
+        select_directory_button = self.ui.require_module_widget("PushButton_select_directory")
+        game_directory_line_edit = self.ui.require_module_widget("LineEdit_game_directory")
+        import_codes_button = self.ui.require_module_widget("PrimaryPushButton_import_codes")
+        reset_codes_button = self.ui.require_module_widget("PushButton_reset_codes")
+        import_codes_text_edit = self.ui.require_module_widget("TextEdit_import_codes")
+        auto_open_checkbox = self.ui.require_module_widget("CheckBox_open_game_directly")
+
         self.ui.PushButton_start.clicked.connect(self.on_start_button_click)
-        self.ui.PrimaryPushButton_path_tutorial.clicked.connect(
+        tutorial_button.clicked.connect(
             lambda: self.enter_game_actions.show_path_tutorial(
                 host=self,
-                anchor_widget=self.ui.PrimaryPushButton_path_tutorial,
+                anchor_widget=tutorial_button,
             ))
         self.ui.PushButton_select_all.clicked.connect(
             lambda: select_all(self.ui.SimpleCardWidget_option))
         self.ui.PushButton_no_select.clicked.connect(
             lambda: no_select(self.ui.SimpleCardWidget_option, self.primary_option_key))
-        self.ui.PushButton_select_directory.clicked.connect(
+        select_directory_button.clicked.connect(
             lambda: self.enter_game_actions.on_select_directory_click(
                 host=self,
-                line_edit=self.ui.LineEdit_game_directory,
+                line_edit=game_directory_line_edit,
                 settings_usecase=self.settings_usecase,
             ))
-        self.ui.PrimaryPushButton_import_codes.clicked.connect(
+        import_codes_button.clicked.connect(
             lambda: self.collect_supplies_actions.on_import_codes_click(
                 host=self,
-                text_edit=self.ui.TextEdit_import_codes,
+                text_edit=import_codes_text_edit,
             ))
-        self.ui.PushButton_reset_codes.clicked.connect(
+        reset_codes_button.clicked.connect(
             lambda: self.collect_supplies_actions.on_reset_codes_click(
                 host=self,
-                text_edit=self.ui.TextEdit_import_codes,
+                text_edit=import_codes_text_edit,
             ))
 
         self.ui.shared_scheduling_panel.toggle_all_cycles.connect(
@@ -566,7 +581,7 @@ class PeriodicTasksPage(QFrame, BaseInterface):
             self._on_task_order_changed)
         self.ui.shared_scheduling_panel.config_changed.connect(
             self._on_shared_config_changed)
-        self.ui.CheckBox_open_game_directly.stateChanged.connect(
+        auto_open_checkbox.stateChanged.connect(
             lambda state: self.enter_game_actions.on_auto_open_toggled(host=self, state=state))
 
         self.ui.shared_scheduling_panel.copy_single_rule_clicked.connect(
@@ -669,7 +684,7 @@ class PeriodicTasksPage(QFrame, BaseInterface):
     def save_changed(self, widget, *args):
         maybe_power_enabled = self.settings_usecase.persist_widget_change(widget)
         if maybe_power_enabled is not None:
-            self.ui.ComboBox_power_day.setEnabled(bool(maybe_power_enabled))
+            self.ui.require_module_widget("ComboBox_power_day").setEnabled(bool(maybe_power_enabled))
 
     def _load_presets(self):
         PeriodicPresetActions.load_presets(self)

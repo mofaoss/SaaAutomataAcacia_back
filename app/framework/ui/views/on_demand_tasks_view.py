@@ -18,11 +18,25 @@ class OnDemandTasksView(QWidget):
         self.gridLayout.setContentsMargins(10, 10, 10, 10)
         self.gridLayout.setSpacing(12)
 
+        self.leftPane = QWidget(self)
+        self.leftPane.setObjectName("leftPane")
+        self.leftPaneLayout = QVBoxLayout(self.leftPane)
+        self.leftPaneLayout.setContentsMargins(0, 0, 0, 0)
+        self.leftPaneLayout.setSpacing(8)
+
         self.SegmentedWidget = SegmentedWidget(self)
         self.SegmentedWidget.setObjectName("SegmentedWidget")
+        self.SegmentedWidget.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed,
+        )
+        self.SegmentedWidget.setMaximumHeight(44)
         self.stackedWidget = QStackedWidget(self)
         self.stackedWidget.setObjectName("stackedWidget")
         self.stackedWidget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
+        self.leftPaneLayout.addWidget(self.SegmentedWidget, 0)
+        self.leftPaneLayout.addWidget(self.stackedWidget, 1)
 
         self.sharedLogCard = SimpleCardWidget(self)
         self.sharedLogCard.setObjectName("sharedLogCard")
@@ -45,8 +59,7 @@ class OnDemandTasksView(QWidget):
         self.gridLayout.setRowStretch(0, 1)
         self.gridLayout.setRowStretch(1, 0)
 
-        self.gridLayout.addWidget(self.SegmentedWidget, 0, 0, 1, 1)
-        self.gridLayout.addWidget(self.stackedWidget, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.leftPane, 0, 0, 2, 1)
         self.gridLayout.addWidget(self.sharedLogCard, 0, 1, 2, 1)
         self.sharedLogTitle.setText(self.tr("共享日志"))
         self._external_sidebar_cards = []

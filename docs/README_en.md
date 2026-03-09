@@ -1,7 +1,7 @@
 
 <div align="center">
   <h1>
-    <img src="../asset/logo_head.png" width="200"/>
+    <img src="./asset/logo_head.png" width="200"/>
     <br/>
     SaaAssistantAca
   </h1>
@@ -106,10 +106,10 @@
 <details>
 <summary>👉 Click to expand screenshots 👈</summary>
 <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-  <img src="../asset/1.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
-  <img src="../asset/2.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
-  <img src="../asset/3.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
-  <img src="../asset/4.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
+  <img src="./asset/1.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
+  <img src="./asset/2.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
+  <img src="./asset/3.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
+  <img src="./asset/4.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
 </div>
 </details>
 

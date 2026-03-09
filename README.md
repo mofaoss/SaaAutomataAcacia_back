@@ -1,6 +1,6 @@
 <div align="center">
     <h1>
-      <img src="./asset/logo_head.png" width="200"/>
+      <img src="./docs/asset/logo_head.png" width="200"/>
       <br/>
       安卡小助手
     </h1>
@@ -107,10 +107,10 @@
 <details>
 <summary>👉 点击展开多张运行截图 👈</summary>
 <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
-  <img src="./asset/1.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
-  <img src="./asset/2.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
-  <img src="./asset/3.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
-  <img src="./asset/4.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
+  <img src="./docs/asset/1.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
+  <img src="./docs/asset/2.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
+  <img src="./docs/asset/3.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
+  <img src="./docs/asset/4.png" style="width: 45%; max-width: 300px; object-fit: contain;" />
 </div>
 </details>
 

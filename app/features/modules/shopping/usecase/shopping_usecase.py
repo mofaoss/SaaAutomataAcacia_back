@@ -222,6 +222,10 @@ class ShoppingSelectionUseCase:
     def _resolve_selectors(root_widget):
         select_person = getattr(root_widget, "select_person", None)
         select_weapon = getattr(root_widget, "select_weapon", None)
+
+        if (select_person is None or select_weapon is None) and hasattr(root_widget, "get_module_widget"):
+            select_person = select_person or root_widget.get_module_widget("select_person")
+            select_weapon = select_weapon or root_widget.get_module_widget("select_weapon")
         return select_person, select_weapon
 
     def load_item_config(self, *, settings_usecase, root_widget):

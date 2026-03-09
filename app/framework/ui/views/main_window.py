@@ -303,7 +303,9 @@ class MainWindow(FluentWindow, BaseInterface):
             ShoppingSelectionUseCase,
         )
         from app.features.scheduling.periodic_ui_texts import apply_periodic_module_texts
-        from app.features.scheduling.task_profile import get_periodic_task_profile
+        from app.framework.application.tasks.periodic_task_profile import (
+            get_periodic_task_profile,
+        )
         from app.features.utils.home_navigation import back_to_home
         from app.features.utils.network import start_cloudflare_update
 
