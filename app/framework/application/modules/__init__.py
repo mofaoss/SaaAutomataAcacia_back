@@ -3,12 +3,15 @@ from app.framework.application.modules.contracts import (
     ModuleSpec,
     ModuleUiBindings,
 )
-from app.framework.application.modules.registry import get_on_demand_module_specs
+from app.framework.application.modules.registry import (
+    get_on_demand_module_specs,
+    get_periodic_module_specs,
+)
 
 __all__ = [
     "HostContext",
     "ModuleSpec",
     "ModuleUiBindings",
     "get_on_demand_module_specs",
+    "get_periodic_module_specs",
 ]
-

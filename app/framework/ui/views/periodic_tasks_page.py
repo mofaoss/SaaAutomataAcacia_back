@@ -19,11 +19,12 @@ from app.framework.ui.shared.style_sheet import StyleSheet
 from app.features.utils.ui import ui_text
 
 from app.features.modules.collect_supplies.usecase.collect_supplies_actions import CollectSuppliesActions
+from app.features.infra.snowbreak_game_environment import SnowbreakGameEnvironment
 from app.features.modules.enter_game.usecase.enter_game_actions import EnterGameActions
 from app.features.modules.event_tips.usecase.event_tips_usecase import EventTipsUseCase
-from app.features.modules.shopping.item_constants import get_person_text_to_key_map, get_weapon_text_to_key_map
 from app.features.modules.shopping.usecase.shopping_usecase import ShoppingSelectionUseCase
 from app.framework.core.task_engine.scheduler import Scheduler
+from app.framework.core.interfaces.game_environment import IGameEnvironment
 from app.framework.infra.logging.gui_logger import setup_ui_logger
 from app.framework.application.periodic.periodic_controller import PeriodicController
 from app.framework.application.periodic.periodic_settings_usecase import PeriodicSettingsUseCase
@@ -33,11 +34,12 @@ from app.framework.application.periodic.periodic_dispatcher import PeriodicDispa
 from app.framework.application.periodic.on_demand_runner import SingleTaskToggle
 from app.framework.application.periodic.periodic_orchestration import (
     build_active_schedule_lines,
-    collect_checked_task_ids_for_rule,
     collect_checked_tasks,
     collect_checked_tasks_from,
-    upsert_rule_to_tasks,
-    withdraw_rule_from_tasks,
+)
+from app.framework.application.periodic.periodic_page_actions import (
+    PeriodicPresetActions,
+    PeriodicRuleActions,
 )
 from app.features.scheduling.task_profile import get_periodic_task_profile
 
@@ -65,7 +67,7 @@ def no_select(widget, primary_option_key: str):
 class PeriodicTasksPage(QFrame, BaseInterface):
     """Periodic task host: supports scheduled, queue, and manual run strategies."""
 
-    def __init__(self, text: str, parent=None):
+    def __init__(self, text: str, parent=None, *, game_environment: IGameEnvironment | None = None):
         super().__init__(parent)
         BaseInterface.__init__(self)
 
@@ -78,8 +80,9 @@ class PeriodicTasksPage(QFrame, BaseInterface):
 
         self.setting_name_list = self._build_setting_name_list()
 
-        self.person_text_to_key = get_person_text_to_key_map(self._is_non_chinese_ui)
-        self.weapon_text_to_key = get_weapon_text_to_key_map(self._is_non_chinese_ui)
+        self.game_environment = game_environment or SnowbreakGameEnvironment(self._is_non_chinese_ui)
+        self.shopping_selection_usecase = ShoppingSelectionUseCase(self._is_non_chinese_ui)
+        self.person_text_to_key, self.weapon_text_to_key = self.shopping_selection_usecase.get_text_to_key_maps()
 
         self.ui = PeriodicTasksView(self, is_non_chinese_ui=self._is_non_chinese_ui)
         root_layout = QVBoxLayout(self)
@@ -100,9 +103,8 @@ class PeriodicTasksPage(QFrame, BaseInterface):
         )
         self.settings_usecase = PeriodicSettingsUseCase()
         self.ui_binding_usecase = PeriodicUiBindingUseCase()
-        self.enter_game_actions = EnterGameActions(self._is_non_chinese_ui)
+        self.enter_game_actions = EnterGameActions(self.game_environment)
         self.collect_supplies_actions = CollectSuppliesActions(self.settings_usecase)
-        self.shopping_selection_usecase = ShoppingSelectionUseCase(self._is_non_chinese_ui)
         self.event_tips_usecase = EventTipsUseCase(
             self.settings_usecase,
             is_non_chinese_ui=self._is_non_chinese_ui,
@@ -464,9 +466,6 @@ class PeriodicTasksPage(QFrame, BaseInterface):
 
     def _load_config(self):
         self.settings_usecase.apply_config_to_widgets(self.ui.findChildren(QWidget))
-        self._load_item_config()
-
-    def _load_item_config(self):
         self.shopping_selection_usecase.load_item_config(
             settings_usecase=self.settings_usecase,
             select_person=self.select_person,
@@ -481,8 +480,16 @@ class PeriodicTasksPage(QFrame, BaseInterface):
             person_selector=self.select_person,
             weapon_selector=self.select_weapon,
             on_widget_change=self.save_changed,
-            on_person_item_state_change=self.save_item_changed,
-            on_weapon_item_state_change=self.save_item2_changed,
+            on_person_item_state_change=lambda index, check_state: self.shopping_selection_usecase.save_person_item(
+                settings_usecase=self.settings_usecase,
+                index=index,
+                check_state=check_state,
+            ),
+            on_weapon_item_state_change=lambda index, check_state: self.shopping_selection_usecase.save_weapon_item(
+                settings_usecase=self.settings_usecase,
+                index=index,
+                check_state=check_state,
+            ),
         )
 
     def set_hwnd(self, hwnd):
@@ -529,7 +536,7 @@ class PeriodicTasksPage(QFrame, BaseInterface):
 
     def open_game_directly(self):
         try:
-            result = self.enter_game_actions.launch_game(logger=self.logger)
+            result = self.game_environment.launch(logger=self.logger)
             if not result.get("ok"):
                 self.logger.error(result.get("error", "启动游戏失败"))
                 self._set_launch_pending_state(False)
@@ -544,7 +551,7 @@ class PeriodicTasksPage(QFrame, BaseInterface):
             self._set_launch_pending_state(False)
 
     def _is_game_window_open(self):
-        return self.enter_game_actions.is_game_window_open()
+        return self.game_environment.is_running()
 
     def _clear_launch_watch_state(self):
         self.check_game_window_timer.stop()
@@ -827,113 +834,10 @@ class PeriodicTasksPage(QFrame, BaseInterface):
         self._initiate_task_run(tasks_to_run)
 
     def _on_copy_single_rule_to_checked(self, rule_data: dict):
-        if not rule_data:
-            return
-
-        checked_task_ids = collect_checked_task_ids_for_rule(
-            task_order=self.ui.taskListWidget.get_task_order(),
-            is_checked=lambda task_id: bool(
-                self.task_widget_map.get(task_id).checkbox.isChecked()
-            ) if self.task_widget_map.get(task_id) else False,
-            primary_task_id=self.primary_task_id,
-            current_panel_task_id=self.ui.shared_scheduling_panel.task_id,
-            allow_primary_when_current=False,
-        )
-
-        if not checked_task_ids:
-            InfoBar.warning(
-                title=ui_text("无生效目标", "No Target Selected"),
-                content=ui_text("请先在左侧列表中勾选需要应用此规则的任务", "Please check tasks in the left list first"),
-                orient=Qt.Orientation.Horizontal,
-                isClosable=True,
-                position=InfoBarPosition.TOP_RIGHT,
-                duration=3000,
-                parent=self
-            )
-            return
-
-        sequence = self.scheduler.get_task_sequence()
-        upsert_rule_to_tasks(
-            sequence=sequence,
-            target_task_ids=set(checked_task_ids),
-            primary_task_id=self.primary_task_id,
-            rule_data=rule_data,
-        )
-        self.scheduler.save_task_sequence(sequence)
-
-        current_task_id = self.ui.shared_scheduling_panel.task_id
-        if current_task_id:
-            task_cfg = next((item for item in sequence if item.get("id") == current_task_id), None)
-            if task_cfg:
-                self.ui.shared_scheduling_panel.load_task(current_task_id, task_cfg)
-
-        self._auto_adjust_after_use_action()
-
-        InfoBar.success(
-            title=ui_text("规则下发成功", "Rule Copied Successfully"),
-            content=ui_text(f"已追加给 {len(checked_task_ids)} 个已勾选任务\n并启用了它们的计划",
-                            f"Rule added to {len(checked_task_ids)} checked tasks\nand enabled their scheduling"),
-            orient=Qt.Orientation.Horizontal,
-            isClosable=True,
-            position=InfoBarPosition.TOP_RIGHT,
-            duration=3500,
-            parent=self
-        )
+        PeriodicRuleActions.copy_single_rule_to_checked(self, rule_data)
 
     def _on_withdraw_single_rule_from_checked(self, rule_data: dict):
-        if not rule_data:
-            return
-
-        current_panel_task_id = self.ui.shared_scheduling_panel.task_id
-
-        checked_task_ids = collect_checked_task_ids_for_rule(
-            task_order=self.ui.taskListWidget.get_task_order(),
-            is_checked=lambda task_id: bool(
-                self.task_widget_map.get(task_id).checkbox.isChecked()
-            ) if self.task_widget_map.get(task_id) else False,
-            primary_task_id=self.primary_task_id,
-            current_panel_task_id=current_panel_task_id,
-            allow_primary_when_current=True,
-        )
-
-        if not checked_task_ids:
-            InfoBar.warning(
-                title=ui_text("无生效目标", "No Target Selected"),
-                content=ui_text("请先在左侧列表中勾选需要撤回规则的任务", "Please check tasks in the left list first"),
-                orient=Qt.Orientation.Horizontal,
-                isClosable=True,
-                position=InfoBarPosition.TOP_RIGHT,
-                duration=3000,
-                parent=self
-            )
-            return
-
-        sequence = self.scheduler.get_task_sequence()
-        modified_count = withdraw_rule_from_tasks(
-            sequence=sequence,
-            target_task_ids=set(checked_task_ids),
-            rule_data=rule_data,
-        )
-        self.scheduler.save_task_sequence(sequence)
-
-        current_task_id = self.ui.shared_scheduling_panel.task_id
-        if current_task_id:
-            task_cfg = next((item for item in sequence if item.get("id") == current_task_id), None)
-            if task_cfg:
-                self.ui.shared_scheduling_panel.load_task(current_task_id, task_cfg)
-
-        self._auto_adjust_after_use_action()
-
-        InfoBar.success(
-            title=ui_text("撤回成功", "Withdraw Successful"),
-            content=ui_text(f"已从 {modified_count} 个任务中移除该时间节点",
-                            f"Removed trigger from {modified_count} tasks"),
-            orient=Qt.Orientation.Horizontal,
-            isClosable=True,
-            position=InfoBarPosition.TOP_RIGHT,
-            duration=3000,
-            parent=self
-        )
+        PeriodicRuleActions.withdraw_single_rule_from_checked(self, rule_data)
 
     def check_game_open(self):
         try:
@@ -1173,20 +1077,6 @@ class PeriodicTasksPage(QFrame, BaseInterface):
         if maybe_power_enabled is not None:
             self.ui.ComboBox_power_day.setEnabled(bool(maybe_power_enabled))
 
-    def save_item_changed(self, index, check_state):
-        self.shopping_selection_usecase.save_person_item(
-            settings_usecase=self.settings_usecase,
-            index=index,
-            check_state=check_state,
-        )
-
-    def save_item2_changed(self, index, check_state):
-        self.shopping_selection_usecase.save_weapon_item(
-            settings_usecase=self.settings_usecase,
-            index=index,
-            check_state=check_state,
-        )
-
     def get_tips(self, url=None):
         try:
             self.event_tips_usecase.refresh_tips_panel(
@@ -1199,67 +1089,19 @@ class PeriodicTasksPage(QFrame, BaseInterface):
             self.logger.error(ui_text(f"更新控件出错：{e}", f"Error occurred while updating controls: {e}"))
 
     def _load_presets(self):
-        presets = self.settings_usecase.load_presets()
-
-        self.ui.ComboBox_presets.blockSignals(True)
-        self.ui.ComboBox_presets.clear()
-        self.ui.ComboBox_presets.addItems(list(presets.keys()))
-        self.ui.ComboBox_presets.setCurrentIndex(0)
-        self.ui.ComboBox_presets.blockSignals(False)
-        # Load the first preset
-        self._on_preset_changed(0)
+        PeriodicPresetActions.load_presets(self)
 
     def _on_preset_changed(self, index):
-        preset_name = self.ui.ComboBox_presets.currentText()
-        enabled_tasks = self.settings_usecase.get_enabled_tasks_for_preset(preset_name)
-        # Apply to checkboxes
-        for task_id, item in self.task_widget_map.items():
-            item.checkbox.setChecked(task_id in enabled_tasks)
+        PeriodicPresetActions.on_preset_changed(self, index)
 
     def _on_add_preset_clicked(self):
-        self.ui.ComboBox_presets.blockSignals(True)
-        self.ui.ComboBox_presets.setCurrentIndex(-1)
-        self.ui.ComboBox_presets.setCurrentText("")
-        self.ui.ComboBox_presets.blockSignals(False)
-        self.ui.ComboBox_presets.setFocus()
+        PeriodicPresetActions.on_add_preset_clicked(self)
 
     def _save_current_preset(self):
-        preset_name = self.ui.ComboBox_presets.currentText().strip()
-        if not preset_name:
-            return
-
-        enabled_tasks = []
-        for task_id, item in self.task_widget_map.items():
-            if item.checkbox.isChecked():
-                enabled_tasks.append(task_id)
-
-        self.settings_usecase.save_preset(preset_name, enabled_tasks)
-
-        # Refresh list if new
-        if self.ui.ComboBox_presets.findText(preset_name) == -1:
-            self.ui.ComboBox_presets.addItem(preset_name)
-
-        self.ui.ComboBox_presets.setCurrentIndex(self.ui.ComboBox_presets.findText(preset_name))
-
-        InfoBar.success(title=ui_text("保存成功", "Saved"), content=ui_text(f"预设 '{preset_name}' 已保存", f"Preset '{preset_name}' saved"), parent=self)
+        PeriodicPresetActions.save_current_preset(self)
 
     def _delete_current_preset(self):
-        preset_name = self.ui.ComboBox_presets.currentText().strip()
-        deleted, reason = self.settings_usecase.delete_preset(preset_name)
-        if not deleted and reason == "not_found":
-            return
-
-        if not deleted and reason == "min_one_required":
-            InfoBar.warning(title=ui_text("无法删除", "Cannot Delete"), content=ui_text("至少保留一个预设", "At least one preset must remain"), parent=self)
-            return
-
-        idx = self.ui.ComboBox_presets.findText(preset_name)
-        if idx >= 0:
-            self.ui.ComboBox_presets.removeItem(idx)
-
-        self.ui.ComboBox_presets.setCurrentIndex(0)
-
-        InfoBar.success(title=ui_text("删除成功", "Deleted"), content=ui_text(f"预设 '{preset_name}' 已删除", f"Preset '{preset_name}' deleted"), parent=self)
+        PeriodicPresetActions.delete_current_preset(self)
 
     def closeEvent(self, event):
         super().closeEvent(event)

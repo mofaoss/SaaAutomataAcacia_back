@@ -33,40 +33,12 @@ from qfluentwidgets import (
     EditableComboBox,
     isDarkTheme,
 )
-from app.features.modules.chasm.ui.chasm_periodic_page import ChasmPage
-from app.features.modules.close_game.ui.close_game_periodic_page import CloseGamePage
-from app.features.modules.collect_supplies.ui.collect_supplies_periodic_page import (
-    CollectSuppliesPage,
-)
-from app.features.modules.enter_game.ui.enter_game_periodic_page import EnterGamePage
-from app.features.modules.get_reward.ui.reward_periodic_page import RewardPage
-from app.features.modules.jigsaw.ui.shard_exchange_periodic_page import (
-    ShardExchangePage,
-)
-from app.features.modules.operation_action.ui.operation_periodic_page import OperationPage
-from app.features.modules.person.ui.person_periodic_page import PersonPage
-from app.features.modules.shopping.ui.shop_periodic_page import ShopPage
-from app.features.modules.upgrade.ui.weapon_upgrade_periodic_page import (
-    WeaponUpgradePage,
-)
-from app.features.modules.use_power.ui.use_power_periodic_page import UsePowerPage
+from app.framework.application.modules import HostContext, get_periodic_module_specs
+from app.features.scheduling.periodic_ui_texts import apply_periodic_module_texts
 
 
 class TaskListView(ListWidget):
     orderChanged = Signal(list)
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setDragDropMode(QAbstractItemView.DragDropMode.InternalMove)
-        self.setDefaultDropAction(Qt.DropAction.MoveAction)
-        # 【修复】：追加 hover 和 selected 的透明属性
-        self.setStyleSheet(
-            "TaskListView { background: transparent; border: none; outline: none; }"
-            "TaskListView::item { background: transparent; }"
-            "TaskListView::item:hover { background: transparent; }"
-            "TaskListView::item:selected { background: transparent; }"
-        )
-        self.model().rowsMoved.connect(self._emit_order_changed)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -806,47 +778,17 @@ class PeriodicTasksView(ScrollArea):
         self.PopUpAniStackedWidget = PopUpAniStackedWidget(
             self.SimpleCardWidget_2)
         self.PopUpAniStackedWidget.setObjectName("PopUpAniStackedWidget")
-
-        self.page_enter = EnterGamePage(self.PopUpAniStackedWidget)
-        self.page_collect = CollectSuppliesPage(self.PopUpAniStackedWidget)
-        self.page_shop = ShopPage(self.PopUpAniStackedWidget)
-        self.page_use_power = UsePowerPage(self.PopUpAniStackedWidget)
-        self.page_person = PersonPage(self.PopUpAniStackedWidget)
-        self.page_chasm = ChasmPage(self.PopUpAniStackedWidget)
-        self.page_reward = RewardPage(self.PopUpAniStackedWidget)
-        self.page_operation = OperationPage(self.PopUpAniStackedWidget)
-        self.page_weapon = WeaponUpgradePage(self.PopUpAniStackedWidget)
-        self.page_shard_exchange = ShardExchangePage(
-            self.PopUpAniStackedWidget)
-        self.page_close_game = CloseGamePage(self.PopUpAniStackedWidget)
-
-        for page in [
-            self.page_enter,
-            self.page_collect,
-            self.page_shop,
-            self.page_use_power,
-            self.page_person,
-            self.page_chasm,
-            self.page_reward,
-            self.page_operation,
-            self.page_weapon,
-            self.page_shard_exchange,
-            self.page_close_game,
-        ]:
+        self.periodic_module_specs = get_periodic_module_specs()
+        self.periodic_pages_by_task_id = {}
+        for spec in self.periodic_module_specs:
+            page = spec.ui_factory(self.PopUpAniStackedWidget, HostContext.PERIODIC)
             if hasattr(page, "bind_host_context"):
-                page.bind_host_context("periodic")
-
-        self.PopUpAniStackedWidget.addWidget(self.page_enter)
-        self.PopUpAniStackedWidget.addWidget(self.page_collect)
-        self.PopUpAniStackedWidget.addWidget(self.page_shop)
-        self.PopUpAniStackedWidget.addWidget(self.page_use_power)
-        self.PopUpAniStackedWidget.addWidget(self.page_person)
-        self.PopUpAniStackedWidget.addWidget(self.page_chasm)
-        self.PopUpAniStackedWidget.addWidget(self.page_reward)
-        self.PopUpAniStackedWidget.addWidget(self.page_operation)
-        self.PopUpAniStackedWidget.addWidget(self.page_weapon)
-        self.PopUpAniStackedWidget.addWidget(self.page_shard_exchange)
-        self.PopUpAniStackedWidget.addWidget(self.page_close_game)
+                page.bind_host_context(HostContext.PERIODIC)
+            self.periodic_pages_by_task_id[spec.id] = page
+            bindings = spec.ui_bindings
+            if bindings is not None and bindings.page_attr:
+                setattr(self, bindings.page_attr, page)
+            self.PopUpAniStackedWidget.addWidget(page)
 
         layout.addWidget(self.TitleLabel_setting)
         layout.addWidget(self.PopUpAniStackedWidget, 1)
@@ -1000,118 +942,17 @@ class PeriodicTasksView(ScrollArea):
         self.PushButton_save_preset.setToolTip(self._ui_text("保存当前勾选到预设", "Save current selection to preset"))
         self.PushButton_delete_preset.setToolTip(self._ui_text("删除当前预设", "Delete current preset"))
         self.PushButton_start.setText(self._ui_text("立即执行 (F8)", "Execute Now (F8)"))
-
-        self.ComboBox_power_day.addItems(['1', '2', '3', '4', '5', '6'])
-        self.ComboBox_power_usage.addItems([
-            self._ui_text('活动材料本', 'Event Stages'),
-            self._ui_text('刷常规后勤', 'Operation Logistics')
-        ])
-        self.ComboBox_run.addItems(["Toggle Sprint", "Hold Sprint"] if self.
-                                   is_non_chinese_ui else ["切换疾跑", "按住疾跑"])
-
-        for line_edit in [
-                self.LineEdit_c1, self.LineEdit_c2, self.LineEdit_c3,
-                self.LineEdit_c4
-        ]:
-            line_edit.setPlaceholderText(self._ui_text("未输入", "Not set"))
-
         self.PushButton_start.setToolTip(
             self._ui_text("快捷键：F8", "Shortcut: F8"))
-
-        self.BodyLabel_enter_tip.setText(
-            "### Tips\n* Select your server in Settings\n* Enable \"Auto open game\" and select the correct game path by the tutorial above\n* Game will be launched automatically when you click start or when a task needs to execute, no need to set schedule\n* Schedule for auto login is not affected by other modules"
-            if self.is_non_chinese_ui else
-            "### 提示\n* 去设置里选择你的区服\n* 建议勾选“自动打开游戏”，请根据上方教程选择对应的路径\n* 点击开始或有任务需要执行时会自动拉起游戏，无需设置计划 \n* 自动登录的计划功能不受其他模块影响"
-        )
-        self.BodyLabel_person_tip.setText(
-            "### Tips\n* Enter codename instead of full name, e.g. use \"朝翼\" (Dawnwing) for \"凯茜娅-朝翼\" (Katya-Dawnwing)"
-            if self.
-            is_non_chinese_ui else "### 提示\n* 输入代号而非全名，比如想要刷“凯茜娅-朝翼”，就输入“朝翼”")
-        self.BodyLabel_collect_supplies.setText(
-            "### Tips\n* Default: Always claim Supply Station stamina and friend stamina \n* Enable \"Redeem Code\" to fetch and redeem online codes automatically\n* Online codes are maintained by developers and may not always be updated in time\n* You can import a txt file for batch redeem (one code per line)"
-            if self.is_non_chinese_ui else
-            "### 提示 \n* 默认必领供应站体力和好友体力\n* 勾选“领取兑换码”会自动拉取在线兑换码进行兑换\n* 在线兑换码由开发者维护，更新不一定及时\n* 导入txt文本文件可以批量使用用户兑换码，txt需要一行一个兑换码"
-        )
-        self.BodyLabel_chasm_tip.setText(
-            "### Tips\n* Neural Simulation opens every Tuesday at 10:00"
-            if self.is_non_chinese_ui else "### 提示\n* 拟境每周2的10:00开启")
-        self.BodyLabel_reward_tip.setText(
-            "### Tips\n* Claim monthly card and daily rewards" if self.
-            is_non_chinese_ui else "### 提示\n* 领取大月卡和日常奖励")
-        self.BodyLabel_weapon_tip.setText(
-            "### Tips\n* Automatically identifies and consumes upgrade materials\n* Stops when weapon reaches max level"
-            if self.is_non_chinese_ui else
-            "### 提示\n* 自动从背包选择第一把武器进行强化\n* 自动识别并消耗升级材料，直到武器等级提升或满级")
-        self.BodyLabel_shard_tip.setText(
-            "### Tips\n* Auto receive, gift, and recycle puzzle shards\n* Retains at least 15 of each shard when recycling"
-            if self.is_non_chinese_ui else
-            "### 提示\n* 自动进行基地信源碎片的接收、赠送和回收\n* 回收时每种碎片默认至少保留15个")
-
-        self.CheckBox_close_game.setText(self._ui_text("退出游戏", "Exit Game"))
-        self.CheckBox_close_proxy.setText(self._ui_text("退出小助手但不关机", "Exit SAA but don't shutdown"))
-        self.CheckBox_shutdown.setText(self._ui_text("关机", "Shutdown PC"))
 
         self.TitleLabel.setText(self._ui_text("日志", "Log"))
         self.PushButton_select_all.setText(self._ui_text("全选", "All"))
         self.PushButton_no_select.setText(self._ui_text("清空", "Clear"))
         self.hint_label.setText(self._ui_text("拖动调整顺序", "Drag to sort"))
-        self.PrimaryPushButton_path_tutorial.setText(
-            self._ui_text("查看教程", "Tutorial"))
-        self.StrongBodyLabel_4.setText(
-            self._ui_text("启动器中查看游戏路径", "Find game path in launcher"))
-        self.CheckBox_open_game_directly.setText(
-            self._ui_text("自动打开游戏", "Auto open game"))
-        self.PushButton_select_directory.setText(self._ui_text("选择", "Browse"))
-        self.CheckBox_mail.setText(self._ui_text("领取邮件", "Claim Mail"))
-        self.CheckBox_fish_bait.setText(self._ui_text("领取鱼饵", "Claim Bait"))
-        self.CheckBox_dormitory.setText(self._ui_text("宿舍碎片", "Dorm Shards"))
-        self.CheckBox_redeem_code.setText(
-            self._ui_text("领取兑换码", "Redeem Codes"))
-        self.CheckBox_receive_shards.setText(
-            self._ui_text("一键接收", "Auto Receive"))
-        self.CheckBox_gift_shards.setText(self._ui_text("一键赠送", "Auto Gift"))
-        self.CheckBox_recycle_shards.setText(
-            self._ui_text("智能回收", "Smart Recycle"))
-        self.PrimaryPushButton_import_codes.setText(
-            self._ui_text("导入", "Import"))
-        self.PushButton_reset_codes.setText(self._ui_text("重置", "Reset"))
-        self.StrongBodyLabel.setText(
-            self._ui_text("选择要购买的商品", "Select items to buy"))
-        self.StrongBodyLabel_2.setText(
-            self._ui_text("选择体力使用方式", "Stamina usage mode"))
-        self.CheckBox_is_use_power.setText(
-            self._ui_text("自动使用期限", "Auto use expiring"))
-        self.BodyLabel_6.setText(self._ui_text("天内的体力药", "day potion"))
-        self.StrongBodyLabel_3.setText(
-            self._ui_text("选择需要刷碎片的角色", "Select characters for shards"))
-        self.BodyLabel_3.setText(self._ui_text("角色1：", "Character 1:"))
-        self.BodyLabel_4.setText(self._ui_text("角色2：", "Character 2:"))
-        self.BodyLabel_5.setText(self._ui_text("角色3：", "Character 3:"))
-        self.BodyLabel_8.setText(self._ui_text("角色4：", "Character 4:"))
-        self.CheckBox_is_use_chip.setText(
-            self._ui_text("记忆嵌片不足时自动使用2片", "Auto use 2 chips when not enough"))
         self.TitleLabel_3.setText(self._ui_text("日程提醒", "Event Reminder"))
-        self.BodyLabel_22.setText(self._ui_text("疾跑方式", "Sprint mode"))
-        self.BodyLabel_7.setText(self._ui_text("刷取次数", "Run count"))
-        self.BodyLabel_tip_action.setText(
-            "### Tips\n* Auto-run operation \n* Repeats the first training stage for specified times with no stamina cost\n* Useful for weekly pass mission count"
-            if self.is_non_chinese_ui else
-            "### 提示\n* 重复刷指定次数无需体力的实战训练第一关\n* 用于完成凭证20次常规行动周常任务")
 
-        shop_items = [
-            ("CheckBox_buy_3", "通用强化套件", "Universal Enhancement Kit"),
-            ("CheckBox_buy_4", "优选强化套件", "Premium Enhancement Kit"),
-            ("CheckBox_buy_5", "精致强化套件", "Exquisite Enhancement Kit"),
-            ("CheckBox_buy_6", "新手战斗记录", "Beginner Battle Record"),
-            ("CheckBox_buy_7", "普通战斗记录", "Standard Battle Record"),
-            ("CheckBox_buy_8", "优秀战斗记录", "Advanced Battle Record"),
-            ("CheckBox_buy_9", "初级职级认证", "Junior Rank Certification"),
-            ("CheckBox_buy_10", "中级职级认证", "Intermediate Rank Certification"),
-            ("CheckBox_buy_11", "高级职级认证", "Senior Rank Certification"),
-            ("CheckBox_buy_12", "合成颗粒", "Synthetic Particles"),
-            ("CheckBox_buy_13", "芳烃塑料", "Hydrocarbon Plastic"),
-            ("CheckBox_buy_14", "单极纤维", "Monopolar Fibers"),
-            ("CheckBox_buy_15", "光纤轴突", "Fiber Axon")
-        ]
-        for attr, zh, en in shop_items:
-            getattr(self, attr).setText(self._ui_text(zh, en))
+        apply_periodic_module_texts(
+            self,
+            is_non_chinese_ui=self.is_non_chinese_ui,
+            ui_text_fn=self._ui_text,
+        )

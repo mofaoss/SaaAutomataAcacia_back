@@ -2,8 +2,13 @@ import time
 
 from app.framework.infra.config.app_config import config
 from app.framework.infra.config.app_config import is_non_chinese_ui_language
-from app.features.modules.shopping.item_constants import get_item_key_to_name_map, get_shop_item_key_to_name_map, \
-    get_shop_item_zh_name_to_display_name_map
+from app.features.modules.shopping.item_constants import (
+    get_item_key_to_name_map,
+    get_person_text_to_key_map,
+    get_shop_item_key_to_name_map,
+    get_shop_item_zh_name_to_display_name_map,
+    get_weapon_text_to_key_map,
+)
 from app.framework.ui.widgets.tree import TreeFrame_person, TreeFrame_weapon
 from app.framework.infra.automation.timer import Timer
 from app.features.utils.home_navigation import back_to_home
@@ -226,6 +231,12 @@ class ShoppingSelectionUseCase:
             is_non_chinese_ui=self._is_non_chinese_ui,
         )
         return select_person, select_weapon
+
+    def get_text_to_key_maps(self):
+        return (
+            get_person_text_to_key_map(self._is_non_chinese_ui),
+            get_weapon_text_to_key_map(self._is_non_chinese_ui),
+        )
 
     @staticmethod
     def load_item_config(settings_usecase, select_person, select_weapon, person_text_to_key, weapon_text_to_key):
