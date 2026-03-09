@@ -59,6 +59,7 @@ class OcrReplacementTable(QFrame, BaseInterface):
         self.TableWidget_ocr_table.setBorderVisible(True)
         self.TableWidget_ocr_table.setBorderRadius(8)
         self.TableWidget_ocr_table.verticalHeader().hide()
+        self.TableWidget_ocr_table.horizontalHeader().show()
         self.TableWidget_ocr_table.setHorizontalHeaderLabels([
             self._ui_text('类型', 'Type'),
             self._ui_text('替换前', 'Before'),

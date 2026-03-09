@@ -24,7 +24,7 @@ class EnterGameActionsPort(Protocol):
     def launch_game(self, *, logger=None) -> dict[str, Any]:
         ...
 
-    def show_path_tutorial(self, *, host, anchor_widget) -> None:
+    def show_path_tutorial(self, *, host, anchor_widget, tutorial_page=None) -> None:
         ...
 
     def on_select_directory_click(self, *, host, line_edit, settings_usecase) -> None:

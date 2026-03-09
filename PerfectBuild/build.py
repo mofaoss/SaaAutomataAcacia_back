@@ -134,7 +134,7 @@ class PerfectBuild:
             # 添加文件
             "--noinclude-qt-plugins=qml,webengine,network,multimedia,sql,test,sensorkit,position,location,bluetooth,nfc,serialport,websockets,printsupport,dbus,xml,pdf",
             "--include-data-file=PerfectBuild/assets/shapely.libs/.load-order-shapely-2.0.7=shapely.libs/.load-order-shapely-2.0.7",
-            "--include-data-dir=app/framework/ui/resources=app/framework/ui/resources",
+            "--include-data-dir=resources=resources",
             "--include-data-file=docs/help.md=docs/help.md",
             "--include-data-file=docs/help_en.md=docs/help_en.md",
             "--include-data-file=update_data.txt=update_data.txt",

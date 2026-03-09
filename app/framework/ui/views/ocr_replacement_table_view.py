@@ -31,6 +31,7 @@ class OcrReplacementTableView:
         self.TableWidget_ocr_table.setShowGrid(False)
         self.TableWidget_ocr_table.setWordWrap(False)
         self.TableWidget_ocr_table.setColumnCount(3)
+        self.TableWidget_ocr_table.setMinimumWidth(420)
         self.TableWidget_ocr_table.setObjectName("TableWidget_ocr_table")
         self.TableWidget_ocr_table.setRowCount(0)
         self.gridLayout.addWidget(self.TableWidget_ocr_table, 0, 0, 5, 1)

@@ -2,7 +2,7 @@
 from enum import Enum
 
 from qfluentwidgets import FluentIconBase, getIconColor, Theme
-from app.framework.ui.resources import resource_qrc  # noqa: F401 - ensure qrc resources are loaded
+from resources import resource_qrc  # noqa: F401 - ensure qrc resources are loaded
 
 
 class Icon(FluentIconBase, Enum):
@@ -13,4 +13,4 @@ class Icon(FluentIconBase, Enum):
     SETTINGS_FILLED = "SettingsFilled"
 
     def path(self, theme=Theme.AUTO):
-        return f":/app/framework/ui/resources/icons/{self.value}_{getIconColor(theme)}.svg"
+        return f":/resources/icons/{self.value}_{getIconColor(theme)}.svg"

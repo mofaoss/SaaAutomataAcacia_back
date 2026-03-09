@@ -9,6 +9,7 @@ from qfluentwidgets import (
     StrongBodyLabel,
 )
 
+from app.framework.infra.runtime.paths import PROJECT_ROOT
 from app.framework.ui.views.periodic_base import ModulePageBase
 
 
@@ -46,3 +47,22 @@ class EnterGamePage(ModulePageBase):
         self.main_layout.addLayout(action_line)
         self.main_layout.addWidget(self.BodyLabel_enter_tip)
         self.finalize()
+
+    @staticmethod
+    def build_path_tutorial_payload(is_non_chinese_ui: bool) -> dict[str, str]:
+        title = "How to find the game path" if is_non_chinese_ui else "如何查找对应游戏路径"
+        content = (
+            'No matter which server/channel you play, first select your server in Settings.\n'
+            'For global server, choose a path like "E:\\SteamLibrary\\steamapps\\common\\SNOWBREAK".\n'
+            'For CN/Bilibili server, open the Snowbreak launcher and find launcher settings.\n'
+            'Then choose the game installation path shown there.'
+            if is_non_chinese_ui
+            else
+            '不管你是哪个渠道服的玩家，第一步都应该先去设置里选服\n国际服选完服之后选择类似"E:\\SteamLibrary\\steamapps\\common\\SNOWBREAK"的路径\n官服和b服的玩家打开尘白启动器，新版或者旧版启动器都找到启动器里对应的设置\n在下面的路径选择中找到并选择刚才你看到的路径'
+        )
+        image = str(PROJECT_ROOT / "app" / "features" / "assets" / "enter_game" / "path_tutorial.png")
+        return {
+            "title": title,
+            "content": content,
+            "image": image,
+        }

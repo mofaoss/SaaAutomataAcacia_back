@@ -536,12 +536,14 @@ class PeriodicTasksPage(QFrame, BaseInterface):
         reset_codes_button = self.ui.require_module_widget("PushButton_reset_codes")
         import_codes_text_edit = self.ui.require_module_widget("TextEdit_import_codes")
         auto_open_checkbox = self.ui.require_module_widget("CheckBox_open_game_directly")
+        tutorial_page = self.ui.get_periodic_page("task_login")
 
         self.ui.PushButton_start.clicked.connect(self.on_start_button_click)
         tutorial_button.clicked.connect(
             lambda: self.enter_game_actions.show_path_tutorial(
                 host=self,
                 anchor_widget=tutorial_button,
+                tutorial_page=tutorial_page,
             ))
         self.ui.PushButton_select_all.clicked.connect(
             lambda: select_all(self.ui.SimpleCardWidget_option))

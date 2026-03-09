@@ -15,6 +15,7 @@ from qfluentwidgets import ScrollArea, CardWidget
 
 from app.framework.infra.config.app_config import config, is_non_chinese_ui_language
 from app.framework.infra.events.signal_bus import signalBus
+from app.framework.infra.runtime.paths import PROJECT_ROOT
 from app.framework.infra.update.updater import get_local_version
 from app.framework.ui.shared.style_sheet import StyleSheet
 from .periodic_base import BaseInterface
@@ -38,7 +39,7 @@ def _resolve_display_image_dir() -> Path:
     if nuitka_onefile_temp:
         candidates.append(Path(nuitka_onefile_temp))
 
-    candidates.append(Path(__file__).resolve().parents[4])
+    candidates.append(Path(getattr(sys, "_MEIPASS", PROJECT_ROOT)))
 
     if getattr(sys, "frozen", False):
         try:
@@ -60,9 +61,9 @@ def _resolve_display_image_dir() -> Path:
             continue
         seen.add(key)
 
-        framework_dir = base / "app" / "framework" / "ui" / "resources" / "display"
-        if framework_dir.exists() and framework_dir.is_dir():
-            return framework_dir
+        root_resources_dir = base / "resources" / "display"
+        if root_resources_dir.exists() and root_resources_dir.is_dir():
+            return root_resources_dir
 
         framework_legacy_dir = base / "app" / "framework" / "ui" / "resources" / "images" / "display"
         if framework_legacy_dir.exists() and framework_legacy_dir.is_dir():
@@ -72,7 +73,7 @@ def _resolve_display_image_dir() -> Path:
         if legacy_dir.exists() and legacy_dir.is_dir():
             return legacy_dir
 
-    return Path("app") / "framework" / "ui" / "resources" / "display"
+    return PROJECT_ROOT / "resources" / "display"
 
 
 class BannerWidget(QWidget):

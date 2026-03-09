@@ -14,8 +14,3 @@ class IGameEnvironment(ABC):
     @abstractmethod
     def launch(self, logger=None) -> dict[str, Any]:
         raise NotImplementedError
-
-    @abstractmethod
-    def get_tutorial_text(self) -> tuple[str, str]:
-        raise NotImplementedError
-

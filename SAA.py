@@ -11,7 +11,7 @@ from app.framework.infra.config.app_config import config, resolve_configured_loc
 from app.framework.infra.runtime.paths import PROJECT_ROOT, ensure_runtime_dirs
 
 
-IMAGES_DIR = Path(getattr(sys, "_MEIPASS", PROJECT_ROOT)) / "app" / "framework" / "ui" / "resources" / "images"
+LOGO_ASSETS_DIR = Path(getattr(sys, "_MEIPASS", PROJECT_ROOT)) / "resources" / "logo"
 
 
 class EarlySplash(QWidget):
@@ -50,8 +50,8 @@ class EarlySplash(QWidget):
 
     def _setup_media(self):
         gif_candidates = [
-            IMAGES_DIR / 'logo_loading.gif',
-            IMAGES_DIR / 'loading.gif',
+            LOGO_ASSETS_DIR / 'logo_loading.gif',
+            LOGO_ASSETS_DIR / 'loading.gif',
         ]
 
         gif_path = next((str(path) for path in gif_candidates if path.exists()), None)
@@ -75,7 +75,7 @@ class EarlySplash(QWidget):
                 return
 
         logo_candidates = [
-            IMAGES_DIR / 'logo.png',
+            LOGO_ASSETS_DIR / 'logo.png',
         ]
         logo_path = next((str(path) for path in logo_candidates if path.exists()), None)
         if logo_path:
@@ -180,7 +180,7 @@ class StartupController(QObject):
         locale = resolve_configured_locale(config.get(config.language))
         self.translator = self.FluentTranslator(locale)
         self.galleryTranslator = QTranslator()
-        self.galleryTranslator.load(locale, "app", ".", ":/app/framework/ui/resources/i18n")
+        self.galleryTranslator.load(locale, "app", ".", ":/resources/i18n")
 
         self.app.installTranslator(self.translator)
         self.app.installTranslator(self.galleryTranslator)

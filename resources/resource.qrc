@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/app/framework/ui/resources/">
+    <qresource prefix="/resources/">
         <file>icons/SettingsFilled_white.svg</file>
         <file>icons/SettingsFilled_black.svg</file>
         <file>icons/Settings_white.svg</file>

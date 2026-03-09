@@ -468,7 +468,7 @@ class PeriodicRuntimeActions:
 
     @staticmethod
     def show_tray_message(host, title, content):
-        tray_icon = QIcon(":/app/framework/ui/resources/logo/logo.png")
+        tray_icon = QIcon(":/resources/logo/logo.png")
         main_win = host.window()
         if hasattr(main_win, "tray_icon") and main_win.tray_icon:
             main_win.tray_icon.showMessage(title, content, tray_icon, 1000)

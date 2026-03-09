@@ -86,7 +86,7 @@ class AboutHeaderWidget(QWidget, BaseInterface):
 
         self.logoLabel = QLabel(self)
         self.logoLabel.setFixedSize(80, 80)
-        pixmap = QPixmap(":/app/framework/ui/resources/logo/sun.png")
+        pixmap = QPixmap(":/resources/logo/sun.png")
         if not pixmap.isNull():
             self.logoLabel.setPixmap(pixmap.scaled(80, 80, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
         else:

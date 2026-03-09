@@ -36,8 +36,8 @@ def get_app_root():
 def get_binary_path(bin_name):
     """专门用于获取 binary 目录下工具的路径"""
     root = get_app_root()
-    # 无论打包还是开发，确保路径指向 app/framework/ui/resources/binary/xxx.exe
-    path = os.path.join(root, "app", "presentation", "resources", "binary", bin_name)
+    # 无论打包还是开发，确保路径指向 resources/binary/xxx.exe
+    path = os.path.join(root, "resources", "binary", bin_name)
     return path
 
 

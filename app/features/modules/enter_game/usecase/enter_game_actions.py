@@ -25,19 +25,6 @@ class SnowbreakGameEnvironment(IGameEnvironment):
     def launch(self, logger=None) -> dict[str, Any]:
         return launch_game_with_guard(logger=logger)
 
-    def get_tutorial_text(self) -> tuple[str, str]:
-        title = "How to find the game path" if self._is_non_chinese_ui else "如何查找对应游戏路径"
-        content = (
-            'No matter which server/channel you play, first select your server in Settings.\n'
-            'For global server, choose a path like "E:\\SteamLibrary\\steamapps\\common\\SNOWBREAK".\n'
-            'For CN/Bilibili server, open the Snowbreak launcher and find launcher settings.\n'
-            'Then choose the game installation path shown there.'
-            if self._is_non_chinese_ui
-            else
-            '不管你是哪个渠道服的玩家，第一步都应该先去设置里选服\n国际服选完服之后选择类似"E:\\SteamLibrary\\steamapps\\common\\SNOWBREAK"的路径\n官服和b服的玩家打开尘白启动器，新版或者旧版启动器都找到启动器里对应的设置\n在下面的路径选择中找到并选择刚才你看到的路径'
-        )
-        return title, content
-
 
 class EnterGameActions:
     """Enter-game module actions hosted by periodic page."""
@@ -49,12 +36,21 @@ class EnterGameActions:
         """Compatibility wrapper for legacy callers."""
         return self.game_environment.launch(logger=logger)
 
-    def show_path_tutorial(self, host, anchor_widget):
-        tutorial_title, tutorial_content = self.game_environment.get_tutorial_text()
+    def show_path_tutorial(self, *, host, anchor_widget, tutorial_page=None):
+        payload = None
+        if tutorial_page is not None and hasattr(tutorial_page, "build_path_tutorial_payload"):
+            payload = tutorial_page.build_path_tutorial_payload(getattr(host, "_is_non_chinese_ui", False))
+        if not payload:
+            from app.features.modules.enter_game.ui.enter_game_periodic_page import EnterGamePage
+
+            payload = EnterGamePage.build_path_tutorial_payload(
+                getattr(host, "_is_non_chinese_ui", False)
+            )
+
         view = FlyoutView(
-            title=tutorial_title,
-            content=tutorial_content,
-            image="app/features/assets/enter_game/path_tutorial.png",
+            title=payload.get("title", ""),
+            content=payload.get("content", ""),
+            image=payload.get("image", ""),
             isClosable=True,
         )
         view.widgetLayout.insertSpacing(1, 5)

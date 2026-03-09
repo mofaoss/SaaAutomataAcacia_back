@@ -36,7 +36,7 @@ from app.framework.infra.update.updater import (
     get_local_version,
 )
 from app.framework.ui.widgets.custom_message_box import CustomMessageBox
-from app.framework.ui.resources import resource_qrc  # don't delete
+from resources import resource_qrc  # don't delete
 
 
 logger = logging.getLogger(__name__)
@@ -100,6 +100,7 @@ class MainWindow(FluentWindow, BaseInterface):
             'setting': False,
         }
         self._shared_task_sidebar_cards = None
+        self._task_sidebar_owner = None
 
         # 【新增】全局任务运行状态
         self.global_is_running = False
@@ -116,6 +117,7 @@ class MainWindow(FluentWindow, BaseInterface):
 
         self._configure_module_registry()
         self.initWindow()
+        self._disable_main_stacked_animation()
         self.initSystemTray()  # 初始化系统托盘
         setup_global_exception_hook()
 
@@ -128,15 +130,15 @@ class MainWindow(FluentWindow, BaseInterface):
 
     @staticmethod
     def _resolve_app_icon() -> QIcon:
-        qrc_path = ":/app/framework/ui/resources/logo/logo.png"
+        qrc_path = ":/resources/logo/logo.png"
         icon = QIcon(qrc_path)
         if not icon.isNull():
             return icon
 
         base_dir = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[3]))
         file_candidates = [
-            base_dir / "app" / "framework" / "ui" / "resources" / "logo" / "logo.png",
-            base_dir / "app" / "framework" / "ui" / "resources" / "logo" / "logo.ico",
+            base_dir / "resources" / "logo" / "logo.png",
+            base_dir / "resources" / "logo" / "logo.ico",
         ]
         for candidate in file_candidates:
             if candidate.exists():
@@ -353,6 +355,17 @@ class MainWindow(FluentWindow, BaseInterface):
         self._localize_widget_if_needed(self.additionalInterface)
         self._sync_task_workspace_sidebar()
 
+    def _disable_main_stacked_animation(self):
+        stacked = getattr(self, "stackedWidget", None)
+        if stacked is None:
+            return
+        set_ani_enabled = getattr(stacked, "setAnimationEnabled", None)
+        if callable(set_ani_enabled):
+            try:
+                set_ani_enabled(False)
+            except Exception:
+                pass
+
     def _sync_task_workspace_sidebar(self):
         if self.homeInterface is None or self.additionalInterface is None:
             return
@@ -360,22 +373,30 @@ class MainWindow(FluentWindow, BaseInterface):
         current_widget = self.stackedWidget.currentWidget()
 
         if current_widget == self.additionalInterface:
+            if self._task_sidebar_owner == "additional":
+                return
             cards = self.homeInterface.detach_shared_sidebar_cards()
             self._shared_task_sidebar_cards = cards
             self.additionalInterface.set_shared_sidebar_cards(
                 cards,
                 shared_log_browser=self.homeInterface.textBrowser_log,
             )
+            self._task_sidebar_owner = "additional"
             return
 
         if current_widget == self.homeInterface:
+            if self._task_sidebar_owner == "home":
+                return
             cards = self.additionalInterface.release_shared_sidebar_cards(
                 shared_log_browser=self.homeInterface.textBrowser_log
             )
             if not cards:
                 cards = self._shared_task_sidebar_cards
             self.homeInterface.attach_shared_sidebar_cards(cards)
+            self._task_sidebar_owner = "home"
             return
+
+        self._task_sidebar_owner = None
 
     def _create_help_interface(self):
         from .help import Help

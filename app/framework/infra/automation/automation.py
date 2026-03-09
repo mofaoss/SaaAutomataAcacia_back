@@ -92,6 +92,19 @@ class Automation:
             self.logger.error(message)
             self._last_error_log[key] = now
 
+    @staticmethod
+    def _template_log_name(template: str) -> str:
+        if not isinstance(template, str):
+            return str(template)
+        normalized = template.replace("\\", "/")
+        for prefix in (
+            "app/features/assets/",
+            "app/features/modules/",
+            "resources/",
+        ):
+            normalized = normalized.replace(prefix, "")
+        return normalized
+
     def _init_input(self):
         self.input_handler = Input(self.hwnd, self.logger)
         # 鼠标部分
@@ -215,17 +228,20 @@ class Automation:
                 if conf >= threshold or threshold is None:
                     top_left, bottom_right = self.calculate_positions((x, y, w, h))
                     if is_log:
-                        self.logger.debug(ui_text(f"目标图片：{template.replace('app/framework/ui/resources/images/', '')} 相似度：{conf:.2f}",
-                                                  f"Target image: {template.replace('app/framework/ui/resources/images/', '')} Similarity: {conf:.2f}"))
+                        template_name = self._template_log_name(template)
+                        self.logger.debug(ui_text(f"目标图片：{template_name} 相似度：{conf:.2f}",
+                                                  f"Target image: {template_name} Similarity: {conf:.2f}"))
                     return top_left, bottom_right, conf
                 else:
                     if is_log:
-                        self.logger.debug(ui_text(f"目标图片：{template.replace('app/framework/ui/resources/images/', '')} 相似度：{conf:.2f}，低于{threshold}",
-                                                  f"Target image: {template.replace('app/framework/ui/resources/images/', '')} Similarity: {conf:.2f}, below {threshold}"))
+                        template_name = self._template_log_name(template)
+                        self.logger.debug(ui_text(f"目标图片：{template_name} 相似度：{conf:.2f}，低于{threshold}",
+                                                  f"Target image: {template_name} Similarity: {conf:.2f}, below {threshold}"))
             else:
                 if is_log:
-                    self.logger.debug(ui_text(f"目标图片：{template.replace('app/framework/ui/resources/images/', '')} 未找到匹配项",
-                                              f"Target image: {template.replace('app/framework/ui/resources/images/', '')} No match found"))
+                    template_name = self._template_log_name(template)
+                    self.logger.debug(ui_text(f"目标图片：{template_name} 未找到匹配项",
+                                              f"Target image: {template_name} No match found"))
             if is_show:
                 for idx, (x, y, w, h, conf) in enumerate(matches):
                     cv2.rectangle(temp,
@@ -619,13 +635,14 @@ class Automation:
                 temp = ImageUtils.extract_letters(temp, letter, thr)
             matches = matcher.match(template, temp)
             if is_log:
+                template_name = self._template_log_name(template)
                 if len(matches) > 0:
                     for i in range(len(matches)):
                         x, y, w, h, conf = matches[i]
-                        self.logger.debug(ui_text(f"目标图片：{template.replace('app/framework/ui/resources/images/', '')} 相似度：{conf:.2f}",
-                                                  f"Target image: {template.replace('app/framework/ui/resources/images/', '')} Similarity: {conf:.2f}"))
-                self.logger.debug(ui_text(f"图片{template.replace('app/framework/ui/resources/images/', '')} 个数为 {len(matches)}",
-                                          f"Count of image {template.replace('app/framework/ui/resources/images/', '')} is {len(matches)}"))
+                        self.logger.debug(ui_text(f"目标图片：{template_name} 相似度：{conf:.2f}",
+                                                  f"Target image: {template_name} Similarity: {conf:.2f}"))
+                self.logger.debug(ui_text(f"图片{template_name} 个数为 {len(matches)}",
+                                          f"Count of image {template_name} is {len(matches)}"))
             if is_show:
                 for idx, (x, y, w, h, conf) in enumerate(matches):
                     cv2.rectangle(temp,
