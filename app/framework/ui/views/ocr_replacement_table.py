@@ -9,7 +9,7 @@ from qfluentwidgets import InfoBar, InfoBarPosition
 from app.framework.infra.config.app_config import is_non_chinese_ui_language
 from app.framework.ui.shared.style_sheet import StyleSheet
 from app.framework.infra.runtime.paths import APPDATA_DIR, ensure_runtime_dirs
-from .base_interface import BaseInterface
+from .periodic_base import BaseInterface
 from app.framework.ui.views.ocr_replacement_table_view import OcrReplacementTableView
 
 

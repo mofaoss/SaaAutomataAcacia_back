@@ -4,7 +4,7 @@ from qfluentwidgets import InfoBar
 from app.framework.infra.config.app_config import is_non_chinese_ui_language
 from app.features.modules.trigger.usecase.auto_f_usecase import AutoFModule
 from app.features.modules.trigger.usecase.nita_auto_e_usecase import NitaAutoEModule
-from app.framework.ui.views.base_interface import BaseInterface
+from app.framework.ui.views.periodic_base import BaseInterface
 from app.features.modules.fishing.ui.subtask import SubTask
 from .trigger_view import TriggerView
 

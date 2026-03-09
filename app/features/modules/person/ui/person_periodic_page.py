@@ -2,12 +2,12 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout
 from qfluentwidgets import BodyLabel, CheckBox, LineEdit, StrongBodyLabel
 
-from app.framework.ui.views.periodic_page_base import PeriodicPageBase
+from app.framework.ui.views.periodic_base import ModulePageBase
 
 
-class PersonPage(PeriodicPageBase):
+class PersonPage(ModulePageBase):
     def __init__(self, parent=None):
-        super().__init__("page_4", parent=parent)
+        super().__init__("page_4", parent=parent, host_context="periodic", use_default_layout=True)
 
         self.StrongBodyLabel_3 = StrongBodyLabel(self)
         self.StrongBodyLabel_3.setObjectName("StrongBodyLabel_3")
@@ -55,4 +55,3 @@ class PersonPage(PeriodicPageBase):
         line.addWidget(label, 1)
         line.addWidget(edit, 2)
         return line
-

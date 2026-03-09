@@ -14,7 +14,7 @@ from app.features.modules.trigger.usecase.auto_f_usecase import AutoFModule
 from app.features.modules.trigger.usecase.nita_auto_e_usecase import NitaAutoEModule
 
 from app.framework.ui.views.on_demand_tasks_view import OnDemandTasksView
-from .base_interface import BaseInterface
+from .periodic_base import BaseInterface
 from app.features.modules.fishing.ui.subtask import SubTask
 from app.framework.infra.logging.gui_logger import setup_ui_logger
 from app.framework.core.event_bus.global_task_bus import global_task_bus
@@ -83,6 +83,8 @@ class OnDemandTasksPage(QFrame, BaseInterface):
     def _mount_module_pages(self):
         for spec in self.module_specs:
             page = spec.ui_factory(self, HostContext.ON_DEMAND)
+            if hasattr(page, "bind_host_context"):
+                page.bind_host_context(HostContext.ON_DEMAND)
             page_name = page.objectName()
             self.module_pages[spec.id] = page
 

@@ -8,12 +8,12 @@ from qfluentwidgets import (
     TextEdit,
 )
 
-from app.framework.ui.views.periodic_page_base import PeriodicPageBase
+from app.framework.ui.views.periodic_base import ModulePageBase
 
 
-class CollectSuppliesPage(PeriodicPageBase):
+class CollectSuppliesPage(ModulePageBase):
     def __init__(self, parent=None):
-        super().__init__("page_3", parent=parent)
+        super().__init__("page_3", parent=parent, host_context="periodic", use_default_layout=True)
 
         self.CheckBox_mail = CheckBox(self)
         self.CheckBox_mail.setObjectName("CheckBox_mail")
@@ -51,4 +51,3 @@ class CollectSuppliesPage(PeriodicPageBase):
         self.main_layout.addWidget(self.TextEdit_import_codes)
         self.main_layout.addWidget(self.BodyLabel_collect_supplies)
         self.finalize()
-

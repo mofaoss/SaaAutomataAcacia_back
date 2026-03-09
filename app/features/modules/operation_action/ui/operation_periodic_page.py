@@ -2,12 +2,12 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout
 from qfluentwidgets import BodyLabel, ComboBox, SpinBox
 
-from app.framework.ui.views.periodic_page_base import PeriodicPageBase
+from app.framework.ui.views.periodic_base import ModulePageBase
 
 
-class OperationPage(PeriodicPageBase):
+class OperationPage(ModulePageBase):
     def __init__(self, parent=None):
-        super().__init__("page_operation", parent=parent)
+        super().__init__("page_operation", parent=parent, host_context="periodic", use_default_layout=True)
 
         self.BodyLabel_7 = BodyLabel(self)
         self.BodyLabel_7.setObjectName("BodyLabel_7")
@@ -36,4 +36,3 @@ class OperationPage(PeriodicPageBase):
         line.addWidget(label, 1)
         line.addWidget(edit, 2)
         return line
-

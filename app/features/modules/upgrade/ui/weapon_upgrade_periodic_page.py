@@ -1,12 +1,12 @@
 from PySide6.QtCore import Qt
 from qfluentwidgets import BodyLabel
 
-from app.framework.ui.views.periodic_page_base import PeriodicPageBase
+from app.framework.ui.views.periodic_base import ModulePageBase
 
 
-class WeaponUpgradePage(PeriodicPageBase):
+class WeaponUpgradePage(ModulePageBase):
     def __init__(self, parent=None):
-        super().__init__("page_weapon", parent=parent)
+        super().__init__("page_weapon", parent=parent, host_context="periodic", use_default_layout=True)
 
         self.BodyLabel_weapon_tip = BodyLabel(self)
         self.BodyLabel_weapon_tip.setObjectName("BodyLabel_weapon_tip")
@@ -14,4 +14,3 @@ class WeaponUpgradePage(PeriodicPageBase):
         self.BodyLabel_weapon_tip.setWordWrap(True)
         self.main_layout.addWidget(self.BodyLabel_weapon_tip)
         self.finalize()
-

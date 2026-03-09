@@ -1,12 +1,12 @@
 from PySide6.QtCore import Qt
 from qfluentwidgets import BodyLabel, CheckBox
 
-from app.framework.ui.views.periodic_page_base import PeriodicPageBase
+from app.framework.ui.views.periodic_base import ModulePageBase
 
 
-class ShardExchangePage(PeriodicPageBase):
+class ShardExchangePage(ModulePageBase):
     def __init__(self, parent=None):
-        super().__init__("page_shard_exchange", parent=parent)
+        super().__init__("page_shard_exchange", parent=parent, host_context="periodic", use_default_layout=True)
 
         self.CheckBox_receive_shards = CheckBox(self)
         self.CheckBox_receive_shards.setObjectName("enable_receive_shards")
@@ -27,4 +27,3 @@ class ShardExchangePage(PeriodicPageBase):
         self.main_layout.addWidget(self.CheckBox_recycle_shards)
         self.main_layout.addWidget(self.BodyLabel_shard_tip)
         self.finalize()
-

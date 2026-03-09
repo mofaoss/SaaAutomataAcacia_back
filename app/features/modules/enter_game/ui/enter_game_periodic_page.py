@@ -9,12 +9,12 @@ from qfluentwidgets import (
     StrongBodyLabel,
 )
 
-from app.framework.ui.views.periodic_page_base import PeriodicPageBase
+from app.framework.ui.views.periodic_base import ModulePageBase
 
 
-class EnterGamePage(PeriodicPageBase):
+class EnterGamePage(ModulePageBase):
     def __init__(self, parent=None):
-        super().__init__("page_5", parent=parent)
+        super().__init__("page_5", parent=parent, host_context="periodic", use_default_layout=True)
 
         top_line = QHBoxLayout()
         self.StrongBodyLabel_4 = StrongBodyLabel(self)
@@ -46,4 +46,3 @@ class EnterGamePage(PeriodicPageBase):
         self.main_layout.addLayout(action_line)
         self.main_layout.addWidget(self.BodyLabel_enter_tip)
         self.finalize()
-

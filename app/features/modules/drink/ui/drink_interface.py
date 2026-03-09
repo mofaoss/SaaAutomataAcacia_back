@@ -2,9 +2,9 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QTextBrowser
 from qfluentwidgets import (BodyLabel, CheckBox, ComboBox, PushButton, SimpleCardWidget, SpinBox, TitleLabel)
 from app.framework.infra.config.app_config import config
-from app.framework.ui.views.on_demand_task_base import OnDemandTaskBase
+from app.framework.ui.views.periodic_base import ModulePageBase
 
-class DrinkInterface(OnDemandTaskBase):
+class DrinkInterface(ModulePageBase):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("page_card")

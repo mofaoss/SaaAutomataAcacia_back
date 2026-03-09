@@ -30,7 +30,7 @@ from app.framework.application.startup.interface_plan import (
     build_initial_interface_keys,
 )
 from app.features.modules.enter_game.usecase.enter_game_usecase import launch_game_with_guard
-from .base_interface import BaseInterface
+from .periodic_base import BaseInterface
 from app.features.utils.updater import get_local_version, get_best_update_candidate
 from app.framework.ui.widgets.custom_message_box import CustomMessageBox
 from app.framework.ui.resources import resource_qrc  # don't delete

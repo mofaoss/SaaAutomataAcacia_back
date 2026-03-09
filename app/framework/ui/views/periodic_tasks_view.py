@@ -809,6 +809,22 @@ class PeriodicTasksView(ScrollArea):
             self.PopUpAniStackedWidget)
         self.page_close_game = CloseGamePage(self.PopUpAniStackedWidget)
 
+        for page in [
+            self.page_enter,
+            self.page_collect,
+            self.page_shop,
+            self.page_use_power,
+            self.page_person,
+            self.page_chasm,
+            self.page_reward,
+            self.page_operation,
+            self.page_weapon,
+            self.page_shard_exchange,
+            self.page_close_game,
+        ]:
+            if hasattr(page, "bind_host_context"):
+                page.bind_host_context("periodic")
+
         self.PopUpAniStackedWidget.addWidget(self.page_enter)
         self.PopUpAniStackedWidget.addWidget(self.page_collect)
         self.PopUpAniStackedWidget.addWidget(self.page_shop)

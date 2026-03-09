@@ -34,6 +34,7 @@ from app.framework.application.tasks.daily_policy import PRIMARY_TASK_ID
 from app.framework.core.event_bus.global_task_bus import global_task_bus
 from app.framework.application.tasks.task_registry import DAILY_TASK_REGISTRY
 from app.framework.application.periodic.periodic_dispatcher import PeriodicDispatcher
+from app.framework.application.scheduling.single_task_toggle import SingleTaskToggle
 from app.framework.application.periodic.periodic_orchestration import (
     build_active_schedule_lines,
     collect_checked_task_ids_for_rule,
@@ -45,7 +46,7 @@ from app.framework.application.periodic.periodic_orchestration import (
 
 # 导入视图与基类
 from app.framework.ui.views.periodic_tasks_view import PeriodicTasksView, TaskItemWidget
-from .base_interface import BaseInterface
+from .periodic_base import BaseInterface
 
 logger = logging.getLogger(__name__)
 
@@ -136,6 +137,7 @@ class PeriodicTasksPage(QFrame, BaseInterface):
 
         self.logger = setup_ui_logger("logger_daily", self.ui.textBrowser_log)
         self.periodic_dispatcher = PeriodicDispatcher(self.logger, self._ui_text)
+        self.single_task_toggle = SingleTaskToggle()
 
         self.check_game_window_timer = QTimer()
         self.check_game_window_timer.timeout.connect(self.check_game_open)
@@ -748,7 +750,7 @@ class PeriodicTasksPage(QFrame, BaseInterface):
             task_coordinator.publish_state(False, "", "", "daily")
 
     def _on_task_play_clicked(self, task_id: str):
-        if self.is_running or self.is_launch_pending:
+        def _stop_local():
             self.logger.info(
                 self._ui_text("已手动中止当前任务", "Task manually stopped"))
             if self.is_launch_pending:
@@ -758,18 +760,28 @@ class PeriodicTasksPage(QFrame, BaseInterface):
             self.periodic_controller.stop_running_thread(
                 reason=self._ui_text('用户点击了手动终止按钮', 'User clicked stop button')
             )
-        else:
-            meta = TASK_REGISTRY.get(task_id, {})
-            task_name = meta.get("en_name", task_id) if getattr(
+
+        def _start_local(selected_task_id: str):
+            meta = TASK_REGISTRY.get(selected_task_id, {})
+            task_name = meta.get("en_name", selected_task_id) if getattr(
                 self, '_is_non_chinese_ui', False) else meta.get(
-                    "zh_name", task_id)
+                    "zh_name", selected_task_id)
             self.logger.info(
                 self._ui_text(f"开始单独重跑任务: {task_name}",
                               f"Force running task: {task_name}"))
 
-            tasks_to_run = [task_id]
+            tasks_to_run = [selected_task_id]
             self._is_running_solo_flag = True
             self._initiate_task_run(tasks_to_run)
+
+        self.single_task_toggle.toggle(
+            task_id,
+            is_global_running=bool(getattr(self, "is_global_running", False)),
+            request_global_stop=task_coordinator.request_stop,
+            is_local_running=bool(self.is_running or self.is_launch_pending),
+            stop_local=_stop_local,
+            start_local=_start_local,
+        )
 
     def _on_task_play_from_here_clicked(self, start_task_id: str):
         if self.is_running or self.is_launch_pending:

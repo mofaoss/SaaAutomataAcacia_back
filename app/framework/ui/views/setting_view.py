@@ -22,7 +22,7 @@ from app.framework.infra.config.app_config import config, isWin11, is_non_chines
 from app.framework.infra.config.setting import QQ, REPO_URL
 from app.framework.infra.events.signal_bus import signalBus
 from app.framework.ui.shared.style_sheet import StyleSheet
-from .base_interface import BaseInterface
+from .periodic_base import BaseInterface
 from app.features.utils.updater import (
     get_local_version,
     resolve_batch_dir,

@@ -16,7 +16,7 @@ from qfluentwidgets import ScrollArea, CardWidget
 from app.framework.infra.config.app_config import config, is_non_chinese_ui_language
 from app.framework.infra.events.signal_bus import signalBus
 from app.framework.ui.shared.style_sheet import StyleSheet
-from .base_interface import BaseInterface
+from .periodic_base import BaseInterface
 from app.features.utils.updater import get_local_version
 
 from app.framework.ui.widgets.samplecardview import SampleCardView

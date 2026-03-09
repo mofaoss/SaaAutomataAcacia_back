@@ -1,12 +1,12 @@
 from PySide6.QtWidgets import QHBoxLayout
 from qfluentwidgets import BodyLabel, CheckBox, ComboBox, StrongBodyLabel
 
-from app.framework.ui.views.periodic_page_base import PeriodicPageBase
+from app.framework.ui.views.periodic_base import ModulePageBase
 
 
-class UsePowerPage(PeriodicPageBase):
+class UsePowerPage(ModulePageBase):
     def __init__(self, parent=None):
-        super().__init__("page_2", parent=parent)
+        super().__init__("page_2", parent=parent, host_context="periodic", use_default_layout=True)
 
         first_line = QHBoxLayout()
         self.CheckBox_is_use_power = CheckBox(self)
@@ -28,4 +28,3 @@ class UsePowerPage(PeriodicPageBase):
         self.main_layout.addWidget(self.StrongBodyLabel_2)
         self.main_layout.addWidget(self.ComboBox_power_usage)
         self.finalize()
-

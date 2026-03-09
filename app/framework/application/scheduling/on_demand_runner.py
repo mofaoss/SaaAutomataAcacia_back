@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable, Optional
 
+from app.framework.application.scheduling.single_task_toggle import SingleTaskToggle
+
 
 @dataclass
 class OnDemandState:
@@ -15,6 +17,7 @@ class OnDemandRunner:
 
     def __init__(self):
         self.state = OnDemandState()
+        self._toggle = SingleTaskToggle()
 
     def toggle(
         self,
@@ -27,25 +30,27 @@ class OnDemandRunner:
         build_thread: Callable[[type, object], object],
         on_thread_state_changed: Callable[[bool], None],
     ):
-        if is_global_running:
-            request_global_stop()
-            return
+        def _start_local(selected_task_id: str):
+            module_class = get_module_class(selected_task_id)
+            if module_class is None:
+                return
 
-        if self.state.current_task_id is not None:
-            self.stop_current()
-            return
+            specific_logger = get_logger(selected_task_id)
+            thread = build_thread(module_class, specific_logger)
+            thread.is_running.connect(on_thread_state_changed)
+            thread.start()
 
-        module_class = get_module_class(task_id)
-        if module_class is None:
-            return
+            self.state.current_task_id = selected_task_id
+            self.state.current_thread = thread
 
-        specific_logger = get_logger(task_id)
-        thread = build_thread(module_class, specific_logger)
-        thread.is_running.connect(on_thread_state_changed)
-        thread.start()
-
-        self.state.current_task_id = task_id
-        self.state.current_thread = thread
+        return self._toggle.toggle(
+            task_id,
+            is_global_running=is_global_running,
+            request_global_stop=request_global_stop,
+            is_local_running=self.state.current_task_id is not None,
+            stop_local=self.stop_current,
+            start_local=_start_local,
+        )
 
     def stop_current(self):
         thread = self.state.current_thread
