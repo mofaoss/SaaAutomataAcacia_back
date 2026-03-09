@@ -6,6 +6,7 @@
 /temp/
 /fish/
 /runtime/
+/app/runtime/
 /log/
 /crash.log
 /main.exe

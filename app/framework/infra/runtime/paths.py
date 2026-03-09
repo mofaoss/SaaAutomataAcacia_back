@@ -12,9 +12,9 @@ def _get_project_root():
         # 打包后，sys.executable 指向 exe 文件，runtime 目录应在 exe 同级
         return Path(sys.executable).parent
     else:
-        # 开发环境：当前文件在 app/infrastructure/runtime/paths.py
-        # 需要向上回退 3 层到项目根目录 (app/infrastructure/runtime -> app/infrastructure -> app -> root)
-        return Path(__file__).resolve().parents[3]
+        # 开发环境：当前文件在 app/framework/infra/runtime/paths.py
+        # 需要向上回退 4 层到项目根目录
+        return Path(__file__).resolve().parents[4]
 
 
 PROJECT_ROOT = _get_project_root()

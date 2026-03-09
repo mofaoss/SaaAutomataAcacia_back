@@ -38,7 +38,7 @@ def _resolve_display_image_dir() -> Path:
     if nuitka_onefile_temp:
         candidates.append(Path(nuitka_onefile_temp))
 
-    candidates.append(Path(__file__).resolve().parents[2])
+    candidates.append(Path(__file__).resolve().parents[4])
 
     if getattr(sys, "frozen", False):
         try:
@@ -60,11 +60,15 @@ def _resolve_display_image_dir() -> Path:
             continue
         seen.add(key)
 
-        display_dir = base / "app" / "presentation" / "resources" / "images" / "display"
-        if display_dir.exists() and display_dir.is_dir():
-            return display_dir
+        framework_dir = base / "app" / "framework" / "ui" / "resources" / "images" / "display"
+        if framework_dir.exists() and framework_dir.is_dir():
+            return framework_dir
 
-    return Path("app") / "presentation" / "resources" / "images" / "display"
+        legacy_dir = base / "app" / "presentation" / "resources" / "images" / "display"
+        if legacy_dir.exists() and legacy_dir.is_dir():
+            return legacy_dir
+
+    return Path("app") / "framework" / "ui" / "resources" / "images" / "display"
 
 
 class BannerWidget(QWidget):

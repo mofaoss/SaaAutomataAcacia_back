@@ -118,6 +118,7 @@ class StartupController(QObject):
         self.translator = None
         self.galleryTranslator = None
         self.importWorker = None
+        self.app.aboutToQuit.connect(self._cleanup_threads)
 
         self._tasks = [
             self._install_translators,
@@ -129,6 +130,7 @@ class StartupController(QObject):
 
     def start(self):
         self.importWorker = RuntimeImportWorker()
+        self.importWorker.setObjectName("startup_import_worker")
         self.importWorker.ready.connect(self._on_import_ready)
         self.importWorker.failed.connect(self._on_import_failed)
         self.importWorker.start()
@@ -152,11 +154,27 @@ class StartupController(QObject):
         self.localize_widget_tree_for_traditional = imported['localize_widget_tree_for_traditional']
         from app.framework.ui.views.main_window import MainWindow
         self.MainWindow = MainWindow
+        if self.importWorker is not None and not self.importWorker.isRunning():
+            self.importWorker.deleteLater()
+            self.importWorker = None
         QTimer.singleShot(0, self._run_next_task)
 
     def _on_import_failed(self, message: str):
         self.splash.close_with_cleanup()
+        if self.importWorker is not None and not self.importWorker.isRunning():
+            self.importWorker.deleteLater()
+            self.importWorker = None
         raise RuntimeError(message)
+
+    def _cleanup_threads(self):
+        worker = self.importWorker
+        if worker is None:
+            return
+        if worker.isRunning():
+            worker.requestInterruption()
+            worker.wait(2000)
+        worker.deleteLater()
+        self.importWorker = None
 
     def _install_translators(self):
         locale = resolve_configured_locale(config.get(config.language))
@@ -187,9 +205,13 @@ class RuntimeImportWorker(QThread):
 
     def run(self):
         try:
+            if self.isInterruptionRequested():
+                return
             from qfluentwidgets import FluentTranslator
             from app.framework.ui.shared.localizer import patch_infobar_for_traditional, localize_widget_tree_for_traditional
 
+            if self.isInterruptionRequested():
+                return
             self.ready.emit({
                 'FluentTranslator': FluentTranslator,
                 'patch_infobar_for_traditional': patch_infobar_for_traditional,
