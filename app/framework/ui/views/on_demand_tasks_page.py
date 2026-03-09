@@ -1,7 +1,7 @@
 import re
 from functools import partial
 
-from PySide6.QtWidgets import QFrame, QWidget, QVBoxLayout
+from PySide6.QtWidgets import QFrame, QSizePolicy, QWidget, QVBoxLayout
 from rapidfuzz import process
 from qfluentwidgets import SpinBox, CheckBox, ComboBox, LineEdit, Slider, InfoBar
 
@@ -126,6 +126,7 @@ class OnDemandTasksPage(QFrame, BaseInterface):
             local_log_card = getattr(page, "SimpleCardWidget_log", None)
             if local_log_card is not None:
                 local_log_card.setVisible(False)
+            self._collapse_module_local_sidebar(page, local_log_card)
 
             if not spec.passive and spec.module_class is not None:
                 self._page_name_to_task_id[page_name] = spec.id
@@ -149,6 +150,46 @@ class OnDemandTasksPage(QFrame, BaseInterface):
                 "start_button_attr": bindings.start_button_attr,
                 "card_widget_attr": bindings.card_widget_attr,
             }
+
+    def _collapse_module_local_sidebar(self, page: QWidget, local_log_card: QWidget | None):
+        if local_log_card is not None:
+            local_log_card.setMinimumWidth(0)
+            local_log_card.setMaximumWidth(0)
+            local_log_card.setSizePolicy(
+                QSizePolicy.Policy.Ignored,
+                QSizePolicy.Policy.Ignored,
+            )
+            local_log_card.updateGeometry()
+
+        right_layout = getattr(page, "right_layout", None)
+        main_layout = getattr(page, "main_layout", None)
+        left_layout = getattr(page, "left_layout", None)
+
+        if right_layout is not None:
+            while right_layout.count():
+                right_item = right_layout.takeAt(0)
+                right_widget = right_item.widget()
+                if right_widget is not None:
+                    right_widget.setParent(None)
+
+        if main_layout is not None and right_layout is not None:
+            right_layout_index = -1
+            left_layout_index = -1
+            for idx in range(main_layout.count()):
+                item = main_layout.itemAt(idx)
+                if item.layout() is right_layout:
+                    right_layout_index = idx
+                elif left_layout is not None and item.layout() is left_layout:
+                    left_layout_index = idx
+
+            if right_layout_index >= 0:
+                main_layout.takeAt(right_layout_index)
+
+            if left_layout_index >= 0:
+                main_layout.setStretch(left_layout_index, 1)
+
+        page.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        page.updateGeometry()
 
     def _get_task_metadata(self):
         return self._task_metadata
