@@ -1,4 +1,4 @@
-# coding:utf-8
+﻿# coding:utf-8
 import os
 import sys
 from pathlib import Path
@@ -7,7 +7,11 @@ from PySide6.QtCore import Qt, QTranslator, QSize, QObject, QThread, QTimer, Sig
 from PySide6.QtGui import QMovie, QPixmap, QFont
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
 
-from app.common.config import config, resolve_configured_locale
+from app.infrastructure.config.app_config import config, resolve_configured_locale
+from app.infrastructure.runtime.paths import PROJECT_ROOT, ensure_runtime_dirs
+
+
+IMAGES_DIR = Path(getattr(sys, "_MEIPASS", PROJECT_ROOT)) / "app" / "presentation" / "resources" / "images"
 
 
 class EarlySplash(QWidget):
@@ -45,12 +49,9 @@ class EarlySplash(QWidget):
         return QSize(w, h)
 
     def _setup_media(self):
-        base_dir = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parent))
         gif_candidates = [
-            base_dir / 'app/resource/images/logo_loading.gif',
-            base_dir / 'app/resource/images/loading.gif',
-            Path('app/resource/images/logo_loading.gif'),
-            Path('app/resource/images/loading.gif'),
+            IMAGES_DIR / 'logo_loading.gif',
+            IMAGES_DIR / 'loading.gif',
         ]
 
         gif_path = next((str(path) for path in gif_candidates if path.exists()), None)
@@ -74,8 +75,7 @@ class EarlySplash(QWidget):
                 return
 
         logo_candidates = [
-            base_dir / 'app/resource/images/logo.png',
-            Path('app/resource/images/logo.png'),
+            IMAGES_DIR / 'logo.png',
         ]
         logo_path = next((str(path) for path in logo_candidates if path.exists()), None)
         if logo_path:
@@ -150,7 +150,7 @@ class StartupController(QObject):
         self.FluentTranslator = imported['FluentTranslator']
         self.patch_infobar_for_traditional = imported['patch_infobar_for_traditional']
         self.localize_widget_tree_for_traditional = imported['localize_widget_tree_for_traditional']
-        from app.view.main_window import MainWindow
+        from app.presentation.views.main_window import MainWindow
         self.MainWindow = MainWindow
         QTimer.singleShot(0, self._run_next_task)
 
@@ -162,7 +162,7 @@ class StartupController(QObject):
         locale = resolve_configured_locale(config.get(config.language))
         self.translator = self.FluentTranslator(locale)
         self.galleryTranslator = QTranslator()
-        self.galleryTranslator.load(locale, "app", ".", ":/app/resource/i18n")
+        self.galleryTranslator.load(locale, "app", ".", ":/app/presentation/resources/i18n")
 
         self.app.installTranslator(self.translator)
         self.app.installTranslator(self.galleryTranslator)
@@ -188,7 +188,7 @@ class RuntimeImportWorker(QThread):
     def run(self):
         try:
             from qfluentwidgets import FluentTranslator
-            from app.common.ui_localizer import patch_infobar_for_traditional, localize_widget_tree_for_traditional
+            from app.presentation.shared.localizer import patch_infobar_for_traditional, localize_widget_tree_for_traditional
 
             self.ready.emit({
                 'FluentTranslator': FluentTranslator,
@@ -221,6 +221,9 @@ def main():
         global_font.setPointSize(10)
         app.setFont(global_font)
     app.setAttribute(Qt.ApplicationAttribute.AA_DontCreateNativeWidgetSiblings)
+
+    # 确保运行时目录存在 (log, temp 等)
+    ensure_runtime_dirs()
 
     early_splash = EarlySplash()
     early_splash.show_centered(app)

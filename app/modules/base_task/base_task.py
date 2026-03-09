@@ -1,13 +1,13 @@
-import logging
+﻿import logging
 
 import win32api
 import win32con
 import win32gui
 
-from app.common.config import config
-from app.common.signal_bus import signalBus
-from app.modules.automation.automation import Automation
-from utils.ui_utils import ui_text
+from app.infrastructure.config.app_config import config
+from app.infrastructure.events.signal_bus import signalBus
+from app.infrastructure.automation.automation import Automation
+from app.utils.ui import ui_text
 
 
 logger = logging.getLogger(__name__)
@@ -87,3 +87,6 @@ class BaseTask:
         else:
             self.logger.debug(ui_text(f'延用auto：{self.auto.hwnd}', f'Using existing auto: {self.auto.hwnd}'))
             return True
+
+
+

@@ -1,14 +1,14 @@
-import time
+﻿import time
 import cv2
 import numpy as np
 import gc
 
-from app.common.config import config
-from app.common.image_utils import ImageUtils
-from app.common.text_normalizer import normalize_chinese_text
-from utils.system_utils import cpu_support_avx2
+from app.infrastructure.config.app_config import config
+from app.infrastructure.vision.image import ImageUtils
+from app.utils.text_normalizer import normalize_chinese_text
+from app.infrastructure.system.cpu import cpu_support_avx2
 from app.modules.onnxocr.onnx_paddleocr import ONNXPaddleOcr
-from utils.ui_utils import ui_text
+from app.utils.ui import ui_text
 
 
 class OCR:
@@ -33,7 +33,7 @@ class OCR:
         self._small_crop_max_area = 140 * 140
 
         # 【新增】：缓存多语言状态，避免每次查询 config
-        from app.common.config import is_non_chinese_ui_language
+        from app.infrastructure.config.app_config import is_non_chinese_ui_language
         self._is_non_chinese = is_non_chinese_ui_language()
 
     def _ui_text(self, zh_text: str, en_text: str) -> str:
@@ -363,3 +363,6 @@ class OCR:
 
         # 强制释放图像残余占用空间
         gc.collect()
+
+
+

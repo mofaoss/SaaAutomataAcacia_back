@@ -49,5 +49,5 @@ class Config:
     app_exec = "SAA"
     app_publisher = "mofaoss"
     app_url = "https://github.com/mofaoss/SaaAssistantAca"
-    app_icon = "app/resource/images/logo.ico"
+    app_icon = "app/presentation/resources/images/logo.ico"
     app_dir = os.getenv("SAA_APP_DIR", str(app_dir()))
