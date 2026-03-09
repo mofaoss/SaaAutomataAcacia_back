@@ -33,7 +33,7 @@ from qfluentwidgets import (
     EditableComboBox,
     isDarkTheme,
 )
-from app.features.application.tasks.daily_policy import PRIMARY_TASK_ID, MANDATORY_DAILY_TASK_IDS
+from app.framework.application.tasks.daily_policy import PRIMARY_TASK_ID, MANDATORY_DAILY_TASK_IDS
 
 
 class TaskListView(ListWidget):

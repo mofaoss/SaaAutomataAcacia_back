@@ -24,8 +24,8 @@ from app.framework.infra.events.signal_bus import signalBus
 from app.framework.core.event_bus.global_task_bus import global_task_bus
 from app.framework.core.observability import AppErrorCode, capture_exception
 from app.framework.core.task_engine.hotkey_poller import GlobalHotkeyPoller
-from app.features.application.hotkey.routing import resolve_f8_action, HotkeyAction
-from app.features.application.startup.interface_plan import (
+from app.framework.application.hotkey.routing import resolve_f8_action, HotkeyAction
+from app.framework.application.startup.interface_plan import (
     build_deferred_interface_keys,
     build_initial_interface_keys,
 )
@@ -655,15 +655,13 @@ class MainWindow(FluentWindow, BaseInterface):
         if self.homeInterface is not None:
             log_configs.append((str(LOG_DIR / "home"), self.homeInterface.textBrowser_log, "home"))
         if self.additionalInterface is not None:
-            log_configs.extend([
-                (str(LOG_DIR / "fishing"), self.additionalInterface.page_fishing.textBrowser_log_fishing, "fishing"),
-                (str(LOG_DIR / "action"), self.additionalInterface.page_action.textBrowser_log_action, "action"),
-                (str(LOG_DIR / "water_bomb"), self.additionalInterface.page_water_bomb.textBrowser_log_water_bomb, "water_bomb"),
-                (str(LOG_DIR / "alien_guardian"), self.additionalInterface.page_alien_guardian.textBrowser_log_alien_guardian, "alien_guardian"),
-                (str(LOG_DIR / "maze"), self.additionalInterface.page_maze.textBrowser_log_maze, "maze"),
-                (str(LOG_DIR / "drink"), self.additionalInterface.page_card.textBrowser_log_drink, "drink"),
-                (str(LOG_DIR / "trigger"), self.additionalInterface.page_trigger.textBrowser_log_trigger, "trigger"),
-            ])
+            shared_log_browser = None
+            if hasattr(self.additionalInterface, "get_shared_log_browser"):
+                shared_log_browser = self.additionalInterface.get_shared_log_browser()
+            elif hasattr(self.additionalInterface, "ui") and hasattr(self.additionalInterface.ui, "textBrowser_shared_log"):
+                shared_log_browser = self.additionalInterface.ui.textBrowser_shared_log
+            if shared_log_browser is not None:
+                log_configs.append((str(LOG_DIR / "additional"), shared_log_browser, "additional"))
 
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 

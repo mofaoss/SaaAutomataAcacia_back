@@ -10,16 +10,6 @@ from app.framework.infra.events.signal_bus import signalBus
 from app.framework.ui.shared.style_sheet import StyleSheet
 from app.features.utils.ui import get_all_children
 
-# 导入业务模块 UI
-from app.features.modules.trigger.ui.trigger_interface import TriggerInterface
-from app.features.modules.fishing.ui.fishing_interface import FishingInterface
-from app.features.modules.operation_action.ui.operation_interface import OperationInterface
-from app.features.modules.water_bomb.ui.water_bomb_interface import WaterBombInterface
-from app.features.modules.alien_guardian.ui.alien_guardian_interface import AlienGuardianInterface
-from app.features.modules.maze.ui.maze_interface import MazeInterface
-from app.features.modules.drink.ui.drink_interface import DrinkInterface
-from app.features.modules.capture_pals.ui.capture_pals_interface import CapturePalsInterface
-
 from app.features.modules.trigger.usecase.auto_f_usecase import AutoFModule
 from app.features.modules.trigger.usecase.nita_auto_e_usecase import NitaAutoEModule
 
@@ -28,8 +18,8 @@ from .base_interface import BaseInterface
 from app.features.modules.fishing.ui.subtask import SubTask
 from app.framework.infra.logging.gui_logger import setup_ui_logger
 from app.framework.core.event_bus.global_task_bus import global_task_bus
-from app.features.application.tasks.task_registry import ADDITIONAL_TASKS
-from app.features.scheduling.on_demand_runner import OnDemandRunner
+from app.framework.application.modules import HostContext, get_on_demand_module_specs
+from app.framework.application.scheduling.on_demand_runner import OnDemandRunner
 
 
 class Additional(QFrame, BaseInterface):
@@ -46,25 +36,12 @@ class Additional(QFrame, BaseInterface):
         self.parent = parent
         self.task_coordinator = global_task_bus
 
-        # 实例化各个功能页面
-        self.page_trigger = TriggerInterface(self)
-        self.page_fishing = FishingInterface(self)
-        self.page_action = OperationInterface(self)
-        self.page_water_bomb = WaterBombInterface(self)
-        self.page_alien_guardian = AlienGuardianInterface(self)
-        self.page_maze = MazeInterface(self)
-        self.page_card = DrinkInterface(self)
-        self.page_capture_pals = CapturePalsInterface(self)
-
-        # 注册页面到 View
-        self.ui.add_page(self.page_trigger, "page_trigger", self._ui_text('自动辅助', 'Trigger'))
-        self.ui.add_page(self.page_fishing, "page_fishing", self._ui_text('钓鱼', 'Fishing'))
-        self.ui.add_page(self.page_action, "page_action", self._ui_text('常规训练', 'Operation'))
-        self.ui.add_page(self.page_water_bomb, "page_water_bomb", self._ui_text('心动水弹', 'Water Bomb'))
-        self.ui.add_page(self.page_alien_guardian, "page_alien_guardian", self._ui_text('异星守护', 'Alien Guardian'))
-        self.ui.add_page(self.page_maze, "page_maze", self._ui_text('验证战场', 'Maze'))
-        self.ui.add_page(self.page_card, "page_card", self._ui_text('猜心对局', 'Card Match'))
-        self.ui.add_page(self.page_capture_pals, "page_capture_pals", self._ui_text('抓帕鲁', 'Capture Pals'))
+        self.module_specs = get_on_demand_module_specs(include_passive=True)
+        self.module_pages = {}
+        self._task_metadata = {}
+        self._page_name_to_task_id = {}
+        self._mount_module_pages()
+        self._build_task_metadata()
 
         # 触发器（自动辅助）独立管理，不受互斥限制
         self.f_thread = None
@@ -73,23 +50,26 @@ class Additional(QFrame, BaseInterface):
         # 全局互斥任务调度中心状态
         self.on_demand_runner = OnDemandRunner()
 
-        # 日志配置
+        # 所有 additional 模块统一共享日志
+        self.shared_logger = setup_ui_logger(
+            "logger_additional_shared",
+            self.ui.textBrowser_shared_log,
+        )
         self.task_loggers = {
-            'fishing': setup_ui_logger("logger_fishing", self.page_fishing.textBrowser_log_fishing),
-            'action': setup_ui_logger("logger_action", self.page_action.textBrowser_log_action),
-            'water_bomb': setup_ui_logger("logger_water_bomb", self.page_water_bomb.textBrowser_log_water_bomb),
-            'alien_guardian': setup_ui_logger("logger_alien_guardian", self.page_alien_guardian.textBrowser_log_alien_guardian),
-            'maze': setup_ui_logger("logger_maze", self.page_maze.textBrowser_log_maze),
-            'drink': setup_ui_logger("logger_drink", self.page_card.textBrowser_log_drink),
-            'capture_pals': setup_ui_logger("logger_capture_pals", self.page_capture_pals.textBrowser_log_capture_pals),
-            'trigger': setup_ui_logger("logger_trigger", self.page_trigger.textBrowser_log_trigger)
+            spec.id: self.shared_logger for spec in self.module_specs
         }
 
         self._load_config()
         self._connect_to_slot()
-        
-        self.SegmentedWidget.setCurrentItem(self.page_trigger.objectName())
-        self.stackedWidget.setCurrentWidget(self.page_trigger)
+        self.ui.sharedLogTitle.setText(self._ui_text("共享日志", "Shared Log"))
+
+        if hasattr(self, "page_trigger"):
+            self.SegmentedWidget.setCurrentItem(self.page_trigger.objectName())
+            self.stackedWidget.setCurrentWidget(self.page_trigger)
+        elif self.stackedWidget.count() > 0:
+            first_page = self.stackedWidget.widget(0)
+            self.SegmentedWidget.setCurrentItem(first_page.objectName())
+            self.stackedWidget.setCurrentWidget(first_page)
         StyleSheet.ADDITIONAL_FEATURES_INTERFACE.apply(self)
 
     def __getattr__(self, item):
@@ -100,23 +80,52 @@ class Additional(QFrame, BaseInterface):
 
     # ---------------- 统一任务调度中心 ----------------
 
-    def _get_task_metadata(self):
-        """Build metadata from centralized task registry."""
-        meta = {}
-        for definition in ADDITIONAL_TASKS:
-            page = getattr(self, definition.page_attr)
-            card = getattr(page, definition.card_widget_attr)
-            log_browser = getattr(page, definition.log_widget_attr)
-            meta[definition.id] = (
-                definition.module_class,
-                card,
-                log_browser,
-                definition.zh_name,
-                definition.en_name,
-                definition.start_button_attr,
-                definition.page_attr,
+    def _mount_module_pages(self):
+        for spec in self.module_specs:
+            page = spec.ui_factory(self, HostContext.ON_DEMAND)
+            page_name = page.objectName()
+            self.module_pages[spec.id] = page
+
+            self.ui.add_page(
+                page,
+                page_name,
+                self._ui_text(spec.zh_name, spec.en_name),
             )
-        return meta
+
+            bindings = spec.ui_bindings
+            if bindings is not None and bindings.page_attr:
+                setattr(self, bindings.page_attr, page)
+
+            # additional 统一共享日志，模块内日志卡片不再作为独立日志出口
+            local_log_card = getattr(page, "SimpleCardWidget_log", None)
+            if local_log_card is not None:
+                local_log_card.setVisible(False)
+
+            if not spec.passive and spec.module_class is not None:
+                self._page_name_to_task_id[page_name] = spec.id
+
+    def _build_task_metadata(self):
+        for spec in self.module_specs:
+            if spec.passive or spec.module_class is None:
+                continue
+            bindings = spec.ui_bindings
+            if bindings is None:
+                continue
+            page = getattr(self, bindings.page_attr, None)
+            if page is None:
+                continue
+
+            self._task_metadata[spec.id] = {
+                "module_class": spec.module_class,
+                "zh_name": spec.zh_name,
+                "en_name": spec.en_name,
+                "page_attr": bindings.page_attr,
+                "start_button_attr": bindings.start_button_attr,
+                "card_widget_attr": bindings.card_widget_attr,
+            }
+
+    def _get_task_metadata(self):
+        return self._task_metadata
 
     def _handle_universal_start_stop(self, clicked_task_id: str):
         self.on_demand_runner.toggle(
@@ -124,7 +133,7 @@ class Additional(QFrame, BaseInterface):
             is_global_running=getattr(self, "is_global_running", False),
             request_global_stop=self.task_coordinator.request_stop,
             get_module_class=lambda task_id: (
-                self._get_task_metadata().get(task_id, (None,))[0]
+                self._get_task_metadata().get(task_id, {}).get("module_class")
             ),
             get_logger=lambda task_id: self.task_loggers.get(task_id, self.logger),
             build_thread=lambda module_class, logger: SubTask(module_class, logger_instance=logger),
@@ -134,53 +143,65 @@ class Additional(QFrame, BaseInterface):
     def _sync_all_ui_state(self, is_running: bool):
         meta_dict = self._get_task_metadata()
         running_task_id = self.on_demand_runner.state.current_task_id
-        for task_id, (mod, card, log, zh, en, start_button_attr, page_attr) in meta_dict.items():
-            page = getattr(self, page_attr, None)
-            btn = getattr(page, start_button_attr, None) if page is not None else None
+        for task_id, meta in meta_dict.items():
+            page = getattr(self, meta["page_attr"], None)
+            btn = getattr(page, meta["start_button_attr"], None) if page is not None else None
+            card = getattr(page, meta["card_widget_attr"], None) if page is not None else None
 
-            if not btn: continue
+            if not btn:
+                continue
 
             if is_running and running_task_id is not None:
-                running_zh = meta_dict[running_task_id][3]
-                running_en = meta_dict[running_task_id][4]
+                running_zh = meta_dict[running_task_id]["zh_name"]
+                running_en = meta_dict[running_task_id]["en_name"]
                 btn.setText(self._ui_text(f'停止 {running_zh} (F8)', f'Stop {running_en} (F8)'))
-                self.set_simple_card_enable(card, False)
+                if card is not None:
+                    self.set_simple_card_enable(card, False)
             else:
-                btn.setText(self._ui_text(f'开始{zh}', f'Start {en}'))
-                self.set_simple_card_enable(card, True)
+                btn.setText(self._ui_text(f'开始{meta["zh_name"]}', f'Start {meta["en_name"]}'))
+                if card is not None:
+                    self.set_simple_card_enable(card, True)
 
         if is_running and running_task_id is not None:
-            zh = meta_dict[running_task_id][3]
-            en = meta_dict[running_task_id][4]
+            zh = meta_dict[running_task_id]["zh_name"]
+            en = meta_dict[running_task_id]["en_name"]
             self.task_coordinator.publish_state(True, zh, en, "additional")
         else:
             self.task_coordinator.publish_state(False, "", "", "additional")
             self.on_demand_runner.clear()
 
     def start_current_visible_task(self):
-        if self.stackedWidget.currentWidget() == self.page_trigger:
+        current_page = self.stackedWidget.currentWidget()
+        if current_page is None:
             return
-        current_page_name = self.stackedWidget.currentWidget().objectName()
-        task_id = current_page_name.replace("page_", "")
-        if task_id == "card": task_id = "drink"
+        if hasattr(self, "page_trigger") and current_page == self.page_trigger:
+            return
+        current_page_name = current_page.objectName()
+        task_id = self._page_name_to_task_id.get(current_page_name)
         if task_id in self._get_task_metadata():
             self._handle_universal_start_stop(task_id)
 
     def _on_global_state_changed(self, is_running: bool, zh_name: str, en_name: str, source: str):
-        if source == "additional": return
+        if source == "additional":
+            return
         self.is_global_running = is_running
         meta_dict = self._get_task_metadata()
-        for task_id, (mod, card, log, zh, en, start_button_attr, page_attr) in meta_dict.items():
-            page = getattr(self, page_attr, None)
-            if not page: continue
-            btn = getattr(page, start_button_attr, None)
-            if not btn: continue
+        for _, meta in meta_dict.items():
+            page = getattr(self, meta["page_attr"], None)
+            if not page:
+                continue
+            btn = getattr(page, meta["start_button_attr"], None)
+            card = getattr(page, meta["card_widget_attr"], None)
+            if not btn:
+                continue
             if is_running:
                 btn.setText(self._ui_text(f'停止 {zh_name} (F8)', f'Stop {en_name} (F8)'))
-                self.set_simple_card_enable(card, False)
+                if card is not None:
+                    self.set_simple_card_enable(card, False)
             else:
-                btn.setText(self._ui_text(f'开始{zh}', f'Start {en}'))
-                self.set_simple_card_enable(card, True)
+                btn.setText(self._ui_text(f'开始{meta["zh_name"]}', f'Start {meta["en_name"]}'))
+                if card is not None:
+                    self.set_simple_card_enable(card, True)
 
     def _on_global_stop_request(self):
         if self.on_demand_runner.state.current_task_id is not None:
@@ -189,28 +210,33 @@ class Additional(QFrame, BaseInterface):
     def _connect_to_slot(self):
         self.task_coordinator.state_changed.connect(self._on_global_state_changed)
         self.task_coordinator.stop_requested.connect(self._on_global_stop_request)
-        
-        self.page_trigger.SwitchButton_f.checkedChanged.connect(self.on_f_toggled)
-        self.page_trigger.SwitchButton_e.checkedChanged.connect(self.on_e_toggled)
+
+        if hasattr(self, "page_trigger"):
+            self.page_trigger.SwitchButton_f.checkedChanged.connect(self.on_f_toggled)
+            self.page_trigger.SwitchButton_e.checkedChanged.connect(self.on_e_toggled)
         
         self.stackedWidget.currentChanged.connect(self.onCurrentIndexChanged)
 
         # 统一分发信号到中枢
-        for definition in ADDITIONAL_TASKS:
-            page = getattr(self, definition.page_attr, None)
+        for task_id, meta in self._get_task_metadata().items():
+            page = getattr(self, meta["page_attr"], None)
             if page is None:
                 continue
-            button = getattr(page, definition.start_button_attr, None)
+            button = getattr(page, meta["start_button_attr"], None)
             if button is None:
                 continue
-            button.clicked.connect(lambda checked=False, task_id=definition.id: self._handle_universal_start_stop(task_id))
+            button.clicked.connect(
+                lambda checked=False, selected_task_id=task_id: self._handle_universal_start_stop(selected_task_id)
+            )
 
         self._connect_to_save_changed()
 
         # 钓鱼专用
-        self.page_fishing.LineEdit_fish_key.editingFinished.connect(
-            lambda: self.update_fish_key(self.page_fishing.LineEdit_fish_key.text()))
-        signalBus.updateFishKey.connect(self.update_fish_key)
+        if hasattr(self, "page_fishing"):
+            self.page_fishing.LineEdit_fish_key.editingFinished.connect(
+                lambda: self.update_fish_key(self.page_fishing.LineEdit_fish_key.text())
+            )
+            signalBus.updateFishKey.connect(self.update_fish_key)
 
     def _load_config(self):
         for widget in self.findChildren(QWidget):
@@ -227,9 +253,11 @@ class Additional(QFrame, BaseInterface):
                 elif isinstance(widget, Slider):
                     widget.setValue(config_item.value)
         
-        # 特殊处理
-        self.page_fishing.update_label_color()
-        if hasattr(self.page_water_bomb, 'load_config'): self.page_water_bomb.load_config()
+        for page in self.module_pages.values():
+            if hasattr(page, 'update_label_color'):
+                page.update_label_color()
+            if hasattr(page, 'load_config'):
+                page.load_config()
 
     def _connect_to_save_changed(self):
         children_list = get_all_children(self)
@@ -263,7 +291,8 @@ class Additional(QFrame, BaseInterface):
             config.set(config_item, widget.currentIndex())
         elif isinstance(widget, Slider):
             config.set(config_item, widget.value())
-            if hasattr(self.page_water_bomb, 'load_config'): self.page_water_bomb.load_config()
+            if hasattr(self, "page_water_bomb") and hasattr(self.page_water_bomb, 'load_config'):
+                self.page_water_bomb.load_config()
 
     def onCurrentIndexChanged(self, index):
         widget = self.stackedWidget.widget(index)
@@ -279,6 +308,8 @@ class Additional(QFrame, BaseInterface):
         return False
 
     def update_fish_key(self, key):
+        if not hasattr(self, "page_fishing"):
+            return
         choices = ["ctrl", "space", "shift"]
         best_match = process.extractOne(key, choices)
         if best_match[1] > 60:
@@ -295,16 +326,16 @@ class Additional(QFrame, BaseInterface):
                 child.setEnabled(enable)
 
     def turn_off_e_switch(self, is_running):
-        if not is_running:
+        if not is_running and hasattr(self, "page_trigger"):
             self.page_trigger.SwitchButton_e.setChecked(False)
 
     def turn_off_f_switch(self, is_running):
-        if not is_running:
+        if not is_running and hasattr(self, "page_trigger"):
             self.page_trigger.SwitchButton_f.setChecked(False)
 
     def on_f_toggled(self, isChecked: bool):
         if isChecked:
-            trigger_logger = self.task_loggers.get('trigger', self.logger)
+            trigger_logger = self.shared_logger
             self.f_thread = SubTask(AutoFModule, logger_instance=trigger_logger)
             self.f_thread.is_running.connect(self.turn_off_f_switch)
             self.f_thread.start()
@@ -315,7 +346,7 @@ class Additional(QFrame, BaseInterface):
 
     def on_e_toggled(self, isChecked: bool):
         if isChecked:
-            trigger_logger = self.task_loggers.get('trigger', self.logger)
+            trigger_logger = self.shared_logger
             self.nita_e_thread = SubTask(NitaAutoEModule, logger_instance=trigger_logger)
             self.nita_e_thread.is_running.connect(self.turn_off_e_switch)
             self.nita_e_thread.start()
@@ -327,5 +358,8 @@ class Additional(QFrame, BaseInterface):
     def showEvent(self, event):
         super().showEvent(event)
         self._load_config()
+
+    def get_shared_log_browser(self):
+        return self.ui.textBrowser_shared_log
 
 

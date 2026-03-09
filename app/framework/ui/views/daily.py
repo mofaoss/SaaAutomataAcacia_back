@@ -27,14 +27,14 @@ from app.framework.ui.widgets.tree import TreeFrame_person, TreeFrame_weapon
 from app.features.modules.shopping.item_constants import get_person_text_to_key_map, get_weapon_text_to_key_map
 from app.framework.core.task_engine.scheduler import Scheduler
 from app.framework.infra.logging.gui_logger import setup_ui_logger
-from app.features.application.daily.controller import DailyController
-from app.features.application.daily.settings_usecase import DailySettingsUseCase
-from app.features.application.daily.ui_binding_usecase import DailyUiBindingUseCase
-from app.features.application.tasks.daily_policy import PRIMARY_TASK_ID
+from app.framework.application.daily.controller import DailyController
+from app.framework.application.daily.settings_usecase import DailySettingsUseCase
+from app.framework.application.daily.ui_binding_usecase import DailyUiBindingUseCase
+from app.framework.application.tasks.daily_policy import PRIMARY_TASK_ID
 from app.framework.core.event_bus.global_task_bus import global_task_bus
-from app.features.application.tasks.task_registry import DAILY_TASK_REGISTRY
-from app.features.scheduling.periodic_scheduler import PeriodicScheduler
-from app.features.application.daily.orchestration import (
+from app.framework.application.tasks.task_registry import DAILY_TASK_REGISTRY
+from app.framework.application.scheduling.periodic_scheduler import PeriodicScheduler
+from app.framework.application.daily.orchestration import (
     build_active_schedule_lines,
     collect_checked_task_ids_for_rule,
     collect_checked_tasks,

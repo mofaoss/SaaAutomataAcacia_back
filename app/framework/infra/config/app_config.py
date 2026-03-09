@@ -8,8 +8,8 @@ from PySide6.QtCore import QLocale
 from qfluentwidgets import (qconfig, QConfig, ConfigItem, OptionsConfigItem, BoolValidator,
                             OptionsValidator, Theme, ConfigSerializer)
 
-from app.features.application.tasks.daily_defaults import build_default_daily_task_sequence
-from app.features.application.tasks.sequence_serializer import TaskSequenceSerializer
+from app.framework.application.tasks.daily_defaults import build_default_daily_task_sequence
+from app.framework.application.tasks.sequence_serializer import TaskSequenceSerializer
 from .setting import CONFIG_FILE
 
 

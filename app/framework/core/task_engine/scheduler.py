@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 
 from PySide6.QtCore import QObject, QTimer, Signal
 
-from app.features.application.tasks.daily_policy import MANDATORY_DAILY_TASK_IDS, PRIMARY_TASK_ID
+from app.framework.application.tasks.daily_policy import MANDATORY_DAILY_TASK_IDS, PRIMARY_TASK_ID
 from app.framework.infra.config.app_config import config
 from app.framework.core.config.daily_sequence import normalize_daily_task_sequence
 from app.framework.core.config.migration import migrate_daily_sequence_schema
