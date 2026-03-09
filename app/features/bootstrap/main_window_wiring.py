@@ -10,9 +10,8 @@ from app.framework.ui.views.periodic_tasks_page import PeriodicTasksPage
 from app.features.modules.collect_supplies.usecase.collect_supplies_usecase import (
     CollectSuppliesModule,
 )
-from app.features.modules.enter_game.usecase.enter_game_actions import (
-    EnterGameActions,
-    SnowbreakGameEnvironment,
+from app.features.modules.enter_game.usecase.enter_game_usecase import (
+    EnterGameService,
 )
 from app.features.modules.event_tips.usecase.event_tips_usecase import (
     EventTipsActions,
@@ -46,14 +45,15 @@ class SnowbreakMainWindowBridge(MainWindowFeatureBridge):
         )
 
     def create_home_interface(self, window):
+        enter_game_service = EnterGameService(window._is_non_chinese_ui)
         return PeriodicTasksPage(
             "Periodic Tasks",
             window,
-            game_environment=SnowbreakGameEnvironment(window._is_non_chinese_ui),
+            game_environment=enter_game_service,
             home_sync=back_to_home,
             task_profile_provider=get_periodic_task_profile,
             create_shopping_selection_usecase=lambda is_non_chinese_ui: ShoppingSelectionUseCase(is_non_chinese_ui),
-            create_enter_game_actions=lambda game_environment: EnterGameActions(game_environment),
+            create_enter_game_actions=lambda _game_environment: enter_game_service,
             create_collect_supplies_actions=lambda settings_usecase: CollectSuppliesModule(
                 redeem_codes_usecase=RedeemCodesUseCase(settings_usecase),
                 redeem_codes_view=RedeemCodesView(),
@@ -91,4 +91,3 @@ class SnowbreakMainWindowBridge(MainWindowFeatureBridge):
 
 def build_main_window_bridge() -> MainWindowFeatureBridge:
     return SnowbreakMainWindowBridge()
-

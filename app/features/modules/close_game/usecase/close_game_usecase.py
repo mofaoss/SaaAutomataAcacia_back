@@ -6,7 +6,7 @@ import win32con
 from app.framework.infra.config.app_config import config
 from app.framework.infra.events.signal_bus import signalBus
 from app.framework.ui.shared.text import ui_text
-from app.features.modules.enter_game.usecase.game_window_probe import is_snowbreak_running
+from app.features.modules.enter_game.usecase.enter_game_usecase import is_snowbreak_running
 
 class CloseGameModule:
     def __init__(self, auto, logger):

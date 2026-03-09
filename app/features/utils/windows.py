@@ -1,5 +1,5 @@
 from app.framework.infra.system.windows import get_hwnd, is_fullscreen
-from app.features.modules.enter_game.usecase.game_window_probe import (
+from app.features.modules.enter_game.usecase.enter_game_usecase import (
     is_snowbreak_running,
 )
 
