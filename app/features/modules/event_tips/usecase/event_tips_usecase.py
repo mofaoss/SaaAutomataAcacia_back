@@ -10,10 +10,8 @@ from app.framework.i18n import tr
 class EventTipsUseCase:
     """Event tips business logic extracted from periodic host."""
 
-    def __init__(self, settings_usecase, is_non_chinese_ui: bool, ui_text_fn):
+    def __init__(self, settings_usecase):
         self.settings_usecase = settings_usecase
-        self._is_non_chinese_ui = bool(is_non_chinese_ui)
-        self._ui_text = ui_text_fn
 
     def _load_tip_payload(self, logger, host, url=None):
         if url:
@@ -71,15 +69,19 @@ class EventTipsUseCase:
 
             days, total_day, status = value
             if status == -1:
-                body_label.setText(f"{key} {self._ui_text('已结束', 'finished')}")
+                body_label.setText(tr("module.event_tips.status.finished", fallback=f"{key} finished"))
                 sort_weight = 99999
                 progress_bar.setValue(0)
             elif status == 1:
-                body_label.setText(self._ui_text(f"{key} 还有 {days} 天开始", f"{key} in {days}d(s)"))
+                body_label.setText(
+                    tr("module.event_tips.status.starts_in", fallback=f"{key} in {days}d(s)")
+                )
                 sort_weight = 10000 + days
                 progress_bar.setValue(0)
             else:
-                body_label.setText(self._ui_text(f"{key}剩：{days}天", f"{key}: {days}d(s) left"))
+                body_label.setText(
+                    tr("module.event_tips.status.left_days", fallback=f"{key}: {days}d(s) left")
+                )
                 sort_weight = days
                 normalized_percent = int((days / max_total_days) * 100)
                 progress_bar.setValue(normalized_percent)

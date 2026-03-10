@@ -242,7 +242,10 @@ class OCR:
         try:
             if image is None:
                 if is_log:
-                    self.logger.debug(tr("module.ocr.legacy.328dd4d1a4f3", fallback="OCR input image is empty, skipping this recognition")one
+                    self.logger.debug(
+                        tr("module.ocr.legacy.328dd4d1a4f3", fallback="OCR input image is empty, skipping this recognition")
+                    )
+                return None
 
             if isinstance(image, str):
                 image_path = image
@@ -276,16 +279,19 @@ class OCR:
 
             if not candidates:
                 if is_log:
-                    self.logger.debug(tr("module.ocr.legacy.b5025abbb9d2", fallback="OCR recognized no text")  self._update_cache(signature, None)
+                    self.logger.debug(tr("module.ocr.legacy.b5025abbb9d2", fallback="OCR recognized no text"))
+                self._update_cache(signature, None)
                 return None
 
             best_name, best_result = max(candidates, key=lambda x: self._score_formatted_result(x[1]))
             if is_log:
-                self.logger.debug(tr("framework.legacy.e553f2750f9a", fallback=f"OCR adopted strategy: {best_name}")          self.log_result(best_result)
+                self.logger.debug(tr("framework.legacy.e553f2750f9a", fallback=f"OCR adopted strategy: {best_name}"))
+                self.log_result(best_result)
             self._update_cache(signature, best_result)
             return best_result
         except Exception as e:
-            error_message = tr("framework.legacy.85dc5a050c0f", fallback=f"Error executing ocr: {e}")   now = time.time()
+            error_message = tr("framework.legacy.85dc5a050c0f", fallback=f"Error executing ocr: {e}")
+            now = time.time()
             if error_message != self._last_error_message or now - self._last_error_time > 2:
                 self.logger.error(error_message)
                 self._last_error_message = error_message
@@ -331,7 +337,9 @@ class OCR:
         log_content = []
         for result in results:
             log_content.append(f'{result[0]}:{result[1]}')
-        self.logger.debug(tr("framework.legacy.c404ba289053", fallback=f"OCR recognition result: {log_content}")ef instance_ocr(self):
+        self.logger.debug(tr("framework.legacy.c404ba289053", fallback=f"OCR recognition result: {log_content}"))
+
+    def instance_ocr(self):
         """实例化OCR引擎。采用单例机制，防止重复初始化导致显存泄漏。"""
         if self._is_initialized and self.ocr is not None:
             return
@@ -340,12 +348,21 @@ class OCR:
             if config.cpu_support_avx2.value is None:
                 cpu_support_avx2(config)
             try:
-                self.logger.debug(tr("module.ocr.legacy.ecbbcbc53c31", fallback="Starting to initialize OCR...")        if config.cpu_support_avx2.value:
+                self.logger.debug(tr("module.ocr.legacy.ecbbcbc53c31", fallback="Starting to initialize OCR..."))
+                if config.cpu_support_avx2.value:
                     self.ocr = ONNXPaddleOcr(use_angle_cls=True, use_gpu=False)
-                    self.logger.info(tr("module.ocr.legacy.5f7324113199", fallback="OCR initialization completed")            self._is_initialized = True
+                    self.logger.info(tr("module.ocr.legacy.5f7324113199", fallback="OCR initialization completed"))
+                    self._is_initialized = True
                 else:
-                    self.logger.error(tr("module.ocr.legacy.5367a13ccc69", fallback="OCR initialization failed: This CPU does not support AVX2 instruction set")tion as e:
-                self.logger.error(tr("framework.legacy.64791083260d", fallback=f"OCR initialization failed: {e}")      raise Exception("初始化OCR失败")
+                    self.logger.error(
+                        tr(
+                            "module.ocr.legacy.5367a13ccc69",
+                            fallback="OCR initialization failed: This CPU does not support AVX2 instruction set",
+                        )
+                    )
+            except Exception as e:
+                self.logger.error(tr("framework.legacy.64791083260d", fallback=f"OCR initialization failed: {e}"))
+                raise Exception("初始化OCR失败")
 
     def stop_ocr(self):
         """清理识别缓存与内部状态，强制执行垃圾回收。不销毁模型实例以支持高频复用。"""

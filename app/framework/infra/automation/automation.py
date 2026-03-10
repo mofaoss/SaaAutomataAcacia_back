@@ -575,7 +575,12 @@ class Automation:
         try:
             self.input_handler.restore_window_position()
         except Exception as e:
-            self._log_error_throttled('restore_window_failed', tr("framework.legacy.d07b729e03a7", fallback=f"Failed to restore window position: {e}")elf):
+            self._log_error_throttled(
+                "restore_window_failed",
+                tr("framework.legacy.d07b729e03a7", fallback=f"Failed to restore window position: {e}"),
+            )
+
+    def start(self):
         self.running = True
 
     def pause(self):
@@ -593,7 +598,11 @@ class Automation:
         从完整图中裁剪出局部图
         """
         if self.first_screenshot is None:
-            self._log_error_throttled('crop_from_first_no_screenshot', tr("framework.legacy.b4da6bfd6ba6", fallback="No first_screenshot currently, crop failed")turn None
+            self._log_error_throttled(
+                "crop_from_first_no_screenshot",
+                tr("framework.legacy.b4da6bfd6ba6", fallback="No first_screenshot currently, crop failed"),
+            )
+            return None
 
         crop_image, _ = ImageUtils.crop_image(self.first_screenshot, crop, self.hwnd)
         if config.showScreenshot.value:
@@ -610,7 +619,11 @@ class Automation:
         if is_screenshot:
             self.take_screenshot()
         if self.first_screenshot is None:
-            self._log_error_throttled('read_text_no_screenshot', tr("framework.legacy.8550a4b147db", fallback="No screenshot currently, unable to read text")ult = []
+            self._log_error_throttled(
+                "read_text_no_screenshot",
+                tr("framework.legacy.8550a4b147db", fallback="No screenshot currently, unable to read text"),
+            )
+            self.ocr_result = []
             return self.ocr_result
         crop_image, _ = ImageUtils.crop_image(self.first_screenshot, crop, self.hwnd)
         self.perform_ocr(image=crop_image, extract=extract, is_log=is_log)
@@ -622,7 +635,11 @@ class Automation:
             if isinstance(target, str):
                 target = cv2.imread(target)
             if target is None:
-                self._log_error_throttled('find_image_and_count_no_target', tr("framework.legacy.7da4be68416d", fallback="Target image is empty, skipping match counting")one
+                self._log_error_throttled(
+                    "find_image_and_count_no_target",
+                    tr("framework.legacy.7da4be68416d", fallback="Target image is empty, skipping match counting"),
+                )
+                return None
             temp = target
             if extract:
                 letter = extract[0]
@@ -650,7 +667,11 @@ class Automation:
                 ImageUtils.show_ndarray(temp)
             return len(matches)
         except Exception as e:
-            self._log_error_throttled('find_image_and_count_error', tr("framework.legacy.3fade0143d76", fallback=f"Error finding image and counting: {e}") None
+            self._log_error_throttled(
+                "find_image_and_count_error",
+                tr("framework.legacy.3fade0143d76", fallback=f"Error finding image and counting: {e}"),
+            )
+            return None
 
     def calculate_power_time(self):
         """
@@ -669,9 +690,11 @@ class Automation:
                 formatted_time = future_time.strftime('%m-%d %H:%M')
                 return formatted_time
             else:
-                self.logger.error(tr("framework.legacy.b247edc1f2a6", fallback=f"Recognition result error: {text}")    return None
+                self.logger.error(tr("framework.legacy.b247edc1f2a6", fallback=f"Recognition result error: {text}"))
+                return None
         except Exception as e:
-            self.logger.error(tr("framework.legacy.a1463b4541cb", fallback=f"Failed to recognize stamina: {e}")return None
+            self.logger.error(tr("framework.legacy.a1463b4541cb", fallback=f"Failed to recognize stamina: {e}"))
+            return None
 
 
 if __name__ == '__main__':

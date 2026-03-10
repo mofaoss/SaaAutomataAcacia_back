@@ -53,12 +53,8 @@ class SnowbreakMainWindowBridge(MainWindowFeatureBridge):
                 redeem_codes_usecase=RedeemCodesUseCase(settings_usecase),
                 redeem_codes_view=RedeemCodesView(),
             ),
-            create_event_tips_actions=lambda settings_usecase, is_non_chinese_ui, ui_text_fn: EventTipsActions(
-                EventTipsUseCase(
-                    settings_usecase,
-                    is_non_chinese_ui=is_non_chinese_ui,
-                    ui_text_fn=ui_text_fn,
-                )
+            create_event_tips_actions=lambda settings_usecase, _is_non_chinese_ui, _ui_text_fn: EventTipsActions(
+                EventTipsUseCase(settings_usecase)
             ),
             startup_update_hook=start_cloudflare_update,
         )

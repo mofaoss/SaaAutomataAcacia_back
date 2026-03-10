@@ -567,7 +567,10 @@ class Input:
                         win32gui.PostMessage(self.hwnd, message, wparam, lparam)
 
                         if config.isInputLog.value:
-                            self.logger.info(tr("framework.legacy.64cf452636e6", fallback=f"Mouse moved to ({x},{y}) and scrolled wheel {delta}")        return True
+                            self.logger.info(
+                                tr("framework.legacy.64cf452636e6", fallback=f"Mouse moved to ({x},{y}) and scrolled wheel {delta}")
+                            )
+                        return True
                     finally:
                         if current_pos is not None:
                             try:
@@ -577,8 +580,21 @@ class Input:
                 last_position = win32api.GetCursorPos()
                 time.sleep(0.02)
 
-            self.logger.warning(tr("framework.legacy.4e66efce731d", fallback=f"Waiting for wheel scrolling timeout, abandoning this wheel input: ({x}, {y}, {delta})") except Exception as e:
-            self.logger.error(tr("framework.legacy.2837c39f5660", fallback=f"Error occurred while scrolling after mouse move ({x}, {y}): {repr(e)}") False
+            self.logger.warning(
+                tr(
+                    "framework.legacy.4e66efce731d",
+                    fallback=f"Waiting for wheel scrolling timeout, abandoning this wheel input: ({x}, {y}, {delta})",
+                )
+            )
+            return False
+        except Exception as e:
+            self.logger.error(
+                tr(
+                    "framework.legacy.2837c39f5660",
+                    fallback=f"Error occurred while scrolling after mouse move ({x}, {y}): {repr(e)}",
+                )
+            )
+            return False
 
     def press_key(self, key, press_time=0.2):
         try:
@@ -586,21 +602,28 @@ class Input:
             time.sleep(press_time)
             self.key_up(key)
         except Exception as e:
-            self.logger.error(tr("framework.legacy.6d24eb9e59c4", fallback=f"Error occurred while simulating key {key}: {repr(e)}")_down(self, key):
+            self.logger.error(tr("framework.legacy.6d24eb9e59c4", fallback=f"Error occurred while simulating key {key}: {repr(e)}"))
+
+    def key_down(self, key):
         vk_code = self.get_virtual_keycode(key)
         scan_code = windll.user32.MapVirtualKeyW(vk_code, 0)
         wparam = vk_code
         lparam = (scan_code << 16) | 1
         win32gui.PostMessage(self.hwnd, self.WmCode["key_down"], wparam, lparam)
         if config.isInputLog.value:
-            self.logger.debug(tr("framework.legacy.e88c659ac469", fallback=f"Key pressed: {key}")ef key_up(self, key):
+            self.logger.debug(tr("framework.legacy.e88c659ac469", fallback=f"Key pressed: {key}"))
+
+    def key_up(self, key):
         vk_code = self.get_virtual_keycode(key)
         scan_code = windll.user32.MapVirtualKeyW(vk_code, 0)
         wparam = vk_code
         lparam = (scan_code << 16) | 1
         win32gui.PostMessage(self.hwnd, self.WmCode["key_up"], wparam, lparam)
         if config.isInputLog.value:
-            self.logger.debug(tr("framework.legacy.98cebd476766", fallback=f"Key released: {key}")name__ == '__main__':
+            self.logger.debug(tr("framework.legacy.98cebd476766", fallback=f"Key released: {key}"))
+
+
+if __name__ == '__main__':
     import win32gui
 
     def get_hwnd_by_title(window_title):
