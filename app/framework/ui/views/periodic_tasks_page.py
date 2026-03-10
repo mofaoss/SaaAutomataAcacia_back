@@ -18,6 +18,7 @@ from app.framework.core.interfaces.periodic_ports import (
     ShoppingSelectionFactory,
 )
 from app.framework.infra.logging.gui_logger import setup_ui_logger
+from app.framework.ui.shared.log_startup_logo import insert_startup_logo
 from app.framework.application.periodic.periodic_controller import PeriodicController
 from app.framework.application.periodic.periodic_settings_usecase import PeriodicSettingsUseCase
 from app.framework.application.periodic.periodic_ui_binding_usecase import PeriodicUiBindingUseCase
@@ -146,6 +147,7 @@ class PeriodicTasksPage(QFrame, BaseInterface):
         self._initWidget()
         self._connect_to_slot()
 
+        insert_startup_logo(self.ui.textBrowser_log)
         self.logger = setup_ui_logger("logger_daily", self.ui.textBrowser_log)
         self.event_tips_actions.bind(ui=self.ui, logger=self.logger, host=self)
         self.refresh_tips = self.event_tips_actions.refresh_tips

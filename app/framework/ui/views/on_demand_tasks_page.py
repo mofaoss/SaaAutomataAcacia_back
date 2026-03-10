@@ -14,6 +14,7 @@ from app.framework.ui.shared.widget_tree import get_all_children
 from app.framework.ui.views.on_demand_tasks_view import OnDemandTasksView
 from .periodic_base import BaseInterface
 from app.framework.infra.logging.gui_logger import setup_ui_logger
+from app.framework.ui.shared.log_startup_logo import insert_startup_logo
 from app.framework.core.event_bus.global_task_bus import global_task_bus
 from app.framework.application.modules import HostContext, get_on_demand_module_specs
 from app.framework.application.periodic.on_demand_runner import OnDemandRunner
@@ -102,6 +103,7 @@ class OnDemandTasksPage(QFrame, BaseInterface):
 
     def _bind_shared_logger(self, log_browser):
         self._active_log_browser = log_browser or self.ui.textBrowser_shared_log
+        insert_startup_logo(self._active_log_browser)
         self.shared_logger = setup_ui_logger(
             "logger_additional_shared",
             self._active_log_browser,
