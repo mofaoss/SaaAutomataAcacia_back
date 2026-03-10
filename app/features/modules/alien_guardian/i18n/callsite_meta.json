@@ -1,4 +1,16 @@
 {
+  "app/features/modules/alien_guardian/ui/alien_guardian_interface.py:68:12": {
+    "kind": "static_literal",
+    "key": "module.alien_guardian.ui.tips_click_start_after_battle_begins_recommended_support_pals_steel_shot_and_bla",
+    "msgid": "tips_click_start_after_battle_begins_recommended_support_pals_steel_shot_and_bla",
+    "source_text": "### Tips\n* Click Start after battle begins\n* Recommended support pals: Steel Shot and Blazing Pitcher\n* Stage mode is semi-automatic: manual shooting and manual next-stage selection are required",
+    "owner_scope": "module",
+    "owner_module": "alien_guardian",
+    "file_path": "app/features/modules/alien_guardian/ui/alien_guardian_interface.py",
+    "line": 68,
+    "col": 12,
+    "context": "ui"
+  },
   "app/features/modules/alien_guardian/ui/alien_guardian_interface.py:69:12": {
     "kind": "static_literal",
     "key": "module.alien_guardian.ui.tips_click_start_after_battle_begins_recommended_support_pals_steel_shot_and_bla",
@@ -23,11 +35,23 @@
     "col": 12,
     "context": "ui"
   },
-  "app/features/modules/alien_guardian/ui/alien_guardian_interface.py:71:34": {
+  "app/features/modules/alien_guardian/ui/alien_guardian_interface.py:70:34": {
     "kind": "static_literal",
     "key": "module.alien_guardian.ui.run_mode",
     "msgid": "run_mode",
     "source_text": "Run mode",
+    "owner_scope": "module",
+    "owner_module": "alien_guardian",
+    "file_path": "app/features/modules/alien_guardian/ui/alien_guardian_interface.py",
+    "line": 70,
+    "col": 34,
+    "context": "ui"
+  },
+  "app/features/modules/alien_guardian/ui/alien_guardian_interface.py:71:34": {
+    "kind": "static_literal",
+    "key": "module.alien_guardian.ui.log",
+    "msgid": "log",
+    "source_text": "Log",
     "owner_scope": "module",
     "owner_module": "alien_guardian",
     "file_path": "app/features/modules/alien_guardian/ui/alien_guardian_interface.py",
@@ -45,6 +69,18 @@
     "file_path": "app/features/modules/alien_guardian/ui/alien_guardian_interface.py",
     "line": 72,
     "col": 34,
+    "context": "ui"
+  },
+  "app/features/modules/alien_guardian/ui/alien_guardian_interface.py:72:53": {
+    "kind": "static_literal",
+    "key": "module.alien_guardian.ui.start_alien_guardian",
+    "msgid": "start_alien_guardian",
+    "source_text": "Start Alien Guardian",
+    "owner_scope": "module",
+    "owner_module": "alien_guardian",
+    "file_path": "app/features/modules/alien_guardian/ui/alien_guardian_interface.py",
+    "line": 72,
+    "col": 53,
     "context": "ui"
   },
   "app/features/modules/alien_guardian/ui/alien_guardian_interface.py:73:34": {
@@ -83,11 +119,23 @@
     "col": 53,
     "context": "ui"
   },
-  "app/features/modules/alien_guardian/ui/alien_guardian_interface.py:77:13": {
+  "app/features/modules/alien_guardian/ui/alien_guardian_interface.py:76:13": {
     "kind": "static_literal",
     "key": "module.alien_guardian.ui.endless_mode",
     "msgid": "endless_mode",
     "source_text": "Endless Mode",
+    "owner_scope": "module",
+    "owner_module": "alien_guardian",
+    "file_path": "app/features/modules/alien_guardian/ui/alien_guardian_interface.py",
+    "line": 76,
+    "col": 13,
+    "context": "ui"
+  },
+  "app/features/modules/alien_guardian/ui/alien_guardian_interface.py:77:13": {
+    "kind": "static_literal",
+    "key": "module.alien_guardian.ui.stage_mode",
+    "msgid": "stage_mode",
+    "source_text": "Stage Mode",
     "owner_scope": "module",
     "owner_module": "alien_guardian",
     "file_path": "app/features/modules/alien_guardian/ui/alien_guardian_interface.py",

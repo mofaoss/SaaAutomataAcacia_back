@@ -226,7 +226,7 @@ class DisplayInterface(ScrollArea, BaseInterface):
         self.windowTrackingQuickSwitchCard = None
 
         self._setup_ui()
-        self._apply_i18n()
+        self.apply_i18n()
         self._load_samples()
 
     def _setup_ui(self):
@@ -269,7 +269,7 @@ class DisplayInterface(ScrollArea, BaseInterface):
         self.gameLanguageNoticeCard.setVisible(self._is_non_chinese_ui)
         self.vBoxLayout.addWidget(self.gameLanguageNoticeCard)
 
-    def _apply_i18n(self):
+    def apply_i18n(self):
         """专门负责文本和多语言翻译（视图层职责）"""
         self.gameLanguageNoticeLabel.setText(
             "Note: Game language for automation supports only Simplified/Traditional Chinese."

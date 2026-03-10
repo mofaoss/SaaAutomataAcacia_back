@@ -1,7 +1,6 @@
 ﻿from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QTextBrowser
 from qfluentwidgets import (BodyLabel, CheckBox, ComboBox, PushButton, SimpleCardWidget, SpinBox, TitleLabel)
-from app.framework.infra.config.app_config import config
 from app.framework.ui.views.periodic_base import ModulePageBase
 
 class DrinkInterface(ModulePageBase):

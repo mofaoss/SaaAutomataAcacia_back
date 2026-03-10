@@ -58,10 +58,10 @@ class ShopPage(ModulePageBase):
 
         self.ScrollArea.setWidget(self.scrollAreaWidgetContents)
         self.main_layout.addWidget(self.ScrollArea)
-        self._apply_i18n()
+        self.apply_i18n()
         self.finalize()
 
-    def _apply_i18n(self):
+    def apply_i18n(self):
         self.StrongBodyLabel.setText(_("Select items to buy", msgid='select_items_to_buy'))
         shop_items = [
             ("CheckBox_buy_3", "通用强化套件", "Universal Enhancement Kit"),

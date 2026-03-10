@@ -47,10 +47,10 @@ class PersonPage(ModulePageBase):
         self.main_layout.addLayout(self._line(self.BodyLabel_8, self.LineEdit_c4))
         self.main_layout.addWidget(self.CheckBox_is_use_chip)
         self.main_layout.addWidget(self.BodyLabel_person_tip)
-        self._apply_i18n()
+        self.apply_i18n()
         self.finalize()
 
-    def _apply_i18n(self):
+    def apply_i18n(self):
         self.StrongBodyLabel_3.setText(_("Select characters for shards", msgid='select_characters_for_shards'))
         self.BodyLabel_3.setText(_("Character 1:", msgid='character_1'))
         self.BodyLabel_4.setText(_("Character 2:", msgid='character_2'))

@@ -1,4 +1,28 @@
 {
+  "app/features/modules/operation_action/ui/operation_interface.py:82:45": {
+    "kind": "static_literal",
+    "key": "module.operation_action.ui.start_operation",
+    "msgid": "start_operation",
+    "source_text": "Start Operation",
+    "owner_scope": "module",
+    "owner_module": "operation_action",
+    "file_path": "app/features/modules/operation_action/ui/operation_interface.py",
+    "line": 82,
+    "col": 45,
+    "context": "ui"
+  },
+  "app/features/modules/operation_action/ui/operation_interface.py:83:33": {
+    "kind": "static_literal",
+    "key": "module.operation_action.ui.run_count",
+    "msgid": "run_count",
+    "source_text": "Run count",
+    "owner_scope": "module",
+    "owner_module": "operation_action",
+    "file_path": "app/features/modules/operation_action/ui/operation_interface.py",
+    "line": 83,
+    "col": 33,
+    "context": "ui"
+  },
   "app/features/modules/operation_action/ui/operation_interface.py:83:45": {
     "kind": "static_literal",
     "key": "module.operation_action.ui.start_operation",
@@ -21,6 +45,18 @@
     "file_path": "app/features/modules/operation_action/ui/operation_interface.py",
     "line": 84,
     "col": 33,
+    "context": "ui"
+  },
+  "app/features/modules/operation_action/ui/operation_interface.py:84:34": {
+    "kind": "static_literal",
+    "key": "module.operation_action.ui.sprint_mode",
+    "msgid": "sprint_mode",
+    "source_text": "Sprint mode",
+    "owner_scope": "module",
+    "owner_module": "operation_action",
+    "file_path": "app/features/modules/operation_action/ui/operation_interface.py",
+    "line": 84,
+    "col": 34,
     "context": "ui"
   },
   "app/features/modules/operation_action/ui/operation_interface.py:84:45": {
@@ -49,9 +85,9 @@
   },
   "app/features/modules/operation_action/ui/operation_interface.py:85:34": {
     "kind": "static_literal",
-    "key": "module.operation_action.ui.sprint_mode",
-    "msgid": "sprint_mode",
-    "source_text": "Sprint mode",
+    "key": "module.operation_action.ui.log",
+    "msgid": "log",
+    "source_text": "Log",
     "owner_scope": "module",
     "owner_module": "operation_action",
     "file_path": "app/features/modules/operation_action/ui/operation_interface.py",

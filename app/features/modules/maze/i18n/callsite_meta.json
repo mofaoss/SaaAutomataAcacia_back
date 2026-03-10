@@ -1,4 +1,16 @@
 {
+  "app/features/modules/maze/ui/maze_interface.py:68:12": {
+    "kind": "static_literal",
+    "key": "module.maze.ui.tips_this_feature_only_supports_the_new_buff_maze_not_the_old_maze_single_run_is",
+    "msgid": "tips_this_feature_only_supports_the_new_buff_maze_not_the_old_maze_single_run_is",
+    "source_text": "### Tips\n* This feature only supports the new Buff Maze, not the old maze\n* Single Run is suitable for first 3 stages; Repeat Run keeps farming the last stage\n* Select buffs in team setup first, then click Start Maze in Acacia\n* Recommended buffs: Skill-Chain Lightning and Shield-Steal\n* Team must include Chenxing - Qiongxian in the middle slot\n* Bring a strong support unit to reduce sudden deaths",
+    "owner_scope": "module",
+    "owner_module": "maze",
+    "file_path": "app/features/modules/maze/ui/maze_interface.py",
+    "line": 68,
+    "col": 12,
+    "context": "ui"
+  },
   "app/features/modules/maze/ui/maze_interface.py:69:12": {
     "kind": "static_literal",
     "key": "module.maze.ui.tips_this_feature_only_supports_the_new_buff_maze_not_the_old_maze_single_run_is",
@@ -23,11 +35,23 @@
     "col": 12,
     "context": "ui"
   },
-  "app/features/modules/maze/ui/maze_interface.py:71:34": {
+  "app/features/modules/maze/ui/maze_interface.py:70:34": {
     "kind": "static_literal",
     "key": "module.maze.ui.run_mode",
     "msgid": "run_mode",
     "source_text": "Run mode",
+    "owner_scope": "module",
+    "owner_module": "maze",
+    "file_path": "app/features/modules/maze/ui/maze_interface.py",
+    "line": 70,
+    "col": 34,
+    "context": "ui"
+  },
+  "app/features/modules/maze/ui/maze_interface.py:71:34": {
+    "kind": "static_literal",
+    "key": "module.maze.ui.log",
+    "msgid": "log",
+    "source_text": "Log",
     "owner_scope": "module",
     "owner_module": "maze",
     "file_path": "app/features/modules/maze/ui/maze_interface.py",
@@ -45,6 +69,18 @@
     "file_path": "app/features/modules/maze/ui/maze_interface.py",
     "line": 72,
     "col": 34,
+    "context": "ui"
+  },
+  "app/features/modules/maze/ui/maze_interface.py:72:43": {
+    "kind": "static_literal",
+    "key": "module.maze.ui.start_maze",
+    "msgid": "start_maze",
+    "source_text": "Start Maze",
+    "owner_scope": "module",
+    "owner_module": "maze",
+    "file_path": "app/features/modules/maze/ui/maze_interface.py",
+    "line": 72,
+    "col": 43,
     "context": "ui"
   },
   "app/features/modules/maze/ui/maze_interface.py:73:34": {
@@ -83,11 +119,23 @@
     "col": 43,
     "context": "ui"
   },
-  "app/features/modules/maze/ui/maze_interface.py:77:13": {
+  "app/features/modules/maze/ui/maze_interface.py:76:13": {
     "kind": "static_literal",
     "key": "module.maze.ui.single_run",
     "msgid": "single_run",
     "source_text": "Single Run",
+    "owner_scope": "module",
+    "owner_module": "maze",
+    "file_path": "app/features/modules/maze/ui/maze_interface.py",
+    "line": 76,
+    "col": 13,
+    "context": "ui"
+  },
+  "app/features/modules/maze/ui/maze_interface.py:77:13": {
+    "kind": "static_literal",
+    "key": "module.maze.ui.repeat_run",
+    "msgid": "repeat_run",
+    "source_text": "Repeat Run",
     "owner_scope": "module",
     "owner_module": "maze",
     "file_path": "app/features/modules/maze/ui/maze_interface.py",

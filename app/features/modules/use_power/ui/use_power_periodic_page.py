@@ -27,10 +27,10 @@ class UsePowerPage(ModulePageBase):
         self.main_layout.addLayout(first_line)
         self.main_layout.addWidget(self.StrongBodyLabel_2)
         self.main_layout.addWidget(self.ComboBox_power_usage)
-        self._apply_i18n()
+        self.apply_i18n()
         self.finalize()
 
-    def _apply_i18n(self):
+    def apply_i18n(self):
         self.ComboBox_power_day.addItems(["1", "2", "3", "4", "5", "6"])
         self.ComboBox_power_usage.addItems(
             [

@@ -1,7 +1,6 @@
 ﻿from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QFrame
 from qfluentwidgets import (BodyLabel, SimpleCardWidget, StrongBodyLabel, SwitchButton)
-from app.framework.infra.config.app_config import config
 from app.framework.ui.views.periodic_base import ModulePageBase
 
 class TriggerInterface(ModulePageBase):

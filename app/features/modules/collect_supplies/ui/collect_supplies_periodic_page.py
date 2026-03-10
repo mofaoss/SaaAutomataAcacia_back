@@ -50,10 +50,10 @@ class CollectSuppliesPage(ModulePageBase):
         self.main_layout.addLayout(redeem_line)
         self.main_layout.addWidget(self.TextEdit_import_codes)
         self.main_layout.addWidget(self.BodyLabel_collect_supplies)
-        self._apply_i18n()
+        self.apply_i18n()
         self.finalize()
 
-    def _apply_i18n(self):
+    def apply_i18n(self):
         self.CheckBox_mail.setText(_("Claim Mail", msgid='claim_mail'))
         self.CheckBox_fish_bait.setText(_("Claim Bait", msgid='claim_bait'))
         self.CheckBox_dormitory.setText(_("Dorm Shards", msgid='dorm_shards'))

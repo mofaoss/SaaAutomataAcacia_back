@@ -1,4 +1,16 @@
 {
+  "app/features/modules/water_bomb/ui/water_bomb_interface.py:101:12": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.ui.tips_stand_at_the_water_bomb_entrance_before_starting_if_items_or_hp_are_not_rec",
+    "msgid": "tips_stand_at_the_water_bomb_entrance_before_starting_if_items_or_hp_are_not_rec",
+    "source_text": "### Tips\n* Stand at the Water Bomb entrance before starting\n* If items or HP are not recognized, lower the two confidence values above",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/ui/water_bomb_interface.py",
+    "line": 101,
+    "col": 12,
+    "context": "ui"
+  },
   "app/features/modules/water_bomb/ui/water_bomb_interface.py:102:12": {
     "kind": "static_literal",
     "key": "module.water_bomb.ui.tips_stand_at_the_water_bomb_entrance_before_starting_if_items_or_hp_are_not_rec",
@@ -9,6 +21,18 @@
     "file_path": "app/features/modules/water_bomb/ui/water_bomb_interface.py",
     "line": 102,
     "col": 12,
+    "context": "ui"
+  },
+  "app/features/modules/water_bomb/ui/water_bomb_interface.py:102:34": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.ui.template_confidence",
+    "msgid": "template_confidence",
+    "source_text": "Template confidence",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/ui/water_bomb_interface.py",
+    "line": 102,
+    "col": 34,
     "context": "ui"
   },
   "app/features/modules/water_bomb/ui/water_bomb_interface.py:103:12": {
@@ -25,9 +49,9 @@
   },
   "app/features/modules/water_bomb/ui/water_bomb_interface.py:103:34": {
     "kind": "static_literal",
-    "key": "module.water_bomb.ui.template_confidence",
-    "msgid": "template_confidence",
-    "source_text": "Template confidence",
+    "key": "module.water_bomb.ui.count_confidence",
+    "msgid": "count_confidence",
+    "source_text": "Count confidence",
     "owner_scope": "module",
     "owner_module": "water_bomb",
     "file_path": "app/features/modules/water_bomb/ui/water_bomb_interface.py",
@@ -37,9 +61,9 @@
   },
   "app/features/modules/water_bomb/ui/water_bomb_interface.py:104:34": {
     "kind": "static_literal",
-    "key": "module.water_bomb.ui.count_confidence",
-    "msgid": "count_confidence",
-    "source_text": "Count confidence",
+    "key": "module.water_bomb.ui.win_streak",
+    "msgid": "win_streak",
+    "source_text": "Win streak",
     "owner_scope": "module",
     "owner_module": "water_bomb",
     "file_path": "app/features/modules/water_bomb/ui/water_bomb_interface.py",
@@ -49,9 +73,9 @@
   },
   "app/features/modules/water_bomb/ui/water_bomb_interface.py:105:34": {
     "kind": "static_literal",
-    "key": "module.water_bomb.ui.win_streak",
-    "msgid": "win_streak",
-    "source_text": "Win streak",
+    "key": "module.water_bomb.ui.stop_after_wins",
+    "msgid": "stop_after_wins",
+    "source_text": "stop after wins",
     "owner_scope": "module",
     "owner_module": "water_bomb",
     "file_path": "app/features/modules/water_bomb/ui/water_bomb_interface.py",
@@ -61,9 +85,9 @@
   },
   "app/features/modules/water_bomb/ui/water_bomb_interface.py:106:34": {
     "kind": "static_literal",
-    "key": "module.water_bomb.ui.stop_after_wins",
-    "msgid": "stop_after_wins",
-    "source_text": "stop after wins",
+    "key": "module.water_bomb.ui.log",
+    "msgid": "log",
+    "source_text": "Log",
     "owner_scope": "module",
     "owner_module": "water_bomb",
     "file_path": "app/features/modules/water_bomb/ui/water_bomb_interface.py",
@@ -81,6 +105,18 @@
     "file_path": "app/features/modules/water_bomb/ui/water_bomb_interface.py",
     "line": 107,
     "col": 34,
+    "context": "ui"
+  },
+  "app/features/modules/water_bomb/ui/water_bomb_interface.py:107:49": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.ui.start_water_bomb",
+    "msgid": "start_water_bomb",
+    "source_text": "Start Water Bomb",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/ui/water_bomb_interface.py",
+    "line": 107,
+    "col": 49,
     "context": "ui"
   },
   "app/features/modules/water_bomb/ui/water_bomb_interface.py:108:34": {

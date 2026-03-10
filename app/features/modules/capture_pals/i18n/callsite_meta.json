@@ -1,4 +1,16 @@
 {
+  "app/features/modules/capture_pals/ui/capture_pals_interface.py:150:57": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.ui.partner_island_mode",
+    "msgid": "partner_island_mode",
+    "source_text": "Partner Island mode",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
+    "line": 150,
+    "col": 57,
+    "context": "ui"
+  },
   "app/features/modules/capture_pals/ui/capture_pals_interface.py:151:57": {
     "kind": "static_literal",
     "key": "module.capture_pals.ui.partner_island_mode",
@@ -11,11 +23,23 @@
     "col": 57,
     "context": "ui"
   },
+  "app/features/modules/capture_pals/ui/capture_pals_interface.py:151:59": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.ui.adventure_island_mode",
+    "msgid": "adventure_island_mode",
+    "source_text": "Adventure Island mode",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
+    "line": 151,
+    "col": 59,
+    "context": "ui"
+  },
   "app/features/modules/capture_pals/ui/capture_pals_interface.py:152:57": {
     "kind": "static_literal",
-    "key": "module.capture_pals.ui.partner_island_mode",
-    "msgid": "partner_island_mode",
-    "source_text": "Partner Island mode",
+    "key": "module.capture_pals.ui.select_islands",
+    "msgid": "select_islands",
+    "source_text": "Select islands",
     "owner_scope": "module",
     "owner_module": "capture_pals",
     "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
@@ -33,6 +57,18 @@
     "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
     "line": 152,
     "col": 59,
+    "context": "ui"
+  },
+  "app/features/modules/capture_pals/ui/capture_pals_interface.py:153:51": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.ui.partner_island",
+    "msgid": "partner_island",
+    "source_text": "Partner Island",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
+    "line": 153,
+    "col": 51,
     "context": "ui"
   },
   "app/features/modules/capture_pals/ui/capture_pals_interface.py:153:57": {
@@ -71,6 +107,18 @@
     "col": 51,
     "context": "ui"
   },
+  "app/features/modules/capture_pals/ui/capture_pals_interface.py:154:53": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.ui.adventure_island",
+    "msgid": "adventure_island",
+    "source_text": "Adventure Island",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
+    "line": 154,
+    "col": 53,
+    "context": "ui"
+  },
   "app/features/modules/capture_pals/ui/capture_pals_interface.py:154:57": {
     "kind": "static_literal",
     "key": "module.capture_pals.ui.select_islands",
@@ -81,6 +129,18 @@
     "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
     "line": 154,
     "col": 57,
+    "context": "ui"
+  },
+  "app/features/modules/capture_pals/ui/capture_pals_interface.py:155:48": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.ui.sync_capture",
+    "msgid": "sync_capture",
+    "source_text": "Sync capture",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
+    "line": 155,
+    "col": 48,
     "context": "ui"
   },
   "app/features/modules/capture_pals/ui/capture_pals_interface.py:155:51": {
@@ -131,6 +191,18 @@
     "col": 53,
     "context": "ui"
   },
+  "app/features/modules/capture_pals/ui/capture_pals_interface.py:156:58": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.ui.partner_island_settings",
+    "msgid": "partner_island_settings",
+    "source_text": "Partner Island settings",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
+    "line": 156,
+    "col": 58,
+    "context": "ui"
+  },
   "app/features/modules/capture_pals/ui/capture_pals_interface.py:157:48": {
     "kind": "static_literal",
     "key": "module.capture_pals.ui.sync_capture",
@@ -145,9 +217,9 @@
   },
   "app/features/modules/capture_pals/ui/capture_pals_interface.py:157:58": {
     "kind": "static_literal",
-    "key": "module.capture_pals.ui.partner_island_settings",
-    "msgid": "partner_island_settings",
-    "source_text": "Partner Island settings",
+    "key": "module.capture_pals.ui.fixed_interval_s",
+    "msgid": "fixed_interval_s",
+    "source_text": "Fixed interval (s)",
     "owner_scope": "module",
     "owner_module": "capture_pals",
     "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
@@ -165,6 +237,18 @@
     "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
     "line": 158,
     "col": 58,
+    "context": "ui"
+  },
+  "app/features/modules/capture_pals/ui/capture_pals_interface.py:158:59": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.ui.patrol_interval_s",
+    "msgid": "patrol_interval_s",
+    "source_text": "Patrol interval (s)",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
+    "line": 158,
+    "col": 59,
     "context": "ui"
   },
   "app/features/modules/capture_pals/ui/capture_pals_interface.py:159:58": {
@@ -191,6 +275,18 @@
     "col": 59,
     "context": "ui"
   },
+  "app/features/modules/capture_pals/ui/capture_pals_interface.py:159:60": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.ui.adventure_island_settings",
+    "msgid": "adventure_island_settings",
+    "source_text": "Adventure Island settings",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
+    "line": 159,
+    "col": 60,
+    "context": "ui"
+  },
   "app/features/modules/capture_pals/ui/capture_pals_interface.py:160:59": {
     "kind": "static_literal",
     "key": "module.capture_pals.ui.patrol_interval_s",
@@ -205,9 +301,9 @@
   },
   "app/features/modules/capture_pals/ui/capture_pals_interface.py:160:60": {
     "kind": "static_literal",
-    "key": "module.capture_pals.ui.adventure_island_settings",
-    "msgid": "adventure_island_settings",
-    "source_text": "Adventure Island settings",
+    "key": "module.capture_pals.ui.fixed_interval_s",
+    "msgid": "fixed_interval_s",
+    "source_text": "Fixed interval (s)",
     "owner_scope": "module",
     "owner_module": "capture_pals",
     "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
@@ -225,6 +321,30 @@
     "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
     "line": 161,
     "col": 60,
+    "context": "ui"
+  },
+  "app/features/modules/capture_pals/ui/capture_pals_interface.py:161:61": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.ui.patrol_interval_s",
+    "msgid": "patrol_interval_s",
+    "source_text": "Patrol interval (s)",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
+    "line": 161,
+    "col": 61,
+    "context": "ui"
+  },
+  "app/features/modules/capture_pals/ui/capture_pals_interface.py:162:49": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.ui.log",
+    "msgid": "log",
+    "source_text": "Log",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
+    "line": 162,
+    "col": 49,
     "context": "ui"
   },
   "app/features/modules/capture_pals/ui/capture_pals_interface.py:162:60": {
@@ -261,6 +381,18 @@
     "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
     "line": 163,
     "col": 49,
+    "context": "ui"
+  },
+  "app/features/modules/capture_pals/ui/capture_pals_interface.py:163:51": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.ui.start_capture_pals",
+    "msgid": "start_capture_pals",
+    "source_text": "Start Capture Pals",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
+    "line": 163,
+    "col": 51,
     "context": "ui"
   },
   "app/features/modules/capture_pals/ui/capture_pals_interface.py:163:61": {
@@ -311,11 +443,23 @@
     "col": 51,
     "context": "ui"
   },
-  "app/features/modules/capture_pals/ui/capture_pals_interface.py:167:12": {
+  "app/features/modules/capture_pals/ui/capture_pals_interface.py:166:12": {
     "kind": "static_literal",
     "key": "module.capture_pals.ui.fixed_point_capture",
     "msgid": "fixed_point_capture",
     "source_text": "Fixed Point Capture",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",
+    "line": 166,
+    "col": 12,
+    "context": "ui"
+  },
+  "app/features/modules/capture_pals/ui/capture_pals_interface.py:167:12": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.ui.patrol_capture",
+    "msgid": "patrol_capture",
+    "source_text": "Patrol Capture",
     "owner_scope": "module",
     "owner_module": "capture_pals",
     "file_path": "app/features/modules/capture_pals/ui/capture_pals_interface.py",

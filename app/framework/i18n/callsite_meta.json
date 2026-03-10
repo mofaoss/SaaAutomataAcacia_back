@@ -1526,6 +1526,18 @@
     "col": 12,
     "context": "ui"
   },
+  "app/framework/i18n/__init__.py:73:12": {
+    "kind": "dynamic_candidate",
+    "key": null,
+    "msgid": null,
+    "raw_expression": "text",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/i18n/__init__.py",
+    "line": 73,
+    "col": 12,
+    "context": "ui"
+  },
   "app/framework/infra/automation/automation.py:131:16": {
     "kind": "dynamic_template",
     "key": "framework.ui.handle_for_window_value_not_found",

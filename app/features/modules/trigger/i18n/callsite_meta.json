@@ -287,6 +287,30 @@
     "col": 20,
     "context": "ui"
   },
+  "app/features/modules/trigger/ui/trigger_interface.py:103:47": {
+    "kind": "static_literal",
+    "key": "module.trigger.ui.auto_collect",
+    "msgid": "auto_collect",
+    "source_text": "Auto Collect",
+    "owner_scope": "module",
+    "owner_module": "trigger",
+    "file_path": "app/features/modules/trigger/ui/trigger_interface.py",
+    "line": 103,
+    "col": 47,
+    "context": "ui"
+  },
+  "app/features/modules/trigger/ui/trigger_interface.py:104:41": {
+    "kind": "static_literal",
+    "key": "module.trigger.ui.automatically_press_f_when_collect_prompt_appears",
+    "msgid": "automatically_press_f_when_collect_prompt_appears",
+    "source_text": "Automatically press F when collect prompt appears",
+    "owner_scope": "module",
+    "owner_module": "trigger",
+    "file_path": "app/features/modules/trigger/ui/trigger_interface.py",
+    "line": 104,
+    "col": 41,
+    "context": "ui"
+  },
   "app/features/modules/trigger/ui/trigger_interface.py:104:47": {
     "kind": "static_literal",
     "key": "module.trigger.ui.auto_collect",
@@ -313,9 +337,9 @@
   },
   "app/features/modules/trigger/ui/trigger_interface.py:105:47": {
     "kind": "static_literal",
-    "key": "module.trigger.ui.auto_collect",
-    "msgid": "auto_collect",
-    "source_text": "Auto Collect",
+    "key": "module.trigger.ui.nita_e_auto_qte",
+    "msgid": "nita_e_auto_qte",
+    "source_text": "Nita E Auto QTE",
     "owner_scope": "module",
     "owner_module": "trigger",
     "file_path": "app/features/modules/trigger/ui/trigger_interface.py",
@@ -325,9 +349,9 @@
   },
   "app/features/modules/trigger/ui/trigger_interface.py:106:41": {
     "kind": "static_literal",
-    "key": "module.trigger.ui.automatically_press_f_when_collect_prompt_appears",
-    "msgid": "automatically_press_f_when_collect_prompt_appears",
-    "source_text": "Automatically press F when collect prompt appears",
+    "key": "module.trigger.ui.automatically_press_e_during_qte_stage",
+    "msgid": "automatically_press_e_during_qte_stage",
+    "source_text": "Automatically press E during QTE stage",
     "owner_scope": "module",
     "owner_module": "trigger",
     "file_path": "app/features/modules/trigger/ui/trigger_interface.py",
@@ -357,6 +381,18 @@
     "file_path": "app/features/modules/trigger/ui/trigger_interface.py",
     "line": 107,
     "col": 41,
+    "context": "ui"
+  },
+  "app/features/modules/trigger/ui/trigger_interface.py:107:44": {
+    "kind": "static_literal",
+    "key": "module.trigger.ui.log",
+    "msgid": "log",
+    "source_text": "Log",
+    "owner_scope": "module",
+    "owner_module": "trigger",
+    "file_path": "app/features/modules/trigger/ui/trigger_interface.py",
+    "line": 107,
+    "col": 44,
     "context": "ui"
   },
   "app/features/modules/trigger/ui/trigger_interface.py:107:47": {
@@ -393,6 +429,18 @@
     "file_path": "app/features/modules/trigger/ui/trigger_interface.py",
     "line": 108,
     "col": 44,
+    "context": "ui"
+  },
+  "app/features/modules/trigger/ui/trigger_interface.py:109:12": {
+    "kind": "static_literal",
+    "key": "module.trigger.ui.tips_launch_the_game_before_enabling_this_feature_these_are_toggle_switches_once",
+    "msgid": "tips_launch_the_game_before_enabling_this_feature_these_are_toggle_switches_once",
+    "source_text": "### Tips\n* Launch the game before enabling this feature\n* These are toggle switches. Once enabled, detection keeps running and triggers automatically when conditions match\n* It does not block manual gameplay, acting as semi-automation assistance",
+    "owner_scope": "module",
+    "owner_module": "trigger",
+    "file_path": "app/features/modules/trigger/ui/trigger_interface.py",
+    "line": 109,
+    "col": 12,
     "context": "ui"
   },
   "app/features/modules/trigger/ui/trigger_interface.py:109:44": {

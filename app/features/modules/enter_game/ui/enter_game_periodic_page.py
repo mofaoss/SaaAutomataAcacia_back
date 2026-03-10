@@ -46,10 +46,10 @@ class EnterGamePage(ModulePageBase):
         self.main_layout.addWidget(self.LineEdit_game_directory)
         self.main_layout.addLayout(action_line)
         self.main_layout.addWidget(self.BodyLabel_enter_tip)
-        self._apply_i18n()
+        self.apply_i18n()
         self.finalize()
 
-    def _apply_i18n(self):
+    def apply_i18n(self):
         self.PrimaryPushButton_path_tutorial.setText(_("Tutorial", msgid='tutorial'))
         self.StrongBodyLabel_4.setText(_("Find game path in launcher", msgid='find_game_path_in_launcher'))
         self.CheckBox_open_game_directly.setText(_("Auto open game", msgid='auto_open_game'))
@@ -78,5 +78,3 @@ class EnterGamePage(ModulePageBase):
             "content": content,
             "image": image,
         }
-
-

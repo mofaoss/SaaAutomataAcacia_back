@@ -1,4 +1,16 @@
 {
+  "app/features/modules/drink/ui/drink_interface.py:81:12": {
+    "kind": "static_literal",
+    "key": "module.drink.ui.tips_stand_at_the_card_match_entrance_before_starting_both_modes_prioritize_endi",
+    "msgid": "tips_stand_at_the_card_match_entrance_before_starting_both_modes_prioritize_endi",
+    "source_text": "### Tips\n* Stand at the Card Match entrance before starting\n* Both modes prioritize ending matches quickly for fast farming\n* Logic: always challenge when possible; play the middle card on your turn\n* Win/loss may vary; it is designed for passive EXP farming",
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/ui/drink_interface.py",
+    "line": 81,
+    "col": 12,
+    "context": "ui"
+  },
   "app/features/modules/drink/ui/drink_interface.py:82:12": {
     "kind": "static_literal",
     "key": "module.drink.ui.tips_stand_at_the_card_match_entrance_before_starting_both_modes_prioritize_endi",
@@ -23,11 +35,23 @@
     "col": 12,
     "context": "ui"
   },
-  "app/features/modules/drink/ui/drink_interface.py:84:34": {
+  "app/features/modules/drink/ui/drink_interface.py:83:34": {
     "kind": "static_literal",
     "key": "module.drink.ui.mode",
     "msgid": "mode",
     "source_text": "Mode",
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/ui/drink_interface.py",
+    "line": 83,
+    "col": 34,
+    "context": "ui"
+  },
+  "app/features/modules/drink/ui/drink_interface.py:84:34": {
+    "kind": "static_literal",
+    "key": "module.drink.ui.run_count_1_means_infinite",
+    "msgid": "run_count_1_means_infinite",
+    "source_text": "Run count (-1 means infinite)",
     "owner_scope": "module",
     "owner_module": "drink",
     "file_path": "app/features/modules/drink/ui/drink_interface.py",
@@ -47,11 +71,23 @@
     "col": 34,
     "context": "ui"
   },
+  "app/features/modules/drink/ui/drink_interface.py:85:42": {
+    "kind": "static_literal",
+    "key": "module.drink.ui.i_have_enabled_speed_up_manually",
+    "msgid": "i_have_enabled_speed_up_manually",
+    "source_text": "I have enabled speed-up manually",
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/ui/drink_interface.py",
+    "line": 85,
+    "col": 42,
+    "context": "ui"
+  },
   "app/features/modules/drink/ui/drink_interface.py:86:34": {
     "kind": "static_literal",
-    "key": "module.drink.ui.run_count_1_means_infinite",
-    "msgid": "run_count_1_means_infinite",
-    "source_text": "Run count (-1 means infinite)",
+    "key": "module.drink.ui.log",
+    "msgid": "log",
+    "source_text": "Log",
     "owner_scope": "module",
     "owner_module": "drink",
     "file_path": "app/features/modules/drink/ui/drink_interface.py",
@@ -95,6 +131,18 @@
     "col": 42,
     "context": "ui"
   },
+  "app/features/modules/drink/ui/drink_interface.py:87:44": {
+    "kind": "static_literal",
+    "key": "module.drink.ui.start_drink",
+    "msgid": "start_drink",
+    "source_text": "Start Drink",
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/ui/drink_interface.py",
+    "line": 87,
+    "col": 44,
+    "context": "ui"
+  },
   "app/features/modules/drink/ui/drink_interface.py:88:34": {
     "kind": "static_literal",
     "key": "module.drink.ui.log",
@@ -131,11 +179,23 @@
     "col": 44,
     "context": "ui"
   },
-  "app/features/modules/drink/ui/drink_interface.py:92:13": {
+  "app/features/modules/drink/ui/drink_interface.py:91:13": {
     "kind": "static_literal",
     "key": "module.drink.ui.standard_fast_exp",
     "msgid": "standard_fast_exp",
     "source_text": "Standard (fast EXP)",
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/ui/drink_interface.py",
+    "line": 91,
+    "col": 13,
+    "context": "ui"
+  },
+  "app/features/modules/drink/ui/drink_interface.py:92:13": {
+    "kind": "static_literal",
+    "key": "module.drink.ui.mystery_box_raid_exp_achievements",
+    "msgid": "mystery_box_raid_exp_achievements",
+    "source_text": "Mystery Box Raid (EXP/Achievements)",
     "owner_scope": "module",
     "owner_module": "drink",
     "file_path": "app/features/modules/drink/ui/drink_interface.py",
