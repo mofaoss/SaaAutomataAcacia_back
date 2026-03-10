@@ -51,13 +51,14 @@ class ModuleContext:
             )
         except Exception:
             return cls(
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                str(path),
-                int(line_no) if isinstance(line_no, int) else None,
+                module_id=None,
+                module_name=None,
+                module_dir=None,
+                assets_dir=None,
+                images_root=None,
+                ocr_root=None,
+                ui_manifest_path=None,
+                generated_manifest_path=None,
+                callsite_file=str(path),
+                callsite_line=int(line_no) if isinstance(line_no, int) else None,
             )

@@ -1,9 +1,11 @@
 import functools
+import inspect
 import math
 import re
 import threading
 import time
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import cv2
 import win32gui
@@ -56,6 +58,8 @@ class Automation:
     _click_verify_change_threshold = 1.0
     _click_verify_roi_padding = 12
     _ui_id_pattern = re.compile(r"^[A-Za-z0-9_.-]+$")
+    _project_root = Path(__file__).resolve().parents[4]
+    _modules_root = _project_root / "app" / "features" / "modules"
 
     def __init__(self, window_title, window_class, logger):
         """
@@ -280,16 +284,125 @@ class Automation:
 
 
     @staticmethod
-    def _template_log_name(template: str) -> str:
+    def _callsite_module_context(skip_min: int = 3, skip_max: int = 14) -> ModuleContext:
+        for frame_info in inspect.stack()[skip_min: skip_max + 1]:
+            frame_path = Path(frame_info.filename).resolve()
+            lower_parts = [part.lower() for part in frame_path.parts]
+            if "modules" not in lower_parts:
+                continue
+            try:
+                idx = lower_parts.index("modules")
+                module_name = frame_path.parts[idx + 1]
+            except Exception:
+                continue
+            module_dir = (Automation._modules_root / module_name).resolve()
+            if not module_dir.exists() or not module_dir.is_dir():
+                continue
+            assets_dir = module_dir / "assets"
+            return ModuleContext(
+                module_id=module_name,
+                module_name=module_name,
+                module_dir=module_dir,
+                assets_dir=assets_dir,
+                images_root=assets_dir / "images",
+                ocr_root=assets_dir / "ocr",
+                ui_manifest_path=assets_dir / "ui.json",
+                generated_manifest_path=assets_dir / "ui.generated.json",
+                callsite_file=str(frame_path),
+                callsite_line=int(frame_info.lineno),
+            )
+        return ModuleContext.from_callsite(skip=skip_min)
+
+    @staticmethod
+    def _module_context_from_template_prefix(template: str) -> ModuleContext | None:
+        if not isinstance(template, str):
+            return None
+        normalized = template.replace("\\", "/").strip()
+        if not normalized or normalized.startswith("/"):
+            return None
+        parts = [p for p in normalized.split("/") if p]
+        if len(parts) >= 4 and parts[0] == "app" and parts[1] == "features" and parts[2] == "modules":
+            first = parts[3]
+        else:
+            first = parts[0] if parts else ""
+        if not first or first in {"assets", "images", "ocr", "resources", "app", "features", "modules"}:
+            return None
+        module_dir = (Automation._modules_root / first).resolve()
+        if not module_dir.exists() or not module_dir.is_dir():
+            return None
+        return ModuleContext(
+            module_id=first,
+            module_name=first,
+            module_dir=module_dir,
+            assets_dir=module_dir / "assets",
+            images_root=module_dir / "assets" / "images",
+            ocr_root=module_dir / "assets" / "ocr",
+            ui_manifest_path=module_dir / "assets" / "ui.json",
+            generated_manifest_path=module_dir / "assets" / "ui.generated.json",
+        )
+
+    @staticmethod
+    def _resolve_template_path(template: str, module_ctx: ModuleContext | None = None) -> Path | None:
+        if not isinstance(template, str):
+            return None
+        normalized = template.replace("\\", "/").strip()
+        if not normalized:
+            return None
+        candidate = Path(normalized)
+        if candidate.is_absolute():
+            return candidate if candidate.exists() else None
+
+        # Strict module sandbox: only resolve within current module directory.
+        if module_ctx is not None and module_ctx.module_dir is not None:
+            module_dir = module_ctx.module_dir
+            rel_candidates: list[str] = [normalized]
+            if module_ctx.module_name:
+                module_prefix = f"{module_ctx.module_name}/"
+                if normalized.startswith(module_prefix):
+                    stripped = normalized[len(module_prefix):]
+                    rel_candidates.append(stripped)
+                full_module_prefix = f"app/features/modules/{module_ctx.module_name}/"
+                if normalized.startswith(full_module_prefix):
+                    rel_candidates.append(normalized[len(full_module_prefix):])
+
+            candidates: list[Path] = []
+            seen_paths: set[str] = set()
+            for rel in rel_candidates:
+                rel = rel.strip("/")
+                if not rel:
+                    continue
+                probes = [
+                    (module_dir / rel).resolve(),
+                    (module_dir / "assets" / rel).resolve(),
+                ]
+                for probe in probes:
+                    probe_key = probe.as_posix().lower()
+                    if probe_key in seen_paths:
+                        continue
+                    seen_paths.add(probe_key)
+                    candidates.append(probe)
+            for probe in candidates:
+                try:
+                    probe.relative_to(module_dir)
+                except Exception:
+                    continue
+                if probe.exists():
+                    return probe
+        return None
+
+    @staticmethod
+    def _template_log_name(template: str, module_ctx: ModuleContext | None = None) -> str:
         if not isinstance(template, str):
             return str(template)
-        normalized = template.replace("\\", "/")
-        for prefix in (
-            "app/features/modules/",
-            "resources/",
-        ):
-            normalized = normalized.replace(prefix, "")
-        return normalized
+        normalized = template.replace("\\", "/").strip()
+        resolved = Automation._resolve_template_path(normalized, module_ctx=module_ctx)
+        if resolved is not None:
+            try:
+                return resolved.relative_to(Automation._project_root).as_posix()
+            except Exception:
+                return resolved.as_posix()
+        module_tag = module_ctx.module_name if module_ctx and module_ctx.module_name else "unknown"
+        return f"{normalized} (missing; module={module_tag})"
 
     def _init_input(self):
         self.input_handler = Input(self.hwnd, self.logger)
@@ -412,22 +525,29 @@ class Automation:
             thr = extract[1]
             temp = ImageUtils.extract_letters(temp, letter, thr)
         try:
-            matches = matcher.match(template, temp)
+            module_ctx = self._callsite_module_context(skip_min=3, skip_max=40)
+            if (module_ctx is None or module_ctx.module_dir is None) and isinstance(template, str):
+                inferred = self._module_context_from_template_prefix(template)
+                if inferred is not None:
+                    module_ctx = inferred
+            resolved_template = self._resolve_template_path(template, module_ctx=module_ctx) if isinstance(template, str) else None
+            template_input = str(resolved_template) if resolved_template is not None else template
+            matches = matcher.match(template_input, temp)
             if len(matches) >= 1:
                 x, y, w, h, conf = matches[0]
                 if conf >= threshold or threshold is None:
                     top_left, bottom_right = self.calculate_positions((x, y, w, h))
                     if is_log:
-                        template_name = self._template_log_name(template)
+                        template_name = self._template_log_name(str(template_input), module_ctx=module_ctx)
                         self.logger.debug(_(f'Target image: {template_name} Similarity: {conf:.2f}', msgid='target_image_template_name_similarity_conf'))
                     return top_left, bottom_right, conf
                 else:
                     if is_log:
-                        template_name = self._template_log_name(template)
+                        template_name = self._template_log_name(str(template_input), module_ctx=module_ctx)
                         self.logger.debug(_(f'Target image: {template_name} Similarity: {conf:.2f}, below {threshold}', msgid='target_image_template_name_similarity_conf_below'))
             else:
                 if is_log:
-                    template_name = self._template_log_name(template)
+                    template_name = self._template_log_name(str(template_input), module_ctx=module_ctx)
                     self.logger.debug(_(f'Target image: {template_name} No match found', msgid='target_image_template_name_no_match_found'))
             if is_show:
                 for idx, (x, y, w, h, conf) in enumerate(matches):
@@ -584,15 +704,18 @@ class Automation:
                 return None
         else:
             # 不截图的时候做相应的裁切，使外部可以不写参数
-            if self.current_screenshot is not None:
-                # 更新当前裁切后的截图和相对位置坐标
-                # ImageUtils.show_ndarray(self.first_screenshot, 'before_current')
-                self.current_screenshot, self.relative_pos = ImageUtils.crop_image(self.first_screenshot, crop,
-                                                                                   self.hwnd)
-                # ImageUtils.show_ndarray(self.current_screenshot, 'after_current')
+            has_cached_screenshot = self.current_screenshot is not None and self.first_screenshot is not None
+            if not has_cached_screenshot:
+                screenshot_result = self.take_screenshot(crop)
+                if not screenshot_result:
+                    self._log_error_throttled(
+                        "find_element_no_current_screenshot",
+                        "No cached screenshot available, fallback capture failed",
+                    )
+                    return None
             else:
-                self._log_error_throttled('find_element_no_current_screenshot', "当前没有current_screenshot,裁切失败")
-                return None
+                # Refresh cropped view from the latest full-frame screenshot cache.
+                self.current_screenshot, self.relative_pos = ImageUtils.crop_image(self.first_screenshot, crop, self.hwnd)
         if find_type is None:
             find_type = "text"
         if config.showScreenshot.value:
@@ -617,7 +740,7 @@ class Automation:
                     return image_threshold
                 return top_left, bottom_right
         else:
-            raise ValueError(f"错误的类型{find_type}")
+            raise ValueError(f"Invalid find type: {find_type}")
         return None
 
     def find(self, target, **kwargs):
@@ -899,9 +1022,16 @@ class Automation:
                 letter = extract[0]
                 thr = extract[1]
                 temp = ImageUtils.extract_letters(temp, letter, thr)
-            matches = matcher.match(template, temp)
+            module_ctx = self._callsite_module_context(skip_min=3, skip_max=40)
+            if (module_ctx is None or module_ctx.module_dir is None) and isinstance(template, str):
+                inferred = self._module_context_from_template_prefix(template)
+                if inferred is not None:
+                    module_ctx = inferred
+            resolved_template = self._resolve_template_path(template, module_ctx=module_ctx) if isinstance(template, str) else None
+            template_input = str(resolved_template) if resolved_template is not None else template
+            matches = matcher.match(template_input, temp)
             if is_log:
-                template_name = self._template_log_name(template)
+                template_name = self._template_log_name(str(template_input), module_ctx=module_ctx)
                 if len(matches) > 0:
                     for i in range(len(matches)):
                         x, y, w, h, conf = matches[i]

@@ -320,7 +320,7 @@ class Input:
                         if click_done:
                             self.window_tracker.hide_window_offscreen()
                             if config.isInputLog.value:
-                                self.logger.info(
+                                self.logger.debug(
                                     _(f'Tracking click completed ({x}, {y})', msgid='tracking_click_completed_x_y')
                                 )
                             return
