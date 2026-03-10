@@ -11,82 +11,48 @@ from app.framework.infra.events.signal_bus import signalBus
 from app.framework.infra.vision.vision import count_color_blocks
 from app.framework.infra.automation.timer import Timer
 
-from app.framework.core.module_system import on_demand_module, periodic_module
+from app.framework.core.module_system import on_demand_module
 
 
 @on_demand_module("Fishing")
-def run_fishing(
-    LineEdit_fish_upper: str = "25,255,255",
-    LineEdit_fish_lower: str = "20,220,245",
-    LineEdit_fish_key: str = "space",
-    isLog: bool = False,
-    CheckBox_is_limit_time: bool = False,
-    SpinBox_fish_times: int = 1,
-    ComboBox_lure_type: int = 0,
-    ComboBox_fishing_mode: int = 0,
-    CheckBox_is_save_fish: bool = False,
-    fish_key_list=None,
-    automation=None,
-    logger=None,
-    app_config=None,
-):
-    module = FishingModule(
-        automation,
-        logger,
-        fish_upper_text=LineEdit_fish_upper,
-        fish_lower_text=LineEdit_fish_lower,
-        fish_key_text=LineEdit_fish_key,
-        is_log=isLog,
-        use_time_judge=CheckBox_is_limit_time,
-        fish_times=int(SpinBox_fish_times),
-        lure_type_index=int(ComboBox_lure_type),
-        fishing_mode=int(ComboBox_fishing_mode),
-        save_fish=bool(CheckBox_is_save_fish),
-        fish_key_list=fish_key_list,
-        app_config=app_config,
-    )
-    module.run()
-
-
 class FishingModule:
     def __init__(
         self,
         auto,
         logger,
-        *,
-        fish_upper_text: str,
-        fish_lower_text: str,
-        fish_key_text: str,
-        is_log: bool,
-        use_time_judge: bool,
-        fish_times: int,
-        lure_type_index: int,
-        fishing_mode: int,
-        save_fish: bool,
-        fish_key_list,
+        LineEdit_fish_upper: str = "25,255,255",
+        LineEdit_fish_lower: str = "20,220,245",
+        LineEdit_fish_key: str = "space",
+        isLog: bool = False,
+        CheckBox_is_limit_time: bool = False,
+        SpinBox_fish_times: int = 1,
+        ComboBox_lure_type: int = 0,
+        ComboBox_fishing_mode: int = 0,
+        CheckBox_is_save_fish: bool = False,
+        fish_key_list=None,
         app_config=None,
     ):
         self.auto = auto
         self.logger = logger
         self.bite_time = None
         self.start_time = None
-        self.is_use_time_judge = bool(use_time_judge)
+        self.is_use_time_judge = bool(CheckBox_is_limit_time)
         self.previous_yellow_block_count = 0
         self.previous_pixels = 0
         self.save_path = os.path.abspath("./fish")
-        self.press_key = fish_key_text
+        self.press_key = LineEdit_fish_key
         self.upper_yellow = None
         self.lower_yellow = None
         self.no_key = False
         self.is_select_fish = False
 
-        self.is_log = bool(is_log)
-        self.fish_upper_text = fish_upper_text
-        self.fish_lower_text = fish_lower_text
-        self.fish_times = max(1, int(fish_times))
-        self.lure_type_index = max(0, int(lure_type_index))
-        self.fishing_mode = max(0, int(fishing_mode))
-        self.save_fish = bool(save_fish)
+        self.is_log = bool(isLog)
+        self.fish_upper_text = LineEdit_fish_upper
+        self.fish_lower_text = LineEdit_fish_lower
+        self.fish_times = max(1, int(SpinBox_fish_times))
+        self.lure_type_index = max(0, int(ComboBox_lure_type))
+        self.fishing_mode = max(0, int(ComboBox_fishing_mode))
+        self.save_fish = bool(CheckBox_is_save_fish)
         self.fish_key_list = fish_key_list or ['shift', 'space', 'ctrl']
         self.app_config = app_config
 

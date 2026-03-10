@@ -92,6 +92,34 @@ _ON_DEMAND_PASSIVE: dict[str, bool] = {
     "trigger": True,
 }
 
+# Keep module ids stable while declarations stay minimal (no explicit module_id).
+# Keys are package folder names under app/features/modules.
+_PERIODIC_MODULE_ID_BY_PACKAGE: dict[str, str] = {
+    "enter_game": "task_login",
+    "collect_supplies": "task_supplies",
+    "shopping": "task_shop",
+    "use_power": "task_stamina",
+    "person": "task_shards",
+    "chasm": "task_chasm",
+    "get_reward": "task_reward",
+    "operation_action": "task_operation",
+    "upgrade": "task_weapon",
+    "jigsaw": "task_shard_exchange",
+    "close_game": "task_close_game",
+}
+
+_ON_DEMAND_MODULE_ID_BY_PACKAGE: dict[str, str] = {
+    "trigger": "trigger",
+    "fishing": "fishing",
+    "operation_action": "action",
+    "water_bomb": "water_bomb",
+    "alien_guardian": "alien_guardian",
+    "maze": "maze",
+    "drink": "drink",
+    "capture_pals": "capture_pals",
+    "massaging": "massaging",
+}
+
 _EN_DECL_RE = re.compile(r"^[\x20-\x7E]+$")
 
 
@@ -257,11 +285,15 @@ def _build_meta(
     _validate_english_declaration(name, field="module name")
     _validate_declaration_fields(fields)
 
+    module_name = _module_name_from_target(target)
     inferred_id = infer_module_id(target)
-    if host == ModuleHost.PERIODIC and not inferred_id.startswith("task_"):
+    if host == ModuleHost.PERIODIC and module_name in _PERIODIC_MODULE_ID_BY_PACKAGE:
+        inferred_id = _PERIODIC_MODULE_ID_BY_PACKAGE[module_name]
+    elif host == ModuleHost.ON_DEMAND and module_name in _ON_DEMAND_MODULE_ID_BY_PACKAGE:
+        inferred_id = _ON_DEMAND_MODULE_ID_BY_PACKAGE[module_name]
+    elif host == ModuleHost.PERIODIC and not inferred_id.startswith("task_"):
         inferred_id = f"task_{inferred_id}"
     resolved_id = module_id or inferred_id
-    module_name = _module_name_from_target(target)
     resolved_order = int(_DEFAULT_ORDER.get(resolved_id, 100) if order is None else order)
     resolved_page_class_path = _infer_page_class_path(target, host)
     resolved_ui_bindings = _infer_ui_bindings(resolved_id, module_name, host)
