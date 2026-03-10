@@ -11,7 +11,7 @@ import win32gui  # 不能删
 
 from app.framework.infra.config.app_config import config
 from app.framework.infra.automation.window_tracker import WindowTracker
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 logger = logging.getLogger(__name__)
 
@@ -135,10 +135,7 @@ class Input:
         if now - self._last_shell_guard_log_time >= self._shell_guard_log_interval:
             if config.isInputLog.value:
                 self.logger.info(
-                    tr(
-                        "framework.legacy.a03262985b45",
-                        fallback="Detected user interacting with desktop/taskbar, keeping tracking hidden and waiting",
-                    )
+                    _('Detected user interacting with desktop/taskbar, keeping tracking hidden and waiting', msgid='a03262985b45')
                 )
             self._last_shell_guard_log_time = now
 
@@ -237,10 +234,7 @@ class Input:
         lock_timeout = max(0.1, min(time_out, 1.0))
         if not self._mouse_action_lock.acquire(timeout=lock_timeout):
             self.logger.error(
-                tr(
-                    "framework.legacy.caa657222e69",
-                    fallback=f"Failed to perform mouse click ({x}, {y}) because mouse operation is in progress",
-                )
+                _(f'Failed to perform mouse click ({x}, {y}) because mouse operation is in progress', msgid='caa657222e69')
             )
             return
         self._sync_tracker_hwnd()
@@ -327,7 +321,7 @@ class Input:
                             self.window_tracker.hide_window_offscreen()
                             if config.isInputLog.value:
                                 self.logger.info(
-                                    tr("framework.legacy.3f8cb64f8a22", fallback=f"Tracking click completed ({x}, {y})")
+                                    _(f'Tracking click completed ({x}, {y})', msgid='3f8cb64f8a22')
                                 )
                             return
                         time.sleep(0.003)
@@ -352,7 +346,7 @@ class Input:
 
                     time.sleep(0.02)
                     if config.isInputLog.value:
-                        self.logger.info(tr("framework.legacy.bb776acba1c2", fallback=f"Mouse move and click ({x}, {y})"))
+                        self.logger.info(_(f'Mouse move and click ({x}, {y})', msgid='bb776acba1c2'))
                     return
                 finally:
                     if current_pos is not None:
@@ -363,13 +357,10 @@ class Input:
 
             active_elapsed = time.time() - start_time - (deferred_time if self._window_tracking_enabled else 0.0)
             if active_elapsed > time_out:
-                raise RuntimeError(tr("framework.legacy.9f046fba4a42", fallback="Click timeout"))
+                raise RuntimeError(_('Click timeout', msgid='9f046fba4a42'))
         except Exception as e:
             self.logger.error(
-                tr(
-                    "framework.legacy.232e9dc79724",
-                    fallback=f"Error occurred while performing mouse move click ({x}, {y}): {repr(e)}",
-                )
+                _(f'Error occurred while performing mouse move click ({x}, {y}): {repr(e)}', msgid='232e9dc79724')
             )
             if self._window_tracking_enabled:
                 self.window_tracker.hide_window_offscreen()
@@ -383,13 +374,10 @@ class Input:
             time.sleep(press_time)
             self.mouse_up(x, y, mouse_key)
             if config.isInputLog.value:
-                self.logger.info(tr("framework.legacy.81f445316f32", fallback=f"Mouse move and click ({x}, {y})"))
+                self.logger.info(_(f'Mouse move and click ({x}, {y})', msgid='81f445316f32'))
         except Exception as e:
             self.logger.error(
-                tr(
-                    "framework.legacy.af21f8ed0e4e",
-                    fallback=f"Error occurred while performing mouse move click ({x}, {y}): {repr(e)}",
-                )
+                _(f'Error occurred while performing mouse move click ({x}, {y}): {repr(e)}', msgid='af21f8ed0e4e')
             )
 
     def move_to(self, x: int, y: int):
@@ -423,13 +411,7 @@ class Input:
             active_elapsed = time.time() - start_time - deferred_time
             if active_elapsed >= effective_timeout:
                 self.logger.warning(
-                    tr(
-                        "framework.legacy.27ab5f2d7bf1",
-                        fallback=(
-                            f"Tracking wheel timeout, abandoning this wheel input: ({x}, {y}, {delta}), "
-                            f"total_batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s"
-                        ),
-                    )
+                    _(f'Tracking wheel timeout, abandoning this wheel input: ({x}, {y}, {delta}), total_batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s', msgid='27ab5f2d7bf1')
                 )
                 return False
 
@@ -452,10 +434,7 @@ class Input:
 
             if not aligned:
                 self.logger.warning(
-                    tr(
-                        "framework.legacy.4dcf931755cd",
-                        fallback=f"Tracking wheel alignment failed, abandoning this wheel input: ({x}, {y}, {delta})",
-                    )
+                    _(f'Tracking wheel alignment failed, abandoning this wheel input: ({x}, {y}, {delta})', msgid='4dcf931755cd')
                 )
                 return False
 
@@ -475,13 +454,7 @@ class Input:
                 active_elapsed = time.time() - start_time - deferred_time
                 if active_elapsed >= effective_timeout:
                     self.logger.warning(
-                        tr(
-                            "framework.legacy.33a98f72903f",
-                            fallback=(
-                                f"Tracking wheel timeout (remainder), abandoning this wheel input: ({x}, {y}, {delta}), "
-                                f"total_batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s"
-                            ),
-                        )
+                        _(f'Tracking wheel timeout (remainder), abandoning this wheel input: ({x}, {y}, {delta}), total_batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s', msgid='33a98f72903f')
                     )
                     return False
 
@@ -504,10 +477,7 @@ class Input:
 
                 if not aligned:
                     self.logger.warning(
-                        tr(
-                            "framework.legacy.23150d6d9a26",
-                            fallback=f"Tracking wheel remainder alignment failed, abandoning this wheel input: ({x}, {y}, {delta})",
-                        )
+                        _(f'Tracking wheel remainder alignment failed, abandoning this wheel input: ({x}, {y}, {delta})', msgid='23150d6d9a26')
                     )
                     return False
                 self.activate()
@@ -516,7 +486,7 @@ class Input:
                 break
 
         if config.isInputLog.value:
-            self.logger.info(tr("framework.legacy.7e075a1d25e4", fallback=f"Tracking mode scrolling completed ({x},{y}) delta={delta}"))
+            self.logger.info(_(f'Tracking mode scrolling completed ({x},{y}) delta={delta}', msgid='7e075a1d25e4'))
         return True
 
     def mouse_scroll(self, x: int, y: int, delta: int = 120, time_out: float = 10.):
@@ -568,7 +538,7 @@ class Input:
 
                         if config.isInputLog.value:
                             self.logger.info(
-                                tr("framework.legacy.64cf452636e6", fallback=f"Mouse moved to ({x},{y}) and scrolled wheel {delta}")
+                                _(f'Mouse moved to ({x},{y}) and scrolled wheel {delta}', msgid='64cf452636e6')
                             )
                         return True
                     finally:
@@ -581,18 +551,12 @@ class Input:
                 time.sleep(0.02)
 
             self.logger.warning(
-                tr(
-                    "framework.legacy.4e66efce731d",
-                    fallback=f"Waiting for wheel scrolling timeout, abandoning this wheel input: ({x}, {y}, {delta})",
-                )
+                _(f'Waiting for wheel scrolling timeout, abandoning this wheel input: ({x}, {y}, {delta})', msgid='4e66efce731d')
             )
             return False
         except Exception as e:
             self.logger.error(
-                tr(
-                    "framework.legacy.2837c39f5660",
-                    fallback=f"Error occurred while scrolling after mouse move ({x}, {y}): {repr(e)}",
-                )
+                _(f'Error occurred while scrolling after mouse move ({x}, {y}): {repr(e)}', msgid='2837c39f5660')
             )
             return False
 
@@ -602,7 +566,7 @@ class Input:
             time.sleep(press_time)
             self.key_up(key)
         except Exception as e:
-            self.logger.error(tr("framework.legacy.6d24eb9e59c4", fallback=f"Error occurred while simulating key {key}: {repr(e)}"))
+            self.logger.error(_(f'Error occurred while simulating key {key}: {repr(e)}', msgid='6d24eb9e59c4'))
 
     def key_down(self, key):
         vk_code = self.get_virtual_keycode(key)
@@ -611,7 +575,7 @@ class Input:
         lparam = (scan_code << 16) | 1
         win32gui.PostMessage(self.hwnd, self.WmCode["key_down"], wparam, lparam)
         if config.isInputLog.value:
-            self.logger.debug(tr("framework.legacy.e88c659ac469", fallback=f"Key pressed: {key}"))
+            self.logger.debug(_(f'Key pressed: {key}', msgid='e88c659ac469'))
 
     def key_up(self, key):
         vk_code = self.get_virtual_keycode(key)
@@ -620,7 +584,7 @@ class Input:
         lparam = (scan_code << 16) | 1
         win32gui.PostMessage(self.hwnd, self.WmCode["key_up"], wparam, lparam)
         if config.isInputLog.value:
-            self.logger.debug(tr("framework.legacy.98cebd476766", fallback=f"Key released: {key}"))
+            self.logger.debug(_(f'Key released: {key}', msgid='98cebd476766'))
 
 
 if __name__ == '__main__':

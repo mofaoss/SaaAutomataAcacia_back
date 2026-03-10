@@ -4,7 +4,7 @@ from PySide6.QtCore import Qt
 from qfluentwidgets import BodyLabel, InfoBar, InfoBarPosition, ProgressBar
 
 from app.features.utils.network import calculate_time_difference, get_date_from_api
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 
 class EventTipsUseCase:
@@ -27,8 +27,8 @@ class EventTipsUseCase:
             return tips_dic
 
         InfoBar.error(
-            title=tr("module.event_tips.legacy.5c1e67a3aca3", fallback="Failed to update event schedule"),
-            content=tr("module.event_tips.legacy.566bc31ba4f4", fallback="No local information stored and no URL fetched"),
+            title=_('Failed to update event schedule', msgid='5c1e67a3aca3'),
+            content=_('No local information stored and no URL fetched', msgid='566bc31ba4f4'),
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
             position=InfoBarPosition.TOP_RIGHT,
@@ -43,7 +43,7 @@ class EventTipsUseCase:
             return
 
         if self.settings_usecase.is_log_enabled():
-            logger.info(tr("module.event_tips.legacy.1ba446845b7f", fallback="Successfully fetched event schedule"))
+            logger.info(_('Successfully fetched event schedule', msgid='1ba446845b7f'))
         normalized = {key: calculate_time_difference(value) for key, value in tips_dic.items()}
         max_total_days = max(
             (
@@ -69,18 +69,18 @@ class EventTipsUseCase:
 
             days, total_day, status = value
             if status == -1:
-                body_label.setText(tr("module.event_tips.status.finished", fallback=f"{key} finished"))
+                body_label.setText(_(f'{key} finished', msgid='finished'))
                 sort_weight = 99999
                 progress_bar.setValue(0)
             elif status == 1:
                 body_label.setText(
-                    tr("module.event_tips.status.starts_in", fallback=f"{key} in {days}d(s)")
+                    _(f'{key} in {days}d(s)', msgid='starts_in')
                 )
                 sort_weight = 10000 + days
                 progress_bar.setValue(0)
             else:
                 body_label.setText(
-                    tr("module.event_tips.status.left_days", fallback=f"{key}: {days}d(s) left")
+                    _(f'{key}: {days}d(s) left', msgid='left_days')
                 )
                 sort_weight = days
                 normalized_percent = int((days / max_total_days) * 100)
@@ -120,4 +120,4 @@ class EventTipsActions:
                 url=url,
             )
         except Exception as e:
-            self._logger.error(tr("framework.legacy.b2f8257d8b77", fallback=f"Error occurred while updating controls: {e}"))
+            self._logger.error(_(f'Error occurred while updating controls: {e}', msgid='b2f8257d8b77'))

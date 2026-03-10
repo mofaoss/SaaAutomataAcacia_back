@@ -30,7 +30,7 @@ from qfluentwidgets import (
     isDarkTheme,
 )
 from app.framework.application.modules import HostContext, get_periodic_module_specs
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 
 class TaskListView(ListWidget):

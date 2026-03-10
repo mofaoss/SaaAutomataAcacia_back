@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QFrame
 from qfluentwidgets import (BodyLabel, SimpleCardWidget, StrongBodyLabel, SwitchButton)
 from app.framework.infra.config.app_config import config
 from app.framework.ui.views.periodic_base import ModulePageBase
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 class TriggerInterface(ModulePageBase):
     def __init__(self, parent=None):

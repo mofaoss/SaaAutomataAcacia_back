@@ -40,7 +40,7 @@ from app.framework.ui.shared.style_sheet import StyleSheet
 from .periodic_base import BaseInterface
 from app.framework.ui.widgets.slider_setting_card import SliderSettingCard
 from app.framework.ui.widgets.text_edit_card import TextEditCard
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 logger = logging.getLogger(__name__)
 

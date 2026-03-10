@@ -3,7 +3,7 @@ import logging
 from PySide6.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
 from app.framework.infra.config.app_config import is_non_chinese_ui_language
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 
 class BaseInterface:

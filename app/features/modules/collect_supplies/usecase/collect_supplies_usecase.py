@@ -10,7 +10,7 @@ from app.framework.infra.automation.timer import Timer
 from app.features.utils.home_navigation import back_to_home
 
 from app.framework.core.module_system import on_demand_module, periodic_module
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 
 @periodic_module("Collect Supplies", module_id="task_supplies")
@@ -68,8 +68,8 @@ class CollectSuppliesModule:
             raise RuntimeError("redeem_codes_usecase is not configured")
         content = self.redeem_codes_usecase.reset_codes(text_edit)
         InfoBar.success(
-            title=tr("module.collect_supplies.legacy.3fd0e9e4395f", fallback="Reset Successful"),
-            content=tr("framework.legacy.d27e72351f53", fallback=f"Successfully reset import and display {content}"),
+            title=_('Reset Successful', msgid='3fd0e9e4395f'),
+            content=_(f'Successfully reset import and display {content}', msgid='d27e72351f53'),
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
             position=InfoBarPosition.TOP_RIGHT,

@@ -2,5 +2,8 @@
   "module.task_close_game.title": "Execute Exit",
   "module.close_game.legacy.d37a4e4fc0c2": "Exiting game...",
   "module.close_game.legacy.429e494e4e1c": "System will shut down in 60s...",
-  "module.close_game.legacy.fb1533f4f2b1": "Exiting Application..."
+  "module.close_game.legacy.fb1533f4f2b1": "Exiting Application...",
+  "module.close_game.log.429e494e4e1c": "System will shut down in 60s...",
+  "module.close_game.log.d37a4e4fc0c2": "Exiting game...",
+  "module.close_game.log.fb1533f4f2b1": "Exiting Application..."
 }

@@ -5,7 +5,7 @@ from qfluentwidgets import CheckBox, ScrollArea, StrongBodyLabel
 from app.framework.infra.config.app_config import is_non_chinese_ui_language
 from app.framework.ui.widgets.tree import TreeFrame_person, TreeFrame_weapon
 from app.framework.ui.views.periodic_base import ModulePageBase
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 
 class ShopPage(ModulePageBase):

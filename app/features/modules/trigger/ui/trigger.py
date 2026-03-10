@@ -7,7 +7,7 @@ from app.features.modules.trigger.usecase.nita_auto_e_usecase import NitaAutoEMo
 from app.framework.ui.views.periodic_base import BaseInterface
 from app.features.modules.fishing.ui.subtask import SubTask
 from .trigger_view import TriggerView
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 
 class Trigger(QFrame, BaseInterface):

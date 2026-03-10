@@ -11,7 +11,7 @@ from app.features.modules.shopping.item_constants import (
 from app.framework.infra.automation.timer import Timer
 from app.features.utils.home_navigation import back_to_home
 from app.framework.core.module_system import on_demand_module, periodic_module
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 
 @periodic_module("Shop", module_id="task_shop")

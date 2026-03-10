@@ -18,7 +18,7 @@ from app.framework.core.event_bus.global_task_bus import global_task_bus
 from app.framework.application.modules import HostContext, get_on_demand_module_specs
 from app.framework.application.periodic.on_demand_runner import OnDemandRunner
 from app.framework.core.task_engine.threads import ModuleTaskThread
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 
 class OnDemandTasksPage(QFrame, BaseInterface):

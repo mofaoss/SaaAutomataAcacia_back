@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import re
 from pathlib import Path
 from typing import Callable
 
@@ -10,7 +11,7 @@ from app.framework.core.module_system.naming import infer_module_id
 from app.framework.core.module_system.registry import register_module
 
 DEFAULT_SOURCE_LANG = "en"
-SUPPORTED_LANGS = ["en", "zh_CN", "zh_TW"]
+SUPPORTED_LANGS = ["en", "zh_CN", "zh_HK"]
 
 _PENDING_PAGES: dict[str, type] = {}
 _DEFAULT_ORDER: dict[str, int] = {
@@ -198,6 +199,32 @@ _FRAMEWORK_DEFAULTS = {
 }
 
 
+
+
+_EN_DECL_RE = re.compile(r"^[\x20-\x7E]+$")
+
+
+def _validate_english_declaration(text: str, *, field: str) -> None:
+    if not isinstance(text, str) or not text.strip():
+        raise ValueError(f"{field} must be a non-empty English string")
+    if not _EN_DECL_RE.fullmatch(text):
+        raise ValueError(
+            f"{field} must use English ASCII declaration text only (found unsupported chars): {text!r}"
+        )
+
+
+def _validate_declaration_fields(fields: dict[str, str | Field] | None) -> None:
+    if not fields:
+        return
+    for param, meta in fields.items():
+        if isinstance(meta, str):
+            _validate_english_declaration(meta, field=f"fields[{param}] label")
+        elif isinstance(meta, Field):
+            if meta.label:
+                _validate_english_declaration(meta.label, field=f"fields[{param}] label")
+            if meta.help:
+                _validate_english_declaration(meta.help, field=f"fields[{param}] help")
+
 def _resolve_symbol(symbol_path: str):
     module_path, symbol_name = symbol_path.rsplit(":", 1)
     mod = importlib.import_module(module_path)
@@ -220,6 +247,9 @@ def _build_meta(
     passive: bool | None = None,
     description: str = "",
 ) -> ModuleMeta:
+    _validate_english_declaration(name, field="module name")
+    _validate_declaration_fields(fields)
+
     resolved_id = module_id or infer_module_id(target)
     defaults = _resolve_module_defaults(resolved_id)
     resolved_order = int(_DEFAULT_ORDER.get(resolved_id, 100) if order is None else order)

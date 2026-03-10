@@ -29,7 +29,7 @@ from app.features.modules.trigger.usecase.nita_auto_e_usecase import NitaAutoEMo
 from app.features.utils.home_navigation import back_to_home
 from app.features.utils.network import start_cloudflare_update
 from app.framework.application.tasks.periodic_task_profile import get_periodic_task_profile
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 
 class SnowbreakMainWindowBridge(MainWindowFeatureBridge):

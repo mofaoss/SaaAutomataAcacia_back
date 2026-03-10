@@ -1,3 +1,6 @@
 {
-  "module.collect_supplies.legacy.3fd0e9e4395f": "重置成功"
+  "module.collect_supplies.legacy.3fd0e9e4395f": "重置成功",
+  "module.collect_supplies.ui.3fd0e9e4395f": "Reset Successful",
+  "module.collect_supplies.ui.d27e72351f53": "Successfully reset import and display {content}",
+  "module.task_supplies.title": "Collect Supplies"
 }

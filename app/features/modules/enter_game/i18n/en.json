@@ -2,5 +2,15 @@
   "module.task_login.title": "Auto Login",
   "module.enter_game.legacy.fc3cf53d556a": "Failed to resolve launch arguments",
   "module.enter_game.legacy.22bfd52ce240": "Detected that the game process started by the program is still running, skipping duplicate startup",
-  "module.enter_game.legacy.f80650f28a54": "Game window already exists"
+  "module.enter_game.legacy.f80650f28a54": "Game window already exists",
+  "module.enter_game.log.22bfd52ce240": "Detected that the game process started by the program is still running, skipping duplicate startup",
+  "module.enter_game.log.528f0473f979": "Failed to resolve launch arguments, start_path: {start_path}, game_channel: {game_channel}",
+  "module.enter_game.log.8bb7e083549c": "Starting {exe_path} {launch_args}",
+  "module.enter_game.log.9eddf8040deb": "Failed to spawn process: {exc}",
+  "module.enter_game.log.df889f0ebf82": "Game.exe not found, please check the path: {start_path}",
+  "module.enter_game.log.f80650f28a54": "Game window already exists",
+  "module.enter_game.ui.1abfcb8e6130": "Game executable not found under: {start_path}",
+  "module.enter_game.ui.4f4b7745f8d0": "Clicking the 'Start' button will {action}automatically launch the game",
+  "module.enter_game.ui.71ae3513d20a": "Failed to spawn process: {exc}",
+  "module.enter_game.ui.fc3cf53d556a": "Failed to resolve launch arguments"
 }

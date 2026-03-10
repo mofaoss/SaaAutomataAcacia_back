@@ -18,7 +18,7 @@ from app.framework.infra.system.windows import get_hwnd
 from app.framework.core.module_system import on_demand_module, periodic_module
 
 from app.features.utils.home_navigation import back_to_home
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 
 _launch_lock = threading.Lock()
@@ -254,7 +254,7 @@ def launch_game_with_guard(
         if _last_game_process is not None and _last_game_process.poll() is None:
             if logger:
                 logger.info(
-                    tr("module.enter_game.legacy.22bfd52ce240", fallback="Detected that the game process started by the program is still running, skipping duplicate startup")
+                    _('Detected that the game process started by the program is still running, skipping duplicate startup', msgid='22bfd52ce240')
                 )
             return {
                 "ok": True,
@@ -271,7 +271,7 @@ def launch_game_with_guard(
 
         if is_game_running():
             if logger:
-                logger.info(tr("module.enter_game.legacy.f80650f28a54", fallback="Game window already exists"))
+                logger.info(_('Game window already exists', msgid='f80650f28a54'))
             return {
                 "ok": True,
                 "already_running": True,
@@ -283,29 +283,29 @@ def launch_game_with_guard(
         if not exe_path or not os.path.exists(exe_path):
             if logger:
                 logger.error(
-                    tr("framework.legacy.df889f0ebf82", fallback=f"Game.exe not found, please check the path: {start_path}")
+                    _(f'Game.exe not found, please check the path: {start_path}', msgid='df889f0ebf82')
                 )
             return {
                 "ok": False,
-                "error": tr("framework.legacy.1abfcb8e6130", fallback=f"Game executable not found under: {start_path}"),
+                "error": _(f'Game executable not found under: {start_path}', msgid='1abfcb8e6130'),
             }
 
         launch_args = get_start_arguments(start_path, game_channel, exe_path=exe_path)
         if launch_args is None:
             if logger:
                 logger.error(
-                    tr("framework.legacy.528f0473f979", fallback=f"Failed to resolve launch arguments, start_path: {start_path}, game_channel: {game_channel}")
+                    _(f'Failed to resolve launch arguments, start_path: {start_path}, game_channel: {game_channel}', msgid='528f0473f979')
                 )
-            return {"ok": False, "error": tr("module.enter_game.legacy.fc3cf53d556a", fallback="Failed to resolve launch arguments")}
+            return {"ok": False, "error": _('Failed to resolve launch arguments', msgid='fc3cf53d556a')}
 
         if logger:
-            logger.debug(tr("framework.legacy.8bb7e083549c", fallback=f"Starting {exe_path} {launch_args}"))
+            logger.debug(_(f'Starting {exe_path} {launch_args}', msgid='8bb7e083549c'))
         try:
             process = subprocess.Popen([exe_path] + launch_args)
         except Exception as exc:
             if logger:
-                logger.error(tr("framework.legacy.9eddf8040deb", fallback=f"Failed to spawn process: {exc}"))
-            return {"ok": False, "error": tr("framework.legacy.71ae3513d20a", fallback=f"Failed to spawn process: {exc}")}
+                logger.error(_(f'Failed to spawn process: {exc}', msgid='9eddf8040deb'))
+            return {"ok": False, "error": _(f'Failed to spawn process: {exc}', msgid='71ae3513d20a')}
 
         _last_game_process = process
         _last_launch_ts = time.time()
@@ -375,7 +375,7 @@ class EnterGameService(IGameEnvironment):
         action = "将" if state == 2 else "不会"
         InfoBar.success(
             title=status,
-            content=tr("framework.legacy.4f4b7745f8d0", fallback=f"Clicking the 'Start' button will {action}automatically launch the game"),
+            content=_(f"Clicking the 'Start' button will {action}automatically launch the game", msgid='4f4b7745f8d0'),
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
             position=InfoBarPosition.TOP_RIGHT,

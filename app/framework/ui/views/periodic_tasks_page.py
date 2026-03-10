@@ -36,7 +36,7 @@ from app.framework.application.periodic.periodic_page_actions import (
 # 导入视图与基类
 from app.framework.ui.views.periodic_tasks_view import PeriodicTasksView, TaskItemWidget
 from .periodic_base import BaseInterface
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 logger = logging.getLogger(__name__)
 

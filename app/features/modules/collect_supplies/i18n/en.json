@@ -1,4 +1,6 @@
 {
   "module.task_supplies.title": "Collect Supplies",
-  "module.collect_supplies.legacy.3fd0e9e4395f": "Reset Successful"
+  "module.collect_supplies.legacy.3fd0e9e4395f": "Reset Successful",
+  "module.collect_supplies.ui.3fd0e9e4395f": "Reset Successful",
+  "module.collect_supplies.ui.d27e72351f53": "Successfully reset import and display {content}"
 }

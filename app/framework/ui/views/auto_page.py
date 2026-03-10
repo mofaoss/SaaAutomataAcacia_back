@@ -48,8 +48,8 @@ class AutoPage(QWidget):
         option_layout.addWidget(self.form_widget)
 
         action_row = QHBoxLayout()
-        self.PushButton_save = PushButton(tr("auto_page.save", fallback="Save"), self.SimpleCardWidget_option)
-        self.PushButton_start = PushButton(tr("auto_page.run", fallback="Run"), self.SimpleCardWidget_option)
+        self.PushButton_save = PushButton(tr('framework.ui.save', fallback='Save'), self.SimpleCardWidget_option)
+        self.PushButton_start = PushButton(tr('framework.ui.run', fallback='Run'), self.SimpleCardWidget_option)
         self.PushButton_start.setObjectName("PushButton_start")
         self.PushButton_save.clicked.connect(self._save_values)
         action_row.addWidget(self.PushButton_save)
@@ -63,7 +63,7 @@ class AutoPage(QWidget):
         self.SimpleCardWidget_log.setObjectName("SimpleCardWidget_log")
         self.SimpleCardWidget_log.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         log_layout = QVBoxLayout(self.SimpleCardWidget_log)
-        log_layout.addWidget(BodyLabel("Log", self.SimpleCardWidget_log))
+        log_layout.addWidget(BodyLabel(tr("framework.ui.log", fallback="Log"), self.SimpleCardWidget_log))
         self.textBrowser_log = QTextBrowser(self.SimpleCardWidget_log)
         self.textBrowser_log.setObjectName("textBrowser_log")
         log_layout.addWidget(self.textBrowser_log)
@@ -76,10 +76,7 @@ class AutoPage(QWidget):
         self.host_context = host_context
 
     def _label_for(self, field: SchemaField) -> str:
-        return tr(
-            field.label_key,
-            fallback=field.label_default or humanize_name(field.param_name),
-        )
+        return tr(field.label_key, fallback=field.label_default or humanize_name(field.param_name))
 
     def _widget_for_field(self, field: SchemaField) -> QWidget:
         hint = field.type_hint
@@ -137,9 +134,9 @@ class AutoPage(QWidget):
         return None
 
     def _build_from_schema(self, schema: list[SchemaField]):
-        self.title_label.setText(
-            tr(f"module.{self.module_meta.id}.title", fallback=getattr(self.module_meta, "name", "Module"))
-        )
+        module_id = getattr(self.module_meta, 'id', 'module')
+        module_name = getattr(self.module_meta, 'name', 'Module')
+        self.title_label.setText(tr(f"module.{module_id}.title", fallback=module_name))
         for field in schema:
             widget = self._widget_for_field(field)
             widget.setObjectName(field.param_name)

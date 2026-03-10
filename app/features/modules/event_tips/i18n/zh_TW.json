@@ -1,5 +1,12 @@
 {
   "module.event_tips.legacy.5c1e67a3aca3": "活动日程更新失败",
   "module.event_tips.legacy.566bc31ba4f4": "本地没有存储信息且未获取到url",
-  "module.event_tips.legacy.1ba446845b7f": "获取活动日程成功"
+  "module.event_tips.legacy.1ba446845b7f": "获取活动日程成功",
+  "module.event_tips.ui.5c1e67a3aca3": "Failed to update event schedule",
+  "module.event_tips.ui.566bc31ba4f4": "No local information stored and no URL fetched",
+  "module.event_tips.log.1ba446845b7f": "Successfully fetched event schedule",
+  "module.event_tips.ui.finished": "{key} finished",
+  "module.event_tips.log.b2f8257d8b77": "Error occurred while updating controls: {e}",
+  "module.event_tips.ui.starts_in": "{key} in {days}d(s)",
+  "module.event_tips.ui.left_days": "{key}: {days}d(s) left"
 }

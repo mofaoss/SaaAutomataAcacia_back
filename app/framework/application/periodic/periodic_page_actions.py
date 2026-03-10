@@ -14,7 +14,7 @@ from app.framework.application.periodic.periodic_orchestration import (
     upsert_rule_to_tasks,
     withdraw_rule_from_tasks,
 )
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 
 class PeriodicPresetActions:
@@ -62,8 +62,8 @@ class PeriodicPresetActions:
         host.ui.ComboBox_presets.setCurrentIndex(host.ui.ComboBox_presets.findText(preset_name))
 
         InfoBar.success(
-            title=tr("framework.legacy.c0ae8f6ea841", fallback="Saved"),
-            content=tr("framework.legacy.42f6cd65c5ca", fallback=f"Preset '{preset_name}' saved"),
+            title=_('Saved', msgid='c0ae8f6ea841'),
+            content=_(f"Preset '{preset_name}' saved", msgid='42f6cd65c5ca'),
             parent=host,
         )
 
@@ -75,8 +75,8 @@ class PeriodicPresetActions:
             return
         if not deleted and reason == "min_one_required":
             InfoBar.warning(
-                title=tr("framework.legacy.9635fe8cd43e", fallback="Cannot Delete"),
-                content=tr("framework.legacy.ae9985813275", fallback="At least one preset must remain"),
+                title=_('Cannot Delete', msgid='9635fe8cd43e'),
+                content=_('At least one preset must remain', msgid='ae9985813275'),
                 parent=host,
             )
             return
@@ -87,8 +87,8 @@ class PeriodicPresetActions:
         host.ui.ComboBox_presets.setCurrentIndex(0)
 
         InfoBar.success(
-            title=tr("framework.legacy.441bda6cd856", fallback="Deleted"),
-            content=tr("framework.legacy.168499bbdb96", fallback=f"Preset '{preset_name}' deleted"),
+            title=_('Deleted', msgid='441bda6cd856'),
+            content=_(f"Preset '{preset_name}' deleted", msgid='168499bbdb96'),
             parent=host,
         )
 
@@ -111,8 +111,8 @@ class PeriodicRuleActions:
 
         if not checked_task_ids:
             InfoBar.warning(
-                title=tr("framework.legacy.1b371d6fb221", fallback="No Target Selected"),
-                content=tr("framework.legacy.cc351cec08d8", fallback="Please check tasks in the left list first"),
+                title=_('No Target Selected', msgid='1b371d6fb221'),
+                content=_('Please check tasks in the left list first', msgid='cc351cec08d8'),
                 orient=Qt.Orientation.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP_RIGHT,
@@ -138,8 +138,8 @@ class PeriodicRuleActions:
 
         host._auto_adjust_after_use_action()
         InfoBar.success(
-            title=tr("framework.legacy.e3ae5bcbf5de", fallback="Rule Copied Successfully"),
-            content=tr("framework.legacy.f30a6af3358a", fallback=f"Rule added to {len(checked_task_ids)} checked tasks\nand enabled their scheduling"),
+            title=_('Rule Copied Successfully', msgid='e3ae5bcbf5de'),
+            content=_(f'Rule added to {len(checked_task_ids)} checked tasks\nand enabled their scheduling', msgid='f30a6af3358a'),
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
             position=InfoBarPosition.TOP_RIGHT,
@@ -165,8 +165,8 @@ class PeriodicRuleActions:
 
         if not checked_task_ids:
             InfoBar.warning(
-                title=tr("framework.legacy.1b371d6fb221", fallback="No Target Selected"),
-                content=tr("framework.legacy.cc351cec08d8", fallback="Please check tasks in the left list first"),
+                title=_('No Target Selected', msgid='1b371d6fb221'),
+                content=_('Please check tasks in the left list first', msgid='cc351cec08d8'),
                 orient=Qt.Orientation.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP_RIGHT,
@@ -191,8 +191,8 @@ class PeriodicRuleActions:
 
         host._auto_adjust_after_use_action()
         InfoBar.success(
-            title=tr("framework.legacy.015f96fc84cf", fallback="Withdraw Successful"),
-            content=tr("framework.legacy.2aa8a383db15", fallback=f"Removed trigger from {modified_count} tasks"),
+            title=_('Withdraw Successful', msgid='015f96fc84cf'),
+            content=_(f'Removed trigger from {modified_count} tasks', msgid='2aa8a383db15'),
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
             position=InfoBarPosition.TOP_RIGHT,
@@ -552,7 +552,7 @@ class PeriodicRuntimeActions:
         pending_tasks = host.periodic_controller.consume_pending_queue_on_external_release()
         if pending_tasks:
             host.logger.info(
-                tr("framework.legacy.839d28ef6808", fallback="External task finished, waking up queued daily tasks...")
+                _('External task finished, waking up queued daily tasks...', msgid='839d28ef6808')
             )
             host.after_start_button_click(pending_tasks)
 

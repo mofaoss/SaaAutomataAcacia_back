@@ -11,7 +11,7 @@ from app.framework.ui.shared.style_sheet import StyleSheet
 from app.framework.infra.runtime.paths import APPDATA_DIR, ensure_runtime_dirs
 from .periodic_base import BaseInterface
 from app.framework.ui.views.ocr_replacement_table_view import OcrReplacementTableView
-from app.framework.i18n import tr
+from app.framework.i18n import _
 
 
 class OcrReplacementTable(QFrame, BaseInterface):

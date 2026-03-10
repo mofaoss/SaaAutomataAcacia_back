@@ -6,5 +6,19 @@
   "module.ocr.legacy.328dd4d1a4f3": "OCR输入图像为空，跳过本次识别",
   "module.ocr.legacy.b5025abbb9d2": "OCR未识别出任何文字",
   "module.ocr.legacy.5f7324113199": "初始化OCR完成",
-  "module.ocr.legacy.5367a13ccc69": "初始化OCR失败：此CPU不支持AVX2指令集"
+  "module.ocr.legacy.5367a13ccc69": "初始化OCR失败：此CPU不支持AVX2指令集",
+  "module.ocr.log.c404ba289053": "OCR recognition result: {log_content}",
+  "module.ocr.ui.85dc5a050c0f": "Error executing ocr: {e}",
+  "module.ocr.log.dd048bb5cb14": "OCR hit frame cache, skipping repeated recognition",
+  "module.ocr.log.e800193de899": "OCR hit no-text cooldown, skipping recognition",
+  "module.ocr.log.1c5f467f1be7": "OCR quick check: low text probability frame, skipping recognition",
+  "module.ocr.log.283283d9f41d": "OCR low-res enhance: {w}x{h} -> {new_w}x{new_h} (x{scale})",
+  "module.ocr.log.e553f2750f9a": "OCR adopted strategy: {best_name}",
+  "module.ocr.log.ecbbcbc53c31": "Starting to initialize OCR...",
+  "module.ocr.log.328dd4d1a4f3": "OCR input image is empty, skipping this recognition",
+  "module.ocr.log.b5025abbb9d2": "OCR recognized no text",
+  "module.ocr.log.5f7324113199": "OCR initialization completed",
+  "module.ocr.log.5367a13ccc69": "OCR initialization failed: This CPU does not support AVX2 instruction set",
+  "module.ocr.log.64791083260d": "OCR initialization failed: {e}",
+  "module.ocr.log.5678b1bd9312": "OCR failed to read image, invalid path or unreadable file: {image_path}"
 }
