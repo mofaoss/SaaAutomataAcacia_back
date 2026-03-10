@@ -1,0 +1,208 @@
+{
+  "app/features/modules/person/usecase/person_usecase.py:134:40": {
+    "kind": "dynamic_template",
+    "key": "module.person.log.tmpl_643e755089c6",
+    "msgid": "tmpl_643e755089c6",
+    "source_template": "未找到对应速战，检查是否已刷取或是否解锁{person_name}的速战",
+    "fields": [
+      "person_name"
+    ],
+    "field_details": {
+      "person_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "person",
+    "file_path": "app/features/modules/person/usecase/person_usecase.py",
+    "line": 134,
+    "col": 40,
+    "context": "log"
+  },
+  "app/features/modules/person/usecase/person_usecase.py:152:33": {
+    "kind": "dynamic_template",
+    "key": "module.person.log.tmpl_f06c790d515a",
+    "msgid": "tmpl_f06c790d515a",
+    "source_template": "找到对应的“速战”：({pos},{min_distance})",
+    "fields": [
+      "pos",
+      "min_distance"
+    ],
+    "field_details": {
+      "pos": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "min_distance": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "person",
+    "file_path": "app/features/modules/person/usecase/person_usecase.py",
+    "line": 152,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/person/usecase/person_usecase.py:155:36": {
+    "kind": "dynamic_template",
+    "key": "module.person.log.tmpl_c74a30a87c08",
+    "msgid": "tmpl_c74a30a87c08",
+    "source_template": "“速战”距离大于{value_1}：({pos},{min_distance})，不是{person_name}的速战",
+    "fields": [
+      "value_1",
+      "pos",
+      "min_distance",
+      "person_name"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "pos": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "min_distance": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "person_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "person",
+    "file_path": "app/features/modules/person/usecase/person_usecase.py",
+    "line": 155,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/person/usecase/person_usecase.py:172:36": {
+    "kind": "static_literal",
+    "key": "module.person.log.txt_be40b8eb9c07",
+    "msgid": "txt_be40b8eb9c07",
+    "source_text": "记忆嵌片已用尽",
+    "owner_scope": "module",
+    "owner_module": "person",
+    "file_path": "app/features/modules/person/usecase/person_usecase.py",
+    "line": 172,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/person/usecase/person_usecase.py:178:33": {
+    "kind": "static_literal",
+    "key": "module.person.log.txt_755a833be224",
+    "msgid": "txt_755a833be224",
+    "source_text": "已打开补充对话框，准备使用 2 片记忆嵌片",
+    "owner_scope": "module",
+    "owner_module": "person",
+    "file_path": "app/features/modules/person/usecase/person_usecase.py",
+    "line": 178,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/person/usecase/person_usecase.py:203:33": {
+    "kind": "static_literal",
+    "key": "module.person.log.txt_79072efe7879",
+    "msgid": "txt_79072efe7879",
+    "source_text": "点击右上角加号补充体力",
+    "owner_scope": "module",
+    "owner_module": "person",
+    "file_path": "app/features/modules/person/usecase/person_usecase.py",
+    "line": 203,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/person/usecase/person_usecase.py:211:34": {
+    "kind": "static_literal",
+    "key": "module.person.log.txt_ad7862e474e6",
+    "msgid": "txt_ad7862e474e6",
+    "source_text": "使用记忆嵌片超时",
+    "owner_scope": "module",
+    "owner_module": "person",
+    "file_path": "app/features/modules/person/usecase/person_usecase.py",
+    "line": 211,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/person/usecase/person_usecase.py:251:36": {
+    "kind": "dynamic_template",
+    "key": "module.person.log.tmpl_fcdeab45261c",
+    "msgid": "tmpl_fcdeab45261c",
+    "source_template": "OCR结果为空或结构异常: {result}",
+    "fields": [
+      "result"
+    ],
+    "field_details": {
+      "result": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "person",
+    "file_path": "app/features/modules/person/usecase/person_usecase.py",
+    "line": 251,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/person/usecase/person_usecase.py:263:33": {
+    "kind": "dynamic_template",
+    "key": "module.person.log.tmpl_7f9f9f9c32c2",
+    "msgid": "tmpl_7f9f9f9c32c2",
+    "source_template": "记忆嵌片更新成功：{times}",
+    "fields": [
+      "times"
+    ],
+    "field_details": {
+      "times": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "person",
+    "file_path": "app/features/modules/person/usecase/person_usecase.py",
+    "line": 263,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/person/usecase/person_usecase.py:265:33": {
+    "kind": "dynamic_template",
+    "key": "module.person.log.tmpl_390dbaa45eb2",
+    "msgid": "tmpl_390dbaa45eb2",
+    "source_template": "记忆嵌片更新失败：{norm}",
+    "fields": [
+      "norm"
+    ],
+    "field_details": {
+      "norm": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "person",
+    "file_path": "app/features/modules/person/usecase/person_usecase.py",
+    "line": 265,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/person/usecase/person_usecase.py:80:34": {
+    "kind": "static_literal",
+    "key": "module.person.log.txt_765c7d097430",
+    "msgid": "txt_765c7d097430",
+    "source_text": "刷取角色碎片超时",
+    "owner_scope": "module",
+    "owner_module": "person",
+    "file_path": "app/features/modules/person/usecase/person_usecase.py",
+    "line": 80,
+    "col": 34,
+    "context": "log"
+  }
+}

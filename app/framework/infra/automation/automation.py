@@ -258,6 +258,7 @@ class Automation:
         except Exception as e:
             self._log_error_throttled("find_image_error", _(f'Error finding image: {e}', msgid='error_finding_image_e'))
             return None, None, None
+        return None, None, None
 
     @atoms
     def perform_ocr(self, extract: list = None, image=None, is_log=False):
@@ -385,9 +386,17 @@ class Automation:
             signalBus.showScreenshot.emit(self.current_screenshot)
         if find_type in ['image', 'text', 'image_threshold']:
             if find_type == 'image':
-                top_left, bottom_right, image_threshold = self.find_image_element(target, threshold,
-                                                                                  match_method=match_method,
-                                                                                  extract=extract, is_log=is_log)
+                image_result = self.find_image_element(
+                    target,
+                    threshold,
+                    match_method=match_method,
+                    extract=extract,
+                    is_log=is_log,
+                )
+                if isinstance(image_result, tuple) and len(image_result) == 3:
+                    top_left, bottom_right, image_threshold = image_result
+                else:
+                    top_left = bottom_right = image_threshold = None
             elif find_type == 'text':
                 top_left, bottom_right = self.find_text_element(target, include, need_ocr, extract, is_log)
             if top_left and bottom_right:
@@ -677,8 +686,8 @@ class Automation:
         """
         识别并计算当前体力值，然后计算出恢复时间
         """
-        ocr_result = self.read_text_from_crop(crop=(900 / 1920, 0, 1076 / 1920, 70 / 1080))
         try:
+            ocr_result = self.read_text_from_crop(crop=(900 / 1920, 0, 1076 / 1920, 70 / 1080))
             text = ocr_result[0][0]
             if "/" in text:
                 num = int(text.split("/")[0])

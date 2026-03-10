@@ -1,6 +1,4 @@
 {
-  "module.maze.title": "Maze",
-  "module.maze.log.今日的迷宫次数已经一滴都不剩了": "今日的迷宫次数已经一滴都不剩了",
-  "module.maze.log.迷宫超时": "迷宫超时",
-  "module.dummy.title": "Maze"
+  "module.dummy.title": "迷宫",
+  "module.maze.title": "迷宫"
 }

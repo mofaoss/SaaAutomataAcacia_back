@@ -1,0 +1,38 @@
+{
+  "app/features/modules/close_game/usecase/close_game_usecase.py:32:29": {
+    "kind": "static_literal",
+    "key": "module.close_game.log.exiting_game",
+    "msgid": "exiting_game",
+    "source_text": "Exiting game...",
+    "owner_scope": "module",
+    "owner_module": "close_game",
+    "file_path": "app/features/modules/close_game/usecase/close_game_usecase.py",
+    "line": 32,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/close_game/usecase/close_game_usecase.py:40:29": {
+    "kind": "static_literal",
+    "key": "module.close_game.log.system_will_shut_down_in_60s",
+    "msgid": "system_will_shut_down_in_60s",
+    "source_text": "System will shut down in 60s...",
+    "owner_scope": "module",
+    "owner_module": "close_game",
+    "file_path": "app/features/modules/close_game/usecase/close_game_usecase.py",
+    "line": 40,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/close_game/usecase/close_game_usecase.py:45:29": {
+    "kind": "static_literal",
+    "key": "module.close_game.log.exiting_application",
+    "msgid": "exiting_application",
+    "source_text": "Exiting Application...",
+    "owner_scope": "module",
+    "owner_module": "close_game",
+    "file_path": "app/features/modules/close_game/usecase/close_game_usecase.py",
+    "line": 45,
+    "col": 29,
+    "context": "log"
+  }
+}

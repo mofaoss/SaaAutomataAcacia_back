@@ -1,0 +1,38 @@
+{
+  "app/features/modules/operation_action/usecase/operation_usecase.py:114:42": {
+    "kind": "static_literal",
+    "key": "module.operation_action.log.txt_25f747b8c522",
+    "msgid": "txt_25f747b8c522",
+    "source_text": "进入常规行动时连续滚轮无进展，已停止以避免后台卡死",
+    "owner_scope": "module",
+    "owner_module": "operation_action",
+    "file_path": "app/features/modules/operation_action/usecase/operation_usecase.py",
+    "line": 114,
+    "col": 42,
+    "context": "log"
+  },
+  "app/features/modules/operation_action/usecase/operation_usecase.py:130:34": {
+    "kind": "static_literal",
+    "key": "module.operation_action.log.txt_a66679214182",
+    "msgid": "txt_a66679214182",
+    "source_text": "进入常规行动超时",
+    "owner_scope": "module",
+    "owner_module": "operation_action",
+    "file_path": "app/features/modules/operation_action/usecase/operation_usecase.py",
+    "line": 130,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/operation_action/usecase/operation_usecase.py:92:34": {
+    "kind": "static_literal",
+    "key": "module.operation_action.log.txt_494267964b01",
+    "msgid": "txt_494267964b01",
+    "source_text": "执行常规训练超时",
+    "owner_scope": "module",
+    "owner_module": "operation_action",
+    "file_path": "app/features/modules/operation_action/usecase/operation_usecase.py",
+    "line": 92,
+    "col": 34,
+    "context": "log"
+  }
+}

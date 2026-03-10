@@ -198,7 +198,7 @@ class Input:
         return stable_count >= self._tracking_stable_samples
 
     def _align_tracking_target(self, x: int, y: int, max_align_attempts=6):
-        for _ in range(max_align_attempts):
+        for attempt_idx in range(max_align_attempts):
             if not self.window_tracker.align_target_to_cursor(x, y):
                 time.sleep(0.001)
                 continue
@@ -280,7 +280,7 @@ class Input:
                     if self._window_tracking_enabled:
                         click_done = False
                         max_attempts = 3
-                        for _ in range(max_attempts):
+                        for attempt_idx in range(max_attempts):
                             active_elapsed = time.time() - start_time - deferred_time
                             if active_elapsed >= time_out:
                                 break
@@ -426,7 +426,7 @@ class Input:
             self._reset_shell_guard_wait()
 
             aligned = False
-            for _ in range(5):
+            for align_attempt_idx in range(5):
                 if self.window_tracker.align_target_to_cursor(x, y):
                     aligned = True
                     break
@@ -441,7 +441,7 @@ class Input:
             self.activate()
             win32gui.SendMessage(self.hwnd, self.WmCode['mouse_move'], 0, lparam)
             current_batch = min(batch_notches, notch_count - sent_notches)
-            for _ in range(current_batch):
+            for wheel_step_idx in range(current_batch):
                 wparam_step = (direction * 120) << 16
                 win32gui.SendMessage(self.hwnd, self.WmCode['mouse_wheel'], wparam_step, lparam)
 
@@ -469,7 +469,7 @@ class Input:
                 self._reset_shell_guard_wait()
 
                 aligned = False
-                for _ in range(5):
+                for remainder_align_attempt_idx in range(5):
                     if self.window_tracker.align_target_to_cursor(x, y):
                         aligned = True
                         break

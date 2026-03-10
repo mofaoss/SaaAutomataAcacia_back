@@ -1,22 +1,4 @@
 {
-  "module.dummy.title": "Use Stamina",
-  "module.task_stamina.title": "Use Stamina",
-  "module.use_power.log.刷常规后勤超时": "刷常规后勤超时",
-  "module.use_power.log.刷活动体力超时": "刷活动体力超时",
-  "module.use_power.log.已打开活动奖励页面_当前无可领取奖励": "已打开活动奖励页面，当前无可领取奖励",
-  "module.use_power.log.已打开活动奖励页面_检测到可领取奖励": "已打开活动奖励页面，检测到可领取奖励",
-  "module.use_power.log.已进入活动奖励页面_当前无可领取奖励": "已进入活动奖励页面，当前无可领取奖励",
-  "module.use_power.log.已进入活动奖励页面_检测到可领取奖励": "已进入活动奖励页面，检测到可领取奖励",
-  "module.use_power.log.常规后勤当前页面无进展_重试": "常规后勤当前页面无进展，重试",
-  "module.use_power.log.材料本未解锁_深渊_难度": "材料本未解锁“深渊”难度",
-  "module.use_power.log.查找_浴火之战_连续滚动无进展_尝试重置页面": "查找“浴火之战”连续滚动无进展，尝试重置页面",
-  "module.use_power.log.查找_深渊_连续滚动无进展_尝试重置页面": "查找“深渊”连续滚动无进展，尝试重置页面",
-  "module.use_power.log.检查体力超时": "检查体力超时",
-  "module.use_power.log.活动奖励页面已就绪_当前无可领取奖励": "活动奖励页面已就绪，当前无可领取奖励",
-  "module.use_power.log.活动奖励页面已就绪_检测到可领取奖励": "活动奖励页面已就绪，检测到可领取奖励",
-  "module.use_power.log.活动奖励页面未成功打开_继续重试": "活动奖励页面未成功打开，继续重试",
-  "module.use_power.log.等待活动任务奖励页面超时_重试打开任务": "等待活动任务奖励页面超时，重试打开任务",
-  "module.use_power.log.进入活动页面超时": "进入活动页面超时",
-  "module.use_power.log.配置数据为空或格式不正确": "配置数据为空或格式不正确",
-  "module.use_power.log.领取活动物资超时": "领取活动物资超时"
+  "module.dummy.title": "领取体力",
+  "module.task_stamina.title": "领取体力"
 }

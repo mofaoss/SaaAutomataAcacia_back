@@ -2,6 +2,7 @@
 import inspect
 import sys
 import types
+from dataclasses import dataclass
 from typing import Callable
 
 from PySide6.QtCore import QThread, Signal
@@ -9,6 +10,15 @@ from PySide6.QtCore import QThread, Signal
 from app.framework.infra.config.app_config import config, is_non_chinese_ui_language
 from app.framework.core.task_engine.runtime_session import RuntimeAutomationSession
 from app.framework.i18n import _
+
+
+@dataclass(slots=True)
+class TaskExecutionResult:
+    ok: bool
+    skipped: bool = False
+    message: str = ""
+    detail: str = ""
+    error: Exception | None = None
 
 
 class TaskQueueThread(QThread):
@@ -106,6 +116,84 @@ class TaskQueueThread(QThread):
             kwargs[name] = None
         return kwargs
 
+    def _telemetry_periodic(self, event: str, task_id: str, task_name: str, detail: str = "") -> None:
+        try:
+            self.logger.debug(
+                "periodic_event=%s task_id=%s task_name=%s detail=%s",
+                event,
+                task_id,
+                task_name,
+                detail,
+            )
+        except Exception:
+            pass
+
+    def _normalize_task_result(
+        self,
+        task_id: str,
+        task_name: str,
+        raw_result,
+    ) -> TaskExecutionResult:
+        return_type = type(raw_result).__name__
+        preview = repr(raw_result)
+        if len(preview) > 180:
+            preview = preview[:177] + "..."
+
+        self._telemetry_periodic(
+            "task_execution_return_observed",
+            task_id,
+            task_name,
+            f"type={return_type} value={preview}",
+        )
+
+        if raw_result is None:
+            self._telemetry_periodic("task_execution_return_none", task_id, task_name, "legacy_none_return")
+            self._telemetry_periodic("task_execution_unpacked_guarded", task_id, task_name, "legacy_none_return")
+            self._telemetry_periodic("task_execution_result_normalized", task_id, task_name, "none=>ok")
+            return TaskExecutionResult(ok=True, message="legacy_none_return")
+
+        if isinstance(raw_result, TaskExecutionResult):
+            return raw_result
+
+        if isinstance(raw_result, bool):
+            self._telemetry_periodic("task_execution_result_normalized", task_id, task_name, f"bool=>ok:{raw_result}")
+            return TaskExecutionResult(ok=bool(raw_result))
+
+        if isinstance(raw_result, dict):
+            ok = bool(raw_result.get("ok", True))
+            skipped = bool(raw_result.get("skipped", False))
+            message = str(raw_result.get("message", "") or "")
+            detail = str(raw_result.get("detail", "") or "")
+            error_obj = raw_result.get("error")
+            error = error_obj if isinstance(error_obj, Exception) else None
+            self._telemetry_periodic("task_execution_result_normalized", task_id, task_name, "dict=>TaskExecutionResult")
+            return TaskExecutionResult(ok=ok, skipped=skipped, message=message, detail=detail, error=error)
+
+        if isinstance(raw_result, (tuple, list)):
+            if len(raw_result) == 0:
+                self._telemetry_periodic("task_execution_result_invalid", task_id, task_name, "empty_tuple_or_list")
+                self._telemetry_periodic("task_execution_unpacked_guarded", task_id, task_name, "empty_tuple_or_list")
+                return TaskExecutionResult(ok=False, detail="empty_tuple_or_list")
+            first = raw_result[0]
+            if isinstance(first, bool):
+                message = str(raw_result[1]) if len(raw_result) > 1 else ""
+                self._telemetry_periodic("task_execution_result_normalized", task_id, task_name, "tuple/list=>TaskExecutionResult")
+                return TaskExecutionResult(ok=first, message=message, detail=preview)
+            self._telemetry_periodic("task_execution_result_invalid", task_id, task_name, "tuple/list first item is not bool")
+            self._telemetry_periodic("task_execution_unpacked_guarded", task_id, task_name, "tuple/list first item is not bool")
+            return TaskExecutionResult(ok=False, detail=preview)
+
+        self._telemetry_periodic("task_execution_result_normalized", task_id, task_name, f"default=>ok ({return_type})")
+        return TaskExecutionResult(ok=True, detail=preview)
+
+    def _execute_module_task(self, task_id: str, task_name: str, module) -> TaskExecutionResult:
+        try:
+            raw_result = module.run()
+            return self._normalize_task_result(task_id, task_name, raw_result)
+        except Exception as exc:
+            self._telemetry_periodic("task_execution_result_invalid", task_id, task_name, f"exception={exc!r}")
+            return TaskExecutionResult(ok=False, message="exception", detail=str(exc), error=exc)
+
     def run(self):
         self.is_running_signal.emit("start")
         normal_stop_flag = True
@@ -126,7 +214,9 @@ class TaskQueueThread(QThread):
                 queued_meta = self.task_registry.get(queued_task_id, {})
                 queued_name = queued_meta.get('en_name', queued_task_id) if is_non_chinese_ui_language() else queued_meta.get('zh_name', queued_task_id)
                 queue_names.append(queued_name)
-            self.logger.info(_(f"Task queue resolved: {', '.join(queue_names)}", msgid='task_queue_resolved'))
+            self.logger.info(
+                _("Task queue resolved: {tasks}", msgid='task_queue_resolved', tasks=', '.join(queue_names))
+            )
 
             for task_id in self.tasks_to_run:
                 if not self._is_running:
@@ -136,35 +226,60 @@ class TaskQueueThread(QThread):
 
                 meta = self.task_registry.get(task_id)
                 if not meta:
-                    self.logger.warning(_(f"Skipping task '{task_id}': metadata not found", msgid='skipping_task_metadata_not_found'))
+                    self.logger.warning(
+                        _("Skipping task '{task_id}': metadata not found", msgid='skipping_task_metadata_not_found', task_id=task_id)
+                    )
                     continue
 
                 task_name = meta['en_name'] if is_non_chinese_ui_language() else meta['zh_name']
-                self.logger.info(_(f'Current task: {task_name}', msgid='current_task_task_name'))
+                self.logger.info(_("Current task: {task_name}", msgid='current_task_task_name', task_name=task_name))
                 self.task_started_signal.emit(task_id)
 
                 task_success = True
                 requires_home_sync = bool(meta.get('requires_home_sync', True))
                 if requires_home_sync:
                     self.logger.info(
-                        _(f'Preparing {task_name}, returning to home...', msgid='preparing_task_name_returning_to_home')
+                        _('Preparing {task_name}, returning to home...', msgid='preparing_task_name_returning_to_home', task_name=task_name)
                     )
                     if not self.home_sync(auto, self.logger):
                         self.logger.error(
-                            _(f'[{task_name}] Failed to return to home before start, skipping.', msgid='task_name_failed_to_return_to_home_before_start')
+                            _('[{task_name}] Failed to return to home before start, skipping.', msgid='task_name_failed_to_return_to_home_before_start', task_name=task_name)
                         )
                         self.logger.warning(
-                            _(f'Task skipped: {task_name}, reason=home_sync_failed', msgid='task_skipped_home_sync_failed')
+                            _('Task skipped: {task_name}, reason=home_sync_failed', msgid='task_skipped_home_sync_failed', task_name=task_name)
                         )
                         task_success = False
 
                 if task_success:
                     module_class = meta['module_class']
                     module = self._instantiate_module(module_class, auto, self.logger, self.runtime_config)
-                    module.run()
+                    execution_result = self._execute_module_task(task_id, task_name, module)
+                    if execution_result.skipped:
+                        task_success = False
+                        self.logger.warning(
+                            _(
+                                "Task skipped: {task_name}, reason={reason}",
+                                msgid="task_skipped_reason",
+                                task_name=task_name,
+                                reason=execution_result.message or execution_result.detail or "unknown",
+                            )
+                        )
+                    elif not execution_result.ok:
+                        task_success = False
+                        err_text = execution_result.detail or execution_result.message or (
+                            str(execution_result.error) if execution_result.error else ""
+                        )
+                        self.logger.error(
+                            _(
+                                "Task failed: {task_name}, reason={reason}",
+                                msgid="task_failed_reason",
+                                task_name=task_name,
+                                reason=err_text or "unknown",
+                            )
+                        )
 
                     if requires_home_sync and self._is_running:
-                        msg = _(f'{task_name} finished, returning to home...', msgid='task_name_finished_returning_to_home')
+                        msg = _('{task_name} finished, returning to home...', msgid='task_name_finished_returning_to_home', task_name=task_name)
                         self.logger.info(msg)
                         self.home_sync(auto, self.logger)
 
@@ -179,13 +294,25 @@ class TaskQueueThread(QThread):
                     break
 
                 if config.inform_message.value or '--toast-only' in sys.argv:
-                    full_time = auto.calculate_power_time() if auto is not None else None
-                    content = f'体力将在 {full_time} 完全恢复' if full_time else '体力计算出错'
-                    self.show_tray_message_signal.emit('已完成勾选任务', content)
+                    try:
+                        full_time = auto.calculate_power_time() if auto is not None else None
+                        content = f'体力将在 {full_time} 完全恢复' if full_time else '体力计算出错'
+                        self.show_tray_message_signal.emit('已完成勾选任务', content)
+                    except Exception as tray_error:
+                        self._telemetry_periodic("task_execution_result_invalid", task_id, task_name, f"tray_notify_error={tray_error!r}")
+                        self.logger.warning(
+                            _(
+                                "Non-critical tray message update failed: {error}",
+                                msgid="non_critical_tray_message_update_failed",
+                                error=str(tray_error),
+                            )
+                        )
 
         except Exception as e:
             if str(e) != '已停止':
-                self.logger.warning(e)
+                self.logger.exception(
+                    _("Unhandled queue runtime exception: {error}", msgid="unhandled_queue_runtime_exception", error=str(e))
+                )
         finally:
             if self.session.auto is not None:
                 self.session.stop()

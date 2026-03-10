@@ -2,78 +2,134 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from app.framework.i18n.runtime import classify_source_language
+from app.framework.i18n.template_render import extract_template_field_details
 SUPPORTED_LANGS = ["en", "zh_CN", "zh_HK"]
+SOURCE_LANGS = {"en", "zh_CN"}
 
 
 def _load(path: Path) -> dict[str, str]:
     if not path.exists():
         return {}
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-        if isinstance(data, dict):
-            return {str(k): str(v) for k, v in data.items()}
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception:
-        pass
-    return {}
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    if not isinstance(data, dict):
+        return {}
+    return {str(k): str(v) for k, v in data.items()}
 
 
-def _save(path: Path, data: dict[str, str]) -> None:
+def _load_template_meta(path: Path) -> dict[str, dict]:
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+    except Exception:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    if not isinstance(data, dict):
+        return {}
+    return {str(k): v for k, v in data.items() if isinstance(v, dict)}
+
+
+def _save(path: Path, data: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(json.dumps(dict(sorted(data.items())), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def _pick_source_value(
-    key: str,
-    all_maps: dict[str, dict[str, str]],
-    source_map: dict[str, str],
-) -> tuple[str | None, str | None]:
-    source_lang = source_map.get(key)
-    if source_lang in SUPPORTED_LANGS:
-        value = all_maps.get(source_lang, {}).get(key)
-        if value is not None:
-            return source_lang, value
-
-    for lang in ("en", "zh_CN", "zh_HK"):
-        value = all_maps.get(lang, {}).get(key)
-        if value is not None:
-            return lang, value
-    return None, None
+def _resolve_dynamic_source_lang(template_meta: dict) -> str:
+    source_template = template_meta.get("source_template")
+    if isinstance(source_template, str) and source_template.strip():
+        try:
+            return classify_source_language(source_template)
+        except Exception:
+            return "en"
+    return "en"
 
 
 def _sync_owner(base_dir: Path) -> tuple[int, int]:
-    maps: dict[str, dict[str, str]] = {
-        lang: _load(base_dir / f"{lang}.json")
-        for lang in SUPPORTED_LANGS
-    }
+    maps = {lang: _load(base_dir / f"{lang}.json") for lang in SUPPORTED_LANGS}
     source_map = _load(base_dir / "source_map.json")
+    template_meta = _load_template_meta(base_dir / "template_meta.json")
 
-    has_any_file = any((base_dir / f"{lang}.json").exists() for lang in SUPPORTED_LANGS)
     all_keys: set[str] = set(source_map.keys())
     for m in maps.values():
         all_keys.update(m.keys())
-
-    if not all_keys and not has_any_file:
-        return 0, 0
+    all_keys.update(template_meta.keys())
 
     changed_files = 0
     filled = 0
+
+    for key in sorted(all_keys):
+        src = source_map.get(key)
+        if src not in SOURCE_LANGS:
+            if key in template_meta:
+                src = _resolve_dynamic_source_lang(template_meta[key])
+            else:
+                src = "en" if key in maps["en"] else "zh_CN" if key in maps["zh_CN"] else "en"
+            source_map[key] = src
+
+        source_value = maps[src].get(key)
+        if source_value is None and key in template_meta:
+            source_template = template_meta[key].get("source_template")
+            if isinstance(source_template, str) and source_template:
+                source_value = source_template
+        if source_value is None:
+            for lang in SUPPORTED_LANGS:
+                if key in maps[lang]:
+                    source_value = maps[lang][key]
+                    break
+        if source_value is None:
+            continue
+
+        if maps[src].get(key) != source_value:
+            maps[src][key] = source_value
+            filled += 1
+
+        meta = template_meta.get(key)
+        if isinstance(meta, dict):
+            source_template = meta.get("source_template")
+            if isinstance(source_template, str) and source_template:
+                details = meta.get("field_details")
+                expected_details = extract_template_field_details(source_template)
+                if details != expected_details:
+                    meta["field_details"] = expected_details
+
     for lang in SUPPORTED_LANGS:
         path = base_dir / f"{lang}.json"
-        cur = dict(maps.get(lang, {}))
-        before = len(cur)
-        for k in sorted(all_keys):
-            if k not in cur:
-                _, source_value = _pick_source_value(k, maps, source_map)
-                if source_value is None:
-                    continue
-                cur[k] = source_value
-                filled += 1
-        if len(cur) != before or not path.exists():
-            _save(path, cur)
+        before = _load(path)
+        after = maps[lang]
+        if before != after:
+            _save(path, after)
             changed_files += 1
+
+    sm_path = base_dir / "source_map.json"
+    before_sm = _load(sm_path)
+    after_sm = dict(sorted(source_map.items()))
+    if before_sm != after_sm:
+        _save(sm_path, after_sm)
+        changed_files += 1
+
+    tm_path = base_dir / "template_meta.json"
+    before_tm = _load_template_meta(tm_path)
+    after_tm = dict(sorted(template_meta.items()))
+    if before_tm != after_tm:
+        _save(tm_path, after_tm)
+        changed_files += 1
+
     return changed_files, filled
 
 
@@ -91,6 +147,8 @@ def main() -> int:
         if not module_dir.is_dir() or module_dir.name.startswith("__"):
             continue
         i18n_dir = module_dir / "i18n"
+        if not i18n_dir.exists():
+            continue
         f, c = _sync_owner(i18n_dir)
         files += f
         filled += c

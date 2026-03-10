@@ -1,24 +1,4 @@
 {
-  "module.task_shard_exchange.title": "Shard Exchange",
-  "module.jigsaw.log.text": "???????????????????????",
-  "module.jigsaw.log.信源碎片相关操作均未勾选_跳过该任务": "信源碎片相关操作均未勾选，跳过该任务。",
-  "module.jigsaw.log.信源选择完毕_等待后续点击确认回收": "信源选择完毕，等待后续点击确认回收...",
-  "module.jigsaw.log.已成功赠送给好友": "已成功赠送给好友。",
-  "module.jigsaw.log.开始信源碎片相关流程": "开始信源碎片相关流程...",
-  "module.jigsaw.log.开始赠送流程": "开始赠送流程...",
-  "module.jigsaw.log.成功一键接收碎片": "成功一键接收碎片。",
-  "module.jigsaw.log.执行自定义动作_寻找并选择数量最多的碎片": "执行自定义动作：寻找并选择数量最多的碎片...",
-  "module.jigsaw.log.未勾选_信源回收_跳过": "未勾选【信源回收】，跳过。",
-  "module.jigsaw.log.未勾选_接收碎片_跳过": "未勾选【接收碎片】，跳过。",
-  "module.jigsaw.log.未勾选_赠送碎片_跳过": "未勾选【赠送碎片】，跳过。",
-  "module.jigsaw.log.未识别出对应的地图": "未识别出对应的地图",
-  "module.jigsaw.log.检查是否有待接收的碎片": "检查是否有待接收的碎片...",
-  "module.jigsaw.log.没有找到能填满全部格子的方案": "没有找到能填满全部格子的方案",
-  "module.jigsaw.log.没有更多碎片可以赠送了": "没有更多碎片可以赠送了。",
-  "module.jigsaw.log.碎片不足_无法进行回收": "碎片不足，无法进行回收。",
-  "module.jigsaw.log.识别到在基地内部_调整拼图视角": "识别到在基地内部，调整拼图视角...",
-  "module.jigsaw.log.赠送流程超时": "赠送流程超时。",
-  "module.jigsaw.log.达到赠送_接收上限": "达到赠送/接收上限。",
-  "module.jigsaw.log.进入信源交换与回收": "进入信源交换与回收...",
-  "module.dummy.title": "Shard Exchange"
+  "module.dummy.title": "Shard Exchange",
+  "module.task_shard_exchange.title": "Shard Exchange"
 }

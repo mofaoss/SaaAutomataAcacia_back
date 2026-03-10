@@ -1,8 +1,5 @@
 {
   "module.action.title": "Operation",
-  "module.task_operation.title": "Operation",
-  "module.operation_action.log.执行常规训练超时": "执行常规训练超时",
-  "module.operation_action.log.进入常规行动时连续滚轮无进展_已停止以避免后台卡死": "进入常规行动时连续滚轮无进展，已停止以避免后台卡死",
-  "module.operation_action.log.进入常规行动超时": "进入常规行动超时",
-  "module.dummy.title": "Operation"
+  "module.dummy.title": "Operation",
+  "module.task_operation.title": "Operation"
 }

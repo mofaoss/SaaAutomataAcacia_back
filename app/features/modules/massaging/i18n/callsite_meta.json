@@ -1,0 +1,26 @@
+{
+  "app/features/modules/massaging/usecase/massaging_usecase.py:51:34": {
+    "kind": "static_literal",
+    "key": "module.massaging.log.txt_da1c18da65d3",
+    "msgid": "txt_da1c18da65d3",
+    "source_text": "进入按摩超时",
+    "owner_scope": "module",
+    "owner_module": "massaging",
+    "file_path": "app/features/modules/massaging/usecase/massaging_usecase.py",
+    "line": 51,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/massaging/usecase/massaging_usecase.py:89:34": {
+    "kind": "static_literal",
+    "key": "module.massaging.log.txt_9e2b58e7b9d2",
+    "msgid": "txt_9e2b58e7b9d2",
+    "source_text": "按摩超时",
+    "owner_scope": "module",
+    "owner_module": "massaging",
+    "file_path": "app/features/modules/massaging/usecase/massaging_usecase.py",
+    "line": 89,
+    "col": 34,
+    "context": "log"
+  }
+}

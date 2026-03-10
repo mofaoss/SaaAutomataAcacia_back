@@ -1,19 +1,4 @@
 {
-  "module.capture_pals.title": "Capture Pals",
-  "module.capture_pals.log.position_correction_before_exit_in_fixed_mode_a_0_33s_wait_0_2s_s_0_033s": "Position correction before exit in fixed mode: A(0.33s) -> Wait(0.2s) -> S(0.033s)",
-  "module.capture_pals.log.text": "?????????????????????????????",
-  "module.capture_pals.log.同步抓帕鲁_切换_进入前退出地图失败": "同步抓帕鲁：切换/进入前退出地图失败",
-  "module.capture_pals.log.同步抓帕鲁_初始进入常驻岛失败": "同步抓帕鲁：初始进入常驻岛失败",
-  "module.capture_pals.log.同步抓帕鲁_所有任务完成或异常_结束": "同步抓帕鲁：所有任务完成或异常，结束",
-  "module.capture_pals.log.同步抓帕鲁_无剩余可用岛_结束": "同步抓帕鲁：无剩余可用岛，结束",
-  "module.capture_pals.log.同步抓帕鲁_无可用岛屿_结束": "同步抓帕鲁：无可用岛屿，结束",
-  "module.capture_pals.log.启动失败_超时仍未检测到初始页面_请手动进入抓帕鲁选岛页面或进入地图后再启动": "启动失败：超时仍未检测到初始页面。请手动进入抓帕鲁选岛页面或进入地图后再启动。",
-  "module.capture_pals.log.启用_同步抓帕鲁_两岛独立模式_到上限后自动只刷未完成岛": "启用：同步抓帕鲁（两岛独立模式 + 到上限后自动只刷未完成岛）",
-  "module.capture_pals.log.尝试点击确认退出按钮": "尝试点击确认退出按钮",
-  "module.capture_pals.log.尝试点击退出地图按钮": "尝试点击退出地图按钮",
-  "module.capture_pals.log.已回到选岛界面": "已回到选岛界面",
-  "module.capture_pals.log.未检测到初始页面_伙伴岛选岛页_地图内任务图标_请手动进入抓帕鲁初始页面后保持不动": "未检测到初始页面（伙伴岛选岛页/地图内任务图标）。请手动进入抓帕鲁初始页面后保持不动。",
-  "module.capture_pals.log.未选择任何岛屿_无法开始抓帕鲁": "未选择任何岛屿，无法开始抓帕鲁",
-  "module.capture_pals.log.检测到已在地图内_先退出回选岛页面以保证流程一致": "检测到已在地图内，先退出回选岛页面以保证流程一致",
-  "module.dummy.title": "Capture Pals"
+  "module.capture_pals.title": "抓帕鲁",
+  "module.dummy.title": "抓帕鲁"
 }

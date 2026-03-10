@@ -1,0 +1,142 @@
+{
+  "module.fishing.log.cn_text_0001_8": {
+    "kind": "dynamic_template",
+    "template_id": "b350a15eb1068283",
+    "msgid": "出了条大的_截图已保存至_file_path",
+    "source_template": "出了条大的！截图已保存至：{file_path}",
+    "fields": [
+      "file_path"
+    ],
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 253,
+    "col": 25,
+    "function_name": "save_picture",
+    "class_name": "FishingModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "b350a15eb106828368f2eb4cf306bec823979053",
+    "callsite_key": "app/features/modules/fishing/usecase/fishing_usecase.py:253:25",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "file_path": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.fishing.log.cn_text_0004_8": {
+    "kind": "dynamic_template",
+    "template_id": "7162176ca5032e59",
+    "msgid": "开始第_value_1_次钓鱼",
+    "source_template": "开始第 {value_1} 次钓鱼",
+    "fields": [
+      "value_1"
+    ],
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 71,
+    "col": 29,
+    "function_name": "run",
+    "class_name": "FishingModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "7162176ca5032e59199b3e6830956b81778f04c5",
+    "callsite_key": "app/features/modules/fishing/usecase/fishing_usecase.py:71:29",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.fishing.log.cn_text_0005_8": {
+    "kind": "dynamic_template",
+    "template_id": "f4e0d32b03a71fe5",
+    "msgid": "未识别出按键文字_请手动设置_e",
+    "source_template": "未识别出按键文字，请手动设置{e}",
+    "fields": [
+      "e"
+    ],
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 302,
+    "col": 30,
+    "function_name": "get_press_key",
+    "class_name": "FishingModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "f4e0d32b03a71fe5649f548c1c9c29706e0c5163",
+    "callsite_key": "app/features/modules/fishing/usecase/fishing_usecase.py:302:30",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.fishing.log.cn_text_0008_8": {
+    "kind": "dynamic_template",
+    "template_id": "8c1c6ef990d66cb3",
+    "msgid": "选定的hsv值_hsv",
+    "source_template": "选定的HSV值: {hsv}",
+    "fields": [
+      "hsv"
+    ],
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/ui/subtask.py",
+    "line": 83,
+    "col": 29,
+    "function_name": "_show_dialog",
+    "class_name": "AdjustColor",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "8c1c6ef990d66cb367aa369ffcbadf712b1a1d15",
+    "callsite_key": "app/features/modules/fishing/ui/subtask.py:83:29",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "hsv": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.fishing.log.cn_text_0011": {
+    "kind": "dynamic_template",
+    "template_id": "7026e5b0587aaabe",
+    "msgid": "钓鱼按键识别最佳匹配为_best_match",
+    "source_template": "钓鱼按键识别最佳匹配为：{best_match}",
+    "fields": [
+      "best_match"
+    ],
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 295,
+    "col": 29,
+    "function_name": "get_press_key",
+    "class_name": "FishingModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "7026e5b0587aaabe72960d7bf256a3597196529a",
+    "callsite_key": "app/features/modules/fishing/usecase/fishing_usecase.py:295:29",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "best_match": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  }
+}

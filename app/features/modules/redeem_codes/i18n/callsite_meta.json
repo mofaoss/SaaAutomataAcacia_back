@@ -1,0 +1,14 @@
+{
+  "app/features/modules/redeem_codes/ui/ui_view.py:18:16": {
+    "kind": "static_literal",
+    "key": "module.redeem_codes.ui.one_code_per_line",
+    "msgid": "one_code_per_line",
+    "source_text": "One code per line",
+    "owner_scope": "module",
+    "owner_module": "redeem_codes",
+    "file_path": "app/features/modules/redeem_codes/ui/ui_view.py",
+    "line": 18,
+    "col": 16,
+    "context": "ui"
+  }
+}

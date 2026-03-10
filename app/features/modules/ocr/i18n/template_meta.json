@@ -1,0 +1,190 @@
+{
+  "module.ocr.log.ocr_adopted_strategy_best_name": {
+    "kind": "dynamic_template",
+    "template_id": "ocr_adopted_strategy_best_name",
+    "msgid": "ocr_adopted_strategy_best_name",
+    "source_template": "OCR adopted strategy: {best_name}",
+    "fields": [
+      "best_name"
+    ],
+    "field_details": {
+      "best_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 288,
+    "col": 34,
+    "function_name": "run",
+    "class_name": "OCR",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "cddde1b5f4cdf748f04bb711acaa9f17fe05ac3f",
+    "callsite_key": "app/features/modules/ocr/ocr.py:288:34",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "module.ocr.log.ocr_failed_to_read_image_invalid_path_or_unreada": {
+    "kind": "dynamic_template",
+    "template_id": "ocr_failed_to_read_image_invalid_path_or_unreada",
+    "msgid": "ocr_failed_to_read_image_invalid_path_or_unreada",
+    "source_template": "OCR failed to read image, invalid path or unreadable file: {image_path}",
+    "fields": [
+      "image_path"
+    ],
+    "field_details": {
+      "image_path": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 255,
+    "col": 42,
+    "function_name": "run",
+    "class_name": "OCR",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "5457b4b442c02038269444a96db3c391ef0e2c08",
+    "callsite_key": "app/features/modules/ocr/ocr.py:255:42",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "module.ocr.log.ocr_initialization_failed_e": {
+    "kind": "dynamic_template",
+    "template_id": "ocr_initialization_failed_e",
+    "msgid": "ocr_initialization_failed_e",
+    "source_template": "OCR initialization failed: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 361,
+    "col": 34,
+    "function_name": "instance_ocr",
+    "class_name": "OCR",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "0b0e04f9557d025c68c4e5d197838f73a4e3093c",
+    "callsite_key": "app/features/modules/ocr/ocr.py:361:34",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "module.ocr.log.ocr_low_res_enhance_w_x_h_new_w_x_new_h_x_scale": {
+    "kind": "dynamic_template",
+    "template_id": "ocr_low_res_enhance_w_x_h_new_w_x_new_h_x_scale",
+    "msgid": "ocr_low_res_enhance_w_x_h_new_w_x_new_h_x_scale",
+    "source_template": "OCR low-res enhance: {w}x{h} -> {new_w}x{new_h} (x{scale:.2f})",
+    "fields": [
+      "w",
+      "h",
+      "new_w",
+      "new_h",
+      "scale"
+    ],
+    "field_details": {
+      "w": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "h": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "new_w": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "new_h": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "scale": {
+        "format_spec": ".2f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 162,
+    "col": 34,
+    "function_name": "_prepare_ocr_image",
+    "class_name": "OCR",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "84329309b4a9f3c08c635998617fc371e2f098a5",
+    "callsite_key": "app/features/modules/ocr/ocr.py:162:34",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "module.ocr.log.ocr_recognition_result_log_content": {
+    "kind": "dynamic_template",
+    "template_id": "ocr_recognition_result_log_content",
+    "msgid": "ocr_recognition_result_log_content",
+    "source_template": "OCR recognition result: {log_content}",
+    "fields": [
+      "log_content"
+    ],
+    "field_details": {
+      "log_content": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 340,
+    "col": 26,
+    "function_name": "log_result",
+    "class_name": "OCR",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "05fddd96c73ff4c8c3310ad7da8b58f0579f2f03",
+    "callsite_key": "app/features/modules/ocr/ocr.py:340:26",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "module.ocr.ui.error_executing_ocr_e": {
+    "kind": "dynamic_template",
+    "template_id": "error_executing_ocr_e",
+    "msgid": "error_executing_ocr_e",
+    "source_template": "Error executing ocr: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 293,
+    "col": 28,
+    "function_name": "run",
+    "class_name": "OCR",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "aa53769bdc3258411c08adb4878955c46ca905bd",
+    "callsite_key": "app/features/modules/ocr/ocr.py:293:28",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  }
+}

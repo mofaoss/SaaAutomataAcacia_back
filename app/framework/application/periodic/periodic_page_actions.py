@@ -233,6 +233,24 @@ class PeriodicRuntimeActions:
 
     @staticmethod
     def initiate_task_run(host, tasks_to_run):
+        requested_task_ids = list(tasks_to_run or [])
+        if requested_task_ids:
+            requested_names = []
+            for task_id in requested_task_ids:
+                meta = host.task_registry.get(task_id, {})
+                display_name = (
+                    meta.get("en_name", task_id)
+                    if getattr(host, "_is_non_chinese_ui", False)
+                    else meta.get("zh_name", task_id)
+                )
+                requested_names.append(display_name)
+            host.logger.info(
+                host._ui_text(
+                    f"收到执行请求任务：{', '.join(requested_names)}",
+                    f"Requested tasks: {', '.join(requested_names)}",
+                )
+            )
+
         game_opened = host._is_game_window_open()
         plan = host.periodic_controller.build_run_plan(
             task_ids=tasks_to_run,
@@ -240,9 +258,39 @@ class PeriodicRuntimeActions:
             auto_open_game_enabled=host.settings_usecase.is_auto_open_game_enabled(),
         )
         host.tasks_to_run = plan.final_tasks
+        primary_task_id = getattr(host, "primary_task_id", None)
+        if (
+            primary_task_id
+            and primary_task_id in host.tasks_to_run
+            and primary_task_id not in requested_task_ids
+            and plan.should_launch_game
+        ):
+            host.logger.info(
+                host._ui_text(
+                    "检测到游戏未运行，已自动将登录任务插入队列首位",
+                    "Game not running, auto-login task inserted at queue head",
+                )
+            )
 
         if not host.tasks_to_run:
+            host.logger.warning(host._ui_text("任务队列为空，未启动执行", "Task queue is empty, run not started"))
             return
+
+        queued_names = []
+        for task_id in host.tasks_to_run:
+            meta = host.task_registry.get(task_id, {})
+            display_name = (
+                meta.get("en_name", task_id)
+                if getattr(host, "_is_non_chinese_ui", False)
+                else meta.get("zh_name", task_id)
+            )
+            queued_names.append(display_name)
+        host.logger.info(
+            host._ui_text(
+                f"最终入队任务：{', '.join(queued_names)}",
+                f"Final queued tasks: {', '.join(queued_names)}",
+            )
+        )
 
         if plan.should_launch_game:
             host.open_game_directly()
@@ -251,8 +299,8 @@ class PeriodicRuntimeActions:
         if plan.should_warn_game_not_open:
             host.logger.warning(
                 host._ui_text(
-                    "⚠️ 检测到游戏未运行，且未开启【自动打开游戏】！若稍后报错未找到句柄，请勾选该功能或手动启动游戏。",
-                    "⚠️ Game is not running and 'Auto open game' is OFF. This may cause handle errors!",
+                    "[计划] 检测到游戏未运行，且未开启【自动打开游戏】！若稍后报错未找到句柄，请勾选该功能或手动启动游戏。",
+                    "[Schedule] Game is not running and 'Auto open game' is OFF. This may cause handle errors!",
                 )
             )
         host.after_start_button_click(host.tasks_to_run)
@@ -529,6 +577,7 @@ class PeriodicRuntimeActions:
             content=host._ui_text("请至少勾选一个任务进行立即执行", "Please select at least one task to run immediately"),
             parent=host,
         )
+        host.logger.warning(host._ui_text("未勾选可执行任务，执行请求已取消", "No runnable task selected, execution cancelled"))
 
     @staticmethod
     def on_global_state_changed(host, is_running: bool, zh_name: str, en_name: str, source: str):

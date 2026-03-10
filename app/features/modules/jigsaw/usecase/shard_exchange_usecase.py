@@ -193,7 +193,7 @@ class ShardExchangeModule:
             self.auto.click_element_with_pos((top_left, bottom_right), action="move_click", n=3)
             time.sleep(0.5)
         else:
-            self.logger.warning(_("???????????????????????"))
+            self.logger.warning(_("未识别到有效碎片数量，已跳过本轮自动选择", msgid="no_valid_fragment_count_detected_skip_auto_select"))
 
     def execute_custom_puzzle_recycle(self, min_retain=15):
         self.logger.info(_(f"开始扫描碎片数量，每种至少保留 {min_retain} 个..."))
@@ -241,7 +241,7 @@ class ShardExchangeModule:
             add_x = int(835 / self.base_w * w)
             add_y = int(486 / self.base_h * h)
 
-            for _ in range(count - 1):
+            for add_click_idx in range(count - 1):
                 self.auto.move_click(add_x, add_y)
                 time.sleep(0.5)
 

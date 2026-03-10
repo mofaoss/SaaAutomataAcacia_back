@@ -1,0 +1,293 @@
+{
+  "app/features/modules/use_power/usecase/use_power_usecase.py:203:34": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_9f5f13fba9a5",
+    "msgid": "txt_9f5f13fba9a5",
+    "source_text": "检查体力超时",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 203,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:246:37": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_ba6ffade001b",
+    "msgid": "txt_ba6ffade001b",
+    "source_text": "已进入活动奖励页面，检测到可领取奖励",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 246,
+    "col": 37,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:248:37": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_ed71b62bb094",
+    "msgid": "txt_ed71b62bb094",
+    "source_text": "已进入活动奖励页面，当前无可领取奖励",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 248,
+    "col": 37,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:264:44": {
+    "kind": "dynamic_template",
+    "key": "module.use_power.log.tmpl_02eb1da91013",
+    "msgid": "tmpl_02eb1da91013",
+    "source_template": "第{attempt}次进入活动页面失败，准备重试",
+    "fields": [
+      "attempt"
+    ],
+    "field_details": {
+      "attempt": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 264,
+    "col": 44,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:273:36": {
+    "kind": "dynamic_template",
+    "key": "module.use_power.log.tmpl_8944b1b1045d",
+    "msgid": "tmpl_8944b1b1045d",
+    "source_template": "第{attempt}次未找到活动任务入口，准备重试",
+    "fields": [
+      "attempt"
+    ],
+    "field_details": {
+      "attempt": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 273,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:280:37": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_5f89d4252951",
+    "msgid": "txt_5f89d4252951",
+    "source_text": "已打开活动奖励页面，检测到可领取奖励",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 280,
+    "col": 37,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:282:37": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_965417a19748",
+    "msgid": "txt_965417a19748",
+    "source_text": "已打开活动奖励页面，当前无可领取奖励",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 282,
+    "col": 37,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:285:32": {
+    "kind": "dynamic_template",
+    "key": "module.use_power.log.tmpl_e0d704465eda",
+    "msgid": "tmpl_e0d704465eda",
+    "source_template": "第{attempt}次活动奖励页面未打开，准备重试",
+    "fields": [
+      "attempt"
+    ],
+    "field_details": {
+      "attempt": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 285,
+    "col": 32,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:299:30": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_8e49dbf8908b",
+    "msgid": "txt_8e49dbf8908b",
+    "source_text": "配置数据为空或格式不正确",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 299,
+    "col": 30,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:326:44": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_57eee03d5b9d",
+    "msgid": "txt_57eee03d5b9d",
+    "source_text": "活动奖励页面未成功打开，继续重试",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 326,
+    "col": 44,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:336:40": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_63544d939532",
+    "msgid": "txt_63544d939532",
+    "source_text": "材料本未解锁“深渊”难度",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 336,
+    "col": 40,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:382:42": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_a44b2b97f05e",
+    "msgid": "txt_a44b2b97f05e",
+    "source_text": "进入活动页面超时",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 382,
+    "col": 42,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:395:49": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_768d66dfc255",
+    "msgid": "txt_768d66dfc255",
+    "source_text": "活动奖励页面已就绪，检测到可领取奖励",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 395,
+    "col": 49,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:397:49": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_c1638cf3a393",
+    "msgid": "txt_c1638cf3a393",
+    "source_text": "活动奖励页面已就绪，当前无可领取奖励",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 397,
+    "col": 49,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:416:48": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_bde579f18f43",
+    "msgid": "txt_bde579f18f43",
+    "source_text": "等待活动任务奖励页面超时，重试打开任务",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 416,
+    "col": 48,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:452:38": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_befae0252f6f",
+    "msgid": "txt_befae0252f6f",
+    "source_text": "领取活动物资超时",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 452,
+    "col": 38,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:454:38": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_d99122bbcf29",
+    "msgid": "txt_d99122bbcf29",
+    "source_text": "刷活动体力超时",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 454,
+    "col": 38,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:521:44": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_1f1f05500f55",
+    "msgid": "txt_1f1f05500f55",
+    "source_text": "查找“浴火之战”连续滚动无进展，尝试重置页面",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 521,
+    "col": 44,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:548:44": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_ca6f28b9b405",
+    "msgid": "txt_ca6f28b9b405",
+    "source_text": "查找“深渊”连续滚动无进展，尝试重置页面",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 548,
+    "col": 44,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:563:36": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_60f174a4e27e",
+    "msgid": "txt_60f174a4e27e",
+    "source_text": "常规后勤当前页面无进展，重试",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 563,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:574:34": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_d78394cce7f4",
+    "msgid": "txt_d78394cce7f4",
+    "source_text": "刷常规后勤超时",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 574,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/use_power/usecase/use_power_usecase.py:60:30": {
+    "kind": "static_literal",
+    "key": "module.use_power.log.txt_8e49dbf8908b",
+    "msgid": "txt_8e49dbf8908b",
+    "source_text": "配置数据为空或格式不正确",
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 60,
+    "col": 30,
+    "context": "log"
+  }
+}

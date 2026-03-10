@@ -1,0 +1,62 @@
+{
+  "app/features/modules/chasm/usecase/chasm_usecase.py:100:36": {
+    "kind": "static_literal",
+    "key": "module.chasm.log.txt_6f1bb8faf2a5",
+    "msgid": "txt_6f1bb8faf2a5",
+    "source_text": "当前未开放拟境",
+    "owner_scope": "module",
+    "owner_module": "chasm",
+    "file_path": "app/features/modules/chasm/usecase/chasm_usecase.py",
+    "line": 100,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/chasm/usecase/chasm_usecase.py:104:36": {
+    "kind": "static_literal",
+    "key": "module.chasm.log.txt_6f1bb8faf2a5",
+    "msgid": "txt_6f1bb8faf2a5",
+    "source_text": "当前未开放拟境",
+    "owner_scope": "module",
+    "owner_module": "chasm",
+    "file_path": "app/features/modules/chasm/usecase/chasm_usecase.py",
+    "line": 104,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/chasm/usecase/chasm_usecase.py:128:34": {
+    "kind": "static_literal",
+    "key": "module.chasm.log.txt_47bc9f327171",
+    "msgid": "txt_47bc9f327171",
+    "source_text": "领取拟境奖励超时",
+    "owner_scope": "module",
+    "owner_module": "chasm",
+    "file_path": "app/features/modules/chasm/usecase/chasm_usecase.py",
+    "line": 128,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/chasm/usecase/chasm_usecase.py:42:36": {
+    "kind": "static_literal",
+    "key": "module.chasm.log.txt_6f1bb8faf2a5",
+    "msgid": "txt_6f1bb8faf2a5",
+    "source_text": "当前未开放拟境",
+    "owner_scope": "module",
+    "owner_module": "chasm",
+    "file_path": "app/features/modules/chasm/usecase/chasm_usecase.py",
+    "line": 42,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/chasm/usecase/chasm_usecase.py:89:34": {
+    "kind": "static_literal",
+    "key": "module.chasm.log.txt_7a972d966bbe",
+    "msgid": "txt_7a972d966bbe",
+    "source_text": "精神拟境超时",
+    "owner_scope": "module",
+    "owner_module": "chasm",
+    "file_path": "app/features/modules/chasm/usecase/chasm_usecase.py",
+    "line": 89,
+    "col": 34,
+    "context": "log"
+  }
+}

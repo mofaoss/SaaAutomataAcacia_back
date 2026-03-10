@@ -1,0 +1,58 @@
+{
+  "module.drink.log.cn_text_0001_8": {
+    "kind": "dynamic_template",
+    "template_id": "69e4560784a2742c",
+    "msgid": "已完成_value_1_次喝酒",
+    "source_template": "已完成{value_1}次喝酒",
+    "fields": [
+      "value_1"
+    ],
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/usecase/drink_usecase.py",
+    "line": 53,
+    "col": 33,
+    "function_name": "run",
+    "class_name": "DrinkModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "69e4560784a2742ca39a35054feff9ac1266c3eb",
+    "callsite_key": "app/features/modules/drink/usecase/drink_usecase.py:53:33",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.drink.log.cn_text_0002_8": {
+    "kind": "dynamic_template",
+    "template_id": "56fbffbe35e9fc04",
+    "msgid": "开始第_count_次喝酒",
+    "source_template": "开始第{count}次喝酒",
+    "fields": [
+      "count"
+    ],
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/usecase/drink_usecase.py",
+    "line": 44,
+    "col": 37,
+    "function_name": "run",
+    "class_name": "DrinkModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "56fbffbe35e9fc04e78f41d1e4fc802e1e4652e8",
+    "callsite_key": "app/features/modules/drink/usecase/drink_usecase.py:44:37",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "count": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  }
+}

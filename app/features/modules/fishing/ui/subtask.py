@@ -67,7 +67,7 @@ class AdjustColor(QThread, BaseTask):
 
     def run(self):
         if not self.init_auto('game'):
-            self.logger.error(_("?????????????"))
+            self.logger.error(_("初始化自动化失败，无法打开颜色校准", msgid="init_automation_failed_unable_to_open_color_calibration"))
             return
         self.auto.take_screenshot()
         img_np = self.auto.get_crop_form_first_screenshot(crop=(1130 / 1920, 240 / 1080, 1500 / 1920, 570 / 1080), is_resize=False)

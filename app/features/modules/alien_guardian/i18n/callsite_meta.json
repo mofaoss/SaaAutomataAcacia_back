@@ -1,0 +1,38 @@
+{
+  "app/features/modules/alien_guardian/usecase/alien_guardian_usecase.py:130:34": {
+    "kind": "static_literal",
+    "key": "module.alien_guardian.log.txt_41cfe240cf3d",
+    "msgid": "txt_41cfe240cf3d",
+    "source_text": "异星守护战斗超时",
+    "owner_scope": "module",
+    "owner_module": "alien_guardian",
+    "file_path": "app/features/modules/alien_guardian/usecase/alien_guardian_usecase.py",
+    "line": 130,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/alien_guardian/usecase/alien_guardian_usecase.py:53:34": {
+    "kind": "static_literal",
+    "key": "module.alien_guardian.log.txt_41cfe240cf3d",
+    "msgid": "txt_41cfe240cf3d",
+    "source_text": "异星守护战斗超时",
+    "owner_scope": "module",
+    "owner_module": "alien_guardian",
+    "file_path": "app/features/modules/alien_guardian/usecase/alien_guardian_usecase.py",
+    "line": 53,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/alien_guardian/usecase/alien_guardian_usecase.py:88:34": {
+    "kind": "static_literal",
+    "key": "module.alien_guardian.log.txt_41cfe240cf3d",
+    "msgid": "txt_41cfe240cf3d",
+    "source_text": "异星守护战斗超时",
+    "owner_scope": "module",
+    "owner_module": "alien_guardian",
+    "file_path": "app/features/modules/alien_guardian/usecase/alien_guardian_usecase.py",
+    "line": 88,
+    "col": 34,
+    "context": "log"
+  }
+}

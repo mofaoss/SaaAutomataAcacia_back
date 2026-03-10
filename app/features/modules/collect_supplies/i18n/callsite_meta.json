@@ -1,0 +1,155 @@
+{
+  "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py:122:34": {
+    "kind": "static_literal",
+    "key": "module.collect_supplies.log.txt_c46faaf756ee",
+    "msgid": "txt_c46faaf756ee",
+    "source_text": "领取好友体力超时",
+    "owner_scope": "module",
+    "owner_module": "collect_supplies",
+    "file_path": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py",
+    "line": 122,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py:161:34": {
+    "kind": "static_literal",
+    "key": "module.collect_supplies.log.txt_7f27c869d1be",
+    "msgid": "txt_7f27c869d1be",
+    "source_text": "购买每日物资配给箱超时",
+    "owner_scope": "module",
+    "owner_module": "collect_supplies",
+    "file_path": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py",
+    "line": 161,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py:193:34": {
+    "kind": "static_literal",
+    "key": "module.collect_supplies.log.txt_61ae02e55a8c",
+    "msgid": "txt_61ae02e55a8c",
+    "source_text": "领取邮箱资源超时",
+    "owner_scope": "module",
+    "owner_module": "collect_supplies",
+    "file_path": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py",
+    "line": 193,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py:229:34": {
+    "kind": "static_literal",
+    "key": "module.collect_supplies.log.txt_63f2dde3bb1d",
+    "msgid": "txt_63f2dde3bb1d",
+    "source_text": "领取鱼饵超时",
+    "owner_scope": "module",
+    "owner_module": "collect_supplies",
+    "file_path": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py",
+    "line": 229,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py:282:34": {
+    "kind": "static_literal",
+    "key": "module.collect_supplies.log.txt_38f62bff935b",
+    "msgid": "txt_38f62bff935b",
+    "source_text": "领取宿舍拼图超时",
+    "owner_scope": "module",
+    "owner_module": "collect_supplies",
+    "file_path": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py",
+    "line": 282,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py:296:36": {
+    "kind": "static_literal",
+    "key": "module.collect_supplies.log.txt_4ee66e7b80ae",
+    "msgid": "txt_4ee66e7b80ae",
+    "source_text": "配置数据为空或格式不正确，无法获取兑换码",
+    "owner_scope": "module",
+    "owner_module": "collect_supplies",
+    "file_path": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py",
+    "line": 296,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py:315:29": {
+    "kind": "static_literal",
+    "key": "module.collect_supplies.log.txt_4fce533e07c2",
+    "msgid": "txt_4fce533e07c2",
+    "source_text": "没有需要兑换的码",
+    "owner_scope": "module",
+    "owner_module": "collect_supplies",
+    "file_path": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py",
+    "line": 315,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py:328:33": {
+    "kind": "static_literal",
+    "key": "module.collect_supplies.log.redeem_code_start",
+    "msgid": "redeem_code_start",
+    "source_text": "Start redeeming code {code}",
+    "owner_scope": "module",
+    "owner_module": "collect_supplies",
+    "file_path": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py",
+    "line": 328,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py:354:33": {
+    "kind": "static_literal",
+    "key": "module.collect_supplies.log.txt_7ac4f37c8635",
+    "msgid": "txt_7ac4f37c8635",
+    "source_text": "兑换码已全部兑换",
+    "owner_scope": "module",
+    "owner_module": "collect_supplies",
+    "file_path": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py",
+    "line": 354,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py:380:34": {
+    "kind": "static_literal",
+    "key": "module.collect_supplies.log.txt_665b993d5ee7",
+    "msgid": "txt_665b993d5ee7",
+    "source_text": "兑换兑换码超时",
+    "owner_scope": "module",
+    "owner_module": "collect_supplies",
+    "file_path": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py",
+    "line": 380,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py:72:18": {
+    "kind": "static_literal",
+    "key": "module.collect_supplies.ui.reset_successful",
+    "msgid": "reset_successful",
+    "source_text": "Reset Successful",
+    "owner_scope": "module",
+    "owner_module": "collect_supplies",
+    "file_path": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py",
+    "line": 72,
+    "col": 18,
+    "context": "ui"
+  },
+  "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py:73:20": {
+    "kind": "dynamic_template",
+    "key": "module.collect_supplies.ui.successfully_reset_import_and_display_content",
+    "msgid": "successfully_reset_import_and_display_content",
+    "source_template": "Successfully reset import and display {content}",
+    "fields": [
+      "content"
+    ],
+    "field_details": {
+      "content": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "collect_supplies",
+    "file_path": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py",
+    "line": 73,
+    "col": 20,
+    "context": "ui"
+  }
+}

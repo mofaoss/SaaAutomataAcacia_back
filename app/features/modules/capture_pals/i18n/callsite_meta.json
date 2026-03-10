@@ -1,0 +1,826 @@
+{
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:201:30": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_dcab81b82349",
+    "msgid": "txt_dcab81b82349",
+    "source_text": "启动失败：超时仍未检测到初始页面。请手动进入抓帕鲁选岛页面或进入地图后再启动。",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 201,
+    "col": 30,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:205:29": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_c4907939bb66",
+    "msgid": "txt_c4907939bb66",
+    "source_text": "检测到已在地图内，先退出回选岛页面以保证流程一致",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 205,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:207:34": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.failed_to_exit_map_back_to_island_select",
+    "msgid": "failed_to_exit_map_back_to_island_select",
+    "source_text": "退出地图失败，未能返回抓帕鲁选岛页面",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 207,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:220:30": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_3d3016b5eb7c",
+    "msgid": "txt_3d3016b5eb7c",
+    "source_text": "未选择任何岛屿，无法开始抓帕鲁",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 220,
+    "col": 30,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:227:29": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_e9d5a5b11be6",
+    "msgid": "txt_e9d5a5b11be6",
+    "source_text": "启用：同步抓帕鲁（两岛独立模式 + 到上限后自动只刷未完成岛）",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 227,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:255:36": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_6a82b451908b",
+    "msgid": "txt_6a82b451908b",
+    "source_text": "未检测到初始页面（伙伴岛选岛页/地图内任务图标）。请手动进入抓帕鲁初始页面后保持不动。",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 255,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:266:25": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_8b5c967cf4dd",
+    "msgid": "tmpl_8b5c967cf4dd",
+    "source_template": "开始：{island_name} 定点抓帕鲁，间隔={island_fixed_interval_sec:.1f}s",
+    "fields": [
+      "island_name",
+      "island_fixed_interval_sec"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "island_fixed_interval_sec": {
+        "format_spec": ".1f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 266,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:269:30": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_9edaab78f728",
+    "msgid": "tmpl_9edaab78f728",
+    "source_template": "{island_name}：进入地图失败，终止该岛抓帕鲁",
+    "fields": [
+      "island_name"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 269,
+    "col": 30,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:279:36": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_a1b10e592efb",
+    "msgid": "tmpl_a1b10e592efb",
+    "source_template": "{island_name}：检测到每日抓帕鲁上限，停止该岛定点抓帕鲁",
+    "fields": [
+      "island_name"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 279,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:284:36": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_6b166203a0ec",
+    "msgid": "tmpl_6b166203a0ec",
+    "source_template": "{island_name}：本轮未找到F抓帕鲁提示，可能在等待刷新。连续次数={no_collect_streak}/{self_FIXED_NO_COLLECT_MAX}",
+    "fields": [
+      "island_name",
+      "no_collect_streak",
+      "self_FIXED_NO_COLLECT_MAX"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "no_collect_streak": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "self_FIXED_NO_COLLECT_MAX": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 284,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:288:38": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_deac4e3e5c64",
+    "msgid": "tmpl_deac4e3e5c64",
+    "source_template": "{island_name}：连续多个刷新周期都未出现F提示，可能站位/点位不正确。请调整位置后重试。停止定点模式。",
+    "fields": [
+      "island_name"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 288,
+    "col": 38,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:298:25": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_265f571724e9",
+    "msgid": "tmpl_265f571724e9",
+    "source_template": "开始：{island_name} 巡逻抓帕鲁，刷新间隔={island_patrol_refresh_interval_sec:.1f}s",
+    "fields": [
+      "island_name",
+      "island_patrol_refresh_interval_sec"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "island_patrol_refresh_interval_sec": {
+        "format_spec": ".1f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 298,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:303:34": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_4ffd2b5908de",
+    "msgid": "tmpl_4ffd2b5908de",
+    "source_template": "{island_name}：进入地图失败，终止该岛巡逻抓帕鲁",
+    "fields": [
+      "island_name"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 303,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:311:36": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_4fa796585d37",
+    "msgid": "tmpl_4fa796585d37",
+    "source_template": "{island_name}：检测到每日抓帕鲁上限，停止该岛巡逻抓帕鲁",
+    "fields": [
+      "island_name"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 311,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:316:36": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_da543db95647",
+    "msgid": "tmpl_da543db95647",
+    "source_template": "{island_name}：本轮未找到F抓帕鲁提示，连续次数={no_collect_streak}/{self_PATROL_NO_COLLECT_MAX}",
+    "fields": [
+      "island_name",
+      "no_collect_streak",
+      "self_PATROL_NO_COLLECT_MAX"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "no_collect_streak": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "self_PATROL_NO_COLLECT_MAX": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 316,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:320:38": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_18216e8397a6",
+    "msgid": "tmpl_18216e8397a6",
+    "source_template": "{island_name}：连续多轮找不到抓帕鲁提示，可能站位/路线不对。停止该模式。",
+    "fields": [
+      "island_name"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 320,
+    "col": 38,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:326:34": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_bda07d4550e5",
+    "msgid": "tmpl_bda07d4550e5",
+    "source_template": "{island_name}：退出地图失败，停止",
+    "fields": [
+      "island_name"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 326,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:339:25": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_b6634cdf998b",
+    "msgid": "tmpl_b6634cdf998b",
+    "source_template": "同步抓帕鲁：自动同步周期 sync_every_sec≈{sync_every_sec:.0f}s (partner≈{value_2:.0f}s, adventure≈{value_3:.0f}s)",
+    "fields": [
+      "sync_every_sec",
+      "value_2",
+      "value_3"
+    ],
+    "field_details": {
+      "sync_every_sec": {
+        "format_spec": ".0f",
+        "conversion": ""
+      },
+      "value_2": {
+        "format_spec": ".0f",
+        "conversion": ""
+      },
+      "value_3": {
+        "format_spec": ".0f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 339,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:357:36": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_b230d1c783e3",
+    "msgid": "tmpl_b230d1c783e3",
+    "source_template": "{st_profile_name}：检测到每日抓帕鲁上限（同步模式将不再前往该岛）",
+    "fields": [
+      "st_profile_name"
+    ],
+    "field_details": {
+      "st_profile_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 357,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:363:36": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_676f6f10421b",
+    "msgid": "tmpl_676f6f10421b",
+    "source_template": "{st_profile_name}：未找到F抓帕鲁提示，连续次数={st_no_collect_streak}/{limit}",
+    "fields": [
+      "st_profile_name",
+      "st_no_collect_streak",
+      "limit"
+    ],
+    "field_details": {
+      "st_profile_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "st_no_collect_streak": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "limit": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 363,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:368:38": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_0c53d4baf67c",
+    "msgid": "tmpl_0c53d4baf67c",
+    "source_template": "{st_profile_name}：连续多轮未出现F提示，标记异常。",
+    "fields": [
+      "st_profile_name"
+    ],
+    "field_details": {
+      "st_profile_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 368,
+    "col": 38,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:384:38": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_e6b32271dbcb",
+    "msgid": "txt_e6b32271dbcb",
+    "source_text": "同步抓帕鲁：切换/进入前退出地图失败",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 384,
+    "col": 38,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:389:34": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_ee5ac827691e",
+    "msgid": "tmpl_ee5ac827691e",
+    "source_template": "同步抓帕鲁：进入{st_profile_name}失败",
+    "fields": [
+      "st_profile_name"
+    ],
+    "field_details": {
+      "st_profile_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 389,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:409:34": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_18023741a852",
+    "msgid": "tmpl_18023741a852",
+    "source_template": "{st_profile_name}：插入任务后退出失败",
+    "fields": [
+      "st_profile_name"
+    ],
+    "field_details": {
+      "st_profile_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 409,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:418:25": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_1d7d3c69286d",
+    "msgid": "tmpl_1d7d3c69286d",
+    "source_template": "启动策略：优先处理长周期 [{long_st_profile_name}]，然后常驻 [{short_st_profile_name}]",
+    "fields": [
+      "long_st_profile_name",
+      "short_st_profile_name"
+    ],
+    "field_details": {
+      "long_st_profile_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "short_st_profile_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 418,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:430:34": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_6e3197ac5ae1",
+    "msgid": "txt_6e3197ac5ae1",
+    "source_text": "同步抓帕鲁：无可用岛屿，结束",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 430,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:434:34": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_c7acb204e1f0",
+    "msgid": "txt_c7acb204e1f0",
+    "source_text": "同步抓帕鲁：初始进入常驻岛失败",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 434,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:445:36": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_7546fdef9549",
+    "msgid": "txt_7546fdef9549",
+    "source_text": "同步抓帕鲁：所有任务完成或异常，结束",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 445,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:452:40": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_c9dea51aae65",
+    "msgid": "txt_c9dea51aae65",
+    "source_text": "同步抓帕鲁：无剩余可用岛，结束",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 452,
+    "col": 40,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:480:37": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_7d81bd5f0934",
+    "msgid": "tmpl_7d81bd5f0934",
+    "source_template": "同步周期到达：插入 [{other_profile_name}]",
+    "fields": [
+      "other_profile_name"
+    ],
+    "field_details": {
+      "other_profile_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 480,
+    "col": 37,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:496:37": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_7d81bd5f0934",
+    "msgid": "tmpl_7d81bd5f0934",
+    "source_template": "同步周期到达：插入 [{other_profile_name}]",
+    "fields": [
+      "other_profile_name"
+    ],
+    "field_details": {
+      "other_profile_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 496,
+    "col": 37,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:529:33": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_9a35eaf17e82",
+    "msgid": "tmpl_9a35eaf17e82",
+    "source_template": "{island_name}：已进入地图（任务图标已出现）",
+    "fields": [
+      "island_name"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 529,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:542:33": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_4b1373b8bd22",
+    "msgid": "tmpl_4b1373b8bd22",
+    "source_template": "{island_name}：已进入地图",
+    "fields": [
+      "island_name"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 542,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:545:26": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_d3b7ad415d9d",
+    "msgid": "tmpl_d3b7ad415d9d",
+    "source_template": "{island_name}：进入地图超时（检查：岛按钮 crop、开始按钮 crop、任务图标 crop/threshold，以及是否确实处于选岛界面）",
+    "fields": [
+      "island_name"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 545,
+    "col": 26,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:562:33": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_c43b52770eb6",
+    "msgid": "txt_c43b52770eb6",
+    "source_text": "已回到选岛界面",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 562,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:569:37": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_c696cf20c8e8",
+    "msgid": "txt_c696cf20c8e8",
+    "source_text": "Position correction before exit in fixed mode: A(0.33s) -> Wait(0.2s) -> S(0.033s)",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 569,
+    "col": 37,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:584:33": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_458a64fb87e2",
+    "msgid": "txt_458a64fb87e2",
+    "source_text": "尝试点击退出地图按钮",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 584,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:594:33": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.txt_ec5152efca15",
+    "msgid": "txt_ec5152efca15",
+    "source_text": "尝试点击确认退出按钮",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 594,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:607:26": {
+    "kind": "static_literal",
+    "key": "module.capture_pals.log.failed_to_exit_map_after_retries_still_not_on_island_select",
+    "msgid": "failed_to_exit_map_after_retries_still_not_on_island_select",
+    "source_text": "退出地图失败：重试后仍未回到抓帕鲁选岛页面",
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 607,
+    "col": 26,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:642:32": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_3bee75097f04",
+    "msgid": "tmpl_3bee75097f04",
+    "source_template": "{island_name}：按F后图标未消失（尝试{self_MAX_FAILED_F_ATTEMPTS}次），疑似到上限或交互失败",
+    "fields": [
+      "island_name",
+      "self_MAX_FAILED_F_ATTEMPTS"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "self_MAX_FAILED_F_ATTEMPTS": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 642,
+    "col": 32,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:647:32": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_b9d09138f5a3",
+    "msgid": "tmpl_b9d09138f5a3",
+    "source_template": "{island_name}：F提示消失后又重新出现，疑似达到每日抓帕鲁上限",
+    "fields": [
+      "island_name"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 647,
+    "col": 32,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:650:25": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_36a8994a7cb2",
+    "msgid": "tmpl_36a8994a7cb2",
+    "source_template": "{island_name}：成功抓到帕鲁",
+    "fields": [
+      "island_name"
+    ],
+    "field_details": {
+      "island_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 650,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/capture_pals/usecase/capture_pals_usecase.py:673:29": {
+    "kind": "dynamic_template",
+    "key": "module.capture_pals.log.tmpl_f776ee883a8c",
+    "msgid": "tmpl_f776ee883a8c",
+    "source_template": "{msg}：{sec:.1f}s",
+    "fields": [
+      "msg",
+      "sec"
+    ],
+    "field_details": {
+      "msg": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "sec": {
+        "format_spec": ".1f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "capture_pals",
+    "file_path": "app/features/modules/capture_pals/usecase/capture_pals_usecase.py",
+    "line": 673,
+    "col": 29,
+    "context": "log"
+  }
+}

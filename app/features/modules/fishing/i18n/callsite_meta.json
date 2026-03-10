@@ -1,0 +1,251 @@
+{
+  "app/features/modules/fishing/ui/subtask.py:24:31": {
+    "kind": "static_literal",
+    "key": "module.fishing.ui.txt_347bb8f44f91",
+    "msgid": "txt_347bb8f44f91",
+    "source_text": "请点击图像上的黄色完美收杆区域 (提取颜色)",
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/ui/subtask.py",
+    "line": 24,
+    "col": 31,
+    "context": "ui"
+  },
+  "app/features/modules/fishing/ui/subtask.py:70:30": {
+    "kind": "static_literal",
+    "key": "module.fishing.log.init_automation_failed_unable_to_open_color_calibration",
+    "msgid": "init_automation_failed_unable_to_open_color_calibration",
+    "source_text": "初始化自动化失败，无法打开颜色校准",
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/ui/subtask.py",
+    "line": 70,
+    "col": 30,
+    "context": "log"
+  },
+  "app/features/modules/fishing/ui/subtask.py:83:29": {
+    "kind": "dynamic_template",
+    "key": "module.fishing.log.tmpl_8c1c6ef990d6",
+    "msgid": "tmpl_8c1c6ef990d6",
+    "source_template": "选定的HSV值: {hsv}",
+    "fields": [
+      "hsv"
+    ],
+    "field_details": {
+      "hsv": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/ui/subtask.py",
+    "line": 83,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:136:34": {
+    "kind": "static_literal",
+    "key": "module.fishing.log.txt_b778cfde041b",
+    "msgid": "txt_b778cfde041b",
+    "source_text": "进入钓鱼超时",
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 136,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:166:34": {
+    "kind": "static_literal",
+    "key": "module.fishing.log.txt_54aca294b8f4",
+    "msgid": "txt_54aca294b8f4",
+    "source_text": "选择鱼饵超时超时",
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 166,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:182:37": {
+    "kind": "static_literal",
+    "key": "module.fishing.log.txt_deafe0dc5887",
+    "msgid": "txt_deafe0dc5887",
+    "source_text": "到点，收杆!",
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 182,
+    "col": 37,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:199:48": {
+    "kind": "static_literal",
+    "key": "module.fishing.log.txt_0da968f014a1",
+    "msgid": "txt_0da968f014a1",
+    "source_text": "咋回事？强制收杆一次",
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 199,
+    "col": 48,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:205:37": {
+    "kind": "static_literal",
+    "key": "module.fishing.log.txt_deafe0dc5887",
+    "msgid": "txt_deafe0dc5887",
+    "source_text": "到点，收杆!",
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 205,
+    "col": 37,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:210:34": {
+    "kind": "static_literal",
+    "key": "module.fishing.log.txt_98b4da294b00",
+    "msgid": "txt_98b4da294b00",
+    "source_text": "钓鱼环节超时",
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 210,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:226:33": {
+    "kind": "static_literal",
+    "key": "module.fishing.log.txt_50e17ab75fe9",
+    "msgid": "txt_50e17ab75fe9",
+    "source_text": "钓鱼佬永不空军！",
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 226,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:236:36": {
+    "kind": "static_literal",
+    "key": "module.fishing.log.txt_77124747671d",
+    "msgid": "txt_77124747671d",
+    "source_text": "鱼跑了，空军！",
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 236,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:243:34": {
+    "kind": "static_literal",
+    "key": "module.fishing.log.txt_f5bc2456bd2b",
+    "msgid": "txt_f5bc2456bd2b",
+    "source_text": "钓鱼结束环节超时",
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 243,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:253:25": {
+    "kind": "dynamic_template",
+    "key": "module.fishing.log.tmpl_b350a15eb106",
+    "msgid": "tmpl_b350a15eb106",
+    "source_template": "出了条大的！截图已保存至：{file_path}",
+    "fields": [
+      "file_path"
+    ],
+    "field_details": {
+      "file_path": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 253,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:295:29": {
+    "kind": "dynamic_template",
+    "key": "module.fishing.log.tmpl_7026e5b0587a",
+    "msgid": "tmpl_7026e5b0587a",
+    "source_template": "钓鱼按键识别最佳匹配为：{best_match}",
+    "fields": [
+      "best_match"
+    ],
+    "field_details": {
+      "best_match": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 295,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:302:30": {
+    "kind": "dynamic_template",
+    "key": "module.fishing.log.tmpl_f4e0d32b03a7",
+    "msgid": "tmpl_f4e0d32b03a7",
+    "source_template": "未识别出按键文字，请手动设置{e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 302,
+    "col": 30,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:66:30": {
+    "kind": "static_literal",
+    "key": "module.fishing.log.txt_dc879d5fefad",
+    "msgid": "txt_dc879d5fefad",
+    "source_text": "运行错误，存在上限的值小于下限",
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 66,
+    "col": 30,
+    "context": "log"
+  },
+  "app/features/modules/fishing/usecase/fishing_usecase.py:71:29": {
+    "kind": "dynamic_template",
+    "key": "module.fishing.log.tmpl_7162176ca503",
+    "msgid": "tmpl_7162176ca503",
+    "source_template": "开始第 {value_1} 次钓鱼",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "fishing",
+    "file_path": "app/features/modules/fishing/usecase/fishing_usecase.py",
+    "line": 71,
+    "col": 29,
+    "context": "log"
+  }
+}

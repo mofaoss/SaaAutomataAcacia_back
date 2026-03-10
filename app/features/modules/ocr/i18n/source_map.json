@@ -1,4 +1,12 @@
 {
+  "module.ocr.legacy.1c5f467f1be7": "en",
+  "module.ocr.legacy.328dd4d1a4f3": "en",
+  "module.ocr.legacy.5367a13ccc69": "en",
+  "module.ocr.legacy.5f7324113199": "en",
+  "module.ocr.legacy.b5025abbb9d2": "en",
+  "module.ocr.legacy.dd048bb5cb14": "en",
+  "module.ocr.legacy.e800193de899": "en",
+  "module.ocr.legacy.ecbbcbc53c31": "en",
   "module.ocr.log.1c5f467f1be7": "en",
   "module.ocr.log.328dd4d1a4f3": "en",
   "module.ocr.log.5367a13ccc69": "en",
@@ -7,12 +15,18 @@
   "module.ocr.log.dd048bb5cb14": "en",
   "module.ocr.log.e800193de899": "en",
   "module.ocr.log.ecbbcbc53c31": "en",
+  "module.ocr.log.ocr_adopted_strategy_best_name": "en",
+  "module.ocr.log.ocr_failed_to_read_image_invalid_path_or_unreada": "en",
   "module.ocr.log.ocr_hit_frame_cache_skipping_repeated_recognitio": "en",
   "module.ocr.log.ocr_hit_no_text_cooldown_skipping_recognition": "en",
   "module.ocr.log.ocr_initialization_completed": "en",
+  "module.ocr.log.ocr_initialization_failed_e": "en",
   "module.ocr.log.ocr_initialization_failed_this_cpu_does_not_supp": "en",
   "module.ocr.log.ocr_input_image_is_empty_skipping_this_recogniti": "en",
+  "module.ocr.log.ocr_low_res_enhance_w_x_h_new_w_x_new_h_x_scale": "en",
   "module.ocr.log.ocr_quick_check_low_text_probability_frame_skipp": "en",
+  "module.ocr.log.ocr_recognition_result_log_content": "en",
   "module.ocr.log.ocr_recognized_no_text": "en",
-  "module.ocr.log.starting_to_initialize_ocr": "en"
+  "module.ocr.log.starting_to_initialize_ocr": "en",
+  "module.ocr.ui.error_executing_ocr_e": "en"
 }

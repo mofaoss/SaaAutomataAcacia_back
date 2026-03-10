@@ -1,0 +1,2702 @@
+{
+  "app/features/utils/home_navigation.py:46:25": {
+    "kind": "static_literal",
+    "key": "framework.log.timeout_returning_to_home_page",
+    "msgid": "timeout_returning_to_home_page",
+    "source_text": "Timeout returning to home page",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/home_navigation.py",
+    "line": 46,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/utils/network.py:252:32": {
+    "kind": "static_literal",
+    "key": "framework.log.error_occurred_while_updating_through_cloudflare",
+    "msgid": "error_occurred_while_updating_through_cloudflare",
+    "source_text": "Error occurred while updating through Cloudflare: Incorrect data format returned",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 252,
+    "col": 32,
+    "context": "log"
+  },
+  "app/features/utils/network.py:262:20": {
+    "kind": "dynamic_template",
+    "key": "framework.log.error_occurred_while_updating_through_cloudflare_2",
+    "msgid": "error_occurred_while_updating_through_cloudflare_2",
+    "source_template": "Error occurred while updating through Cloudflare: Missing required field {field} in updateData",
+    "fields": [
+      "field"
+    ],
+    "field_details": {
+      "field": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 262,
+    "col": 20,
+    "context": "log"
+  },
+  "app/features/utils/network.py:271:24": {
+    "kind": "dynamic_template",
+    "key": "framework.log.error_occurred_while_updating_through_cloudflare_2",
+    "msgid": "error_occurred_while_updating_through_cloudflare_2",
+    "source_template": "Error occurred while updating through Cloudflare: Missing required field {field} in updateData",
+    "fields": [
+      "field"
+    ],
+    "field_details": {
+      "field": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 271,
+    "col": 24,
+    "context": "log"
+  },
+  "app/features/utils/network.py:281:16": {
+    "kind": "dynamic_template",
+    "key": "framework.log.error_occurred_while_parsing_api_response_data_v",
+    "msgid": "error_occurred_while_parsing_api_response_data_v",
+    "source_template": "Error occurred while parsing API response data: {value_1}",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 281,
+    "col": 16,
+    "context": "log"
+  },
+  "app/features/utils/network.py:287:12": {
+    "kind": "dynamic_template",
+    "key": "framework.log.error_occurred_while_processing_cloudflare_data",
+    "msgid": "error_occurred_while_processing_cloudflare_data",
+    "source_template": "Error occurred while processing Cloudflare data: {value_1}",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 287,
+    "col": 12,
+    "context": "log"
+  },
+  "app/features/utils/network.py:298:31": {
+    "kind": "dynamic_template",
+    "key": "framework.log.obtained_update_information_online_data",
+    "msgid": "obtained_update_information_online_data",
+    "source_template": "Obtained update information: {online_data}",
+    "fields": [
+      "online_data"
+    ],
+    "field_details": {
+      "online_data": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 298,
+    "col": 31,
+    "context": "log"
+  },
+  "app/features/utils/network.py:305:18": {
+    "kind": "static_literal",
+    "key": "framework.ui.update_successful",
+    "msgid": "update_successful",
+    "source_text": "Update Successful",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 305,
+    "col": 18,
+    "context": "ui"
+  },
+  "app/features/utils/network.py:306:20": {
+    "kind": "static_literal",
+    "key": "framework.ui.new_redeem_code_event_information_detected",
+    "msgid": "new_redeem_code_event_information_detected",
+    "source_text": "New redeem code event information detected",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 306,
+    "col": 20,
+    "context": "ui"
+  },
+  "app/features/utils/network.py:335:39": {
+    "kind": "dynamic_template",
+    "key": "framework.log.obtained_update_information_online_data",
+    "msgid": "obtained_update_information_online_data",
+    "source_template": "Obtained update information: {online_data}",
+    "fields": [
+      "online_data"
+    ],
+    "field_details": {
+      "online_data": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 335,
+    "col": 39,
+    "context": "log"
+  },
+  "app/features/utils/network.py:342:26": {
+    "kind": "static_literal",
+    "key": "framework.ui.update_successful_3",
+    "msgid": "update_successful_3",
+    "source_text": "Update Successful",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 342,
+    "col": 26,
+    "context": "ui"
+  },
+  "app/features/utils/network.py:343:28": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.new_content_detected",
+    "msgid": "new_content_detected",
+    "source_template": "New {content} detected",
+    "fields": [
+      "content"
+    ],
+    "field_details": {
+      "content": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 343,
+    "col": 28,
+    "context": "ui"
+  },
+  "app/features/utils/network.py:360:31": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_8da9b789e8df",
+    "msgid": "tmpl_8da9b789e8df",
+    "source_template": "获取到更新信息：{online_data}",
+    "fields": [
+      "online_data"
+    ],
+    "field_details": {
+      "online_data": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 360,
+    "col": 31,
+    "context": "log"
+  },
+  "app/features/utils/network.py:366:18": {
+    "kind": "static_literal",
+    "key": "framework.ui.update_successful_2",
+    "msgid": "update_successful_2",
+    "source_text": "Update Successful",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 366,
+    "col": 18,
+    "context": "ui"
+  },
+  "app/features/utils/network.py:367:20": {
+    "kind": "static_literal",
+    "key": "framework.ui.new_redeem_code_event_information_detected_2",
+    "msgid": "new_redeem_code_event_information_detected_2",
+    "source_text": "New redeem code event information detected",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 367,
+    "col": 20,
+    "context": "ui"
+  },
+  "app/features/utils/network.py:377:16": {
+    "kind": "static_literal",
+    "key": "framework.log.local_configuration_data_format_is_incorrect_usi",
+    "msgid": "local_configuration_data_format_is_incorrect_usi",
+    "source_text": "Local configuration data format is incorrect, using online data",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 377,
+    "col": 16,
+    "context": "log"
+  },
+  "app/features/utils/network.py:397:24": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_bd8d84c408d8",
+    "msgid": "tmpl_bd8d84c408d8",
+    "source_template": "通过cloudflare在线更新出错: {error_msg}",
+    "fields": [
+      "error_msg"
+    ],
+    "field_details": {
+      "error_msg": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 397,
+    "col": 24,
+    "context": "log"
+  },
+  "app/features/utils/updater.py:205:29": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_c70bac70518e",
+    "msgid": "tmpl_c70bac70518e",
+    "source_template": "GitHub API {response_status_code} Rate Limit hit! Using fallback.",
+    "fields": [
+      "response_status_code"
+    ],
+    "field_details": {
+      "response_status_code": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/updater.py",
+    "line": 205,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/utils/updater.py:207:29": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_89cbf8012da0",
+    "msgid": "tmpl_89cbf8012da0",
+    "source_template": "GitHub API Error {response_status_code}: {response_text}",
+    "fields": [
+      "response_status_code",
+      "response_text"
+    ],
+    "field_details": {
+      "response_status_code": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "response_text": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/updater.py",
+    "line": 207,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/utils/updater.py:210:25": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_eaf988974898",
+    "msgid": "tmpl_eaf988974898",
+    "source_template": "GitHub API Connection Error: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/updater.py",
+    "line": 210,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/utils/updater.py:214:23": {
+    "kind": "static_literal",
+    "key": "framework.log.txt_c9b43d47718d",
+    "msgid": "txt_c9b43d47718d",
+    "source_text": "Falling back to expired config cache due to API failure.",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/updater.py",
+    "line": 214,
+    "col": 23,
+    "context": "log"
+  },
+  "app/features/utils/updater.py:354:35": {
+    "kind": "static_literal",
+    "key": "framework.log.txt_631f8ff4eb40",
+    "msgid": "txt_631f8ff4eb40",
+    "source_text": "failed to remove existing update package: %s",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/updater.py",
+    "line": 354,
+    "col": 35,
+    "context": "log"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:114:22": {
+    "kind": "static_literal",
+    "key": "framework.ui.no_target_selected",
+    "msgid": "no_target_selected",
+    "source_text": "No Target Selected",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 114,
+    "col": 22,
+    "context": "ui"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:115:24": {
+    "kind": "static_literal",
+    "key": "framework.ui.please_check_tasks_in_the_left_list_first",
+    "msgid": "please_check_tasks_in_the_left_list_first",
+    "source_text": "Please check tasks in the left list first",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 115,
+    "col": 24,
+    "context": "ui"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:141:18": {
+    "kind": "static_literal",
+    "key": "framework.ui.rule_copied_successfully",
+    "msgid": "rule_copied_successfully",
+    "source_text": "Rule Copied Successfully",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 141,
+    "col": 18,
+    "context": "ui"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:142:20": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.rule_added_to_value_checked_tasks_and_enabled_th",
+    "msgid": "rule_added_to_value_checked_tasks_and_enabled_th",
+    "source_template": "Rule added to {value_1} checked tasks\nand enabled their scheduling",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 142,
+    "col": 20,
+    "context": "ui"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:168:22": {
+    "kind": "static_literal",
+    "key": "framework.ui.no_target_selected_2",
+    "msgid": "no_target_selected_2",
+    "source_text": "No Target Selected",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 168,
+    "col": 22,
+    "context": "ui"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:169:24": {
+    "kind": "static_literal",
+    "key": "framework.ui.please_check_tasks_in_the_left_list_first_2",
+    "msgid": "please_check_tasks_in_the_left_list_first_2",
+    "source_text": "Please check tasks in the left list first",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 169,
+    "col": 24,
+    "context": "ui"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:194:18": {
+    "kind": "static_literal",
+    "key": "framework.ui.withdraw_successful",
+    "msgid": "withdraw_successful",
+    "source_text": "Withdraw Successful",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 194,
+    "col": 18,
+    "context": "ui"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:195:20": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.removed_trigger_from_modified_count_tasks",
+    "msgid": "removed_trigger_from_modified_count_tasks",
+    "source_template": "Removed trigger from {modified_count} tasks",
+    "fields": [
+      "modified_count"
+    ],
+    "field_details": {
+      "modified_count": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 195,
+    "col": 20,
+    "context": "ui"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:604:16": {
+    "kind": "static_literal",
+    "key": "framework.log.external_task_finished_waking_up_queued_daily_ta",
+    "msgid": "external_task_finished_waking_up_queued_daily_ta",
+    "source_text": "External task finished, waking up queued daily tasks...",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 604,
+    "col": 16,
+    "context": "log"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:65:18": {
+    "kind": "static_literal",
+    "key": "framework.ui.saved",
+    "msgid": "saved",
+    "source_text": "Saved",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 65,
+    "col": 18,
+    "context": "ui"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:66:20": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.preset_preset_name_saved",
+    "msgid": "preset_preset_name_saved",
+    "source_template": "Preset '{preset_name}' saved",
+    "fields": [
+      "preset_name"
+    ],
+    "field_details": {
+      "preset_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 66,
+    "col": 20,
+    "context": "ui"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:78:22": {
+    "kind": "static_literal",
+    "key": "framework.ui.cannot_delete",
+    "msgid": "cannot_delete",
+    "source_text": "Cannot Delete",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 78,
+    "col": 22,
+    "context": "ui"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:79:24": {
+    "kind": "static_literal",
+    "key": "framework.ui.at_least_one_preset_must_remain",
+    "msgid": "at_least_one_preset_must_remain",
+    "source_text": "At least one preset must remain",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 79,
+    "col": 24,
+    "context": "ui"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:90:18": {
+    "kind": "static_literal",
+    "key": "framework.ui.deleted",
+    "msgid": "deleted",
+    "source_text": "Deleted",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 90,
+    "col": 18,
+    "context": "ui"
+  },
+  "app/framework/application/periodic/periodic_page_actions.py:91:20": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.preset_preset_name_deleted",
+    "msgid": "preset_preset_name_deleted",
+    "source_template": "Preset '{preset_name}' deleted",
+    "fields": [
+      "preset_name"
+    ],
+    "field_details": {
+      "preset_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 91,
+    "col": 20,
+    "context": "ui"
+  },
+  "app/framework/core/observability/reporting.py:13:17": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_978bce403707",
+    "msgid": "tmpl_978bce403707",
+    "source_template": "{prefix}{error}{suffix}",
+    "fields": [
+      "prefix",
+      "error",
+      "suffix"
+    ],
+    "field_details": {
+      "prefix": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "error": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "suffix": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/observability/reporting.py",
+    "line": 13,
+    "col": 17,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/base_task.py:32:16": {
+    "kind": "static_literal",
+    "key": "framework.log.window_height_is_0_cannot_calculate_ratio",
+    "msgid": "window_height_is_0_cannot_calculate_ratio",
+    "source_text": "Window height is 0, cannot calculate ratio",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/base_task.py",
+    "line": 32,
+    "col": 16,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/base_task.py:42:12": {
+    "kind": "static_literal",
+    "key": "framework.ui.meets",
+    "msgid": "meets",
+    "source_text": "Meets",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/base_task.py",
+    "line": 42,
+    "col": 12,
+    "context": "ui"
+  },
+  "app/framework/core/task_engine/base_task.py:44:17": {
+    "kind": "static_literal",
+    "key": "framework.ui.does_not_meet",
+    "msgid": "does_not_meet",
+    "source_text": "Does not meet",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/base_task.py",
+    "line": 44,
+    "col": 17,
+    "context": "ui"
+  },
+  "app/framework/core/task_engine/base_task.py:47:12": {
+    "kind": "dynamic_template",
+    "key": "framework.log.client_area_size_client_width_x_client_height_ac",
+    "msgid": "client_area_size_client_width_x_client_height_ac",
+    "source_template": "Client area size: {client_width}x{client_height} ({actual_ratio:.3f}:1), {status} 16:9 standard ratio",
+    "fields": [
+      "client_width",
+      "client_height",
+      "actual_ratio",
+      "status"
+    ],
+    "field_details": {
+      "client_width": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "client_height": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "actual_ratio": {
+        "format_spec": ".3f",
+        "conversion": ""
+      },
+      "status": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/base_task.py",
+    "line": 47,
+    "col": 12,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/base_task.py:54:16": {
+    "kind": "static_literal",
+    "key": "framework.log.game_window_does_not_meet_16_9_ratio_please_adju",
+    "msgid": "game_window_does_not_meet_16_9_ratio_please_adju",
+    "source_text": "Game window does not meet 16:9 ratio, please adjust manually.",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/base_task.py",
+    "line": 54,
+    "col": 16,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/base_task.py:66:30": {
+    "kind": "dynamic_template",
+    "key": "framework.log.using_existing_auto_value",
+    "msgid": "using_existing_auto_value",
+    "source_template": "Using existing auto: {self_auto_hwnd}",
+    "fields": [
+      "self_auto_hwnd"
+    ],
+    "field_details": {
+      "self_auto_hwnd": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/base_task.py",
+    "line": 66,
+    "col": 30,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/base_task.py:81:30": {
+    "kind": "static_literal",
+    "key": "framework.log.game_window_ratio_is_not_16_9",
+    "msgid": "game_window_ratio_is_not_16_9",
+    "source_text": "Game window ratio is not 16:9",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/base_task.py",
+    "line": 81,
+    "col": 30,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/base_task.py:84:30": {
+    "kind": "dynamic_template",
+    "key": "framework.log.failed_to_initialize_auto_e",
+    "msgid": "failed_to_initialize_auto_e",
+    "source_template": "Failed to initialize auto: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/base_task.py",
+    "line": 84,
+    "col": 30,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:114:36": {
+    "kind": "static_literal",
+    "key": "framework.log.no_tasks_queued_skipping_execution",
+    "msgid": "no_tasks_queued_skipping_execution",
+    "source_text": "No tasks queued; skipping execution",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 114,
+    "col": 36,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:119:34": {
+    "kind": "static_literal",
+    "key": "framework.log.runtime_automation_session_initialization_failed",
+    "msgid": "runtime_automation_session_initialization_failed",
+    "source_text": "Runtime automation session initialization failed; tasks skipped",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 119,
+    "col": 34,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:130:16": {
+    "kind": "static_literal",
+    "key": "framework.log.task_queue_resolved",
+    "msgid": "task_queue_resolved",
+    "source_text": "Task queue resolved: {tasks}",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 130,
+    "col": 16,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:136:40": {
+    "kind": "static_literal",
+    "key": "framework.log.execution_interrupted_before_task_start",
+    "msgid": "execution_interrupted_before_task_start",
+    "source_text": "Execution interrupted before task start",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 136,
+    "col": 40,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:142:24": {
+    "kind": "static_literal",
+    "key": "framework.log.skipping_task_metadata_not_found",
+    "msgid": "skipping_task_metadata_not_found",
+    "source_text": "Skipping task '{task_id}': metadata not found",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 142,
+    "col": 24,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:147:33": {
+    "kind": "static_literal",
+    "key": "framework.log.current_task_task_name",
+    "msgid": "current_task_task_name",
+    "source_text": "Current task: {task_name}",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 147,
+    "col": 33,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:154:24": {
+    "kind": "static_literal",
+    "key": "framework.log.preparing_task_name_returning_to_home",
+    "msgid": "preparing_task_name_returning_to_home",
+    "source_text": "Preparing {task_name}, returning to home...",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 154,
+    "col": 24,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:158:28": {
+    "kind": "static_literal",
+    "key": "framework.log.task_name_failed_to_return_to_home_before_start",
+    "msgid": "task_name_failed_to_return_to_home_before_start",
+    "source_text": "[{task_name}] Failed to return to home before start, skipping.",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 158,
+    "col": 28,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:161:28": {
+    "kind": "static_literal",
+    "key": "framework.log.task_skipped_home_sync_failed",
+    "msgid": "task_skipped_home_sync_failed",
+    "source_text": "Task skipped: {task_name}, reason=home_sync_failed",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 161,
+    "col": 28,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:171:30": {
+    "kind": "static_literal",
+    "key": "framework.ui.task_name_finished_returning_to_home",
+    "msgid": "task_name_finished_returning_to_home",
+    "source_text": "{task_name} finished, returning to home...",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 171,
+    "col": 30,
+    "context": "ui"
+  },
+  "app/framework/core/task_engine/threads.py:202:36": {
+    "kind": "static_literal",
+    "key": "framework.log.no_tasks_queued_skipping_execution",
+    "msgid": "no_tasks_queued_skipping_execution",
+    "source_text": "No tasks queued; skipping execution",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 202,
+    "col": 36,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:207:34": {
+    "kind": "static_literal",
+    "key": "framework.log.runtime_automation_session_initialization_failed",
+    "msgid": "runtime_automation_session_initialization_failed",
+    "source_text": "Runtime automation session initialization failed; tasks skipped",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 207,
+    "col": 34,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:218:16": {
+    "kind": "static_literal",
+    "key": "framework.log.task_queue_resolved",
+    "msgid": "task_queue_resolved",
+    "source_text": "Task queue resolved: {tasks}",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 218,
+    "col": 16,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:224:40": {
+    "kind": "static_literal",
+    "key": "framework.log.execution_interrupted_before_task_start",
+    "msgid": "execution_interrupted_before_task_start",
+    "source_text": "Execution interrupted before task start",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 224,
+    "col": 40,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:230:24": {
+    "kind": "static_literal",
+    "key": "framework.log.skipping_task_metadata_not_found",
+    "msgid": "skipping_task_metadata_not_found",
+    "source_text": "Skipping task '{task_id}': metadata not found",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 230,
+    "col": 24,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:233:32": {
+    "kind": "dynamic_template",
+    "key": "framework.log.exception_occurred_while_stopping_sub_task_ignor",
+    "msgid": "exception_occurred_while_stopping_sub_task_ignor",
+    "source_template": "Exception occurred while stopping sub task, ignored: {e}",
+    "fields": [
+      "e"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 233,
+    "col": 32,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:235:33": {
+    "kind": "static_literal",
+    "key": "framework.log.current_task_task_name",
+    "msgid": "current_task_task_name",
+    "source_text": "Current task: {task_name}",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 235,
+    "col": 33,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:242:24": {
+    "kind": "static_literal",
+    "key": "framework.log.preparing_task_name_returning_to_home",
+    "msgid": "preparing_task_name_returning_to_home",
+    "source_text": "Preparing {task_name}, returning to home...",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 242,
+    "col": 24,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:245:32": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_3edd0b79ee2e",
+    "msgid": "tmpl_3edd0b79ee2e",
+    "source_template": "SubTask：{e}",
+    "fields": [
+      "e"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 245,
+    "col": 32,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:246:28": {
+    "kind": "static_literal",
+    "key": "framework.log.task_name_failed_to_return_to_home_before_start",
+    "msgid": "task_name_failed_to_return_to_home_before_start",
+    "source_text": "[{task_name}] Failed to return to home before start, skipping.",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 246,
+    "col": 28,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:249:28": {
+    "kind": "static_literal",
+    "key": "framework.log.task_skipped_home_sync_failed",
+    "msgid": "task_skipped_home_sync_failed",
+    "source_text": "Task skipped: {task_name}, reason=home_sync_failed",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 249,
+    "col": 28,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:250:36": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_0b515f4f1710",
+    "msgid": "tmpl_0b515f4f1710",
+    "source_template": "SubTask结束时恢复窗口位置失败：{stop_error}",
+    "fields": [
+      "stop_error"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 250,
+    "col": 36,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:260:28": {
+    "kind": "static_literal",
+    "key": "framework.log.task_skipped_reason",
+    "msgid": "task_skipped_reason",
+    "source_text": "Task skipped: {task_name}, reason={reason}",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 260,
+    "col": 28,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:273:28": {
+    "kind": "static_literal",
+    "key": "framework.log.task_failed_reason",
+    "msgid": "task_failed_reason",
+    "source_text": "Task failed: {task_name}, reason={reason}",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 273,
+    "col": 28,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:282:30": {
+    "kind": "static_literal",
+    "key": "framework.ui.task_name_finished_returning_to_home",
+    "msgid": "task_name_finished_returning_to_home",
+    "source_text": "{task_name} finished, returning to home...",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 282,
+    "col": 30,
+    "context": "ui"
+  },
+  "app/framework/core/task_engine/threads.py:304:28": {
+    "kind": "static_literal",
+    "key": "framework.log.non_critical_tray_message_update_failed",
+    "msgid": "non_critical_tray_message_update_failed",
+    "source_text": "Non-critical tray message update failed: {error}",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 304,
+    "col": 28,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:314:20": {
+    "kind": "static_literal",
+    "key": "framework.log.unhandled_queue_runtime_exception",
+    "msgid": "unhandled_queue_runtime_exception",
+    "source_text": "Unhandled queue runtime exception: {error}",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 314,
+    "col": 20,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:344:32": {
+    "kind": "dynamic_template",
+    "key": "framework.log.exception_occurred_while_stopping_sub_task_ignor",
+    "msgid": "exception_occurred_while_stopping_sub_task_ignor",
+    "source_template": "Exception occurred while stopping sub task, ignored: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 344,
+    "col": 32,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:356:32": {
+    "kind": "dynamic_template",
+    "key": "framework.log.exception_occurred_while_stopping_sub_task_ignor",
+    "msgid": "exception_occurred_while_stopping_sub_task_ignor",
+    "source_template": "Exception occurred while stopping sub task, ignored: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 356,
+    "col": 32,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:361:36": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_0b515f4f1710",
+    "msgid": "tmpl_0b515f4f1710",
+    "source_template": "SubTask结束时恢复窗口位置失败：{stop_error}",
+    "fields": [
+      "stop_error"
+    ],
+    "field_details": {
+      "stop_error": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 361,
+    "col": 36,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:368:32": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_3edd0b79ee2e",
+    "msgid": "tmpl_3edd0b79ee2e",
+    "source_template": "SubTask：{e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 368,
+    "col": 32,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:373:36": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_0b515f4f1710",
+    "msgid": "tmpl_0b515f4f1710",
+    "source_template": "SubTask结束时恢复窗口位置失败：{stop_error}",
+    "fields": [
+      "stop_error"
+    ],
+    "field_details": {
+      "stop_error": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 373,
+    "col": 36,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:49:16": {
+    "kind": "dynamic_template",
+    "key": "framework.log.interrupt_detected_stopping_automatic_task_reaso",
+    "msgid": "interrupt_detected_stopping_automatic_task_reaso",
+    "source_template": "Interrupt detected, stopping automatic task: {reason}",
+    "fields": [
+      "reason"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 49,
+    "col": 16,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:56:20": {
+    "kind": "dynamic_template",
+    "key": "framework.log.exception_occurred_while_stopping_automatic_task",
+    "msgid": "exception_occurred_while_stopping_automatic_task",
+    "source_template": "Exception occurred while stopping automatic task, ignored: {e}",
+    "fields": [
+      "e"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 56,
+    "col": 20,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:59:16": {
+    "kind": "dynamic_template",
+    "key": "framework.log.interrupt_detected_stopping_automatic_task_reaso",
+    "msgid": "interrupt_detected_stopping_automatic_task_reaso",
+    "source_template": "Interrupt detected, stopping automatic task: {reason}",
+    "fields": [
+      "reason"
+    ],
+    "field_details": {
+      "reason": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 59,
+    "col": 16,
+    "context": "log"
+  },
+  "app/framework/core/task_engine/threads.py:66:20": {
+    "kind": "dynamic_template",
+    "key": "framework.log.exception_occurred_while_stopping_automatic_task",
+    "msgid": "exception_occurred_while_stopping_automatic_task",
+    "source_template": "Exception occurred while stopping automatic task, ignored: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 66,
+    "col": 20,
+    "context": "log"
+  },
+  "app/framework/infra/automation/automation.py:131:16": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.handle_for_window_value_not_found",
+    "msgid": "handle_for_window_value_not_found",
+    "source_template": "Handle for window {self_window_title} not found",
+    "fields": [
+      "self_window_title"
+    ],
+    "field_details": {
+      "self_window_title": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 131,
+    "col": 16,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:169:29": {
+    "kind": "dynamic_template",
+    "key": "framework.log.found_handle_for_window_value_hwnd",
+    "msgid": "found_handle_for_window_value_hwnd",
+    "source_template": "Found handle for window {self_window_title}: {hwnd}",
+    "fields": [
+      "self_window_title",
+      "hwnd"
+    ],
+    "field_details": {
+      "self_window_title": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "hwnd": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 169,
+    "col": 29,
+    "context": "log"
+  },
+  "app/framework/infra/automation/automation.py:172:29": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.handle_for_value_not_found",
+    "msgid": "handle_for_value_not_found",
+    "source_template": "Handle for {self_window_title} not found",
+    "fields": [
+      "self_window_title"
+    ],
+    "field_details": {
+      "self_window_title": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 172,
+    "col": 29,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:194:64": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.screenshot_failed_e",
+    "msgid": "screenshot_failed_e",
+    "source_template": "Screenshot failed: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 194,
+    "col": 64,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:220:16": {
+    "kind": "static_literal",
+    "key": "framework.ui.no_available_screenshot_currently_skipping_image",
+    "msgid": "no_available_screenshot_currently_skipping_image",
+    "source_text": "No available screenshot currently, skipping image matching",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 220,
+    "col": 16,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:236:42": {
+    "kind": "dynamic_template",
+    "key": "framework.log.target_image_template_name_similarity_conf",
+    "msgid": "target_image_template_name_similarity_conf",
+    "source_template": "Target image: {template_name} Similarity: {conf:.2f}",
+    "fields": [
+      "template_name",
+      "conf"
+    ],
+    "field_details": {
+      "template_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "conf": {
+        "format_spec": ".2f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 236,
+    "col": 42,
+    "context": "log"
+  },
+  "app/framework/infra/automation/automation.py:241:42": {
+    "kind": "dynamic_template",
+    "key": "framework.log.target_image_template_name_similarity_conf_below",
+    "msgid": "target_image_template_name_similarity_conf_below",
+    "source_template": "Target image: {template_name} Similarity: {conf:.2f}, below {threshold}",
+    "fields": [
+      "template_name",
+      "conf",
+      "threshold"
+    ],
+    "field_details": {
+      "template_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "conf": {
+        "format_spec": ".2f",
+        "conversion": ""
+      },
+      "threshold": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 241,
+    "col": 42,
+    "context": "log"
+  },
+  "app/framework/infra/automation/automation.py:245:38": {
+    "kind": "dynamic_template",
+    "key": "framework.log.target_image_template_name_no_match_found",
+    "msgid": "target_image_template_name_no_match_found",
+    "source_template": "Target image: {template_name} No match found",
+    "fields": [
+      "template_name"
+    ],
+    "field_details": {
+      "template_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 245,
+    "col": 38,
+    "context": "log"
+  },
+  "app/framework/infra/automation/automation.py:259:58": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.error_finding_image_e",
+    "msgid": "error_finding_image_e",
+    "source_template": "Error finding image: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 259,
+    "col": 58,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:276:59": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.ocr_recognition_failed_e",
+    "msgid": "ocr_recognition_failed_e",
+    "source_template": "OCR recognition failed: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 276,
+    "col": 59,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:458:30": {
+    "kind": "dynamic_template",
+    "key": "framework.log.target_target_initial_verification_unconfirmed_r",
+    "msgid": "target_target_initial_verification_unconfirmed_r",
+    "source_template": "Target {target} initial verification unconfirmed, retrying click",
+    "fields": [
+      "target"
+    ],
+    "field_details": {
+      "target": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 458,
+    "col": 30,
+    "context": "log"
+  },
+  "app/framework/infra/automation/automation.py:580:16": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.failed_to_restore_window_position_e",
+    "msgid": "failed_to_restore_window_position_e",
+    "source_template": "Failed to restore window position: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 580,
+    "col": 16,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:603:16": {
+    "kind": "static_literal",
+    "key": "framework.ui.no_first_screenshot_currently_crop_failed",
+    "msgid": "no_first_screenshot_currently_crop_failed",
+    "source_text": "No first_screenshot currently, crop failed",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 603,
+    "col": 16,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:624:16": {
+    "kind": "static_literal",
+    "key": "framework.ui.no_screenshot_currently_unable_to_read_text",
+    "msgid": "no_screenshot_currently_unable_to_read_text",
+    "source_text": "No screenshot currently, unable to read text",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 624,
+    "col": 16,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:640:20": {
+    "kind": "static_literal",
+    "key": "framework.ui.target_image_is_empty_skipping_match_counting",
+    "msgid": "target_image_is_empty_skipping_match_counting",
+    "source_text": "Target image is empty, skipping match counting",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 640,
+    "col": 20,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:654:42": {
+    "kind": "dynamic_template",
+    "key": "framework.log.target_image_template_name_similarity_conf",
+    "msgid": "target_image_template_name_similarity_conf",
+    "source_template": "Target image: {template_name} Similarity: {conf:.2f}",
+    "fields": [
+      "template_name",
+      "conf"
+    ],
+    "field_details": {
+      "template_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "conf": {
+        "format_spec": ".2f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 654,
+    "col": 42,
+    "context": "log"
+  },
+  "app/framework/infra/automation/automation.py:655:34": {
+    "kind": "dynamic_template",
+    "key": "framework.log.count_of_image_template_name_is_value",
+    "msgid": "count_of_image_template_name_is_value",
+    "source_template": "Count of image {template_name} is {value_2}",
+    "fields": [
+      "template_name",
+      "value_2"
+    ],
+    "field_details": {
+      "template_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_2": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 655,
+    "col": 34,
+    "context": "log"
+  },
+  "app/framework/infra/automation/automation.py:672:16": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.error_finding_image_and_counting_e",
+    "msgid": "error_finding_image_and_counting_e",
+    "source_template": "Error finding image and counting: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 672,
+    "col": 16,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:693:34": {
+    "kind": "dynamic_template",
+    "key": "framework.log.recognition_result_error_text",
+    "msgid": "recognition_result_error_text",
+    "source_template": "Recognition result error: {text}",
+    "fields": [
+      "text"
+    ],
+    "field_details": {
+      "text": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 693,
+    "col": 34,
+    "context": "log"
+  },
+  "app/framework/infra/automation/automation.py:696:30": {
+    "kind": "dynamic_template",
+    "key": "framework.log.failed_to_recognize_stamina_e",
+    "msgid": "failed_to_recognize_stamina_e",
+    "source_template": "Failed to recognize stamina: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 696,
+    "col": 30,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:138:20": {
+    "kind": "static_literal",
+    "key": "framework.log.detected_user_interacting_with_desktop_taskbar_k",
+    "msgid": "detected_user_interacting_with_desktop_taskbar_k",
+    "source_text": "Detected user interacting with desktop/taskbar, keeping tracking hidden and waiting",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 138,
+    "col": 20,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:237:16": {
+    "kind": "dynamic_template",
+    "key": "framework.log.failed_to_perform_mouse_click_x_y_because_mouse",
+    "msgid": "failed_to_perform_mouse_click_x_y_because_mouse",
+    "source_template": "Failed to perform mouse click ({x}, {y}) because mouse operation is in progress",
+    "fields": [
+      "x",
+      "y"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 237,
+    "col": 16,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:324:36": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tracking_click_completed_x_y",
+    "msgid": "tracking_click_completed_x_y",
+    "source_template": "Tracking click completed ({x}, {y})",
+    "fields": [
+      "x",
+      "y"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 324,
+    "col": 36,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:349:41": {
+    "kind": "dynamic_template",
+    "key": "framework.log.mouse_move_and_click_x_y",
+    "msgid": "mouse_move_and_click_x_y",
+    "source_template": "Mouse move and click ({x}, {y})",
+    "fields": [
+      "x",
+      "y"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 349,
+    "col": 41,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:360:35": {
+    "kind": "static_literal",
+    "key": "framework.ui.click_timeout",
+    "msgid": "click_timeout",
+    "source_text": "Click timeout",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 360,
+    "col": 35,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/input.py:363:16": {
+    "kind": "dynamic_template",
+    "key": "framework.log.error_occurred_while_performing_mouse_move_click",
+    "msgid": "error_occurred_while_performing_mouse_move_click",
+    "source_template": "Error occurred while performing mouse move click ({x}, {y}): {value_3}",
+    "fields": [
+      "x",
+      "y",
+      "value_3"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_3": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 363,
+    "col": 16,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:377:33": {
+    "kind": "dynamic_template",
+    "key": "framework.log.mouse_move_and_click_x_y",
+    "msgid": "mouse_move_and_click_x_y",
+    "source_template": "Mouse move and click ({x}, {y})",
+    "fields": [
+      "x",
+      "y"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 377,
+    "col": 33,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:380:16": {
+    "kind": "dynamic_template",
+    "key": "framework.log.error_occurred_while_performing_mouse_move_click",
+    "msgid": "error_occurred_while_performing_mouse_move_click",
+    "source_template": "Error occurred while performing mouse move click ({x}, {y}): {value_3}",
+    "fields": [
+      "x",
+      "y",
+      "value_3"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_3": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 380,
+    "col": 16,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:414:20": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tracking_wheel_timeout_abandoning_this_wheel_inp",
+    "msgid": "tracking_wheel_timeout_abandoning_this_wheel_inp",
+    "source_template": "Tracking wheel timeout, abandoning this wheel input: ({x}, {y}, {delta}), total_batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s",
+    "fields": [
+      "x",
+      "y",
+      "delta",
+      "total_batches",
+      "finished_batches",
+      "effective_timeout"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "total_batches": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "finished_batches": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "effective_timeout": {
+        "format_spec": ".2f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 414,
+    "col": 20,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:437:20": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tracking_wheel_alignment_failed_abandoning_this",
+    "msgid": "tracking_wheel_alignment_failed_abandoning_this",
+    "source_template": "Tracking wheel alignment failed, abandoning this wheel input: ({x}, {y}, {delta})",
+    "fields": [
+      "x",
+      "y",
+      "delta"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 437,
+    "col": 20,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:457:24": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tracking_wheel_timeout_remainder_abandoning_this",
+    "msgid": "tracking_wheel_timeout_remainder_abandoning_this",
+    "source_template": "Tracking wheel timeout (remainder), abandoning this wheel input: ({x}, {y}, {delta}), total_batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s",
+    "fields": [
+      "x",
+      "y",
+      "delta",
+      "total_batches",
+      "finished_batches",
+      "effective_timeout"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "total_batches": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "finished_batches": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "effective_timeout": {
+        "format_spec": ".2f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 457,
+    "col": 24,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:480:24": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tracking_wheel_remainder_alignment_failed_abando",
+    "msgid": "tracking_wheel_remainder_alignment_failed_abando",
+    "source_template": "Tracking wheel remainder alignment failed, abandoning this wheel input: ({x}, {y}, {delta})",
+    "fields": [
+      "x",
+      "y",
+      "delta"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 480,
+    "col": 24,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:489:29": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tracking_mode_scrolling_completed_x_y_delta_delt",
+    "msgid": "tracking_mode_scrolling_completed_x_y_delta_delt",
+    "source_template": "Tracking mode scrolling completed ({x},{y}) delta={delta}",
+    "fields": [
+      "x",
+      "y",
+      "delta"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 489,
+    "col": 29,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:541:32": {
+    "kind": "dynamic_template",
+    "key": "framework.log.mouse_moved_to_x_y_and_scrolled_wheel_delta",
+    "msgid": "mouse_moved_to_x_y_and_scrolled_wheel_delta",
+    "source_template": "Mouse moved to ({x},{y}) and scrolled wheel {delta}",
+    "fields": [
+      "x",
+      "y",
+      "delta"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 541,
+    "col": 32,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:554:16": {
+    "kind": "dynamic_template",
+    "key": "framework.log.waiting_for_wheel_scrolling_timeout_abandoning_t",
+    "msgid": "waiting_for_wheel_scrolling_timeout_abandoning_t",
+    "source_template": "Waiting for wheel scrolling timeout, abandoning this wheel input: ({x}, {y}, {delta})",
+    "fields": [
+      "x",
+      "y",
+      "delta"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 554,
+    "col": 16,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:559:16": {
+    "kind": "dynamic_template",
+    "key": "framework.log.error_occurred_while_scrolling_after_mouse_move",
+    "msgid": "error_occurred_while_scrolling_after_mouse_move",
+    "source_template": "Error occurred while scrolling after mouse move ({x}, {y}): {value_3}",
+    "fields": [
+      "x",
+      "y",
+      "value_3"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_3": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 559,
+    "col": 16,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:569:30": {
+    "kind": "dynamic_template",
+    "key": "framework.log.error_occurred_while_simulating_key_key_value",
+    "msgid": "error_occurred_while_simulating_key_key_value",
+    "source_template": "Error occurred while simulating key {key}: {value_2}",
+    "fields": [
+      "key",
+      "value_2"
+    ],
+    "field_details": {
+      "key": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_2": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 569,
+    "col": 30,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:578:30": {
+    "kind": "dynamic_template",
+    "key": "framework.log.key_pressed_key",
+    "msgid": "key_pressed_key",
+    "source_template": "Key pressed: {key}",
+    "fields": [
+      "key"
+    ],
+    "field_details": {
+      "key": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 578,
+    "col": 30,
+    "context": "log"
+  },
+  "app/framework/infra/automation/input.py:587:30": {
+    "kind": "dynamic_template",
+    "key": "framework.log.key_released_key",
+    "msgid": "key_released_key",
+    "source_template": "Key released: {key}",
+    "fields": [
+      "key"
+    ],
+    "field_details": {
+      "key": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 587,
+    "col": 30,
+    "context": "log"
+  },
+  "app/framework/infra/automation/screenshot.py:101:30": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_fe139fe80d29",
+    "msgid": "tmpl_fe139fe80d29",
+    "source_template": "未找到窗口: {title}",
+    "fields": [
+      "title"
+    ],
+    "field_details": {
+      "title": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/screenshot.py",
+    "line": 101,
+    "col": 30,
+    "context": "log"
+  },
+  "app/framework/infra/automation/window_tracker.py:187:30": {
+    "kind": "static_literal",
+    "key": "framework.log.txt_bc1b6ea94bb0",
+    "msgid": "txt_bc1b6ea94bb0",
+    "source_text": "窗口追踪失败：无效窗口句柄",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/window_tracker.py",
+    "line": 187,
+    "col": 30,
+    "context": "log"
+  },
+  "app/framework/infra/automation/window_tracker.py:194:38": {
+    "kind": "static_literal",
+    "key": "framework.log.txt_27c6fa28e299",
+    "msgid": "txt_27c6fa28e299",
+    "source_text": "窗口追踪失败：无法获取顶层窗口句柄",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/window_tracker.py",
+    "line": 194,
+    "col": 38,
+    "context": "log"
+  },
+  "app/framework/infra/automation/window_tracker.py:205:44": {
+    "kind": "static_literal",
+    "key": "framework.log.txt_e2e85bf76496",
+    "msgid": "txt_e2e85bf76496",
+    "source_text": "窗口追踪失败：窗口尺寸异常，恢复失败，已跳过本次移动",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/window_tracker.py",
+    "line": 205,
+    "col": 44,
+    "context": "log"
+  },
+  "app/framework/infra/automation/window_tracker.py:226:52": {
+    "kind": "static_literal",
+    "key": "framework.log.txt_b053682994ca",
+    "msgid": "txt_b053682994ca",
+    "source_text": "窗口追踪失败：尺寸纠正后仍异常，恢复失败",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/window_tracker.py",
+    "line": 226,
+    "col": 52,
+    "context": "log"
+  },
+  "app/framework/infra/automation/window_tracker.py:265:44": {
+    "kind": "static_literal",
+    "key": "framework.log.txt_ae2e3f0299dd",
+    "msgid": "txt_ae2e3f0299dd",
+    "source_text": "窗口追踪检测到窗口尺寸异常，回滚失败",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/window_tracker.py",
+    "line": 265,
+    "col": 44,
+    "context": "log"
+  },
+  "app/framework/infra/automation/window_tracker.py:284:48": {
+    "kind": "static_literal",
+    "key": "framework.log.txt_fbb38f5ae828",
+    "msgid": "txt_fbb38f5ae828",
+    "source_text": "窗口追踪检测到跨屏缩放异常，修复失败",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/window_tracker.py",
+    "line": 284,
+    "col": 48,
+    "context": "log"
+  },
+  "app/framework/infra/automation/window_tracker.py:291:30": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_f4a889c29c2e",
+    "msgid": "tmpl_f4a889c29c2e",
+    "source_template": "窗口追踪失败：{value_1}",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/window_tracker.py",
+    "line": 291,
+    "col": 30,
+    "context": "log"
+  },
+  "app/framework/infra/automation/window_tracker.py:337:32": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_5c722645c018",
+    "msgid": "tmpl_5c722645c018",
+    "source_template": "窗口移出可视区失败：{value_1}",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/window_tracker.py",
+    "line": 337,
+    "col": 32,
+    "context": "log"
+  },
+  "app/framework/infra/automation/window_tracker.py:371:32": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_cfe4a46c6505",
+    "msgid": "tmpl_cfe4a46c6505",
+    "source_template": "窗口归位失败：{value_1}",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/window_tracker.py",
+    "line": 371,
+    "col": 32,
+    "context": "log"
+  },
+  "app/framework/infra/vision/image.py:158:29": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_de23f5d017c4",
+    "msgid": "tmpl_de23f5d017c4",
+    "source_template": "图像匹配过程出现异常: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/vision/image.py",
+    "line": 158,
+    "col": 29,
+    "context": "log"
+  },
+  "app/framework/infra/vision/matcher.py:134:35": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_3be49d8041b5",
+    "msgid": "tmpl_3be49d8041b5",
+    "source_template": "模板图片读取失败: {template_path}",
+    "fields": [
+      "template_path"
+    ],
+    "field_details": {
+      "template_path": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/vision/matcher.py",
+    "line": 134,
+    "col": 35,
+    "context": "log"
+  },
+  "app/framework/infra/vision/matcher.py:220:29": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_b0556a744ebc",
+    "msgid": "tmpl_b0556a744ebc",
+    "source_template": "图像识别底层异常({file_name})：{value_2}",
+    "fields": [
+      "file_name",
+      "value_2"
+    ],
+    "field_details": {
+      "file_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_2": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/vision/matcher.py",
+    "line": 220,
+    "col": 29,
+    "context": "log"
+  },
+  "app/framework/ui/views/main_window.py:162:27": {
+    "kind": "static_literal",
+    "key": "framework.log.txt_5d1deca9b1dc",
+    "msgid": "txt_5d1deca9b1dc",
+    "source_text": "system tray icon is null; tray may be invisible",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 162,
+    "col": 27,
+    "context": "log"
+  },
+  "app/framework/ui/views/main_window.py:225:20": {
+    "kind": "static_literal",
+    "key": "framework.log.hotkey_pressed",
+    "msgid": "hotkey_pressed",
+    "source_text": "Hotkey pressed",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 225,
+    "col": 20,
+    "context": "log"
+  },
+  "app/framework/ui/views/main_window.py:470:35": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_7058d4156e76",
+    "msgid": "tmpl_7058d4156e76",
+    "source_template": "未配置游戏路径，请先根据教程配置路径",
+    "fields": [],
+    "field_details": {},
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 470,
+    "col": 35,
+    "context": "log"
+  },
+  "app/framework/ui/views/main_window.py:472:32": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_ce7f9cbf211d",
+    "msgid": "tmpl_ce7f9cbf211d",
+    "source_template": "开始自动运行日常",
+    "fields": [],
+    "field_details": {},
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 472,
+    "col": 32,
+    "context": "log"
+  },
+  "app/framework/ui/views/main_window.py:475:31": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_c091a6fe6cb0",
+    "msgid": "tmpl_c091a6fe6cb0",
+    "source_template": "未勾选\"自动打开游戏\"",
+    "fields": [],
+    "field_details": {},
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 475,
+    "col": 31,
+    "context": "log"
+  },
+  "app/framework/ui/views/main_window.py:579:27": {
+    "kind": "static_literal",
+    "key": "framework.log.txt_20cc2ec64796",
+    "msgid": "txt_20cc2ec64796",
+    "source_text": "feature_bridge is not configured",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 579,
+    "col": 27,
+    "context": "log"
+  },
+  "app/framework/ui/views/main_window.py:797:31": {
+    "kind": "static_literal",
+    "key": "framework.log.txt_1172a417c3f5",
+    "msgid": "txt_1172a417c3f5",
+    "source_text": "未能获取到有效的更新下载链接",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 797,
+    "col": 31,
+    "context": "log"
+  },
+  "app/framework/ui/views/main_window.py:853:25": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_bf4b5033f5c8",
+    "msgid": "tmpl_bf4b5033f5c8",
+    "source_template": "写入 crash.log 失败: {log_error}",
+    "fields": [
+      "log_error"
+    ],
+    "field_details": {
+      "log_error": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 853,
+    "col": 25,
+    "context": "log"
+  },
+  "app/framework/ui/views/main_window.py:862:25": {
+    "kind": "dynamic_template",
+    "key": "framework.log.tmpl_a8be319969db",
+    "msgid": "tmpl_a8be319969db",
+    "source_template": "崩溃弹窗失败: {dialog_error}",
+    "fields": [
+      "dialog_error"
+    ],
+    "field_details": {
+      "dialog_error": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 862,
+    "col": 25,
+    "context": "log"
+  },
+  "app/framework/ui/views/periodic_tasks_page.py:396:29": {
+    "kind": "dynamic_template",
+    "key": "framework.log.periodic_active_schedule_output",
+    "msgid": "periodic_active_schedule_output",
+    "source_template": "{value_1}{value_2}",
+    "fields": [
+      "value_1",
+      "value_2"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_2": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/periodic_tasks_page.py",
+    "line": 396,
+    "col": 29,
+    "context": "log"
+  },
+  "app/framework/ui/views/periodic_tasks_view.py:106:34": {
+    "kind": "static_literal",
+    "key": "framework.ui.txt_22441e7571e2",
+    "msgid": "txt_22441e7571e2",
+    "source_text": "00:00",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/periodic_tasks_view.py",
+    "line": 106,
+    "col": 34,
+    "context": "ui"
+  },
+  "app/framework/ui/views/periodic_tasks_view.py:112:34": {
+    "kind": "static_literal",
+    "key": "framework.ui.txt_356a192b7913",
+    "msgid": "txt_356a192b7913",
+    "source_text": "1",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/periodic_tasks_view.py",
+    "line": 112,
+    "col": 34,
+    "context": "ui"
+  },
+  "app/framework/ui/views/periodic_tasks_view.py:533:31": {
+    "kind": "static_literal",
+    "key": "framework.ui.txt_356a192b7913",
+    "msgid": "txt_356a192b7913",
+    "source_text": "1",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/periodic_tasks_view.py",
+    "line": 533,
+    "col": 31,
+    "context": "ui"
+  },
+  "app/framework/ui/views/setting_view.py:522:44": {
+    "kind": "static_literal",
+    "key": "framework.ui.txt_9391ca694630",
+    "msgid": "txt_9391ca694630",
+    "source_text": "996710620",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/setting_view.py",
+    "line": 522,
+    "col": 44,
+    "context": "ui"
+  },
+  "app/framework/ui/views/setting_view.py:95:38": {
+    "kind": "static_literal",
+    "key": "framework.ui.txt_2c2d6bb537b9",
+    "msgid": "txt_2c2d6bb537b9",
+    "source_text": "LOGO",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/setting_view.py",
+    "line": 95,
+    "col": 38,
+    "context": "ui"
+  },
+  "app/framework/ui/widgets/custom_message_box.py:26:34": {
+    "kind": "static_literal",
+    "key": "framework.ui.txt_f526c89937e1",
+    "msgid": "txt_f526c89937e1",
+    "source_text": "确定",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/widgets/custom_message_box.py",
+    "line": 26,
+    "col": 34,
+    "context": "ui"
+  },
+  "app/framework/ui/widgets/custom_message_box.py:27:37": {
+    "kind": "static_literal",
+    "key": "framework.ui.txt_6c14bd7f6f9e",
+    "msgid": "txt_6c14bd7f6f9e",
+    "source_text": "关闭",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/widgets/custom_message_box.py",
+    "line": 27,
+    "col": 37,
+    "context": "ui"
+  },
+  "app/framework/ui/widgets/custom_message_box.py:46:30": {
+    "kind": "static_literal",
+    "key": "framework.ui.txt_040f06fd7740",
+    "msgid": "txt_040f06fd7740",
+    "source_text": "content",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/widgets/custom_message_box.py",
+    "line": 46,
+    "col": 30,
+    "context": "ui"
+  }
+}

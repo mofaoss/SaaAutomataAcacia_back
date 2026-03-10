@@ -1,13 +1,4 @@
 {
-  "module.close_game.legacy.429e494e4e1c": "System will shut down in 60s...",
-  "module.close_game.legacy.d37a4e4fc0c2": "Exiting game...",
-  "module.close_game.legacy.fb1533f4f2b1": "Exiting Application...",
-  "module.close_game.log.429e494e4e1c": "System will shut down in 60s...",
-  "module.close_game.log.d37a4e4fc0c2": "Exiting game...",
-  "module.close_game.log.exiting_application": "Exiting Application...",
-  "module.close_game.log.exiting_game": "Exiting game...",
-  "module.close_game.log.fb1533f4f2b1": "Exiting Application...",
-  "module.close_game.log.system_will_shut_down_in_60s": "System will shut down in 60s...",
-  "module.dummy.title": "Execute Exit",
-  "module.task_close_game.title": "Execute Exit"
+  "module.dummy.title": "关闭游戏",
+  "module.task_close_game.title": "关闭游戏"
 }

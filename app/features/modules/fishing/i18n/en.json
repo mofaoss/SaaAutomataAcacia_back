@@ -1,15 +1,4 @@
 {
-  "module.fishing.title": "Fishing",
-  "module.fishing.log.text": "?????????????",
-  "module.fishing.log.到点_收杆": "到点，收杆!",
-  "module.fishing.log.咋回事_强制收杆一次": "咋回事？强制收杆一次",
-  "module.fishing.log.运行错误_存在上限的值小于下限": "运行错误，存在上限的值小于下限",
-  "module.fishing.log.进入钓鱼超时": "进入钓鱼超时",
-  "module.fishing.log.选择鱼饵超时超时": "选择鱼饵超时超时",
-  "module.fishing.log.钓鱼佬永不空军": "钓鱼佬永不空军！",
-  "module.fishing.log.钓鱼环节超时": "钓鱼环节超时",
-  "module.fishing.log.钓鱼结束环节超时": "钓鱼结束环节超时",
-  "module.fishing.log.鱼跑了_空军": "鱼跑了，空军！",
-  "module.fishing.ui.请点击图像上的黄色完美收杆区域_提取颜色": "请点击图像上的黄色完美收杆区域 (提取颜色)",
-  "module.dummy.title": "Fishing"
+  "module.dummy.title": "Fishing",
+  "module.fishing.title": "Fishing"
 }

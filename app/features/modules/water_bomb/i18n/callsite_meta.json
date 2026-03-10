@@ -1,0 +1,373 @@
+{
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:100:34": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.log.txt_e6dbf839e2f7",
+    "msgid": "txt_e6dbf839e2f7",
+    "source_text": "进入心动水弹界面超时",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 100,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:120:36": {
+    "kind": "dynamic_template",
+    "key": "module.water_bomb.log.tmpl_2cc4eb6fef2f",
+    "msgid": "tmpl_2cc4eb6fef2f",
+    "source_template": "对战失败，连胜中断",
+    "fields": [],
+    "field_details": {},
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 120,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:131:36": {
+    "kind": "dynamic_template",
+    "key": "module.water_bomb.log.tmpl_e675f9747cd4",
+    "msgid": "tmpl_e675f9747cd4",
+    "source_template": "对战胜利，当前连胜为：{self_current_win}",
+    "fields": [
+      "self_current_win"
+    ],
+    "field_details": {
+      "self_current_win": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 131,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:133:37": {
+    "kind": "dynamic_template",
+    "key": "module.water_bomb.log.tmpl_c75ca8bedded",
+    "msgid": "tmpl_c75ca8bedded",
+    "source_template": "已达成{self_end_win}连胜",
+    "fields": [
+      "self_end_win"
+    ],
+    "field_details": {
+      "self_end_win": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 133,
+    "col": 37,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:185:41": {
+    "kind": "dynamic_template",
+    "key": "module.water_bomb.log.tmpl_4287a04cc106",
+    "msgid": "tmpl_4287a04cc106",
+    "source_template": "当前最佳操作为：{current_strategy}, 胜率为：{win_prob}",
+    "fields": [
+      "current_strategy",
+      "win_prob"
+    ],
+    "field_details": {
+      "current_strategy": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "win_prob": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 185,
+    "col": 41,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:222:50": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.log.txt_f90f4fc5221b",
+    "msgid": "txt_f90f4fc5221b",
+    "source_text": "重置之锤使用失败",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 222,
+    "col": 50,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:228:50": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.log.txt_2e73659f6895",
+    "msgid": "txt_2e73659f6895",
+    "source_text": "偷道具失败",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 228,
+    "col": 50,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:235:50": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.log.txt_36c69577c995",
+    "msgid": "txt_36c69577c995",
+    "source_text": "开枪失败",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 235,
+    "col": 50,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:243:34": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.log.txt_0ddc509bb2d6",
+    "msgid": "txt_0ddc509bb2d6",
+    "source_text": "心动水弹对战超时",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 243,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:276:34": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.log.txt_0b02159fc6bb",
+    "msgid": "txt_0b02159fc6bb",
+    "source_text": "重开超时",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 276,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:279:28": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.log.txt_9155b4736eb7",
+    "msgid": "txt_9155b4736eb7",
+    "source_text": "胜率为0，选择重开",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 279,
+    "col": 28,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:347:34": {
+    "kind": "dynamic_template",
+    "key": "module.water_bomb.log.tmpl_3ea00afcec93",
+    "msgid": "tmpl_3ea00afcec93",
+    "source_template": "{person}超时",
+    "fields": [
+      "person"
+    ],
+    "field_details": {
+      "person": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 347,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:380:38": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.log.txt_c5f17c5e958e",
+    "msgid": "txt_c5f17c5e958e",
+    "source_text": "看破墨镜后处理未识别到任何文字",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 380,
+    "col": 38,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:388:34": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.log.txt_368592221ee0",
+    "msgid": "txt_368592221ee0",
+    "source_text": "看破墨镜后处理超时",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 388,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:466:34": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.log.txt_c24516b975a3",
+    "msgid": "txt_c24516b975a3",
+    "source_text": "使用重置之锤超时",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 466,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:493:34": {
+    "kind": "static_literal",
+    "key": "module.water_bomb.log.txt_3015dacc74d7",
+    "msgid": "txt_3015dacc74d7",
+    "source_text": "偷道具超时",
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 493,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:529:34": {
+    "kind": "dynamic_template",
+    "key": "module.water_bomb.log.tmpl_87f4f7bc9a22",
+    "msgid": "tmpl_87f4f7bc9a22",
+    "source_template": "使用道具{item_name}超时",
+    "fields": [
+      "item_name"
+    ],
+    "field_details": {
+      "item_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 529,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:601:25": {
+    "kind": "dynamic_template",
+    "key": "module.water_bomb.log.tmpl_61ae32446819",
+    "msgid": "tmpl_61ae32446819",
+    "source_template": "当前血量上限：{self_max_hp}",
+    "fields": [
+      "self_max_hp"
+    ],
+    "field_details": {
+      "self_max_hp": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 601,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:602:25": {
+    "kind": "dynamic_template",
+    "key": "module.water_bomb.log.tmpl_4511eb7fb29a",
+    "msgid": "tmpl_4511eb7fb29a",
+    "source_template": "当前玩家血量：{self_current_player_hp}，对方血量：{self_current_enemy_hp}",
+    "fields": [
+      "self_current_player_hp",
+      "self_current_enemy_hp"
+    ],
+    "field_details": {
+      "self_current_player_hp": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "self_current_enemy_hp": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 602,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:603:25": {
+    "kind": "dynamic_template",
+    "key": "module.water_bomb.log.tmpl_bc3029f51b35",
+    "msgid": "tmpl_bc3029f51b35",
+    "source_template": "当前水弹数量：{self_remaining_live_bullet}，空弹数量：{self_remaining_blank_bullet}",
+    "fields": [
+      "self_remaining_live_bullet",
+      "self_remaining_blank_bullet"
+    ],
+    "field_details": {
+      "self_remaining_live_bullet": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "self_remaining_blank_bullet": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 603,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:618:25": {
+    "kind": "dynamic_template",
+    "key": "module.water_bomb.log.tmpl_ac9f13a7dfd3",
+    "msgid": "tmpl_ac9f13a7dfd3",
+    "source_template": "玩家道具：{self_player_items}",
+    "fields": [
+      "self_player_items"
+    ],
+    "field_details": {
+      "self_player_items": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 618,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:619:25": {
+    "kind": "dynamic_template",
+    "key": "module.water_bomb.log.tmpl_10fa250277fb",
+    "msgid": "tmpl_10fa250277fb",
+    "source_template": "对方道具：{self_enemy_items}",
+    "fields": [
+      "self_enemy_items"
+    ],
+    "field_details": {
+      "self_enemy_items": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 619,
+    "col": 25,
+    "context": "log"
+  }
+}

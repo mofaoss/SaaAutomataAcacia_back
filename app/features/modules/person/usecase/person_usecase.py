@@ -178,7 +178,7 @@ class PersonModule:
                 self.logger.info(_("已打开补充对话框，准备使用 2 片记忆嵌片"))
 
                 # 核心修改：固定点击加号 2 次（1235, 624 为对话框内加号的坐标）
-                for _ in range(2):
+                for click_idx in range(2):
                     self.auto.click_element_with_pos(pos=(int(1235 / self.auto.scale_x), int(624 / self.auto.scale_y)))
                     time.sleep(0.2)
 

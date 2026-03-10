@@ -1,0 +1,124 @@
+{
+  "module.event_tips.log.error_occurred_while_updating_controls_e": {
+    "kind": "dynamic_template",
+    "template_id": "error_occurred_while_updating_controls_e",
+    "msgid": "error_occurred_while_updating_controls_e",
+    "source_template": "Error occurred while updating controls: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 231,
+    "col": 31,
+    "function_name": "refresh_tips",
+    "class_name": "EventTipsActions",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "a43e644f1119101f6bb8cb13e23c36ed07bfa862",
+    "callsite_key": "app/features/modules/event_tips/usecase/event_tips_usecase.py:231:31",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "module.event_tips.ui.finished": {
+    "kind": "dynamic_template",
+    "template_id": "finished",
+    "msgid": "finished",
+    "source_template": "{key} finished",
+    "fields": [
+      "key"
+    ],
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 72,
+    "col": 38,
+    "function_name": "refresh_tips_panel",
+    "class_name": "EventTipsUseCase",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "9c7a9d79edc0241b3b6558280a7edad66ffcedb2",
+    "callsite_key": "app/features/modules/event_tips/usecase/event_tips_usecase.py:72:38",
+    "is_runtime_visible": true,
+    "mixed_source_template": false,
+    "field_details": {
+      "key": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.event_tips.ui.left_days": {
+    "kind": "dynamic_template",
+    "template_id": "left_days",
+    "msgid": "left_days",
+    "source_template": "{key}: {days}d(s) left",
+    "fields": [
+      "key",
+      "days"
+    ],
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 83,
+    "col": 23,
+    "function_name": "refresh_tips_panel",
+    "class_name": "EventTipsUseCase",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "ca6703985475edf00b309ddb0537104f6f332904",
+    "callsite_key": "app/features/modules/event_tips/usecase/event_tips_usecase.py:83:23",
+    "is_runtime_visible": true,
+    "mixed_source_template": false,
+    "field_details": {
+      "key": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "days": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.event_tips.ui.starts_in": {
+    "kind": "dynamic_template",
+    "template_id": "starts_in",
+    "msgid": "starts_in",
+    "source_template": "{key} in {days}d(s)",
+    "fields": [
+      "key",
+      "days"
+    ],
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 77,
+    "col": 23,
+    "function_name": "refresh_tips_panel",
+    "class_name": "EventTipsUseCase",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "1b269347dddd49423ef7806e05c92d81aec1fa7d",
+    "callsite_key": "app/features/modules/event_tips/usecase/event_tips_usecase.py:77:23",
+    "is_runtime_visible": true,
+    "mixed_source_template": false,
+    "field_details": {
+      "key": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "days": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  }
+}

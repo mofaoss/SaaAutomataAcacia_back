@@ -1,0 +1,26 @@
+{
+  "app/features/modules/get_reward/usecase/get_reward_usecase.py:117:34": {
+    "kind": "static_literal",
+    "key": "module.get_reward.log.txt_f595c566e197",
+    "msgid": "txt_f595c566e197",
+    "source_text": "领取凭证奖励超时",
+    "owner_scope": "module",
+    "owner_module": "get_reward",
+    "file_path": "app/features/modules/get_reward/usecase/get_reward_usecase.py",
+    "line": 117,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/get_reward/usecase/get_reward_usecase.py:69:34": {
+    "kind": "static_literal",
+    "key": "module.get_reward.log.txt_f828ccd23235",
+    "msgid": "txt_f828ccd23235",
+    "source_text": "领取任务奖励超时",
+    "owner_scope": "module",
+    "owner_module": "get_reward",
+    "file_path": "app/features/modules/get_reward/usecase/get_reward_usecase.py",
+    "line": 69,
+    "col": 34,
+    "context": "log"
+  }
+}

@@ -1,8 +1,4 @@
 {
   "module.drink.title": "Card Match",
-  "module.drink.log.玩法未解锁": "玩法未解锁",
-  "module.drink.log.进入酒馆超时": "进入酒馆超时",
-  "module.drink.log.酒馆对局超时": "酒馆对局超时",
-  "module.drink.log.重进对局超时": "重进对局超时",
   "module.dummy.title": "Card Match"
 }

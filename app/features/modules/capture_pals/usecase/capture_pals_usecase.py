@@ -204,7 +204,7 @@ class CapturePalsModule:
         if state == "IN_MAP":
             self.logger.info(_("检测到已在地图内，先退出回选岛页面以保证流程一致"))
             if not self.exit_map_to_island_select():
-                self.logger.error(_("?????????????????????????????"))
+                self.logger.error(_("退出地图失败，未能返回抓帕鲁选岛页面", msgid="failed_to_exit_map_back_to_island_select"))
                 return
 
         enable_partner = self.enable_partner
@@ -604,7 +604,7 @@ class CapturePalsModule:
             # 等一等再判定是否回到选岛（可中断）
             self.sleep_with_log(1.0)
 
-        self.logger.error(_("???????????????????????????????????????"))
+        self.logger.error(_("退出地图失败：重试后仍未回到抓帕鲁选岛页面", msgid="failed_to_exit_map_after_retries_still_not_on_island_select"))
         return False
 
     def _wait_collect_state(self, want_present: bool, timeout_sec: float, interval: float = 0.1, stable_count: int = 3) -> bool:

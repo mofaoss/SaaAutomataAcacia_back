@@ -1,0 +1,318 @@
+{
+  "module.water_bomb.log.cn_text_0001_8": {
+    "kind": "dynamic_template",
+    "template_id": "3ea00afcec93fbb8",
+    "msgid": "person_超时",
+    "source_template": "{person}超时",
+    "fields": [
+      "person"
+    ],
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 347,
+    "col": 34,
+    "function_name": "handle_shooting",
+    "class_name": "WaterBombModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "3ea00afcec93fbb860370172fab24e1b456010a1",
+    "callsite_key": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:347:34",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "person": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.water_bomb.log.cn_text_0002_8": {
+    "kind": "dynamic_template",
+    "template_id": "87f4f7bc9a22eb1c",
+    "msgid": "使用道具_item_name_超时",
+    "source_template": "使用道具{item_name}超时",
+    "fields": [
+      "item_name"
+    ],
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 529,
+    "col": 34,
+    "function_name": "use_normal_item",
+    "class_name": "WaterBombModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "87f4f7bc9a22eb1cff214eb7dcf418fdf3bd0f01",
+    "callsite_key": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:529:34",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "item_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.water_bomb.log.cn_text_0006_8": {
+    "kind": "dynamic_template",
+    "template_id": "2cc4eb6fef2f3030",
+    "msgid": "对战失败_连胜中断",
+    "source_template": "对战失败，连胜中断",
+    "fields": [],
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 120,
+    "col": 36,
+    "function_name": "fight",
+    "class_name": "WaterBombModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "2cc4eb6fef2f303072e1822a7c20a9f10b1d6117",
+    "callsite_key": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:120:36",
+    "is_runtime_visible": true,
+    "mixed_source_template": false,
+    "field_details": {}
+  },
+  "module.water_bomb.log.cn_text_0007_8": {
+    "kind": "dynamic_template",
+    "template_id": "e675f9747cd4a25b",
+    "msgid": "对战胜利_当前连胜为_self_current_win",
+    "source_template": "对战胜利，当前连胜为：{self_current_win}",
+    "fields": [
+      "self_current_win"
+    ],
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 131,
+    "col": 36,
+    "function_name": "fight",
+    "class_name": "WaterBombModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "e675f9747cd4a25b94f95b7b5bfe937f6c74d28c",
+    "callsite_key": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:131:36",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "self_current_win": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.water_bomb.log.cn_text_0008_8": {
+    "kind": "dynamic_template",
+    "template_id": "10fa250277fb8b55",
+    "msgid": "对方道具_self_enemy_items",
+    "source_template": "对方道具：{self_enemy_items}",
+    "fields": [
+      "self_enemy_items"
+    ],
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 619,
+    "col": 25,
+    "function_name": "update_items_list",
+    "class_name": "WaterBombModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "10fa250277fb8b556da3abd32b107bf984c1ac5a",
+    "callsite_key": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:619:25",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "self_enemy_items": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.water_bomb.log.cn_text_0009_8": {
+    "kind": "dynamic_template",
+    "template_id": "c75ca8beddedd4f7",
+    "msgid": "已达成_self_end_win_连胜",
+    "source_template": "已达成{self_end_win}连胜",
+    "fields": [
+      "self_end_win"
+    ],
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 133,
+    "col": 37,
+    "function_name": "fight",
+    "class_name": "WaterBombModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "c75ca8beddedd4f7c8232b0f1db6211ddcab034c",
+    "callsite_key": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:133:37",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "self_end_win": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.water_bomb.log.cn_text_0011_8": {
+    "kind": "dynamic_template",
+    "template_id": "4287a04cc106c26d",
+    "msgid": "当前最佳操作为_current_strategy_胜率为_win_prob",
+    "source_template": "当前最佳操作为：{current_strategy}, 胜率为：{win_prob}",
+    "fields": [
+      "current_strategy",
+      "win_prob"
+    ],
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 185,
+    "col": 41,
+    "function_name": "fight",
+    "class_name": "WaterBombModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "4287a04cc106c26d2c6950c286696050f9e44a3a",
+    "callsite_key": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:185:41",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "current_strategy": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "win_prob": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.water_bomb.log.cn_text_0012": {
+    "kind": "dynamic_template",
+    "template_id": "bc3029f51b356642",
+    "msgid": "当前水弹数量_self_remaining_live_bullet_空弹数量_self_remaining_blank_bullet",
+    "source_template": "当前水弹数量：{self_remaining_live_bullet}，空弹数量：{self_remaining_blank_bullet}",
+    "fields": [
+      "self_remaining_live_bullet",
+      "self_remaining_blank_bullet"
+    ],
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 603,
+    "col": 25,
+    "function_name": "update_hp_and_bullet",
+    "class_name": "WaterBombModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "bc3029f51b356642449a67f347a3a4b1b1ee91b0",
+    "callsite_key": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:603:25",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "self_remaining_live_bullet": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "self_remaining_blank_bullet": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.water_bomb.log.cn_text_0013": {
+    "kind": "dynamic_template",
+    "template_id": "4511eb7fb29a99dd",
+    "msgid": "当前玩家血量_self_current_player_hp_对方血量_self_current_enemy_hp",
+    "source_template": "当前玩家血量：{self_current_player_hp}，对方血量：{self_current_enemy_hp}",
+    "fields": [
+      "self_current_player_hp",
+      "self_current_enemy_hp"
+    ],
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 602,
+    "col": 25,
+    "function_name": "update_hp_and_bullet",
+    "class_name": "WaterBombModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "4511eb7fb29a99dd89da6077820bff6c4c0fc987",
+    "callsite_key": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:602:25",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "self_current_player_hp": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "self_current_enemy_hp": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.water_bomb.log.cn_text_0014": {
+    "kind": "dynamic_template",
+    "template_id": "61ae32446819b15d",
+    "msgid": "当前血量上限_self_max_hp",
+    "source_template": "当前血量上限：{self_max_hp}",
+    "fields": [
+      "self_max_hp"
+    ],
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 601,
+    "col": 25,
+    "function_name": "update_hp_and_bullet",
+    "class_name": "WaterBombModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "61ae32446819b15d1059d2439e27fb84a2b89ba1",
+    "callsite_key": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:601:25",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "self_max_hp": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.water_bomb.log.cn_text_0016": {
+    "kind": "dynamic_template",
+    "template_id": "ac9f13a7dfd3322a",
+    "msgid": "玩家道具_self_player_items",
+    "source_template": "玩家道具：{self_player_items}",
+    "fields": [
+      "self_player_items"
+    ],
+    "owner_scope": "module",
+    "owner_module": "water_bomb",
+    "file_path": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py",
+    "line": 618,
+    "col": 25,
+    "function_name": "update_items_list",
+    "class_name": "WaterBombModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "ac9f13a7dfd3322ae542ab420db194a317ffc554",
+    "callsite_key": "app/features/modules/water_bomb/usecase/water_bomb_usecase.py:618:25",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "self_player_items": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  }
+}

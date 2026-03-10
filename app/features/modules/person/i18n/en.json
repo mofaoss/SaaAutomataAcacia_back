@@ -1,9 +1,4 @@
 {
-  "module.task_shards.title": "Character Shards",
-  "module.person.log.使用记忆嵌片超时": "使用记忆嵌片超时",
-  "module.person.log.刷取角色碎片超时": "刷取角色碎片超时",
-  "module.person.log.已打开补充对话框_准备使用_2_片记忆嵌片": "已打开补充对话框，准备使用 2 片记忆嵌片",
-  "module.person.log.点击右上角加号补充体力": "点击右上角加号补充体力",
-  "module.person.log.记忆嵌片已用尽": "记忆嵌片已用尽",
-  "module.dummy.title": "Character Shards"
+  "module.dummy.title": "Character Shards",
+  "module.task_shards.title": "Character Shards"
 }

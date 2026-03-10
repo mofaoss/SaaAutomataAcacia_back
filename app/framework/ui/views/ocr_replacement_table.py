@@ -320,4 +320,3 @@ class OcrReplacementTable(QFrame, BaseInterface):
 
         self.TableWidget_ocr_table.resizeColumnsToContents()
         # self.resize(self.parent.width(), self.parent.height())
-

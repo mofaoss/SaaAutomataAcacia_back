@@ -1,0 +1,2034 @@
+{
+  "framework.log.client_area_size_client_width_x_client_height_ac": {
+    "kind": "dynamic_template",
+    "template_id": "client_area_size_client_width_x_client_height_ac",
+    "msgid": "client_area_size_client_width_x_client_height_ac",
+    "source_template": "Client area size: {client_width}x{client_height} ({actual_ratio:.3f}:1), {status} 16:9 standard ratio",
+    "fields": [
+      "client_width",
+      "client_height",
+      "actual_ratio",
+      "status"
+    ],
+    "field_details": {
+      "client_width": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "client_height": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "actual_ratio": {
+        "format_spec": ".3f",
+        "conversion": ""
+      },
+      "status": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/base_task.py",
+    "line": 47,
+    "col": 12,
+    "function_name": "determine_screen_ratio",
+    "class_name": "BaseTask",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "ce77cfdb6d2cf893585e515c134081ed996a1cc9",
+    "callsite_key": "app/framework/core/task_engine/base_task.py:47:12",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.cn_text_0001_8": {
+    "kind": "dynamic_template",
+    "template_id": "0b515f4f1710a7a8",
+    "msgid": "subtask结束时恢复窗口位置失败_stop_error",
+    "source_template": "SubTask结束时恢复窗口位置失败：{stop_error}",
+    "fields": [
+      "stop_error"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 250,
+    "col": 36,
+    "function_name": "run",
+    "class_name": "ModuleTaskThread",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "0b515f4f1710a7a83637ee3336044799c5ecd71c",
+    "callsite_key": "app/framework/core/task_engine/threads.py:250:36",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "stop_error": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.cn_text_0002_8": {
+    "kind": "dynamic_template",
+    "template_id": "bf4b5033f5c87af2",
+    "msgid": "写入_crash_log_失败_log_error",
+    "source_template": "写入 crash.log 失败: {log_error}",
+    "fields": [
+      "log_error"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 853,
+    "col": 25,
+    "function_name": "handle_exception",
+    "class_name": null,
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "bf4b5033f5c87af2fb3b6506bde557f6e16383af",
+    "callsite_key": "app/framework/ui/views/main_window.py:853:25",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "log_error": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.cn_text_0003_8": {
+    "kind": "dynamic_template",
+    "template_id": "de23f5d017c435df",
+    "msgid": "图像匹配过程出现异常_e",
+    "source_template": "图像匹配过程出现异常: {e}",
+    "fields": [
+      "e"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/vision/image.py",
+    "line": 158,
+    "col": 29,
+    "function_name": "match_template",
+    "class_name": "ImageUtils",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "de23f5d017c435dfebcbdaeb6e6f330ff8e37f46",
+    "callsite_key": "app/framework/infra/vision/image.py:158:29",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.cn_text_0004_8": {
+    "kind": "dynamic_template",
+    "template_id": "b0556a744ebc7002",
+    "msgid": "图像识别底层异常_file_name_value_2",
+    "source_template": "图像识别底层异常({file_name})：{value_2}",
+    "fields": [
+      "file_name",
+      "value_2"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/vision/matcher.py",
+    "line": 220,
+    "col": 29,
+    "function_name": "match",
+    "class_name": "Matcher",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "b0556a744ebc7002a8a60845407d35321c0d797c",
+    "callsite_key": "app/framework/infra/vision/matcher.py:220:29",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "file_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_2": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.cn_text_0005_8": {
+    "kind": "dynamic_template",
+    "template_id": "a8be319969dbf226",
+    "msgid": "崩溃弹窗失败_dialog_error",
+    "source_template": "崩溃弹窗失败: {dialog_error}",
+    "fields": [
+      "dialog_error"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 862,
+    "col": 25,
+    "function_name": "handle_exception",
+    "class_name": null,
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "a8be319969dbf22619b965278b333dd2e9b5269a",
+    "callsite_key": "app/framework/ui/views/main_window.py:862:25",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "dialog_error": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.cn_text_0006_8": {
+    "kind": "dynamic_template",
+    "template_id": "ce7f9cbf211d7a99",
+    "msgid": "开始自动运行日常",
+    "source_template": "开始自动运行日常",
+    "fields": [],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 472,
+    "col": 32,
+    "function_name": "_finalize_startup",
+    "class_name": "MainWindow",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "ce7f9cbf211d7a992c2b8fce8e691c0778733eae",
+    "callsite_key": "app/framework/ui/views/main_window.py:472:32",
+    "is_runtime_visible": true,
+    "mixed_source_template": false,
+    "field_details": {}
+  },
+  "framework.log.cn_text_0007_8": {
+    "kind": "dynamic_template",
+    "template_id": "c091a6fe6cb0fd58",
+    "msgid": "未勾选_自动打开游戏",
+    "source_template": "未勾选\"自动打开游戏\"",
+    "fields": [],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 475,
+    "col": 31,
+    "function_name": "_finalize_startup",
+    "class_name": "MainWindow",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "c091a6fe6cb0fd58d76ce7ae755b3f1519eb433b",
+    "callsite_key": "app/framework/ui/views/main_window.py:475:31",
+    "is_runtime_visible": true,
+    "mixed_source_template": false,
+    "field_details": {}
+  },
+  "framework.log.cn_text_0008_8": {
+    "kind": "dynamic_template",
+    "template_id": "fe139fe80d298380",
+    "msgid": "未找到窗口_title",
+    "source_template": "未找到窗口: {title}",
+    "fields": [
+      "title"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/screenshot.py",
+    "line": 101,
+    "col": 30,
+    "function_name": "get_window",
+    "class_name": "Screenshot",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "fe139fe80d29838033fba35df38748b249c0452f",
+    "callsite_key": "app/framework/infra/automation/screenshot.py:101:30",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "title": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.cn_text_0010": {
+    "kind": "dynamic_template",
+    "template_id": "7058d4156e76e520",
+    "msgid": "未配置游戏路径_请先根据教程配置路径",
+    "source_template": "未配置游戏路径，请先根据教程配置路径",
+    "fields": [],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/main_window.py",
+    "line": 470,
+    "col": 35,
+    "function_name": "_finalize_startup",
+    "class_name": "MainWindow",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "7058d4156e76e5203fdb16d89890de29dccaa0e3",
+    "callsite_key": "app/framework/ui/views/main_window.py:470:35",
+    "is_runtime_visible": true,
+    "mixed_source_template": false,
+    "field_details": {}
+  },
+  "framework.log.cn_text_0011": {
+    "kind": "dynamic_template",
+    "template_id": "3be49d8041b5ef14",
+    "msgid": "模板图片读取失败_template_path",
+    "source_template": "模板图片读取失败: {template_path}",
+    "fields": [
+      "template_path"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/vision/matcher.py",
+    "line": 134,
+    "col": 35,
+    "function_name": "match",
+    "class_name": "Matcher",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "3be49d8041b5ef14459ec7f56216c42cb75d11c1",
+    "callsite_key": "app/framework/infra/vision/matcher.py:134:35",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "template_path": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.cn_text_0012": {
+    "kind": "dynamic_template",
+    "template_id": "cfe4a46c6505628e",
+    "msgid": "窗口归位失败_value_1",
+    "source_template": "窗口归位失败：{value_1}",
+    "fields": [
+      "value_1"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/window_tracker.py",
+    "line": 371,
+    "col": 32,
+    "function_name": "restore_window_position",
+    "class_name": "WindowTracker",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "cfe4a46c6505628e9fe3ed0e0f26bff78c3786bb",
+    "callsite_key": "app/framework/infra/automation/window_tracker.py:371:32",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.cn_text_0013": {
+    "kind": "dynamic_template",
+    "template_id": "5c722645c0184e60",
+    "msgid": "窗口移出可视区失败_value_1",
+    "source_template": "窗口移出可视区失败：{value_1}",
+    "fields": [
+      "value_1"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/window_tracker.py",
+    "line": 337,
+    "col": 32,
+    "function_name": "hide_window_offscreen",
+    "class_name": "WindowTracker",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "5c722645c0184e60f1eae7b1dfa3c7a00b783900",
+    "callsite_key": "app/framework/infra/automation/window_tracker.py:337:32",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.cn_text_0014": {
+    "kind": "dynamic_template",
+    "template_id": "f4a889c29c2eaf61",
+    "msgid": "窗口追踪失败_value_1",
+    "source_template": "窗口追踪失败：{value_1}",
+    "fields": [
+      "value_1"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/window_tracker.py",
+    "line": 291,
+    "col": 30,
+    "function_name": "align_target_to_cursor",
+    "class_name": "WindowTracker",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "f4a889c29c2eaf61c5ba19c1299cc6477d7a92a4",
+    "callsite_key": "app/framework/infra/automation/window_tracker.py:291:30",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.cn_text_0021": {
+    "kind": "dynamic_template",
+    "template_id": "8da9b789e8df0c66",
+    "msgid": "获取到更新信息_online_data",
+    "source_template": "获取到更新信息：{online_data}",
+    "fields": [
+      "online_data"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 360,
+    "col": 31,
+    "function_name": "handle_update_logic_fallback",
+    "class_name": null,
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "8da9b789e8df0c665f8a21a07c8e4db16f782498",
+    "callsite_key": "app/features/utils/network.py:360:31",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "online_data": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.cn_text_0022": {
+    "kind": "dynamic_template",
+    "template_id": "bd8d84c408d8ddac",
+    "msgid": "通过cloudflare在线更新出错_error_msg",
+    "source_template": "通过cloudflare在线更新出错: {error_msg}",
+    "fields": [
+      "error_msg"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 397,
+    "col": 24,
+    "function_name": "handle_cloudflare_error",
+    "class_name": null,
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "bd8d84c408d8ddacdaf0723153c3c18fa889cf59",
+    "callsite_key": "app/features/utils/network.py:397:24",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "error_msg": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.count_of_image_template_name_is_value": {
+    "kind": "dynamic_template",
+    "template_id": "count_of_image_template_name_is_value",
+    "msgid": "count_of_image_template_name_is_value",
+    "source_template": "Count of image {template_name} is {value_2}",
+    "fields": [
+      "template_name",
+      "value_2"
+    ],
+    "field_details": {
+      "template_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_2": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 655,
+    "col": 34,
+    "function_name": "find_image_and_count",
+    "class_name": "Automation",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "e87bbe2856b7e1e5d96f99038bab686d0dbf39a7",
+    "callsite_key": "app/framework/infra/automation/automation.py:655:34",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.error_occurred_while_parsing_api_response_data_v": {
+    "kind": "dynamic_template",
+    "template_id": "error_occurred_while_parsing_api_response_data_v",
+    "msgid": "error_occurred_while_parsing_api_response_data_v",
+    "source_template": "Error occurred while parsing API response data: {value_1}",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 281,
+    "col": 16,
+    "function_name": "handle_cloudflare_success",
+    "class_name": null,
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "33d9cd47bd31f99c288879ac3e25eb044a3e6c43",
+    "callsite_key": "app/features/utils/network.py:281:16",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.error_occurred_while_performing_mouse_move_click": {
+    "kind": "dynamic_template",
+    "template_id": "error_occurred_while_performing_mouse_move_click",
+    "msgid": "error_occurred_while_performing_mouse_move_click",
+    "source_template": "Error occurred while performing mouse move click ({x}, {y}): {value_3}",
+    "fields": [
+      "x",
+      "y",
+      "value_3"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_3": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 363,
+    "col": 16,
+    "function_name": "move_click",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "c0ecae0d76488075e2b6be98f5e764a268e60120",
+    "callsite_key": "app/framework/infra/automation/input.py:363:16",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.error_occurred_while_processing_cloudflare_data": {
+    "kind": "dynamic_template",
+    "template_id": "error_occurred_while_processing_cloudflare_data",
+    "msgid": "error_occurred_while_processing_cloudflare_data",
+    "source_template": "Error occurred while processing Cloudflare data: {value_1}",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 287,
+    "col": 12,
+    "function_name": "handle_cloudflare_success",
+    "class_name": null,
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "cfe39f2f56b699b1d5936e7e3cf90f768af7b301",
+    "callsite_key": "app/features/utils/network.py:287:12",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.error_occurred_while_scrolling_after_mouse_move": {
+    "kind": "dynamic_template",
+    "template_id": "error_occurred_while_scrolling_after_mouse_move",
+    "msgid": "error_occurred_while_scrolling_after_mouse_move",
+    "source_template": "Error occurred while scrolling after mouse move ({x}, {y}): {value_3}",
+    "fields": [
+      "x",
+      "y",
+      "value_3"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_3": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 559,
+    "col": 16,
+    "function_name": "mouse_scroll",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "828bba6449eeb7d1cea1dcc6d8609f1cd3bb6d2e",
+    "callsite_key": "app/framework/infra/automation/input.py:559:16",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.error_occurred_while_simulating_key_key_value": {
+    "kind": "dynamic_template",
+    "template_id": "error_occurred_while_simulating_key_key_value",
+    "msgid": "error_occurred_while_simulating_key_key_value",
+    "source_template": "Error occurred while simulating key {key}: {value_2}",
+    "fields": [
+      "key",
+      "value_2"
+    ],
+    "field_details": {
+      "key": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_2": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 569,
+    "col": 30,
+    "function_name": "press_key",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "7f5ee6efd45e567326e4b9141b902965d489961e",
+    "callsite_key": "app/framework/infra/automation/input.py:569:30",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.error_occurred_while_updating_through_cloudflare_2": {
+    "kind": "dynamic_template",
+    "template_id": "error_occurred_while_updating_through_cloudflare_2",
+    "msgid": "error_occurred_while_updating_through_cloudflare_2",
+    "source_template": "Error occurred while updating through Cloudflare: Missing required field {field} in updateData",
+    "fields": [
+      "field"
+    ],
+    "field_details": {
+      "field": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 262,
+    "col": 20,
+    "function_name": "handle_cloudflare_success",
+    "class_name": null,
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "9ea650563ceb7a640f75dddf4374e7ef058e8e30",
+    "callsite_key": "app/features/utils/network.py:262:20",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.exception_occurred_while_stopping_automatic_task": {
+    "kind": "dynamic_template",
+    "template_id": "exception_occurred_while_stopping_automatic_task",
+    "msgid": "exception_occurred_while_stopping_automatic_task",
+    "source_template": "Exception occurred while stopping automatic task, ignored: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 66,
+    "col": 20,
+    "function_name": "stop",
+    "class_name": "TaskQueueThread",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "42bcdb3cc59d8d0456099bf68cf35431f5cca526",
+    "callsite_key": "app/framework/core/task_engine/threads.py:66:20",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.exception_occurred_while_stopping_sub_task_ignor": {
+    "kind": "dynamic_template",
+    "template_id": "exception_occurred_while_stopping_sub_task_ignor",
+    "msgid": "exception_occurred_while_stopping_sub_task_ignor",
+    "source_template": "Exception occurred while stopping sub task, ignored: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 356,
+    "col": 32,
+    "function_name": "stop",
+    "class_name": "ModuleTaskThread",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "9a68065526f07d6ca9629b8021ac5088ebaaf558",
+    "callsite_key": "app/framework/core/task_engine/threads.py:356:32",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.failed_to_initialize_auto_e": {
+    "kind": "dynamic_template",
+    "template_id": "failed_to_initialize_auto_e",
+    "msgid": "failed_to_initialize_auto_e",
+    "source_template": "Failed to initialize auto: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/base_task.py",
+    "line": 84,
+    "col": 30,
+    "function_name": "init_auto",
+    "class_name": "BaseTask",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "ed486bf818c9a04a648bc5df732ddf4511d5c229",
+    "callsite_key": "app/framework/core/task_engine/base_task.py:84:30",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.failed_to_perform_mouse_click_x_y_because_mouse": {
+    "kind": "dynamic_template",
+    "template_id": "failed_to_perform_mouse_click_x_y_because_mouse",
+    "msgid": "failed_to_perform_mouse_click_x_y_because_mouse",
+    "source_template": "Failed to perform mouse click ({x}, {y}) because mouse operation is in progress",
+    "fields": [
+      "x",
+      "y"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 237,
+    "col": 16,
+    "function_name": "move_click",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "0f830a7da11011520b602d31dc0bdf7d38a1a3e2",
+    "callsite_key": "app/framework/infra/automation/input.py:237:16",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.failed_to_recognize_stamina_e": {
+    "kind": "dynamic_template",
+    "template_id": "failed_to_recognize_stamina_e",
+    "msgid": "failed_to_recognize_stamina_e",
+    "source_template": "Failed to recognize stamina: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 696,
+    "col": 30,
+    "function_name": "calculate_power_time",
+    "class_name": "Automation",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "e3effb9eed0b2227a6b830b865904905554ca16a",
+    "callsite_key": "app/framework/infra/automation/automation.py:696:30",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.found_handle_for_window_value_hwnd": {
+    "kind": "dynamic_template",
+    "template_id": "found_handle_for_window_value_hwnd",
+    "msgid": "found_handle_for_window_value_hwnd",
+    "source_template": "Found handle for window {self_window_title}: {hwnd}",
+    "fields": [
+      "self_window_title",
+      "hwnd"
+    ],
+    "field_details": {
+      "self_window_title": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "hwnd": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 169,
+    "col": 29,
+    "function_name": "get_hwnd",
+    "class_name": "Automation",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "4848e19e923fd18675c73c60d2ee7488fba0b950",
+    "callsite_key": "app/framework/infra/automation/automation.py:169:29",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.github_api_connection_error_e": {
+    "kind": "dynamic_template",
+    "template_id": "eaf98897489818f8",
+    "msgid": "github_api_connection_error_e",
+    "source_template": "GitHub API Connection Error: {e}",
+    "fields": [
+      "e"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/updater.py",
+    "line": 210,
+    "col": 25,
+    "function_name": "get_github_release_channels",
+    "class_name": null,
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "eaf98897489818f8936a74f9db9427943ab17ec2",
+    "callsite_key": "app/features/utils/updater.py:210:25",
+    "is_runtime_visible": true,
+    "mixed_source_template": false,
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.github_api_error_response_status_code_response_text": {
+    "kind": "dynamic_template",
+    "template_id": "89cbf8012da0a304",
+    "msgid": "github_api_error_response_status_code_response_text",
+    "source_template": "GitHub API Error {response_status_code}: {response_text}",
+    "fields": [
+      "response_status_code",
+      "response_text"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/updater.py",
+    "line": 207,
+    "col": 29,
+    "function_name": "get_github_release_channels",
+    "class_name": null,
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "89cbf8012da0a304ccd7e392f3790428431e8253",
+    "callsite_key": "app/features/utils/updater.py:207:29",
+    "is_runtime_visible": true,
+    "mixed_source_template": false,
+    "field_details": {
+      "response_status_code": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "response_text": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.github_api_response_status_code_rate_limit_hit_using_fallback": {
+    "kind": "dynamic_template",
+    "template_id": "c70bac70518ebc17",
+    "msgid": "github_api_response_status_code_rate_limit_hit_using_fallback",
+    "source_template": "GitHub API {response_status_code} Rate Limit hit! Using fallback.",
+    "fields": [
+      "response_status_code"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/updater.py",
+    "line": 205,
+    "col": 29,
+    "function_name": "get_github_release_channels",
+    "class_name": null,
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "c70bac70518ebc17bb171f443817b4c32074be54",
+    "callsite_key": "app/features/utils/updater.py:205:29",
+    "is_runtime_visible": true,
+    "mixed_source_template": false,
+    "field_details": {
+      "response_status_code": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.interrupt_detected_stopping_automatic_task_reaso": {
+    "kind": "dynamic_template",
+    "template_id": "interrupt_detected_stopping_automatic_task_reaso",
+    "msgid": "interrupt_detected_stopping_automatic_task_reaso",
+    "source_template": "Interrupt detected, stopping automatic task: {reason}",
+    "fields": [
+      "reason"
+    ],
+    "field_details": {
+      "reason": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 59,
+    "col": 16,
+    "function_name": "stop",
+    "class_name": "TaskQueueThread",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "5d2222b1ac3479b9dfc71717513df5cd8d6b9f90",
+    "callsite_key": "app/framework/core/task_engine/threads.py:59:16",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.key_pressed_key": {
+    "kind": "dynamic_template",
+    "template_id": "key_pressed_key",
+    "msgid": "key_pressed_key",
+    "source_template": "Key pressed: {key}",
+    "fields": [
+      "key"
+    ],
+    "field_details": {
+      "key": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 578,
+    "col": 30,
+    "function_name": "key_down",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "1b1594151f3becd5078c48b61b0f091783b18043",
+    "callsite_key": "app/framework/infra/automation/input.py:578:30",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.key_released_key": {
+    "kind": "dynamic_template",
+    "template_id": "key_released_key",
+    "msgid": "key_released_key",
+    "source_template": "Key released: {key}",
+    "fields": [
+      "key"
+    ],
+    "field_details": {
+      "key": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 587,
+    "col": 30,
+    "function_name": "key_up",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "9c643070b9e713cdf26e8e7a6808328b251d5c64",
+    "callsite_key": "app/framework/infra/automation/input.py:587:30",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.mouse_move_and_click_x_y": {
+    "kind": "dynamic_template",
+    "template_id": "mouse_move_and_click_x_y",
+    "msgid": "mouse_move_and_click_x_y",
+    "source_template": "Mouse move and click ({x}, {y})",
+    "fields": [
+      "x",
+      "y"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 377,
+    "col": 33,
+    "function_name": "mouse_click",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "889fe64ee1b787db0e8ae1ed4b70d790a9238351",
+    "callsite_key": "app/framework/infra/automation/input.py:377:33",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.mouse_moved_to_x_y_and_scrolled_wheel_delta": {
+    "kind": "dynamic_template",
+    "template_id": "mouse_moved_to_x_y_and_scrolled_wheel_delta",
+    "msgid": "mouse_moved_to_x_y_and_scrolled_wheel_delta",
+    "source_template": "Mouse moved to ({x},{y}) and scrolled wheel {delta}",
+    "fields": [
+      "x",
+      "y",
+      "delta"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 541,
+    "col": 32,
+    "function_name": "mouse_scroll",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "387fefc369ae8053eb0601d87a124d0aa9807567",
+    "callsite_key": "app/framework/infra/automation/input.py:541:32",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.obtained_update_information_online_data": {
+    "kind": "dynamic_template",
+    "template_id": "obtained_update_information_online_data",
+    "msgid": "obtained_update_information_online_data",
+    "source_template": "Obtained update information: {online_data}",
+    "fields": [
+      "online_data"
+    ],
+    "field_details": {
+      "online_data": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 298,
+    "col": 31,
+    "function_name": "handle_update_logic",
+    "class_name": null,
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "9b3b94c21a5ba8cbceb182a6732d560857ba9d8e",
+    "callsite_key": "app/features/utils/network.py:298:31",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.periodic_active_schedule_output": {
+    "kind": "dynamic_template",
+    "template_id": "periodic_active_schedule_output",
+    "msgid": "periodic_active_schedule_output",
+    "source_template": "{value_1}{value_2}",
+    "fields": [
+      "value_1",
+      "value_2"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_2": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/ui/views/periodic_tasks_page.py",
+    "line": 396,
+    "col": 29,
+    "function_name": "_output_schedule_log",
+    "class_name": "PeriodicTasksPage",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "52bfb176aeb2ce882802c0e4b54be71595eda162",
+    "callsite_key": "app/framework/ui/views/periodic_tasks_page.py:396:29",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.prefix_error_suffix": {
+    "kind": "dynamic_template",
+    "template_id": "978bce4037070c84",
+    "msgid": "prefix_error_suffix",
+    "source_template": "{prefix}{error}{suffix}",
+    "fields": [
+      "prefix",
+      "error",
+      "suffix"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/observability/reporting.py",
+    "line": 13,
+    "col": 17,
+    "function_name": "capture_exception",
+    "class_name": null,
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "978bce4037070c84fb0729d6799c0af59d06dba5",
+    "callsite_key": "app/framework/core/observability/reporting.py:13:17",
+    "is_runtime_visible": true,
+    "mixed_source_template": false,
+    "field_details": {
+      "prefix": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "error": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "suffix": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.recognition_result_error_text": {
+    "kind": "dynamic_template",
+    "template_id": "recognition_result_error_text",
+    "msgid": "recognition_result_error_text",
+    "source_template": "Recognition result error: {text}",
+    "fields": [
+      "text"
+    ],
+    "field_details": {
+      "text": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 693,
+    "col": 34,
+    "function_name": "calculate_power_time",
+    "class_name": "Automation",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "a649b91311d8c949c9f689c6b02cbf82da87db47",
+    "callsite_key": "app/framework/infra/automation/automation.py:693:34",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.subtask_e": {
+    "kind": "dynamic_template",
+    "template_id": "3edd0b79ee2e4337",
+    "msgid": "subtask_e",
+    "source_template": "SubTask：{e}",
+    "fields": [
+      "e"
+    ],
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/threads.py",
+    "line": 245,
+    "col": 32,
+    "function_name": "run",
+    "class_name": "ModuleTaskThread",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "3edd0b79ee2e43372d115ba0afb21c8f5a0ebe39",
+    "callsite_key": "app/framework/core/task_engine/threads.py:245:32",
+    "is_runtime_visible": true,
+    "mixed_source_template": false,
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "framework.log.target_image_template_name_no_match_found": {
+    "kind": "dynamic_template",
+    "template_id": "target_image_template_name_no_match_found",
+    "msgid": "target_image_template_name_no_match_found",
+    "source_template": "Target image: {template_name} No match found",
+    "fields": [
+      "template_name"
+    ],
+    "field_details": {
+      "template_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 245,
+    "col": 38,
+    "function_name": "find_image_element",
+    "class_name": "Automation",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "be939f7ab0ff5503a9fe8c122a1eaf1c76ee1e8f",
+    "callsite_key": "app/framework/infra/automation/automation.py:245:38",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.target_image_template_name_similarity_conf": {
+    "kind": "dynamic_template",
+    "template_id": "target_image_template_name_similarity_conf",
+    "msgid": "target_image_template_name_similarity_conf",
+    "source_template": "Target image: {template_name} Similarity: {conf:.2f}",
+    "fields": [
+      "template_name",
+      "conf"
+    ],
+    "field_details": {
+      "template_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "conf": {
+        "format_spec": ".2f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 236,
+    "col": 42,
+    "function_name": "find_image_element",
+    "class_name": "Automation",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "4764991fec0a9302b2cafca9281ae748e8bfbef7",
+    "callsite_key": "app/framework/infra/automation/automation.py:236:42",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.target_image_template_name_similarity_conf_below": {
+    "kind": "dynamic_template",
+    "template_id": "target_image_template_name_similarity_conf_below",
+    "msgid": "target_image_template_name_similarity_conf_below",
+    "source_template": "Target image: {template_name} Similarity: {conf:.2f}, below {threshold}",
+    "fields": [
+      "template_name",
+      "conf",
+      "threshold"
+    ],
+    "field_details": {
+      "template_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "conf": {
+        "format_spec": ".2f",
+        "conversion": ""
+      },
+      "threshold": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 241,
+    "col": 42,
+    "function_name": "find_image_element",
+    "class_name": "Automation",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "61f7f52007fbb5c032497b4292bde4acad17ef34",
+    "callsite_key": "app/framework/infra/automation/automation.py:241:42",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.target_target_initial_verification_unconfirmed_r": {
+    "kind": "dynamic_template",
+    "template_id": "target_target_initial_verification_unconfirmed_r",
+    "msgid": "target_target_initial_verification_unconfirmed_r",
+    "source_template": "Target {target} initial verification unconfirmed, retrying click",
+    "fields": [
+      "target"
+    ],
+    "field_details": {
+      "target": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 458,
+    "col": 30,
+    "function_name": "click_element",
+    "class_name": "Automation",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "7c6d6f8d5c7f55052b48c65aa275fedbce06c909",
+    "callsite_key": "app/framework/infra/automation/automation.py:458:30",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.tracking_click_completed_x_y": {
+    "kind": "dynamic_template",
+    "template_id": "tracking_click_completed_x_y",
+    "msgid": "tracking_click_completed_x_y",
+    "source_template": "Tracking click completed ({x}, {y})",
+    "fields": [
+      "x",
+      "y"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 324,
+    "col": 36,
+    "function_name": "move_click",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "2c1f0f6ca2b0b4f439bbb8681dbd1d5684faeb53",
+    "callsite_key": "app/framework/infra/automation/input.py:324:36",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.tracking_mode_scrolling_completed_x_y_delta_delt": {
+    "kind": "dynamic_template",
+    "template_id": "tracking_mode_scrolling_completed_x_y_delta_delt",
+    "msgid": "tracking_mode_scrolling_completed_x_y_delta_delt",
+    "source_template": "Tracking mode scrolling completed ({x},{y}) delta={delta}",
+    "fields": [
+      "x",
+      "y",
+      "delta"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 489,
+    "col": 29,
+    "function_name": "_send_scroll_tracking",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "4447749e480ee581bf45d8368eeed4fa10233671",
+    "callsite_key": "app/framework/infra/automation/input.py:489:29",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.tracking_wheel_alignment_failed_abandoning_this": {
+    "kind": "dynamic_template",
+    "template_id": "tracking_wheel_alignment_failed_abandoning_this",
+    "msgid": "tracking_wheel_alignment_failed_abandoning_this",
+    "source_template": "Tracking wheel alignment failed, abandoning this wheel input: ({x}, {y}, {delta})",
+    "fields": [
+      "x",
+      "y",
+      "delta"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 437,
+    "col": 20,
+    "function_name": "_send_scroll_tracking",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "89bbc9d3951e174f45cd21d5847a67ca01778f40",
+    "callsite_key": "app/framework/infra/automation/input.py:437:20",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.tracking_wheel_remainder_alignment_failed_abando": {
+    "kind": "dynamic_template",
+    "template_id": "tracking_wheel_remainder_alignment_failed_abando",
+    "msgid": "tracking_wheel_remainder_alignment_failed_abando",
+    "source_template": "Tracking wheel remainder alignment failed, abandoning this wheel input: ({x}, {y}, {delta})",
+    "fields": [
+      "x",
+      "y",
+      "delta"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 480,
+    "col": 24,
+    "function_name": "_send_scroll_tracking",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "dec736c4f295cd56b34179f9f15869c1efa80930",
+    "callsite_key": "app/framework/infra/automation/input.py:480:24",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.tracking_wheel_timeout_abandoning_this_wheel_inp": {
+    "kind": "dynamic_template",
+    "template_id": "tracking_wheel_timeout_abandoning_this_wheel_inp",
+    "msgid": "tracking_wheel_timeout_abandoning_this_wheel_inp",
+    "source_template": "Tracking wheel timeout, abandoning this wheel input: ({x}, {y}, {delta}), total_batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s",
+    "fields": [
+      "x",
+      "y",
+      "delta",
+      "total_batches",
+      "finished_batches",
+      "effective_timeout"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "total_batches": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "finished_batches": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "effective_timeout": {
+        "format_spec": ".2f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 414,
+    "col": 20,
+    "function_name": "_send_scroll_tracking",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "5983a8f4910a997e85f2418956e9b2fdf9644da6",
+    "callsite_key": "app/framework/infra/automation/input.py:414:20",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.tracking_wheel_timeout_remainder_abandoning_this": {
+    "kind": "dynamic_template",
+    "template_id": "tracking_wheel_timeout_remainder_abandoning_this",
+    "msgid": "tracking_wheel_timeout_remainder_abandoning_this",
+    "source_template": "Tracking wheel timeout (remainder), abandoning this wheel input: ({x}, {y}, {delta}), total_batches={total_batches}, finished={finished_batches}, timeout={effective_timeout:.2f}s",
+    "fields": [
+      "x",
+      "y",
+      "delta",
+      "total_batches",
+      "finished_batches",
+      "effective_timeout"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "total_batches": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "finished_batches": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "effective_timeout": {
+        "format_spec": ".2f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 457,
+    "col": 24,
+    "function_name": "_send_scroll_tracking",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "5b01e1f8fb557430dfb3036c5bbbfef786f3b95a",
+    "callsite_key": "app/framework/infra/automation/input.py:457:24",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.using_existing_auto_value": {
+    "kind": "dynamic_template",
+    "template_id": "using_existing_auto_value",
+    "msgid": "using_existing_auto_value",
+    "source_template": "Using existing auto: {self_auto_hwnd}",
+    "fields": [
+      "self_auto_hwnd"
+    ],
+    "field_details": {
+      "self_auto_hwnd": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/core/task_engine/base_task.py",
+    "line": 66,
+    "col": 30,
+    "function_name": "init_auto",
+    "class_name": "BaseTask",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "7d716e956ea1dd2a53fdcd2bed3dcf7c7024f6b1",
+    "callsite_key": "app/framework/core/task_engine/base_task.py:66:30",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.log.waiting_for_wheel_scrolling_timeout_abandoning_t": {
+    "kind": "dynamic_template",
+    "template_id": "waiting_for_wheel_scrolling_timeout_abandoning_t",
+    "msgid": "waiting_for_wheel_scrolling_timeout_abandoning_t",
+    "source_template": "Waiting for wheel scrolling timeout, abandoning this wheel input: ({x}, {y}, {delta})",
+    "fields": [
+      "x",
+      "y",
+      "delta"
+    ],
+    "field_details": {
+      "x": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "y": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "delta": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/input.py",
+    "line": 554,
+    "col": 16,
+    "function_name": "mouse_scroll",
+    "class_name": "Input",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "a86ab56543c1a1e4a19370738ee11381b54eae62",
+    "callsite_key": "app/framework/infra/automation/input.py:554:16",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.ui.error_finding_image_and_counting_e": {
+    "kind": "dynamic_template",
+    "template_id": "error_finding_image_and_counting_e",
+    "msgid": "error_finding_image_and_counting_e",
+    "source_template": "Error finding image and counting: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 672,
+    "col": 16,
+    "function_name": "find_image_and_count",
+    "class_name": "Automation",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "656e2d6237b5e8a1741a8e872a1662aa87a8be12",
+    "callsite_key": "app/framework/infra/automation/automation.py:672:16",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.ui.error_finding_image_e": {
+    "kind": "dynamic_template",
+    "template_id": "error_finding_image_e",
+    "msgid": "error_finding_image_e",
+    "source_template": "Error finding image: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 259,
+    "col": 58,
+    "function_name": "find_image_element",
+    "class_name": "Automation",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "4e15c8c4fd0be168883f9b5d415e7672c50856c3",
+    "callsite_key": "app/framework/infra/automation/automation.py:259:58",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.ui.failed_to_restore_window_position_e": {
+    "kind": "dynamic_template",
+    "template_id": "failed_to_restore_window_position_e",
+    "msgid": "failed_to_restore_window_position_e",
+    "source_template": "Failed to restore window position: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 580,
+    "col": 16,
+    "function_name": "stop",
+    "class_name": "Automation",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "000423cd9483ccfffec63bf51712b3923107752d",
+    "callsite_key": "app/framework/infra/automation/automation.py:580:16",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.ui.handle_for_value_not_found": {
+    "kind": "dynamic_template",
+    "template_id": "handle_for_value_not_found",
+    "msgid": "handle_for_value_not_found",
+    "source_template": "Handle for {self_window_title} not found",
+    "fields": [
+      "self_window_title"
+    ],
+    "field_details": {
+      "self_window_title": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 172,
+    "col": 29,
+    "function_name": "get_hwnd",
+    "class_name": "Automation",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "903bb47596b378808fb89662fb4842574a709eab",
+    "callsite_key": "app/framework/infra/automation/automation.py:172:29",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.ui.handle_for_window_value_not_found": {
+    "kind": "dynamic_template",
+    "template_id": "handle_for_window_value_not_found",
+    "msgid": "handle_for_window_value_not_found",
+    "source_template": "Handle for window {self_window_title} not found",
+    "fields": [
+      "self_window_title"
+    ],
+    "field_details": {
+      "self_window_title": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 131,
+    "col": 16,
+    "function_name": "_ensure_input_hwnd",
+    "class_name": "Automation",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "2207d14f7b0f9bb51216c1072d4720d1487aacb2",
+    "callsite_key": "app/framework/infra/automation/automation.py:131:16",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.ui.new_content_detected": {
+    "kind": "dynamic_template",
+    "template_id": "new_content_detected",
+    "msgid": "new_content_detected",
+    "source_template": "New {content} detected",
+    "fields": [
+      "content"
+    ],
+    "field_details": {
+      "content": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/features/utils/network.py",
+    "line": 343,
+    "col": 28,
+    "function_name": "handle_update_logic",
+    "class_name": null,
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "f81a2f25aa6a496b5d685064ab88fb8fe44cbd56",
+    "callsite_key": "app/features/utils/network.py:343:28",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.ui.ocr_recognition_failed_e": {
+    "kind": "dynamic_template",
+    "template_id": "ocr_recognition_failed_e",
+    "msgid": "ocr_recognition_failed_e",
+    "source_template": "OCR recognition failed: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 276,
+    "col": 59,
+    "function_name": "perform_ocr",
+    "class_name": "Automation",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "41a57207ad82d696d7238064af81586e1d74966e",
+    "callsite_key": "app/framework/infra/automation/automation.py:276:59",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.ui.preset_preset_name_deleted": {
+    "kind": "dynamic_template",
+    "template_id": "preset_preset_name_deleted",
+    "msgid": "preset_preset_name_deleted",
+    "source_template": "Preset '{preset_name}' deleted",
+    "fields": [
+      "preset_name"
+    ],
+    "field_details": {
+      "preset_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 91,
+    "col": 20,
+    "function_name": "delete_current_preset",
+    "class_name": "PeriodicPresetActions",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "f2ced9d5976029965379ff10e04b42425c9a4f55",
+    "callsite_key": "app/framework/application/periodic/periodic_page_actions.py:91:20",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.ui.preset_preset_name_saved": {
+    "kind": "dynamic_template",
+    "template_id": "preset_preset_name_saved",
+    "msgid": "preset_preset_name_saved",
+    "source_template": "Preset '{preset_name}' saved",
+    "fields": [
+      "preset_name"
+    ],
+    "field_details": {
+      "preset_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 66,
+    "col": 20,
+    "function_name": "save_current_preset",
+    "class_name": "PeriodicPresetActions",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "92dbd15f4b9673478e1bced469f22999b7dd6b79",
+    "callsite_key": "app/framework/application/periodic/periodic_page_actions.py:66:20",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.ui.removed_trigger_from_modified_count_tasks": {
+    "kind": "dynamic_template",
+    "template_id": "removed_trigger_from_modified_count_tasks",
+    "msgid": "removed_trigger_from_modified_count_tasks",
+    "source_template": "Removed trigger from {modified_count} tasks",
+    "fields": [
+      "modified_count"
+    ],
+    "field_details": {
+      "modified_count": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 195,
+    "col": 20,
+    "function_name": "withdraw_single_rule_from_checked",
+    "class_name": "PeriodicRuleActions",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "6db024d1d1dc1381f9efbdaca7c77d55130bb0fc",
+    "callsite_key": "app/framework/application/periodic/periodic_page_actions.py:195:20",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.ui.rule_added_to_value_checked_tasks_and_enabled_th": {
+    "kind": "dynamic_template",
+    "template_id": "rule_added_to_value_checked_tasks_and_enabled_th",
+    "msgid": "rule_added_to_value_checked_tasks_and_enabled_th",
+    "source_template": "Rule added to {value_1} checked tasks\nand enabled their scheduling",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/application/periodic/periodic_page_actions.py",
+    "line": 142,
+    "col": 20,
+    "function_name": "copy_single_rule_to_checked",
+    "class_name": "PeriodicRuleActions",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "edeeea82340d14a808f3e7d0aba821c6c8d52b46",
+    "callsite_key": "app/framework/application/periodic/periodic_page_actions.py:142:20",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "framework.ui.screenshot_failed_e": {
+    "kind": "dynamic_template",
+    "template_id": "screenshot_failed_e",
+    "msgid": "screenshot_failed_e",
+    "source_template": "Screenshot failed: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 194,
+    "col": 64,
+    "function_name": "take_screenshot",
+    "class_name": "Automation",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "87fba8277eca1cf290f05114628b4d14bc1155a8",
+    "callsite_key": "app/framework/infra/automation/automation.py:194:64",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  }
+}

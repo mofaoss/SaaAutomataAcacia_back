@@ -1,0 +1,86 @@
+{
+  "module.use_power.log.cn_text_0015_8": {
+    "kind": "dynamic_template",
+    "template_id": "8944b1b1045d3846",
+    "msgid": "第_attempt_次未找到活动任务入口_准备重试",
+    "source_template": "第{attempt}次未找到活动任务入口，准备重试",
+    "fields": [
+      "attempt"
+    ],
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 273,
+    "col": 36,
+    "function_name": "open_activity_reward_page",
+    "class_name": "UsePowerModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "8944b1b1045d384659ae534172dfb898f0533d71",
+    "callsite_key": "app/features/modules/use_power/usecase/use_power_usecase.py:273:36",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "attempt": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.use_power.log.cn_text_0016_8": {
+    "kind": "dynamic_template",
+    "template_id": "e0d704465edaab89",
+    "msgid": "第_attempt_次活动奖励页面未打开_准备重试",
+    "source_template": "第{attempt}次活动奖励页面未打开，准备重试",
+    "fields": [
+      "attempt"
+    ],
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 285,
+    "col": 32,
+    "function_name": "open_activity_reward_page",
+    "class_name": "UsePowerModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "e0d704465edaab89d68c2fcd8805bd72d814532d",
+    "callsite_key": "app/features/modules/use_power/usecase/use_power_usecase.py:285:32",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "attempt": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  },
+  "module.use_power.log.cn_text_0017_8": {
+    "kind": "dynamic_template",
+    "template_id": "02eb1da910132705",
+    "msgid": "第_attempt_次进入活动页面失败_准备重试",
+    "source_template": "第{attempt}次进入活动页面失败，准备重试",
+    "fields": [
+      "attempt"
+    ],
+    "owner_scope": "module",
+    "owner_module": "use_power",
+    "file_path": "app/features/modules/use_power/usecase/use_power_usecase.py",
+    "line": 264,
+    "col": 44,
+    "function_name": "open_activity_reward_page",
+    "class_name": "UsePowerModule",
+    "context": "log",
+    "source_language": "zh_CN",
+    "template_hash": "02eb1da910132705a7d323f85ae188d9b5fd47a7",
+    "callsite_key": "app/features/modules/use_power/usecase/use_power_usecase.py:264:44",
+    "is_runtime_visible": true,
+    "mixed_source_template": true,
+    "field_details": {
+      "attempt": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "app/features/modules/drink/usecase/drink_usecase.py:133:34": {
+    "kind": "static_literal",
+    "key": "module.drink.log.txt_f85dd903b70f",
+    "msgid": "txt_f85dd903b70f",
+    "source_text": "进入酒馆超时",
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/usecase/drink_usecase.py",
+    "line": 133,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/drink/usecase/drink_usecase.py:165:34": {
+    "kind": "static_literal",
+    "key": "module.drink.log.txt_d97288de7e1e",
+    "msgid": "txt_d97288de7e1e",
+    "source_text": "酒馆对局超时",
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/usecase/drink_usecase.py",
+    "line": 165,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/drink/usecase/drink_usecase.py:243:34": {
+    "kind": "static_literal",
+    "key": "module.drink.log.txt_d97288de7e1e",
+    "msgid": "txt_d97288de7e1e",
+    "source_text": "酒馆对局超时",
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/usecase/drink_usecase.py",
+    "line": 243,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/drink/usecase/drink_usecase.py:265:34": {
+    "kind": "static_literal",
+    "key": "module.drink.log.txt_d7864bb02c44",
+    "msgid": "txt_d7864bb02c44",
+    "source_text": "重进对局超时",
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/usecase/drink_usecase.py",
+    "line": 265,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/drink/usecase/drink_usecase.py:44:37": {
+    "kind": "dynamic_template",
+    "key": "module.drink.log.tmpl_56fbffbe35e9",
+    "msgid": "tmpl_56fbffbe35e9",
+    "source_template": "开始第{count}次喝酒",
+    "fields": [
+      "count"
+    ],
+    "field_details": {
+      "count": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/usecase/drink_usecase.py",
+    "line": 44,
+    "col": 37,
+    "context": "log"
+  },
+  "app/features/modules/drink/usecase/drink_usecase.py:53:33": {
+    "kind": "dynamic_template",
+    "key": "module.drink.log.tmpl_69e4560784a2",
+    "msgid": "tmpl_69e4560784a2",
+    "source_template": "已完成{value_1}次喝酒",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/usecase/drink_usecase.py",
+    "line": 53,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/drink/usecase/drink_usecase.py:69:36": {
+    "kind": "static_literal",
+    "key": "module.drink.log.txt_e663ae4a386c",
+    "msgid": "txt_e663ae4a386c",
+    "source_text": "玩法未解锁",
+    "owner_scope": "module",
+    "owner_module": "drink",
+    "file_path": "app/features/modules/drink/usecase/drink_usecase.py",
+    "line": 69,
+    "col": 36,
+    "context": "log"
+  }
+}

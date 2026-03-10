@@ -1,0 +1,244 @@
+{
+  "app/features/modules/ocr/ocr.py:112:20": {
+    "kind": "static_literal",
+    "key": "module.ocr.log.ocr_hit_frame_cache_skipping_repeated_recognitio",
+    "msgid": "ocr_hit_frame_cache_skipping_repeated_recognitio",
+    "source_text": "OCR hit frame cache, skipping repeated recognition",
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 112,
+    "col": 20,
+    "context": "log"
+  },
+  "app/features/modules/ocr/ocr.py:125:20": {
+    "kind": "static_literal",
+    "key": "module.ocr.log.ocr_hit_no_text_cooldown_skipping_recognition",
+    "msgid": "ocr_hit_no_text_cooldown_skipping_recognition",
+    "source_text": "OCR hit no-text cooldown, skipping recognition",
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 125,
+    "col": 20,
+    "context": "log"
+  },
+  "app/features/modules/ocr/ocr.py:132:20": {
+    "kind": "static_literal",
+    "key": "module.ocr.log.ocr_quick_check_low_text_probability_frame_skipp",
+    "msgid": "ocr_quick_check_low_text_probability_frame_skipp",
+    "source_text": "OCR quick check: low text probability frame, skipping recognition",
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 132,
+    "col": 20,
+    "context": "log"
+  },
+  "app/features/modules/ocr/ocr.py:162:34": {
+    "kind": "dynamic_template",
+    "key": "module.ocr.log.ocr_low_res_enhance_w_x_h_new_w_x_new_h_x_scale",
+    "msgid": "ocr_low_res_enhance_w_x_h_new_w_x_new_h_x_scale",
+    "source_template": "OCR low-res enhance: {w}x{h} -> {new_w}x{new_h} (x{scale:.2f})",
+    "fields": [
+      "w",
+      "h",
+      "new_w",
+      "new_h",
+      "scale"
+    ],
+    "field_details": {
+      "w": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "h": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "new_w": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "new_h": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "scale": {
+        "format_spec": ".2f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 162,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/ocr/ocr.py:246:24": {
+    "kind": "static_literal",
+    "key": "module.ocr.log.ocr_input_image_is_empty_skipping_this_recogniti",
+    "msgid": "ocr_input_image_is_empty_skipping_this_recogniti",
+    "source_text": "OCR input image is empty, skipping this recognition",
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 246,
+    "col": 24,
+    "context": "log"
+  },
+  "app/features/modules/ocr/ocr.py:255:42": {
+    "kind": "dynamic_template",
+    "key": "module.ocr.log.ocr_failed_to_read_image_invalid_path_or_unreada",
+    "msgid": "ocr_failed_to_read_image_invalid_path_or_unreada",
+    "source_template": "OCR failed to read image, invalid path or unreadable file: {image_path}",
+    "fields": [
+      "image_path"
+    ],
+    "field_details": {
+      "image_path": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 255,
+    "col": 42,
+    "context": "log"
+  },
+  "app/features/modules/ocr/ocr.py:282:38": {
+    "kind": "static_literal",
+    "key": "module.ocr.log.ocr_recognized_no_text",
+    "msgid": "ocr_recognized_no_text",
+    "source_text": "OCR recognized no text",
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 282,
+    "col": 38,
+    "context": "log"
+  },
+  "app/features/modules/ocr/ocr.py:288:34": {
+    "kind": "dynamic_template",
+    "key": "module.ocr.log.ocr_adopted_strategy_best_name",
+    "msgid": "ocr_adopted_strategy_best_name",
+    "source_template": "OCR adopted strategy: {best_name}",
+    "fields": [
+      "best_name"
+    ],
+    "field_details": {
+      "best_name": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 288,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/ocr/ocr.py:293:28": {
+    "kind": "dynamic_template",
+    "key": "module.ocr.ui.error_executing_ocr_e",
+    "msgid": "error_executing_ocr_e",
+    "source_template": "Error executing ocr: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 293,
+    "col": 28,
+    "context": "ui"
+  },
+  "app/features/modules/ocr/ocr.py:340:26": {
+    "kind": "dynamic_template",
+    "key": "module.ocr.log.ocr_recognition_result_log_content",
+    "msgid": "ocr_recognition_result_log_content",
+    "source_template": "OCR recognition result: {log_content}",
+    "fields": [
+      "log_content"
+    ],
+    "field_details": {
+      "log_content": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 340,
+    "col": 26,
+    "context": "log"
+  },
+  "app/features/modules/ocr/ocr.py:351:34": {
+    "kind": "static_literal",
+    "key": "module.ocr.log.starting_to_initialize_ocr",
+    "msgid": "starting_to_initialize_ocr",
+    "source_text": "Starting to initialize OCR...",
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 351,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/ocr/ocr.py:354:37": {
+    "kind": "static_literal",
+    "key": "module.ocr.log.ocr_initialization_completed",
+    "msgid": "ocr_initialization_completed",
+    "source_text": "OCR initialization completed",
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 354,
+    "col": 37,
+    "context": "log"
+  },
+  "app/features/modules/ocr/ocr.py:358:24": {
+    "kind": "static_literal",
+    "key": "module.ocr.log.ocr_initialization_failed_this_cpu_does_not_supp",
+    "msgid": "ocr_initialization_failed_this_cpu_does_not_supp",
+    "source_text": "OCR initialization failed: This CPU does not support AVX2 instruction set",
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 358,
+    "col": 24,
+    "context": "log"
+  },
+  "app/features/modules/ocr/ocr.py:361:34": {
+    "kind": "dynamic_template",
+    "key": "module.ocr.log.ocr_initialization_failed_e",
+    "msgid": "ocr_initialization_failed_e",
+    "source_template": "OCR initialization failed: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "ocr",
+    "file_path": "app/features/modules/ocr/ocr.py",
+    "line": 361,
+    "col": 34,
+    "context": "log"
+  }
+}

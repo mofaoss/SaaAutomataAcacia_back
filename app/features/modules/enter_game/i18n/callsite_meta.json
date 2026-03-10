@@ -1,0 +1,243 @@
+{
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:258:20": {
+    "kind": "static_literal",
+    "key": "module.enter_game.log.detected_that_the_game_process_started_by_the_pr",
+    "msgid": "detected_that_the_game_process_started_by_the_pr",
+    "source_text": "Detected that the game process started by the program is still running, skipping duplicate startup",
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 258,
+    "col": 20,
+    "context": "log"
+  },
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:275:28": {
+    "kind": "static_literal",
+    "key": "module.enter_game.log.game_window_already_exists",
+    "msgid": "game_window_already_exists",
+    "source_text": "Game window already exists",
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 275,
+    "col": 28,
+    "context": "log"
+  },
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:287:20": {
+    "kind": "dynamic_template",
+    "key": "module.enter_game.log.game_exe_not_found_please_check_the_path_start_p",
+    "msgid": "game_exe_not_found_please_check_the_path_start_p",
+    "source_template": "Game.exe not found, please check the path: {start_path}",
+    "fields": [
+      "start_path"
+    ],
+    "field_details": {
+      "start_path": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 287,
+    "col": 20,
+    "context": "log"
+  },
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:291:25": {
+    "kind": "dynamic_template",
+    "key": "module.enter_game.ui.game_executable_not_found_under_start_path",
+    "msgid": "game_executable_not_found_under_start_path",
+    "source_template": "Game executable not found under: {start_path}",
+    "fields": [
+      "start_path"
+    ],
+    "field_details": {
+      "start_path": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 291,
+    "col": 25,
+    "context": "ui"
+  },
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:298:20": {
+    "kind": "dynamic_template",
+    "key": "module.enter_game.log.failed_to_resolve_launch_arguments_start_path_st",
+    "msgid": "failed_to_resolve_launch_arguments_start_path_st",
+    "source_template": "Failed to resolve launch arguments, start_path: {start_path}, game_channel: {game_channel}",
+    "fields": [
+      "start_path",
+      "game_channel"
+    ],
+    "field_details": {
+      "start_path": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "game_channel": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 298,
+    "col": 20,
+    "context": "log"
+  },
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:300:42": {
+    "kind": "static_literal",
+    "key": "module.enter_game.ui.failed_to_resolve_launch_arguments",
+    "msgid": "failed_to_resolve_launch_arguments",
+    "source_text": "Failed to resolve launch arguments",
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 300,
+    "col": 42,
+    "context": "ui"
+  },
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:303:25": {
+    "kind": "dynamic_template",
+    "key": "module.enter_game.log.starting_exe_path_launch_args",
+    "msgid": "starting_exe_path_launch_args",
+    "source_template": "Starting {exe_path} {launch_args}",
+    "fields": [
+      "exe_path",
+      "launch_args"
+    ],
+    "field_details": {
+      "exe_path": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "launch_args": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 303,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:308:29": {
+    "kind": "dynamic_template",
+    "key": "module.enter_game.ui.failed_to_spawn_process_exc",
+    "msgid": "failed_to_spawn_process_exc",
+    "source_template": "Failed to spawn process: {exc}",
+    "fields": [
+      "exc"
+    ],
+    "field_details": {
+      "exc": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 308,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:309:42": {
+    "kind": "dynamic_template",
+    "key": "module.enter_game.ui.failed_to_spawn_process_exc",
+    "msgid": "failed_to_spawn_process_exc",
+    "source_template": "Failed to spawn process: {exc}",
+    "fields": [
+      "exc"
+    ],
+    "field_details": {
+      "exc": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 309,
+    "col": 42,
+    "context": "ui"
+  },
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:379:20": {
+    "kind": "dynamic_template",
+    "key": "module.enter_game.ui.clicking_the_start_button_will_action_automatica",
+    "msgid": "clicking_the_start_button_will_action_automatica",
+    "source_template": "Clicking the 'Start' button will {action}automatically launch the game",
+    "fields": [
+      "action"
+    ],
+    "field_details": {
+      "action": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 379,
+    "col": 20,
+    "context": "ui"
+  },
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:63:33": {
+    "kind": "static_literal",
+    "key": "module.enter_game.log.txt_1be4148184b8",
+    "msgid": "txt_1be4148184b8",
+    "source_text": "需要更新",
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 63,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:66:34": {
+    "kind": "static_literal",
+    "key": "module.enter_game.log.txt_ce08b8b145bb",
+    "msgid": "txt_ce08b8b145bb",
+    "source_text": "启动器开始游戏超时",
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 66,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:80:33": {
+    "kind": "static_literal",
+    "key": "module.enter_game.log.txt_0d6c1ae471d9",
+    "msgid": "txt_0d6c1ae471d9",
+    "source_text": "已进入游戏",
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 80,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/enter_game/usecase/enter_game_usecase.py:96:34": {
+    "kind": "static_literal",
+    "key": "module.enter_game.log.txt_c5303da7e7c3",
+    "msgid": "txt_c5303da7e7c3",
+    "source_text": "进入游戏超时",
+    "owner_scope": "module",
+    "owner_module": "enter_game",
+    "file_path": "app/features/modules/enter_game/usecase/enter_game_usecase.py",
+    "line": 96,
+    "col": 34,
+    "context": "log"
+  }
+}

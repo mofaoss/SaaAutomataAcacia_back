@@ -1,5 +1,15 @@
 {
-  "module.alien_guardian.title": "Alien Guardian",
-  "module.alien_guardian.log.异星守护战斗超时": "异星守护战斗超时",
-  "module.dummy.title": "Alien Guardian"
+  "module.alien_guardian.log.cn_text_0001": "异星守护战斗超时",
+  "module.alien_guardian.log.cn_text_0001_10": "异星守护战斗超时",
+  "module.alien_guardian.log.cn_text_0001_2": "异星守护战斗超时",
+  "module.alien_guardian.log.cn_text_0001_3": "异星守护战斗超时",
+  "module.alien_guardian.log.cn_text_0001_4": "异星守护战斗超时",
+  "module.alien_guardian.log.cn_text_0001_5": "异星守护战斗超时",
+  "module.alien_guardian.log.cn_text_0001_6": "异星守护战斗超时",
+  "module.alien_guardian.log.cn_text_0001_7": "异星守护战斗超时",
+  "module.alien_guardian.log.cn_text_0001_8": "异星守护战斗超时",
+  "module.alien_guardian.log.cn_text_0001_9": "异星守护战斗超时",
+  "module.alien_guardian.title": "异星守护",
+  "module.dummy.title": "异星守护",
+  "module.alien_guardian.log.txt_41cfe240cf3d": "异星守护战斗超时"
 }

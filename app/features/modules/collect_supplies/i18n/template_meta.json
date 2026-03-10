@@ -1,0 +1,30 @@
+{
+  "module.collect_supplies.ui.successfully_reset_import_and_display_content": {
+    "kind": "dynamic_template",
+    "template_id": "successfully_reset_import_and_display_content",
+    "msgid": "successfully_reset_import_and_display_content",
+    "source_template": "Successfully reset import and display {content}",
+    "fields": [
+      "content"
+    ],
+    "field_details": {
+      "content": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "collect_supplies",
+    "file_path": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py",
+    "line": 73,
+    "col": 20,
+    "function_name": "on_reset_codes_click",
+    "class_name": "CollectSuppliesModule",
+    "context": "ui",
+    "source_language": "en",
+    "template_hash": "bcbe83187bfbfc5e1d8528c22e5512d045a563de",
+    "callsite_key": "app/features/modules/collect_supplies/usecase/collect_supplies_usecase.py:73:20",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  }
+}

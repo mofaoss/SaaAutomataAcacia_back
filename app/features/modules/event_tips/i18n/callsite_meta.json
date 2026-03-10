@@ -1,0 +1,251 @@
+{
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:106:24": {
+    "kind": "static_literal",
+    "key": "module.event_tips.log.successfully_fetched_event_schedule",
+    "msgid": "successfully_fetched_event_schedule",
+    "source_text": "Successfully fetched event schedule",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 106,
+    "col": 24,
+    "context": "log"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:133:18": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.failed_to_update_event_schedule",
+    "msgid": "failed_to_update_event_schedule",
+    "source_text": "Failed to update event schedule",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 133,
+    "col": 18,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:134:20": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.no_local_information_stored_and_no_url_fetched",
+    "msgid": "no_local_information_stored_and_no_url_fetched",
+    "source_text": "No local information stored and no URL fetched",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 134,
+    "col": 20,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:149:24": {
+    "kind": "static_literal",
+    "key": "module.event_tips.log.successfully_fetched_event_schedule",
+    "msgid": "successfully_fetched_event_schedule",
+    "source_text": "Successfully fetched event schedule",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 149,
+    "col": 24,
+    "context": "log"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:179:31": {
+    "kind": "dynamic_template",
+    "key": "module.event_tips.log.error_occurred_while_updating_controls_e",
+    "msgid": "error_occurred_while_updating_controls_e",
+    "source_template": "Error occurred while updating controls: {e}",
+    "fields": [
+      "e"
+    ],
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 179,
+    "col": 31,
+    "context": "log"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:231:31": {
+    "kind": "dynamic_template",
+    "key": "module.event_tips.log.error_occurred_while_updating_controls_e",
+    "msgid": "error_occurred_while_updating_controls_e",
+    "source_template": "Error occurred while updating controls: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 231,
+    "col": 31,
+    "context": "log"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:234:31": {
+    "kind": "dynamic_template",
+    "key": "module.event_tips.log.error_occurred_while_updating_controls_e",
+    "msgid": "error_occurred_while_updating_controls_e",
+    "source_template": "Error occurred while updating controls: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 234,
+    "col": 31,
+    "context": "log"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:39:18": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.status_finished",
+    "msgid": "status_finished",
+    "source_text": "Finished",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 39,
+    "col": 18,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:44:15": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.status_remaining_days",
+    "msgid": "status_remaining_days",
+    "source_text": "Remaining {days} days",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 44,
+    "col": 15,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:51:15": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.status_starts_in_days",
+    "msgid": "status_starts_in_days",
+    "source_text": "Starts in {days} days",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 51,
+    "col": 15,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:67:14": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.event_status_display",
+    "msgid": "event_status_display",
+    "source_text": "{title}: {status}",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 67,
+    "col": 14,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:75:23": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.event_status_finished",
+    "msgid": "event_status_finished",
+    "source_text": "Finished",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 75,
+    "col": 23,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:77:23": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.event_status_remaining_days",
+    "msgid": "event_status_remaining_days",
+    "source_text": "{days} days remaining",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 77,
+    "col": 23,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:79:23": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.event_status_remaining_hours",
+    "msgid": "event_status_remaining_hours",
+    "source_text": "{hours} hours remaining",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 79,
+    "col": 23,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:81:23": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.event_status_remaining_minutes",
+    "msgid": "event_status_remaining_minutes",
+    "source_text": "{minutes} minutes remaining",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 81,
+    "col": 23,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:83:23": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.event_status_starts_in_days",
+    "msgid": "event_status_starts_in_days",
+    "source_text": "Starts in {days} days",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 83,
+    "col": 23,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:90:18": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.failed_to_update_event_schedule",
+    "msgid": "failed_to_update_event_schedule",
+    "source_text": "Failed to update event schedule",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 90,
+    "col": 18,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:91:20": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.no_local_information_stored_and_no_url_fetched",
+    "msgid": "no_local_information_stored_and_no_url_fetched",
+    "source_text": "No local information stored and no URL fetched",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 91,
+    "col": 20,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:92:17": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.event_status_display_with_title",
+    "msgid": "event_status_display_with_title",
+    "source_text": "{title}: {status}",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 92,
+    "col": 17,
+    "context": "ui"
+  }
+}

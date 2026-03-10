@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 from __future__ import annotations
 
 import argparse
@@ -17,13 +17,14 @@ def _run_step(name: str, cmd: list[str]) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Unified i18n workflow: extract -> seed -> audit -> guard")
+    parser = argparse.ArgumentParser(description="Unified i18n workflow: extract -> normalize -> seed -> audit -> guard")
     parser.add_argument("--all", action="store_true", help="Run guard on all files (default: changed files only)")
     args = parser.parse_args()
 
     py = sys.executable
     steps = [
         ("extract", [py, "scripts/extract_module_i18n.py"]),
+        ("normalize", [py, "scripts/normalize_i18n_data.py"]),
         ("seed-missing", [py, "scripts/seed_i18n_missing.py"]),
         ("audit", [py, "scripts/audit_i18n.py", "--fail-on-issues"]),
     ]

@@ -1,0 +1,441 @@
+{
+  "app/features/modules/jigsaw/usecase/jigsaw_usecase.py:290:40": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_0c08b005ae3e",
+    "msgid": "txt_0c08b005ae3e",
+    "source_text": "没有找到能填满全部格子的方案",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/jigsaw_usecase.py",
+    "line": 290,
+    "col": 40,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/jigsaw_usecase.py:293:34": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_70bcbdd1a0fd",
+    "msgid": "txt_70bcbdd1a0fd",
+    "source_text": "未识别出对应的地图",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/jigsaw_usecase.py",
+    "line": 293,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/jigsaw_usecase.py:407:41": {
+    "kind": "dynamic_template",
+    "key": "module.jigsaw.log.tmpl_f45708f1f4c3",
+    "msgid": "tmpl_f45708f1f4c3",
+    "source_template": "成功找到第{value_1}个方案",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/jigsaw_usecase.py",
+    "line": 407,
+    "col": 41,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/jigsaw_usecase.py:414:41": {
+    "kind": "dynamic_template",
+    "key": "module.jigsaw.log.tmpl_f45708f1f4c3",
+    "msgid": "tmpl_f45708f1f4c3",
+    "source_template": "成功找到第{value_1}个方案",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/jigsaw_usecase.py",
+    "line": 414,
+    "col": 41,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/jigsaw_usecase.py:488:29": {
+    "kind": "dynamic_template",
+    "key": "module.jigsaw.log.tmpl_13c9e1a5d3c1",
+    "msgid": "tmpl_13c9e1a5d3c1",
+    "source_template": "-------方案{value_1}，得分：{value_2}-------",
+    "fields": [
+      "value_1",
+      "value_2"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_2": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/jigsaw_usecase.py",
+    "line": 488,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/jigsaw_usecase.py:492:25": {
+    "kind": "dynamic_template",
+    "key": "module.jigsaw.log.tmpl_e220043fb9e3",
+    "msgid": "tmpl_e220043fb9e3",
+    "source_template": "最优方案为：方案{value_1}",
+    "fields": [
+      "value_1"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/jigsaw_usecase.py",
+    "line": 492,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:103:25": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_4b36f5d23bab",
+    "msgid": "txt_4b36f5d23bab",
+    "source_text": "检查是否有待接收的碎片...",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 103,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:106:33": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_e8d1a87afe86",
+    "msgid": "txt_e8d1a87afe86",
+    "source_text": "成功一键接收碎片。",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 106,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:110:25": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_a8d9dfbfec72",
+    "msgid": "txt_a8d9dfbfec72",
+    "source_text": "开始赠送流程...",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 110,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:122:36": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_54eba78596e9",
+    "msgid": "txt_54eba78596e9",
+    "source_text": "达到赠送/接收上限。",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 122,
+    "col": 36,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:132:37": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_3ba2ed6d3c30",
+    "msgid": "txt_3ba2ed6d3c30",
+    "source_text": "已成功赠送给好友。",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 132,
+    "col": 37,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:137:33": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_eb0ee52f7360",
+    "msgid": "txt_eb0ee52f7360",
+    "source_text": "没有更多碎片可以赠送了。",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 137,
+    "col": 33,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:141:34": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_e4aaa31123ac",
+    "msgid": "txt_e4aaa31123ac",
+    "source_text": "赠送流程超时。",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 141,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:145:25": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_5d44561c4127",
+    "msgid": "txt_5d44561c4127",
+    "source_text": "进入信源交换与回收...",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 145,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:153:40": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_8c9b94b53218",
+    "msgid": "txt_8c9b94b53218",
+    "source_text": "碎片不足，无法进行回收。",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 153,
+    "col": 40,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:158:25": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_1d6dd3a4e6cd",
+    "msgid": "txt_1d6dd3a4e6cd",
+    "source_text": "执行自定义动作：寻找并选择数量最多的碎片...",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 158,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:186:29": {
+    "kind": "dynamic_template",
+    "key": "module.jigsaw.log.tmpl_bfadd614ce6a",
+    "msgid": "tmpl_bfadd614ce6a",
+    "source_template": "寻找到最大碎片数量为: {max_val}，准备点击选中该碎片。",
+    "fields": [
+      "max_val"
+    ],
+    "field_details": {
+      "max_val": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 186,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:196:32": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.no_valid_fragment_count_detected_skip_auto_select",
+    "msgid": "no_valid_fragment_count_detected_skip_auto_select",
+    "source_text": "未识别到有效碎片数量，已跳过本轮自动选择",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 196,
+    "col": 32,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:199:25": {
+    "kind": "dynamic_template",
+    "key": "module.jigsaw.log.tmpl_28f2e1b754f9",
+    "msgid": "tmpl_28f2e1b754f9",
+    "source_template": "开始扫描碎片数量，每种至少保留 {min_retain} 个...",
+    "fields": [
+      "min_retain"
+    ],
+    "field_details": {
+      "min_retain": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 199,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:220:25": {
+    "kind": "dynamic_template",
+    "key": "module.jigsaw.log.tmpl_4738088a3660",
+    "msgid": "tmpl_4738088a3660",
+    "source_template": "当前信源碎片数量总计: {puzzle_counts}",
+    "fields": [
+      "puzzle_counts"
+    ],
+    "field_details": {
+      "puzzle_counts": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 220,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:223:25": {
+    "kind": "dynamic_template",
+    "key": "module.jigsaw.log.tmpl_0d7ba5dbcfa4",
+    "msgid": "tmpl_0d7ba5dbcfa4",
+    "source_template": "计算完毕，待回收碎片数量分布: {recycle_amounts}",
+    "fields": [
+      "recycle_amounts"
+    ],
+    "field_details": {
+      "recycle_amounts": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 223,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:231:29": {
+    "kind": "dynamic_template",
+    "key": "module.jigsaw.log.tmpl_868bc408e732",
+    "msgid": "tmpl_868bc408e732",
+    "source_template": "选中碎片类型 [{value_1}]，准备回收 {count} 个。",
+    "fields": [
+      "value_1",
+      "count"
+    ],
+    "field_details": {
+      "value_1": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "count": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 231,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:248:25": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_c1fa1892242e",
+    "msgid": "txt_c1fa1892242e",
+    "source_text": "信源选择完毕，等待后续点击确认回收...",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 248,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:64:29": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_8a816e53b4d1",
+    "msgid": "txt_8a816e53b4d1",
+    "source_text": "信源碎片相关操作均未勾选，跳过该任务。",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 64,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:67:25": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_c47ead1f5bf3",
+    "msgid": "txt_c47ead1f5bf3",
+    "source_text": "开始信源碎片相关流程...",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 67,
+    "col": 25,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:75:29": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_7ffeae7157b6",
+    "msgid": "txt_7ffeae7157b6",
+    "source_text": "未勾选【接收碎片】，跳过。",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 75,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:80:29": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_069d28174cc0",
+    "msgid": "txt_069d28174cc0",
+    "source_text": "未勾选【赠送碎片】，跳过。",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 80,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:85:29": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_77e41fb8130d",
+    "msgid": "txt_77e41fb8130d",
+    "source_text": "未勾选【信源回收】，跳过。",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 85,
+    "col": 29,
+    "context": "log"
+  },
+  "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py:90:29": {
+    "kind": "static_literal",
+    "key": "module.jigsaw.log.txt_0ed86114790e",
+    "msgid": "txt_0ed86114790e",
+    "source_text": "识别到在基地内部，调整拼图视角...",
+    "owner_scope": "module",
+    "owner_module": "jigsaw",
+    "file_path": "app/features/modules/jigsaw/usecase/shard_exchange_usecase.py",
+    "line": 90,
+    "col": 29,
+    "context": "log"
+  }
+}

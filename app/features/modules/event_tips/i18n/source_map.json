@@ -1,8 +1,22 @@
 {
   "module.event_tips.log.1ba446845b7f": "en",
+  "module.event_tips.log.error_occurred_while_updating_controls_e": "en",
   "module.event_tips.log.successfully_fetched_event_schedule": "en",
   "module.event_tips.ui.566bc31ba4f4": "en",
   "module.event_tips.ui.5c1e67a3aca3": "en",
+  "module.event_tips.ui.event_status_display": "en",
+  "module.event_tips.ui.event_status_display_with_title": "en",
+  "module.event_tips.ui.event_status_finished": "en",
+  "module.event_tips.ui.event_status_remaining_days": "en",
+  "module.event_tips.ui.event_status_remaining_hours": "en",
+  "module.event_tips.ui.event_status_remaining_minutes": "en",
+  "module.event_tips.ui.event_status_starts_in_days": "en",
   "module.event_tips.ui.failed_to_update_event_schedule": "en",
-  "module.event_tips.ui.no_local_information_stored_and_no_url_fetched": "en"
+  "module.event_tips.ui.finished": "en",
+  "module.event_tips.ui.left_days": "en",
+  "module.event_tips.ui.no_local_information_stored_and_no_url_fetched": "en",
+  "module.event_tips.ui.starts_in": "en",
+  "module.event_tips.ui.status_finished": "en",
+  "module.event_tips.ui.status_remaining_days": "en",
+  "module.event_tips.ui.status_starts_in_days": "en"
 }

@@ -1,0 +1,26 @@
+{
+  "app/features/modules/maze/usecase/maze_usecase.py:101:34": {
+    "kind": "static_literal",
+    "key": "module.maze.log.txt_db0376a9c8ea",
+    "msgid": "txt_db0376a9c8ea",
+    "source_text": "迷宫超时",
+    "owner_scope": "module",
+    "owner_module": "maze",
+    "file_path": "app/features/modules/maze/usecase/maze_usecase.py",
+    "line": 101,
+    "col": 34,
+    "context": "log"
+  },
+  "app/features/modules/maze/usecase/maze_usecase.py:34:36": {
+    "kind": "static_literal",
+    "key": "module.maze.log.txt_349be3359a9a",
+    "msgid": "txt_349be3359a9a",
+    "source_text": "今日的迷宫次数已经一滴都不剩了",
+    "owner_scope": "module",
+    "owner_module": "maze",
+    "file_path": "app/features/modules/maze/usecase/maze_usecase.py",
+    "line": 34,
+    "col": 36,
+    "context": "log"
+  }
+}

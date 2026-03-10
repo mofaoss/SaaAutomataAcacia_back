@@ -1,15 +1,4 @@
 {
-  "module.task_weapon.title": "Weapon Upgrade",
-  "module.upgrade.log.发现空的强化槽_点击_号打开材料选择面板": "发现空的强化槽，点击【+】号打开材料选择面板...",
-  "module.upgrade.log.开始武器强化流程": "开始武器强化流程...",
-  "module.upgrade.log.成功进入枪械培养界面": "成功进入枪械培养界面。",
-  "module.upgrade.log.未找到背包按钮_中止": "未找到背包按钮，中止。",
-  "module.upgrade.log.正在打开背包并筛选武器": "正在打开背包并筛选武器...",
-  "module.upgrade.log.武器升级流程达到最长执行时间_超时": "武器升级流程达到最长执行时间 (超时)。",
-  "module.upgrade.log.武器等级已满_停止升级流程": "武器等级已满，停止升级流程。",
-  "module.upgrade.log.用户未勾选_升级枪械_跳过该任务": "用户未勾选【升级枪械】，跳过该任务。",
-  "module.upgrade.log.经验不足_持续添加强化材料": "经验不足，持续添加强化材料...",
-  "module.upgrade.log.经验值已足够_点击_升级_按钮": "经验值已足够，点击【升级】按钮！",
-  "module.upgrade.log.触发_等级提升_点击空白处关闭弹窗": "触发【等级提升】，点击空白处关闭弹窗...",
-  "module.dummy.title": "Weapon Upgrade"
+  "module.dummy.title": "Weapon Upgrade",
+  "module.task_weapon.title": "Weapon Upgrade"
 }

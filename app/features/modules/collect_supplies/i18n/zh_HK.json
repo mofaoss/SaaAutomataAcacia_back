@@ -1,18 +1,4 @@
 {
-  "module.collect_supplies.legacy.3fd0e9e4395f": "Reset Successful",
-  "module.collect_supplies.log.redeem_code_start": "Start redeeming code {code}",
-  "module.collect_supplies.log.兑换兑换码超时": "兑换兑换码超时",
-  "module.collect_supplies.log.兑换码已全部兑换": "兑换码已全部兑换",
-  "module.collect_supplies.log.没有需要兑换的码": "没有需要兑换的码",
-  "module.collect_supplies.log.购买每日物资配给箱超时": "购买每日物资配给箱超时",
-  "module.collect_supplies.log.配置数据为空或格式不正确_无法获取兑换码": "配置数据为空或格式不正确，无法获取兑换码",
-  "module.collect_supplies.log.领取好友体力超时": "领取好友体力超时",
-  "module.collect_supplies.log.领取宿舍拼图超时": "领取宿舍拼图超时",
-  "module.collect_supplies.log.领取邮箱资源超时": "领取邮箱资源超时",
-  "module.collect_supplies.log.领取鱼饵超时": "领取鱼饵超时",
-  "module.collect_supplies.ui.3fd0e9e4395f": "Reset Successful",
-  "module.collect_supplies.ui.d27e72351f53": "Successfully reset import and display {content}",
-  "module.collect_supplies.ui.reset_successful": "Reset Successful",
-  "module.dummy.title": "Collect Supplies",
-  "module.task_supplies.title": "Collect Supplies"
+  "module.dummy.title": "领取补给",
+  "module.task_supplies.title": "领取补给"
 }

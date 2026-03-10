@@ -21,7 +21,7 @@ class OperationModule:
         back_to_home(self.auto, self.logger)
 
         self.enter_train()
-        for _ in range(self.times):
+        for fight_idx in range(self.times):
             self.fight()
         back_to_home(self.auto, self.logger)
 
@@ -71,7 +71,7 @@ class OperationModule:
                             self.auto.press_key("shift")
                             time.sleep(6)
                         else:
-                            for _ in range(10):
+                            for sprint_idx in range(10):
                                 self.auto.press_key("shift", press_time=1)
                                 time.sleep(0.3)
                         self.auto.key_up("w")
