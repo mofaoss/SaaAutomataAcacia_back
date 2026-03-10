@@ -1,12 +1,11 @@
-﻿{
-  "module.event_tips.ui.failed_to_update_event_schedule": "活動日程更新失敗",
-  "module.event_tips.ui.no_local_information_stored_and_no_url_fetched": "本地沒有存儲信息且未獲取到 URL",
-  "module.event_tips.log.successfully_fetched_event_schedule": "獲取活動日程成功",
+{
   "module.event_tips.log.error_occurred_while_updating_controls_e": "更新控件出錯：{e}",
+  "module.event_tips.log.successfully_fetched_event_schedule": "獲取活動日程成功",
   "module.event_tips.ui.event_status_finished": "已結束",
   "module.event_tips.ui.event_status_remaining_days": "剩餘 {days} 天",
   "module.event_tips.ui.event_status_remaining_hours": "剩餘 {hours} 小時",
   "module.event_tips.ui.event_status_remaining_minutes": "剩餘 {minutes} 分鐘",
   "module.event_tips.ui.event_status_starts_in_days": "{days} 天後開始",
-  "module.event_tips.ui.event_status_display_with_title": "{title}：{status}"
+  "module.event_tips.ui.failed_to_update_event_schedule": "活動日程更新失敗",
+  "module.event_tips.ui.no_local_information_stored_and_no_url_fetched": "本地沒有存儲信息且未獲取到 URL"
 }

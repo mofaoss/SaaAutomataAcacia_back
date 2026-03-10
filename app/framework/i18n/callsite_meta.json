@@ -1492,6 +1492,27 @@
     "col": 59,
     "context": "ui"
   },
+  "app/framework/infra/automation/automation.py:277:59": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.ocr_recognition_failed_e",
+    "msgid": "ocr_recognition_failed_e",
+    "source_template": "OCR recognition failed: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 277,
+    "col": 59,
+    "context": "ui"
+  },
   "app/framework/infra/automation/automation.py:458:30": {
     "kind": "dynamic_template",
     "key": "framework.log.target_target_initial_verification_unconfirmed_r",
@@ -1510,6 +1531,27 @@
     "owner_module": null,
     "file_path": "app/framework/infra/automation/automation.py",
     "line": 458,
+    "col": 30,
+    "context": "log"
+  },
+  "app/framework/infra/automation/automation.py:467:30": {
+    "kind": "dynamic_template",
+    "key": "framework.log.target_target_initial_verification_unconfirmed_r",
+    "msgid": "target_target_initial_verification_unconfirmed_r",
+    "source_template": "Target {target} initial verification unconfirmed, retrying click",
+    "fields": [
+      "target"
+    ],
+    "field_details": {
+      "target": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 467,
     "col": 30,
     "context": "log"
   },
@@ -1534,6 +1576,27 @@
     "col": 16,
     "context": "ui"
   },
+  "app/framework/infra/automation/automation.py:589:16": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.failed_to_restore_window_position_e",
+    "msgid": "failed_to_restore_window_position_e",
+    "source_template": "Failed to restore window position: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 589,
+    "col": 16,
+    "context": "ui"
+  },
   "app/framework/infra/automation/automation.py:603:16": {
     "kind": "static_literal",
     "key": "framework.ui.no_first_screenshot_currently_crop_failed",
@@ -1543,6 +1606,18 @@
     "owner_module": null,
     "file_path": "app/framework/infra/automation/automation.py",
     "line": 603,
+    "col": 16,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:612:16": {
+    "kind": "static_literal",
+    "key": "framework.ui.no_first_screenshot_currently_crop_failed",
+    "msgid": "no_first_screenshot_currently_crop_failed",
+    "source_text": "No first_screenshot currently, crop failed",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 612,
     "col": 16,
     "context": "ui"
   },
@@ -1558,6 +1633,18 @@
     "col": 16,
     "context": "ui"
   },
+  "app/framework/infra/automation/automation.py:633:16": {
+    "kind": "static_literal",
+    "key": "framework.ui.no_screenshot_currently_unable_to_read_text",
+    "msgid": "no_screenshot_currently_unable_to_read_text",
+    "source_text": "No screenshot currently, unable to read text",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 633,
+    "col": 16,
+    "context": "ui"
+  },
   "app/framework/infra/automation/automation.py:640:20": {
     "kind": "static_literal",
     "key": "framework.ui.target_image_is_empty_skipping_match_counting",
@@ -1567,6 +1654,18 @@
     "owner_module": null,
     "file_path": "app/framework/infra/automation/automation.py",
     "line": 640,
+    "col": 20,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:649:20": {
+    "kind": "static_literal",
+    "key": "framework.ui.target_image_is_empty_skipping_match_counting",
+    "msgid": "target_image_is_empty_skipping_match_counting",
+    "source_text": "Target image is empty, skipping match counting",
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 649,
     "col": 20,
     "context": "ui"
   },
@@ -1622,6 +1721,58 @@
     "col": 34,
     "context": "log"
   },
+  "app/framework/infra/automation/automation.py:663:42": {
+    "kind": "dynamic_template",
+    "key": "framework.log.target_image_template_name_similarity_conf",
+    "msgid": "target_image_template_name_similarity_conf",
+    "source_template": "Target image: {template_name} Similarity: {conf:.2f}",
+    "fields": [
+      "template_name",
+      "conf"
+    ],
+    "field_details": {
+      "template_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "conf": {
+        "format_spec": ".2f",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 663,
+    "col": 42,
+    "context": "log"
+  },
+  "app/framework/infra/automation/automation.py:664:34": {
+    "kind": "dynamic_template",
+    "key": "framework.log.count_of_image_template_name_is_value",
+    "msgid": "count_of_image_template_name_is_value",
+    "source_template": "Count of image {template_name} is {value_2}",
+    "fields": [
+      "template_name",
+      "value_2"
+    ],
+    "field_details": {
+      "template_name": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "value_2": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 664,
+    "col": 34,
+    "context": "log"
+  },
   "app/framework/infra/automation/automation.py:672:16": {
     "kind": "dynamic_template",
     "key": "framework.ui.error_finding_image_and_counting_e",
@@ -1640,6 +1791,27 @@
     "owner_module": null,
     "file_path": "app/framework/infra/automation/automation.py",
     "line": 672,
+    "col": 16,
+    "context": "ui"
+  },
+  "app/framework/infra/automation/automation.py:681:16": {
+    "kind": "dynamic_template",
+    "key": "framework.ui.error_finding_image_and_counting_e",
+    "msgid": "error_finding_image_and_counting_e",
+    "source_template": "Error finding image and counting: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 681,
     "col": 16,
     "context": "ui"
   },
@@ -1682,6 +1854,48 @@
     "owner_module": null,
     "file_path": "app/framework/infra/automation/automation.py",
     "line": 696,
+    "col": 30,
+    "context": "log"
+  },
+  "app/framework/infra/automation/automation.py:702:34": {
+    "kind": "dynamic_template",
+    "key": "framework.log.recognition_result_error_text",
+    "msgid": "recognition_result_error_text",
+    "source_template": "Recognition result error: {text}",
+    "fields": [
+      "text"
+    ],
+    "field_details": {
+      "text": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 702,
+    "col": 34,
+    "context": "log"
+  },
+  "app/framework/infra/automation/automation.py:705:30": {
+    "kind": "dynamic_template",
+    "key": "framework.log.failed_to_recognize_stamina_e",
+    "msgid": "failed_to_recognize_stamina_e",
+    "source_template": "Failed to recognize stamina: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "framework",
+    "owner_module": null,
+    "file_path": "app/framework/infra/automation/automation.py",
+    "line": 705,
     "col": 30,
     "context": "log"
   },

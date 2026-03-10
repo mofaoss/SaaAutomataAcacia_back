@@ -306,7 +306,7 @@ class TaskItemWidget(QWidget):
             font = self.label.font()
             font.setBold(False)
 
-            schedule_prefix = "[Schedule] " if self._is_non_chinese_ui else "[计划] "
+            schedule_prefix = "📅 "
             base_text = f"{schedule_prefix}{self._original_text}" if self.is_scheduled else self._original_text
 
             self.btn.setVisible(True)
@@ -380,7 +380,7 @@ class TaskItemWidget(QWidget):
         """在任务执行期间无感刷新计划图标📅，绝不触碰任何锁和按钮状态"""
         self.is_scheduled = is_scheduled
 
-        schedule_prefix = "[Schedule] " if self._is_non_chinese_ui else "[计划] "
+        schedule_prefix = "📅 "
         base_text = f"{schedule_prefix}{self._original_text}" if self.is_scheduled else self._original_text
 
         suffix = self._get_state_suffix(self.current_state)

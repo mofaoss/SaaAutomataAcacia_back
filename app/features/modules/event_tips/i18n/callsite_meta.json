@@ -35,6 +35,30 @@
     "col": 20,
     "context": "ui"
   },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:145:18": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.failed_to_update_event_schedule",
+    "msgid": "failed_to_update_event_schedule",
+    "source_text": "Failed to update event schedule",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 145,
+    "col": 18,
+    "context": "ui"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:146:20": {
+    "kind": "static_literal",
+    "key": "module.event_tips.ui.no_local_information_stored_and_no_url_fetched",
+    "msgid": "no_local_information_stored_and_no_url_fetched",
+    "source_text": "No local information stored and no URL fetched",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 146,
+    "col": 20,
+    "context": "ui"
+  },
   "app/features/modules/event_tips/usecase/event_tips_usecase.py:149:24": {
     "kind": "static_literal",
     "key": "module.event_tips.log.successfully_fetched_event_schedule",
@@ -44,6 +68,18 @@
     "owner_module": "event_tips",
     "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
     "line": 149,
+    "col": 24,
+    "context": "log"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:161:24": {
+    "kind": "static_literal",
+    "key": "module.event_tips.log.successfully_fetched_event_schedule",
+    "msgid": "successfully_fetched_event_schedule",
+    "source_text": "Successfully fetched event schedule",
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 161,
     "col": 24,
     "context": "log"
   },
@@ -101,6 +137,27 @@
     "owner_module": "event_tips",
     "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
     "line": 234,
+    "col": 31,
+    "context": "log"
+  },
+  "app/features/modules/event_tips/usecase/event_tips_usecase.py:243:31": {
+    "kind": "dynamic_template",
+    "key": "module.event_tips.log.error_occurred_while_updating_controls_e",
+    "msgid": "error_occurred_while_updating_controls_e",
+    "source_template": "Error occurred while updating controls: {e}",
+    "fields": [
+      "e"
+    ],
+    "field_details": {
+      "e": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "event_tips",
+    "file_path": "app/features/modules/event_tips/usecase/event_tips_usecase.py",
+    "line": 243,
     "col": 31,
     "context": "log"
   },

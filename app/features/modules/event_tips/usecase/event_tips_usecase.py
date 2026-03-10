@@ -200,11 +200,12 @@ class EventTipsUseCase:
                 normalized_percent = int((days / max_total_days) * 100)
                 progress_bar.setValue(normalized_percent)
 
-            parsed_status = parse_external_status_text(raw_status)
-            logger.debug(
-                f"event_status_trace raw_title={key} raw_status_text={raw_status} "
-                f"parsed={parsed_status} locale_used={i18n_runtime._resolve_lang()} final_display={body_label.text()}"
-            )
+            if self.settings_usecase.is_log_enabled():
+                parsed_status = parse_external_status_text(raw_status)
+                logger.debug(
+                    f"event_status_trace raw_title={key} raw_status_text={raw_status} "
+                    f"parsed={parsed_status} locale_used={i18n_runtime._resolve_lang()} final_display={body_label.text()}"
+                )
 
             items_list.append([body_label, progress_bar, sort_weight])
             index += 1
