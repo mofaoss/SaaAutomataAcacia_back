@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, Optional
+from typing import Callable, Optional, Literal
 
 
 class HostContext(str, Enum):
@@ -29,10 +29,10 @@ class ModuleSpec:
     module_class: Optional[type] = None
     ui_bindings: Optional[ModuleUiBindings] = None
     passive: bool = False
+    on_demand_execution: Literal["exclusive", "background"] = "exclusive"
 
     def supports(self, host: HostContext) -> bool:
         return host in self.hosts
 
     def get_name(self, is_non_chinese_ui: bool) -> str:
         return self.en_name if is_non_chinese_ui else self.zh_name
-

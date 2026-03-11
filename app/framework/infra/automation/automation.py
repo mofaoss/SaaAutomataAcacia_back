@@ -23,7 +23,7 @@ from app.framework.infra.automation.input import Input
 from app.framework.infra.automation.screenshot import Screenshot
 from app.framework.infra.vision.ocr_service import run_ocr
 from app.framework.i18n import _
-from app.framework.ui_resources import ModuleContext, UIDefinition, UIReference, UIResolver, UIResolveError, U
+from app.framework.infra.ui_manifest import ModuleContext, UIDefinition, UIReference, UIResolver, UIResolveError, U
 
 
 def atoms(func):

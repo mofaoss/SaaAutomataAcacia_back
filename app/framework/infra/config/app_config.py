@@ -268,6 +268,10 @@ class Config(QConfig):
     LineEdit_fish_key      = ConfigItem("add_fish", "LineEdit_fish_key", "space")
     fish_key_list          = ConfigItem("add_fish", "fish_key_list", ['shift', 'space', 'ctrl'])
 
+    # --- Trigger helpers ---
+    CheckBox_trigger_auto_f = ConfigItem("add_trigger", "CheckBox_trigger_auto_f", True, BoolValidator())
+    CheckBox_trigger_auto_e = ConfigItem("add_trigger", "CheckBox_trigger_auto_e", True, BoolValidator())
+
     # --- 异星守护 / 迷宫 / 按摩 / 酒馆 ---
     ComboBox_mode        = OptionsConfigItem("add_alien", "ComboBox_mode", 0, OptionsValidator([0, 1]))
     ComboBox_mode_maze   = OptionsConfigItem("add_maze", "ComboBox_mode_maze", 0, OptionsValidator([0, 1]))

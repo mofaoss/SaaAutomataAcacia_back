@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from app.framework.i18n.runtime import report_i18n_event
-from app.framework.ui_resources.models import UIDefinition
+from app.framework.infra.ui_manifest.models import UIDefinition
 
 
 def _load_json(path: Path) -> dict[str, Any]:

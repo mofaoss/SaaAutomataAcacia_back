@@ -45,9 +45,9 @@ def _meta_to_spec(meta, host: ModuleHost) -> ModuleSpec:
         if meta.page_cls is not None:
             meta.ui_factory = lambda parent, _host: meta.page_cls(parent)
         else:
-            from app.framework.ui.views.auto_page import AutoPage
+            from app.framework.ui.auto_page.factory import build_auto_page
 
-            meta.ui_factory = lambda parent, host_ctx, _meta=meta: AutoPage(parent, module_meta=_meta, host_context=host_ctx)
+            meta.ui_factory = lambda parent, host_ctx, _meta=meta: build_auto_page(parent, module_meta=_meta, host_context=host_ctx)
 
     if meta.ui_bindings is None:
         meta.ui_bindings = ModuleUiBindings(
@@ -69,6 +69,7 @@ def _meta_to_spec(meta, host: ModuleHost) -> ModuleSpec:
         module_class=module_class,
         ui_bindings=meta.ui_bindings,
         passive=meta.passive,
+        on_demand_execution=getattr(meta, "on_demand_execution", "exclusive"),
     )
 
 

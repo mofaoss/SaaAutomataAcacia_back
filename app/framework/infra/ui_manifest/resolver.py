@@ -5,10 +5,10 @@ from typing import Any
 
 from app.framework.infra.config.app_config import is_non_chinese_ui_language, is_traditional_ui_language
 from app.framework.i18n.runtime import report_i18n_event
-from app.framework.ui_resources.context import ModuleContext
-from app.framework.ui_resources.manifest_engine import ManifestEngine
-from app.framework.ui_resources.models import ResolvedUIObject, UIReference, UIDefinition
-from app.framework.ui_resources.schema import parse_position, resolve_position_for_environment
+from app.framework.infra.ui_manifest.context import ModuleContext
+from app.framework.infra.ui_manifest.manifest_engine import ManifestEngine
+from app.framework.infra.ui_manifest.models import ResolvedUIObject, UIReference, UIDefinition
+from app.framework.infra.ui_manifest.schema import parse_position, resolve_position_for_environment
 
 
 class UIResolveError(RuntimeError):

@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import inspect
 
-from app.framework.ui_resources.context import ModuleContext
-from app.framework.ui_resources.explain import UIExplainResult
-from app.framework.ui_resources.manifest_engine import ManifestEngine
-from app.framework.ui_resources.models import UIDefinition, UIReference, ResolvedUIObject
-from app.framework.ui_resources.resolver import AssetResolver, UIResolveError, UIResolver
+from app.framework.infra.ui_manifest.context import ModuleContext
+from app.framework.infra.ui_manifest.explain import UIExplainResult
+from app.framework.infra.ui_manifest.manifest_engine import ManifestEngine
+from app.framework.infra.ui_manifest.models import UIDefinition, UIReference, ResolvedUIObject
+from app.framework.infra.ui_manifest.resolver import AssetResolver, UIResolveError, UIResolver
 
 
 def U(

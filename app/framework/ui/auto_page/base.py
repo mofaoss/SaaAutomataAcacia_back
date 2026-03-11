@@ -37,9 +37,10 @@ from app.framework.i18n import _, tr
 from app.framework.infra.config.app_config import config
 from app.framework.core.module_system.models import SchemaField
 from app.framework.core.module_system.naming import humanize_name
+from app.framework.ui.auto_page.i18n_mixin import AutoPageI18nMixin
 
 
-class AutoPage(QWidget):
+class AutoPageBase(AutoPageI18nMixin, QWidget):
     """Battle-hardened AutoPage: Guaranteed type safety and pixel-perfect layout."""
 
     def __init__(self, parent=None, *, module_meta=None, host_context=None):
@@ -53,7 +54,10 @@ class AutoPage(QWidget):
         self._rendered_group_keys: set[str] = set()
         self._color_previews: list[dict[str, Any]] = []
         self._resolved_action_specs: list[dict[str, Any]] = []
-        
+        self.PushButton_start: PrimaryPushButton | None = None
+        self.SimpleCardWidget_log: SimpleCardWidget | None = None
+        self.textBrowser_log: QTextBrowser | None = None
+
         module_id = getattr(module_meta, 'id', 'unknown')
         self.setObjectName(f"page_{module_id}")
 
@@ -74,12 +78,12 @@ class AutoPage(QWidget):
         self.settings_layout.setContentsMargins(0, 0, 12, 0)
         self.settings_layout.setSpacing(8)
         self.settings_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        
+
         self.scroll_area.setWidget(self.settings_container)
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setStyleSheet("ScrollArea {background: transparent; border: none}")
         self.scroll_area.viewport().setStyleSheet("background: transparent")
-        
+
         self.left_panel_layout.addWidget(self.scroll_area, 1)
 
         # Optional custom module actions (e.g., calibration helpers)
@@ -90,34 +94,50 @@ class AutoPage(QWidget):
         self.actions_bar.setVisible(False)
         self.left_panel_layout.addWidget(self.actions_bar)
 
-        # Stateful Action Button
-        self.PushButton_start = PrimaryPushButton(self.left_panel)
-        self.PushButton_start.setObjectName(f"PushButton_start_{module_id}")
-        self.PushButton_start.setFixedHeight(45)
-        self.PushButton_start.clicked.connect(self._handle_start_click)
-        # Compatibility alias for legacy host bindings that resolve by attribute names.
-        setattr(self, f"PushButton_start_{module_id}", self.PushButton_start)
-        self.left_panel_layout.addWidget(self.PushButton_start)
+        if self._should_show_start_button():
+            self.PushButton_start = self._create_start_button(module_id)
+            self.left_panel_layout.addWidget(self.PushButton_start)
 
         self.main_layout.addWidget(self.left_panel, 2)
 
-        # Right Panel (Stretch 1)
-        self.SimpleCardWidget_log = SimpleCardWidget(self)
-        log_inner_layout = QVBoxLayout(self.SimpleCardWidget_log)
-        self.log_title = StrongBodyLabel(tr("framework.ui.log", fallback="Log"), self.SimpleCardWidget_log)
-        log_inner_layout.addWidget(self.log_title)
-        self.textBrowser_log = QTextBrowser(self.SimpleCardWidget_log)
-        self.textBrowser_log.setObjectName(f"textBrowser_log_{module_id}")
-        self.textBrowser_log.setStyleSheet("border: none; background: transparent")
-        # Compatibility alias for legacy host bindings that resolve by attribute names.
-        setattr(self, f"textBrowser_log_{module_id}", self.textBrowser_log)
-        log_inner_layout.addWidget(self.textBrowser_log)
-        self.main_layout.addWidget(self.SimpleCardWidget_log, 1)
+        if self._should_show_log_panel():
+            self.SimpleCardWidget_log = self._create_log_panel(module_id)
+            self.main_layout.addWidget(self.SimpleCardWidget_log, 1)
+        else:
+            self.main_layout.setStretch(0, 1)
 
         self._build_from_schema(getattr(module_meta, "config_schema", []))
         self._build_actions()
         self._load_values()
         self._update_button_state(False)
+
+    def _should_show_start_button(self) -> bool:
+        return True
+
+    def _should_show_log_panel(self) -> bool:
+        return True
+
+    def _create_start_button(self, module_id: str) -> PrimaryPushButton:
+        button = PrimaryPushButton(self.left_panel)
+        button.setObjectName(f"PushButton_start_{module_id}")
+        button.setFixedHeight(45)
+        button.clicked.connect(self._handle_start_click)
+        # Compatibility alias for legacy host bindings that resolve by attribute names.
+        setattr(self, f"PushButton_start_{module_id}", button)
+        return button
+
+    def _create_log_panel(self, module_id: str) -> SimpleCardWidget:
+        card = SimpleCardWidget(self)
+        log_inner_layout = QVBoxLayout(card)
+        self.log_title = StrongBodyLabel(tr("framework.ui.log", fallback="Log"), card)
+        log_inner_layout.addWidget(self.log_title)
+        self.textBrowser_log = QTextBrowser(card)
+        self.textBrowser_log.setObjectName(f"textBrowser_log_{module_id}")
+        self.textBrowser_log.setStyleSheet("border: none; background: transparent")
+        # Compatibility alias for legacy host bindings that resolve by attribute names.
+        setattr(self, f"textBrowser_log_{module_id}", self.textBrowser_log)
+        log_inner_layout.addWidget(self.textBrowser_log)
+        return card
 
     def _handle_start_click(self):
         if not self._is_running:
@@ -128,6 +148,9 @@ class AutoPage(QWidget):
         self._update_button_state(is_running)
 
     def _update_button_state(self, is_running: bool):
+        if self.PushButton_start is None:
+            return
+
         module_id = getattr(self.module_meta, 'id', 'unknown')
         if is_running:
             stop_text = tr(f"module.{module_id}.ui.stop_{module_id}")
@@ -146,170 +169,6 @@ class AutoPage(QWidget):
         if "field_widgets" in self.__dict__ and name in self.field_widgets:
             return self.field_widgets[name]
         raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
-
-    @staticmethod
-    def _snake_key(text: str, *, max_len: int | None = None) -> str:
-        normalized = re.sub(r"[^A-Za-z0-9]+", "_", str(text or "").strip().lower())
-        normalized = re.sub(r"_+", "_", normalized).strip("_")
-        if max_len is not None and max_len > 0:
-            normalized = normalized[:max_len].rstrip("_")
-        return normalized or "action"
-
-    @staticmethod
-    def _strip_widget_prefix(param_name: str) -> str:
-        return re.sub(r"^(SpinBox|ComboBox|CheckBox|LineEdit|DoubleSpinBox|Slider)_", "", str(param_name or ""))
-
-    @staticmethod
-    def _looks_like_mojibake(text: str) -> bool:
-        if not text:
-            return False
-        cjk = sum(1 for ch in text if 0x4E00 <= ord(ch) <= 0x9FFF)
-        if cjk > 0:
-            return False
-        latin_ext = sum(1 for ch in text if 0x00C0 <= ord(ch) <= 0x024F)
-        return latin_ext >= 4 and (latin_ext * 2) >= len(text)
-
-    @staticmethod
-    def _is_unusable_translated_text(text: str) -> bool:
-        stripped = str(text or "").strip()
-        if not stripped:
-            return True
-        if "\ufffd" in stripped:
-            return True
-        if "?" in stripped or any(ord(ch) == 0xFF1F for ch in stripped):
-            has_meaningful = any(ch.isalnum() or (0x4E00 <= ord(ch) <= 0x9FFF) for ch in stripped)
-            if not has_meaningful:
-                return True
-        if AutoPage._looks_like_mojibake(stripped):
-            return True
-        return False
-
-    @staticmethod
-    def _first_translated(candidates: list[str]) -> str:
-        for key in candidates:
-            if not key:
-                continue
-            rendered = tr(key)
-            if rendered != key and not AutoPage._is_unusable_translated_text(rendered):
-                return rendered
-        return ""
-
-    def _field_label_candidates(self, field: SchemaField) -> list[str]:
-        module_id = getattr(self.module_meta, "id", "module")
-        stripped = self._strip_widget_prefix(field.param_name)
-        ui_name = self._snake_key(stripped)
-        candidates = [
-            field.label_key,
-            f"module.{module_id}.field.{field.param_name}.label",
-            f"module.{module_id}.field.{field.field_id}.label",
-            f"module.dummy.field.{field.param_name}.label",
-            f"module.dummy.field.{field.field_id}.label",
-            f"module.{module_id}.ui.{ui_name}",
-            f"module.{module_id}.ui.{self._snake_key(field.label_default)}",
-        ]
-        if ui_name.endswith("_times"):
-            stem = ui_name[:-6]
-            candidates.append(f"module.{module_id}.ui.{stem}_attempts")
-            candidates.append(f"module.{module_id}.ui.run_count_1_means_infinite")
-        if ui_name.startswith("is_"):
-            candidates.append(f"module.{module_id}.ui.{ui_name[3:]}")
-
-        # De-duplicate while preserving order.
-        seen: set[str] = set()
-        ordered: list[str] = []
-        for item in candidates:
-            if item and item not in seen:
-                ordered.append(item)
-                seen.add(item)
-        return ordered
-
-    def _group_label(self, group_name: str | None) -> str:
-        module_id = getattr(self.module_meta, "id", "module")
-        if not group_name:
-            return tr(f"module.{module_id}.title", fallback=getattr(self.module_meta, "name", ""))
-
-        group_key = self._snake_key(group_name, max_len=80)
-        candidates = [
-            f"module.{module_id}.group.{group_key}",
-            f"module.{module_id}.ui.group_{group_key}",
-            f"module.{module_id}.ui.{group_key}",
-            f"framework.ui.group_{group_key}",
-            f"framework.group.{group_key}",
-            str(group_name),
-        ]
-        translated = self._first_translated(candidates)
-        if translated:
-            return translated
-        return tr(str(group_name), fallback=str(group_name))
-
-    @staticmethod
-    def _normalize_tips_markdown(text: str) -> str:
-        normalized = str(text or "")
-        normalized = normalized.replace("\\r\\n", "\n").replace("\\n", "\n").replace("\r\n", "\n")
-
-        lines = [line.rstrip() for line in normalized.split("\n")]
-        while lines and not lines[0].strip():
-            lines.pop(0)
-        while lines and not lines[-1].strip():
-            lines.pop()
-        if not lines:
-            return ""
-
-        cleaned: list[str] = []
-        for line in lines:
-            stripped = line.strip()
-            if stripped.startswith("- "):
-                stripped = f"* {stripped[2:].strip()}"
-            cleaned.append(stripped)
-
-        if cleaned[0].startswith("###") and len(cleaned) > 1 and cleaned[1].startswith("*"):
-            cleaned.insert(1, "")
-
-        return "\n".join(cleaned)
-    def _tips_text(self, description: str) -> str:
-        module_id = getattr(self.module_meta, "id", "module")
-        description_key = self._snake_key(description, max_len=80)
-        candidates = [
-            f"module.{module_id}.description",
-            f"module.{module_id}.ui.description",
-            f"module.{module_id}.ui.tips",
-            f"module.{module_id}.ui.{description_key}",
-            f"module.{module_id}.ui.tips_{description_key}",
-            description,
-        ]
-        translated = self._first_translated(candidates)
-        if translated:
-            return self._normalize_tips_markdown(translated)
-        return self._normalize_tips_markdown(tr(description, fallback=description))
-
-    def _action_label(self, label: str, method_name: str) -> str:
-        module_id = getattr(self.module_meta, "id", "module")
-        action_id = self._snake_key(method_name)
-        candidates = [
-            f"module.{module_id}.action.{action_id}.label",
-            f"module.{module_id}.ui.{action_id}",
-            f"module.{module_id}.ui.{self._snake_key(label)}",
-            label,
-        ]
-        translated = self._first_translated(candidates)
-        return translated or str(label)
-
-    @staticmethod
-    def _normalize_group_key(group_name: str | None) -> str:
-        return AutoPage._snake_key(str(group_name or ""), max_len=80)
-
-    @staticmethod
-    def _tokenize_for_match(text: str) -> set[str]:
-        tokens: set[str] = set()
-        normalized = AutoPage._snake_key(text, max_len=120)
-        for token in normalized.split("_"):
-            token = token.strip()
-            if len(token) < 2:
-                continue
-            tokens.add(token)
-            if len(token) >= 5:
-                tokens.add(token[:5])
-        return tokens
 
     def _iter_action_specs(self) -> list[dict[str, Any]]:
         actions = getattr(self.module_meta, "actions", None) or {}
@@ -696,7 +555,7 @@ class AutoPage(QWidget):
             except Exception:
                 continue
 
-        hint = AutoPage._strip_optional_hint(field.type_hint)
+        hint = AutoPageBase._strip_optional_hint(field.type_hint)
         origin = get_origin(hint)
         if origin in (Literal,):
             return list(get_args(hint))
@@ -727,38 +586,37 @@ class AutoPage(QWidget):
 
 
     def _option_label(self, field: SchemaField, option: Any) -> str:
-        module_id = getattr(self.module_meta, "id", "module")
         option_raw = str(option)
         option_key = self._snake_key(option_raw, max_len=48)
         param_key = self._snake_key(field.param_name, max_len=64)
         field_key = self._snake_key(field.field_id, max_len=64)
         stripped_key = self._snake_key(self._strip_widget_prefix(field.param_name), max_len=64)
 
-        candidates = [
-            f"module.{module_id}.field.{field.field_id}.option.{option_raw}",
-            f"module.{module_id}.field.{field.param_name}.option.{option_raw}",
-            f"module.{module_id}.field.{stripped_key}.option.{option_raw}",
-            f"module.{module_id}.option.{field_key}.{option_raw}",
-            f"module.{module_id}.option.{param_key}.{option_raw}",
-            f"module.{module_id}.option.{stripped_key}.{option_raw}",
-            f"module.{module_id}.ui.{field_key}_{option_raw}",
-            f"module.{module_id}.ui.{param_key}_{option_raw}",
-            f"module.{module_id}.ui.{stripped_key}_{option_raw}",
-        ]
-        if option_key and option_key != option_raw:
+        candidates: list[str] = []
+        for module_id in self._module_i18n_ids():
             candidates.extend([
-                f"module.{module_id}.field.{field.field_id}.option.{option_key}",
-                f"module.{module_id}.field.{field.param_name}.option.{option_key}",
-                f"module.{module_id}.field.{stripped_key}.option.{option_key}",
-                f"module.{module_id}.option.{field_key}.{option_key}",
-                f"module.{module_id}.option.{param_key}.{option_key}",
-                f"module.{module_id}.option.{stripped_key}.{option_key}",
-                f"module.{module_id}.ui.{field_key}_{option_key}",
-                f"module.{module_id}.ui.{param_key}_{option_key}",
-                f"module.{module_id}.ui.{stripped_key}_{option_key}",
+                f"module.{module_id}.field.{field.field_id}.option.{option_raw}",
+                f"module.{module_id}.field.{field.param_name}.option.{option_raw}",
+                f"module.{module_id}.field.{stripped_key}.option.{option_raw}",
+                f"module.{module_id}.option.{field_key}.{option_raw}",
+                f"module.{module_id}.option.{param_key}.{option_raw}",
+                f"module.{module_id}.option.{stripped_key}.{option_raw}",
+                f"module.{module_id}.ui.{field_key}_{option_raw}",
+                f"module.{module_id}.ui.{param_key}_{option_raw}",
+                f"module.{module_id}.ui.{stripped_key}_{option_raw}",
             ])
-
-
+            if option_key and option_key != option_raw:
+                candidates.extend([
+                    f"module.{module_id}.field.{field.field_id}.option.{option_key}",
+                    f"module.{module_id}.field.{field.param_name}.option.{option_key}",
+                    f"module.{module_id}.field.{stripped_key}.option.{option_key}",
+                    f"module.{module_id}.option.{field_key}.{option_key}",
+                    f"module.{module_id}.option.{param_key}.{option_key}",
+                    f"module.{module_id}.option.{stripped_key}.{option_key}",
+                    f"module.{module_id}.ui.{field_key}_{option_key}",
+                    f"module.{module_id}.ui.{param_key}_{option_key}",
+                    f"module.{module_id}.ui.{stripped_key}_{option_key}",
+                ])
 
         translated = self._first_translated(candidates)
         if translated:
@@ -780,14 +638,12 @@ class AutoPage(QWidget):
             if dedupe_key in seen:
                 continue
             seen.add(dedupe_key)
-
             if explicit_label is not None and explicit_label.strip():
-                module_id = getattr(self.module_meta, "id", "module")
                 explicit_key = self._snake_key(explicit_label, max_len=80)
-                label = self._first_translated([
-                    explicit_label,
-                    f"module.{module_id}.ui.{explicit_key}",
-                ])
+                explicit_candidates = [explicit_label]
+                for module_id in self._module_i18n_ids():
+                    explicit_candidates.append(f"module.{module_id}.ui.{explicit_key}")
+                label = self._first_translated(explicit_candidates)
                 if not label:
                     label = tr(explicit_label, fallback=explicit_label)
             else:
@@ -879,10 +735,10 @@ class AutoPage(QWidget):
                         return parsed
                 return [part.strip() for part in re.split(r"[\n,]", stripped) if part.strip()]
             if isinstance(default_value, tuple):
-                arr = AutoPage._parse_text_to_default_type(text, list(default_value))
+                arr = AutoPageBase._parse_text_to_default_type(text, list(default_value))
                 return tuple(arr) if isinstance(arr, list) else default_value
             if isinstance(default_value, set):
-                arr = AutoPage._parse_text_to_default_type(text, list(default_value))
+                arr = AutoPageBase._parse_text_to_default_type(text, list(default_value))
                 return set(arr) if isinstance(arr, list) else default_value
         except Exception:
             return default_value
@@ -1359,6 +1215,8 @@ class AutoPage(QWidget):
                 raw_value = self._get_widget_value(field, widget)
                 typed_value = self._coerce_value_for_config(field, raw_value)
                 config.set(cfg_item, typed_value)
+
+
 
 
 

@@ -14,5 +14,11 @@
   "module.trigger.ui.tips_launch_the_game_before_enabling_this_feature_these_are_toggle_switches_once": "### Tips\n* Launch the game before enabling this feature\n* These are toggle switches. Once enabled, detection keeps running and triggers automatically when conditions match\n* It does not block manual gameplay, acting as semi-automation assistance",
   "module.trigger.ui.trigger_list": "Trigger List",
   "module.trigger.log.error": "Error",
-  "module.trigger.log.game_task_is_not_running": "Game/Task is not running"
+  "module.trigger.log.game_task_is_not_running": "Game/Task is not running",
+  "module.dummy.field.auto_f.label": "Auto F",
+  "module.dummy.field.auto_f.help": "Automatically press F when collect prompt appears",
+  "module.dummy.field.nita_auto_e.label": "Nita Auto E",
+  "module.dummy.field.nita_auto_e.help": "Automatically press E during QTE stage",
+  "module.trigger.log.trigger_started_in_background_mode": "Trigger started in background mode",
+  "module.trigger.log.trigger_skipped_all_options_disabled": "Trigger skipped: all options are disabled"
 }

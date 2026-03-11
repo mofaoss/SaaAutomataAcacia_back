@@ -1,4 +1,4 @@
-﻿import re
+import re
 from functools import partial
 
 from PySide6.QtCore import QEasingCurve, QParallelAnimationGroup, QPropertyAnimation, QPoint
@@ -51,7 +51,9 @@ class OnDemandTasksPage(QFrame, BaseInterface):
         self._mount_module_pages()
         self._build_task_metadata()
         self.module_thread_cls = module_thread_cls
-`r`n
+        self._background_task_threads = {}
+
+
         # 鍏ㄥ眬浜掓枼浠诲姟璋冨害涓績鐘舵€?
         self.on_demand_runner = OnDemandRunner()
 
@@ -62,11 +64,7 @@ class OnDemandTasksPage(QFrame, BaseInterface):
         self._load_config()
         self._connect_to_slot()
         self.ui.sharedLogTitle.setText(self._ui_text("鍏变韩鏃ュ織", "Shared Log"))
-
-        if hasattr(self, "page_trigger"):
-            self.SegmentedWidget.setCurrentItem(self.page_trigger.objectName())
-            self.stackedWidget.setCurrentWidget(self.page_trigger)
-        elif self.stackedWidget.count() > 0:
+        if self.stackedWidget.count() > 0:
             first_page = self.stackedWidget.widget(0)
             self.SegmentedWidget.setCurrentItem(first_page.objectName())
             self.stackedWidget.setCurrentWidget(first_page)
@@ -175,6 +173,7 @@ class OnDemandTasksPage(QFrame, BaseInterface):
                 "page_attr": bindings.page_attr,
                 "start_button_attr": bindings.start_button_attr,
                 "card_widget_attr": bindings.card_widget_attr,
+                "on_demand_execution": getattr(spec, "on_demand_execution", "exclusive"),
             }
 
     @staticmethod
@@ -292,7 +291,72 @@ class OnDemandTasksPage(QFrame, BaseInterface):
     def _get_task_metadata(self):
         return self._task_metadata
 
+    @staticmethod
+    def _execution_policy(meta: dict) -> str:
+        policy = str(meta.get("on_demand_execution", "exclusive") or "exclusive").strip().lower()
+        return "background" if policy == "background" else "exclusive"
+
+    def _build_module_thread(self, task_id: str, module_class: type, logger):
+        meta = self._get_task_metadata().get(task_id, {})
+        return self.module_thread_cls(
+            module_class,
+            logger_instance=logger,
+            task_id=task_id,
+            task_name=self._ui_text(
+                meta.get("zh_name", task_id),
+                meta.get("en_name", task_id),
+            ),
+        )
+
+    def _is_background_task_running(self, task_id: str) -> bool:
+        thread = self._background_task_threads.get(task_id)
+        if thread is None:
+            return False
+        try:
+            running = bool(thread.isRunning())
+        except Exception:
+            running = False
+        if not running:
+            self._background_task_threads.pop(task_id, None)
+        return running
+
+    def _toggle_background_task(self, task_id: str):
+        meta = self._get_task_metadata().get(task_id)
+        if not meta:
+            return
+
+        thread = self._background_task_threads.get(task_id)
+        if thread is not None and thread.isRunning():
+            thread.stop()
+            return
+
+        module_class = meta.get("module_class")
+        if module_class is None:
+            return
+
+        logger = self.task_loggers.get(task_id, self.logger)
+        thread = self._build_module_thread(task_id, module_class, logger)
+        thread.is_running.connect(
+            lambda is_running, selected_task_id=task_id: self._on_background_thread_state_changed(
+                selected_task_id,
+                is_running,
+            )
+        )
+        self._background_task_threads[task_id] = thread
+        thread.start()
+        self._refresh_task_ui()
+
+    def _on_background_thread_state_changed(self, task_id: str, is_running: bool):
+        if not is_running:
+            self._background_task_threads.pop(task_id, None)
+        self._refresh_task_ui()
+
     def _handle_universal_start_stop(self, clicked_task_id: str):
+        meta = self._get_task_metadata().get(clicked_task_id, {})
+        if self._execution_policy(meta) == "background":
+            self._toggle_background_task(clicked_task_id)
+            return
+
         self.on_demand_runner.toggle(
             clicked_task_id,
             is_global_running=getattr(self, "is_global_running", False),
@@ -301,54 +365,80 @@ class OnDemandTasksPage(QFrame, BaseInterface):
                 self._get_task_metadata().get(task_id, {}).get("module_class")
             ),
             get_logger=lambda task_id: self.task_loggers.get(task_id, self.logger),
-            build_thread=lambda task_id, module_class, logger: self.module_thread_cls(
+            build_thread=lambda task_id, module_class, logger: self._build_module_thread(
+                task_id,
                 module_class,
-                logger_instance=logger,
-                task_id=task_id,
-                task_name=self._ui_text(
-                    self._get_task_metadata().get(task_id, {}).get("zh_name", task_id),
-                    self._get_task_metadata().get(task_id, {}).get("en_name", task_id),
-                ),
+                logger,
             ),
             on_thread_state_changed=self._sync_all_ui_state,
         )
 
-    def _sync_all_ui_state(self, is_running: bool):
+    def _refresh_task_ui(self):
         meta_dict = self._get_task_metadata()
         running_task_id = self.on_demand_runner.state.current_task_id
+        external_running = bool(getattr(self, "is_global_running", False))
+        external_zh = getattr(self, "_external_running_zh_name", "")
+        external_en = getattr(self, "_external_running_en_name", "")
+
         for task_id, meta in meta_dict.items():
             page = getattr(self, meta["page_attr"], None)
             btn = self._resolve_task_button(page, task_id, meta["start_button_attr"])
             card = self._resolve_task_card(page, task_id, meta["card_widget_attr"])
-
             if not btn:
                 continue
 
-            if is_running and running_task_id is not None:
-                running_zh = meta_dict[running_task_id]["zh_name"]
-                running_en = meta_dict[running_task_id]["en_name"]
-                btn.setText(self._ui_text(f'鍋滄 {running_zh} (F8)', f'Stop {running_en} (F8)'))
+            policy = self._execution_policy(meta)
+            if policy == "background":
+                if self._is_background_task_running(task_id):
+                    btn.setText(self._ui_text(f"停止 {meta['zh_name']} (F8)", f"Stop {meta['en_name']} (F8)"))
+                    if card is not None:
+                        self.set_simple_card_enable(card, False)
+                else:
+                    btn.setText(self._ui_text(f"开始 {meta['zh_name']}", f"Start {meta['en_name']}"))
+                    if card is not None:
+                        self.set_simple_card_enable(card, True)
+                continue
+
+            if external_running:
+                stop_zh = external_zh or meta["zh_name"]
+                stop_en = external_en or meta["en_name"]
+                btn.setText(self._ui_text(f"停止 {stop_zh} (F8)", f"Stop {stop_en} (F8)"))
                 if card is not None:
                     self.set_simple_card_enable(card, False)
-            else:
-                btn.setText(self._ui_text(f'寮€濮媨meta["zh_name"]}', f'Start {meta["en_name"]}'))
-                if card is not None:
-                    self.set_simple_card_enable(card, True)
+                continue
 
+            if running_task_id is not None:
+                running_meta = meta_dict.get(running_task_id, {})
+                running_zh = running_meta.get("zh_name", running_task_id)
+                running_en = running_meta.get("en_name", running_task_id)
+                btn.setText(self._ui_text(f"停止 {running_zh} (F8)", f"Stop {running_en} (F8)"))
+                if card is not None:
+                    self.set_simple_card_enable(card, False)
+                continue
+
+            btn.setText(self._ui_text(f"开始 {meta['zh_name']}", f"Start {meta['en_name']}"))
+            if card is not None:
+                self.set_simple_card_enable(card, True)
+
+    def _sync_all_ui_state(self, is_running: bool):
+        meta_dict = self._get_task_metadata()
+        running_task_id = self.on_demand_runner.state.current_task_id
         if is_running and running_task_id is not None:
-            zh = meta_dict[running_task_id]["zh_name"]
-            en = meta_dict[running_task_id]["en_name"]
+            running_meta = meta_dict.get(running_task_id, {})
+            zh = running_meta.get("zh_name", running_task_id)
+            en = running_meta.get("en_name", running_task_id)
             self.task_coordinator.publish_state(True, zh, en, "on_demand")
         else:
             self.task_coordinator.publish_state(False, "", "", "on_demand")
             self.on_demand_runner.clear()
 
+        self._refresh_task_ui()
+
     def start_current_visible_task(self):
         current_page = self.stackedWidget.currentWidget()
         if current_page is None:
             return
-        if hasattr(self, "page_trigger") and current_page == self.page_trigger:
-            return
+
         current_page_name = current_page.objectName()
         task_id = self._page_name_to_task_id.get(current_page_name)
         if task_id in self._get_task_metadata():
@@ -358,23 +448,9 @@ class OnDemandTasksPage(QFrame, BaseInterface):
         if source in {"on_demand", "additional"}:
             return
         self.is_global_running = is_running
-        meta_dict = self._get_task_metadata()
-        for _task_id, meta in meta_dict.items():
-            page = getattr(self, meta["page_attr"], None)
-            if not page:
-                continue
-            btn = self._resolve_task_button(page, _task_id, meta["start_button_attr"])
-            card = self._resolve_task_card(page, _task_id, meta["card_widget_attr"])
-            if not btn:
-                continue
-            if is_running:
-                btn.setText(self._ui_text(f'鍋滄 {zh_name} (F8)', f'Stop {en_name} (F8)'))
-                if card is not None:
-                    self.set_simple_card_enable(card, False)
-            else:
-                btn.setText(self._ui_text(f'寮€濮媨meta["zh_name"]}', f'Start {meta["en_name"]}'))
-                if card is not None:
-                    self.set_simple_card_enable(card, True)
+        self._external_running_zh_name = zh_name
+        self._external_running_en_name = en_name
+        self._refresh_task_ui()
 
     def _on_global_stop_request(self):
         if self.on_demand_runner.state.current_task_id is not None:
@@ -383,9 +459,8 @@ class OnDemandTasksPage(QFrame, BaseInterface):
     def _connect_to_slot(self):
         self.task_coordinator.state_changed.connect(self._on_global_state_changed)
         self.task_coordinator.stop_requested.connect(self._on_global_stop_request)
-`r`nself.stackedWidget.currentChanged.connect(self.onCurrentIndexChanged)
+        self.stackedWidget.currentChanged.connect(self.onCurrentIndexChanged)
 
-        # 缁熶竴鍒嗗彂淇″彿鍒颁腑鏋?
         for task_id, meta in self._get_task_metadata().items():
             page = getattr(self, meta["page_attr"], None)
             if page is None:
@@ -399,12 +474,13 @@ class OnDemandTasksPage(QFrame, BaseInterface):
 
         self._connect_to_save_changed()
 
-        # 閽撻奔涓撶敤
         if hasattr(self, "page_fishing"):
             self.page_fishing.LineEdit_fish_key.editingFinished.connect(
                 lambda: self.update_fish_key(self.page_fishing.LineEdit_fish_key.text())
             )
             signalBus.updateFishKey.connect(self.update_fish_key)
+
+        self._refresh_task_ui()
 
     def _load_config(self):
         for widget in self.findChildren(QWidget):
@@ -492,10 +568,10 @@ class OnDemandTasksPage(QFrame, BaseInterface):
                 if child.objectName() == 'LineEdit_fish_base' and enable:
                     continue
                 child.setEnabled(enable)
-`r`n    def showEvent(self, event):
+
+    def showEvent(self, event):
         super().showEvent(event)
         self._load_config()
 
     def get_shared_log_browser(self):
         return self._active_log_browser
-

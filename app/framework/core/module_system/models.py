@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Callable
+from typing import Any, Callable, Literal
 
 
 class ModuleHost(str, Enum):
@@ -56,6 +56,8 @@ class ModuleMeta:
     description: str = ""
     enabled: bool = True
     passive: bool = False
+
+    on_demand_execution: Literal["exclusive", "background"] = "exclusive"
 
     en_name: str = ""
 

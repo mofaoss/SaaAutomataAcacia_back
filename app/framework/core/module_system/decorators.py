@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import importlib
 import inspect
@@ -90,6 +90,10 @@ _ON_DEMAND_PAGE_ALIAS: dict[str, str] = {
 }
 
 _ON_DEMAND_PASSIVE: dict[str, bool] = {
+}
+
+_ON_DEMAND_EXECUTION: dict[str, str] = {
+    "trigger": "background",
 }
 
 # Keep module ids stable while declarations stay minimal (no explicit module_id).
@@ -309,6 +313,11 @@ def _build_meta(
     resolved_page_class_path = _infer_page_class_path(target, host)
     resolved_ui_bindings = _infer_ui_bindings(resolved_id, module_name, host)
     resolved_passive = bool(_ON_DEMAND_PASSIVE.get(resolved_id, False) if passive is None else passive)
+    resolved_on_demand_execution = "exclusive"
+    if host == ModuleHost.ON_DEMAND:
+        resolved_on_demand_execution = str(_ON_DEMAND_EXECUTION.get(resolved_id, "exclusive")).strip().lower()
+        if resolved_on_demand_execution not in {"exclusive", "background"}:
+            resolved_on_demand_execution = "exclusive"
 
     periodic_overrides = _PERIODIC_POLICY_OVERRIDES.get(resolved_id, {})
     resolved_periodic_enabled_by_default = bool(periodic_overrides.get("periodic_enabled_by_default", False))
@@ -340,6 +349,7 @@ def _build_meta(
         description=description,
         enabled=enabled,
         passive=resolved_passive,
+        on_demand_execution=resolved_on_demand_execution,
         module_class=module_class,
         periodic_enabled_by_default=resolved_periodic_enabled_by_default,
         periodic_mandatory=resolved_periodic_mandatory,
@@ -452,4 +462,5 @@ def module_page(module_id: str):
         return cls
 
     return decorator
+
 
