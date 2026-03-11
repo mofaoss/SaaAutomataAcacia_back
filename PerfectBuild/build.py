@@ -142,6 +142,27 @@ class PerfectBuild:
             print(f"[build] warning: skip missing data file: {src}")
             return None
 
+        def _collect_dynamic_python_modules() -> list[str]:
+            modules_root = Path(self.app_dir, "app", "features", "modules")
+            if not modules_root.exists():
+                return []
+            patterns = [
+                "*/usecase/*_usecase.py",
+                "*/ui/*.py",
+                "*/ui/**/*.py",
+            ]
+            modules: set[str] = set()
+            for pattern in patterns:
+                for py_file in modules_root.glob(pattern):
+                    if not py_file.is_file():
+                        continue
+                    if py_file.name == "__init__.py":
+                        continue
+                    rel = py_file.relative_to(self.app_dir).with_suffix("")
+                    module_name = ".".join(rel.parts)
+                    modules.add(module_name)
+            return sorted(modules)
+
         cmd_args = [
             "python",
             "-m",
@@ -163,6 +184,8 @@ class PerfectBuild:
             include = _include_arg(src, dst, kind)
             if include:
                 cmd_args.append(include)
+        for module_name in _collect_dynamic_python_modules():
+            cmd_args.append(f"--include-module={module_name}")
         if platform.system() == "Windows":
             cmd_args.extend((f"--windows-icon-from-ico={self.app_icon}", "--msvc=latest"))
         # '--windows-console-mode=disable',
@@ -301,3 +324,4 @@ def main(args):
 
 if __name__ == "__main__":
     main(sys.argv)
+
