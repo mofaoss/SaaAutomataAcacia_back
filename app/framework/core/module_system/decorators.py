@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import importlib
 import inspect
@@ -90,7 +90,6 @@ _ON_DEMAND_PAGE_ALIAS: dict[str, str] = {
 }
 
 _ON_DEMAND_PASSIVE: dict[str, bool] = {
-    "trigger": True,
 }
 
 # Keep module ids stable while declarations stay minimal (no explicit module_id).
@@ -265,8 +264,6 @@ def _infer_ui_bindings(resolved_id: str, module_name: str | None, host: ModuleHo
     # on-demand defaults
     suffix = _ON_DEMAND_PAGE_ALIAS.get(resolved_id, resolved_id)
     page_attr = f"page_{suffix}"
-    if resolved_id == "trigger":
-        return ModuleUiBindings(page_attr=page_attr, log_widget_attr="textBrowser_log_trigger")
 
     return ModuleUiBindings(
         page_attr=page_attr,
@@ -455,3 +452,4 @@ def module_page(module_id: str):
         return cls
 
     return decorator
+

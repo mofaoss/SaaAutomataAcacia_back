@@ -1,10 +1,10 @@
-import re
+﻿import re
 from functools import partial
 
 from PySide6.QtCore import QEasingCurve, QParallelAnimationGroup, QPropertyAnimation, QPoint
 from PySide6.QtWidgets import QFrame, QSizePolicy, QWidget, QVBoxLayout
 from rapidfuzz import process
-from qfluentwidgets import SpinBox, CheckBox, ComboBox, LineEdit, Slider, InfoBar
+from qfluentwidgets import SpinBox, CheckBox, ComboBox, LineEdit, Slider
 
 from app.framework.infra.config.app_config import config
 from app.framework.infra.events.signal_bus import signalBus
@@ -31,8 +31,6 @@ class OnDemandTasksPage(QFrame, BaseInterface):
         parent=None,
         *,
         shared_log_browser=None,
-        auto_f_module_cls=None,
-        auto_e_module_cls=None,
         module_thread_cls=ModuleTaskThread,
     ):
         super().__init__(parent)
@@ -52,24 +50,18 @@ class OnDemandTasksPage(QFrame, BaseInterface):
         self._page_name_to_task_id = {}
         self._mount_module_pages()
         self._build_task_metadata()
-        self.auto_f_module_cls = auto_f_module_cls
-        self.auto_e_module_cls = auto_e_module_cls
         self.module_thread_cls = module_thread_cls
-
-        # 触发器（自动辅助）独立管理，不受互斥限制
-        self.f_thread = None
-        self.nita_e_thread = None
-
-        # 全局互斥任务调度中心状态
+`r`n
+        # 鍏ㄥ眬浜掓枼浠诲姟璋冨害涓績鐘舵€?
         self.on_demand_runner = OnDemandRunner()
 
-        # 所有 additional 模块统一共享日志
+        # 鎵€鏈?additional 妯″潡缁熶竴鍏变韩鏃ュ織
         self._active_log_browser = shared_log_browser or self.ui.textBrowser_shared_log
         self._bind_shared_logger(self._active_log_browser)
 
         self._load_config()
         self._connect_to_slot()
-        self.ui.sharedLogTitle.setText(self._ui_text("共享日志", "Shared Log"))
+        self.ui.sharedLogTitle.setText(self._ui_text("鍏变韩鏃ュ織", "Shared Log"))
 
         if hasattr(self, "page_trigger"):
             self.SegmentedWidget.setCurrentItem(self.page_trigger.objectName())
@@ -136,7 +128,7 @@ class OnDemandTasksPage(QFrame, BaseInterface):
             return getattr(ui, item)
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{item}'")
 
-    # ---------------- 统一任务调度中心 ----------------
+    # ---------------- 缁熶竴浠诲姟璋冨害涓績 ----------------
 
     def _mount_module_pages(self):
         for spec in self.module_specs:
@@ -156,7 +148,7 @@ class OnDemandTasksPage(QFrame, BaseInterface):
             if bindings is not None and bindings.page_attr:
                 setattr(self, bindings.page_attr, page)
 
-            # additional 统一共享日志，模块内日志卡片不再作为独立日志出口
+            # additional 缁熶竴鍏变韩鏃ュ織锛屾ā鍧楀唴鏃ュ織鍗＄墖涓嶅啀浣滀负鐙珛鏃ュ織鍑哄彛
             local_log_card = getattr(page, "SimpleCardWidget_log", None)
             if local_log_card is not None:
                 local_log_card.setVisible(False)
@@ -335,11 +327,11 @@ class OnDemandTasksPage(QFrame, BaseInterface):
             if is_running and running_task_id is not None:
                 running_zh = meta_dict[running_task_id]["zh_name"]
                 running_en = meta_dict[running_task_id]["en_name"]
-                btn.setText(self._ui_text(f'停止 {running_zh} (F8)', f'Stop {running_en} (F8)'))
+                btn.setText(self._ui_text(f'鍋滄 {running_zh} (F8)', f'Stop {running_en} (F8)'))
                 if card is not None:
                     self.set_simple_card_enable(card, False)
             else:
-                btn.setText(self._ui_text(f'开始{meta["zh_name"]}', f'Start {meta["en_name"]}'))
+                btn.setText(self._ui_text(f'寮€濮媨meta["zh_name"]}', f'Start {meta["en_name"]}'))
                 if card is not None:
                     self.set_simple_card_enable(card, True)
 
@@ -376,11 +368,11 @@ class OnDemandTasksPage(QFrame, BaseInterface):
             if not btn:
                 continue
             if is_running:
-                btn.setText(self._ui_text(f'停止 {zh_name} (F8)', f'Stop {en_name} (F8)'))
+                btn.setText(self._ui_text(f'鍋滄 {zh_name} (F8)', f'Stop {en_name} (F8)'))
                 if card is not None:
                     self.set_simple_card_enable(card, False)
             else:
-                btn.setText(self._ui_text(f'开始{meta["zh_name"]}', f'Start {meta["en_name"]}'))
+                btn.setText(self._ui_text(f'寮€濮媨meta["zh_name"]}', f'Start {meta["en_name"]}'))
                 if card is not None:
                     self.set_simple_card_enable(card, True)
 
@@ -391,14 +383,9 @@ class OnDemandTasksPage(QFrame, BaseInterface):
     def _connect_to_slot(self):
         self.task_coordinator.state_changed.connect(self._on_global_state_changed)
         self.task_coordinator.stop_requested.connect(self._on_global_stop_request)
+`r`nself.stackedWidget.currentChanged.connect(self.onCurrentIndexChanged)
 
-        if hasattr(self, "page_trigger"):
-            self.page_trigger.SwitchButton_f.checkedChanged.connect(self.on_f_toggled)
-            self.page_trigger.SwitchButton_e.checkedChanged.connect(self.on_e_toggled)
-        
-        self.stackedWidget.currentChanged.connect(self.onCurrentIndexChanged)
-
-        # 统一分发信号到中枢
+        # 缁熶竴鍒嗗彂淇″彿鍒颁腑鏋?
         for task_id, meta in self._get_task_metadata().items():
             page = getattr(self, meta["page_attr"], None)
             if page is None:
@@ -412,7 +399,7 @@ class OnDemandTasksPage(QFrame, BaseInterface):
 
         self._connect_to_save_changed()
 
-        # 钓鱼专用
+        # 閽撻奔涓撶敤
         if hasattr(self, "page_fishing"):
             self.page_fishing.LineEdit_fish_key.editingFinished.connect(
                 lambda: self.update_fish_key(self.page_fishing.LineEdit_fish_key.text())
@@ -505,62 +492,10 @@ class OnDemandTasksPage(QFrame, BaseInterface):
                 if child.objectName() == 'LineEdit_fish_base' and enable:
                     continue
                 child.setEnabled(enable)
-
-    def turn_off_e_switch(self, is_running):
-        if not is_running and hasattr(self, "page_trigger"):
-            self.page_trigger.SwitchButton_e.setChecked(False)
-
-    def turn_off_f_switch(self, is_running):
-        if not is_running and hasattr(self, "page_trigger"):
-            self.page_trigger.SwitchButton_f.setChecked(False)
-
-    def on_f_toggled(self, isChecked: bool):
-        if isChecked:
-            if self.auto_f_module_cls is None:
-                InfoBar.warning(
-                    self._ui_text("自动按F", "Auto F"),
-                    self._ui_text("功能未注册", "Feature not registered"),
-                    isClosable=True,
-                    duration=2000,
-                    parent=self,
-                )
-                if hasattr(self, "page_trigger"):
-                    self.page_trigger.SwitchButton_f.setChecked(False)
-                return
-            trigger_logger = self.shared_logger
-            self.f_thread = self.module_thread_cls(self.auto_f_module_cls, logger_instance=trigger_logger)
-            self.f_thread.is_running.connect(self.turn_off_f_switch)
-            self.f_thread.start()
-        else:
-            if self.f_thread and self.f_thread.isRunning():
-                self.f_thread.stop()
-                InfoBar.success(self._ui_text('自动按F', 'Auto F'), self._ui_text('已关闭', 'Disabled'), isClosable=True, duration=2000, parent=self)
-
-    def on_e_toggled(self, isChecked: bool):
-        if isChecked:
-            if self.auto_e_module_cls is None:
-                InfoBar.warning(
-                    self._ui_text("妮塔自动E", "Nita Auto E"),
-                    self._ui_text("功能未注册", "Feature not registered"),
-                    isClosable=True,
-                    duration=2000,
-                    parent=self,
-                )
-                if hasattr(self, "page_trigger"):
-                    self.page_trigger.SwitchButton_e.setChecked(False)
-                return
-            trigger_logger = self.shared_logger
-            self.nita_e_thread = self.module_thread_cls(self.auto_e_module_cls, logger_instance=trigger_logger)
-            self.nita_e_thread.is_running.connect(self.turn_off_e_switch)
-            self.nita_e_thread.start()
-        else:
-            if self.nita_e_thread and self.nita_e_thread.isRunning():
-                self.nita_e_thread.stop()
-                InfoBar.success(self._ui_text('妮塔自动E', 'Nita Auto E'), self._ui_text('已关闭', 'Disabled'), isClosable=True, duration=2000, parent=self)
-
-    def showEvent(self, event):
+`r`n    def showEvent(self, event):
         super().showEvent(event)
         self._load_config()
 
     def get_shared_log_browser(self):
         return self._active_log_browser
+

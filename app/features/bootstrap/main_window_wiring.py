@@ -1,4 +1,4 @@
-# coding:utf-8
+﻿# coding:utf-8
 from __future__ import annotations
 
 from app.framework.core.module_system import discover_modules
@@ -24,8 +24,6 @@ from app.features.modules.redeem_codes.usecase.redeem_codes_usecase import (
     RedeemCodesUseCase,
 )
 from app.features.modules.shopping.usecase.shopping_usecase import ShoppingSelectionUseCase
-from app.features.modules.trigger.usecase.auto_f_usecase import AutoFModule
-from app.features.modules.trigger.usecase.nita_auto_e_usecase import NitaAutoEModule
 from app.features.utils.home_navigation import back_to_home
 from app.features.utils.network import start_cloudflare_update
 from app.framework.application.tasks.periodic_task_profile import get_periodic_task_profile
@@ -68,8 +66,6 @@ class SnowbreakMainWindowBridge(MainWindowFeatureBridge):
             "On Demand Tasks",
             window,
             shared_log_browser=shared_log_browser,
-            auto_f_module_cls=AutoFModule,
-            auto_e_module_cls=NitaAutoEModule,
             module_thread_cls=ModuleTaskThread,
         )
 
@@ -82,3 +78,4 @@ class SnowbreakMainWindowBridge(MainWindowFeatureBridge):
 
 def build_main_window_bridge() -> MainWindowFeatureBridge:
     return SnowbreakMainWindowBridge()
+

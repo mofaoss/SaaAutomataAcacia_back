@@ -369,9 +369,10 @@ class PeriodicTasksPage(QFrame, BaseInterface):
         self._sync_task_sequence_from_ui()
         self._load_initial_task_panel()
 
-        combo_power_day = self.ui.require_module_widget("ComboBox_power_day")
-        check_use_power = self.ui.require_module_widget("CheckBox_is_use_power")
-        combo_power_day.setEnabled(check_use_power.isChecked())
+        combo_power_day = self.ui.get_module_widget("ComboBox_power_day")
+        check_use_power = self.ui.get_module_widget("CheckBox_is_use_power")
+        if combo_power_day is not None and check_use_power is not None:
+            combo_power_day.setEnabled(check_use_power.isChecked())
 
         StyleSheet.PERIODIC_TASKS_INTERFACE.apply(self)
         shop_scroll_area = self.ui.get_module_widget("ScrollArea")
@@ -559,43 +560,92 @@ class PeriodicTasksPage(QFrame, BaseInterface):
     def _stop_running_guard(self):
         self.running_game_guard_timer.stop()
 
+    def _first_module_widget(self, *widget_attrs: str):
+        for widget_attr in widget_attrs:
+            widget = self.ui.get_module_widget(widget_attr)
+            if widget is not None:
+                return widget
+        return None
+
+    @staticmethod
+    def _is_auto_action_button(widget) -> bool:
+        if widget is None or not hasattr(widget, "objectName"):
+            return False
+        object_name = widget.objectName()
+        return isinstance(object_name, str) and object_name.startswith("PushButton_action_")
+
     def _connect_to_slot(self):
-        tutorial_button = self.ui.require_module_widget("PrimaryPushButton_path_tutorial")
-        select_directory_button = self.ui.require_module_widget("PushButton_select_directory")
-        game_directory_line_edit = self.ui.require_module_widget("LineEdit_game_directory")
-        import_codes_button = self.ui.require_module_widget("PrimaryPushButton_import_codes")
-        reset_codes_button = self.ui.require_module_widget("PushButton_reset_codes")
-        import_codes_text_edit = self.ui.require_module_widget("TextEdit_import_codes")
-        auto_open_checkbox = self.ui.require_module_widget("CheckBox_open_game_directly")
+        tutorial_button = self._first_module_widget(
+            "PrimaryPushButton_path_tutorial",
+            "PushButton_action_action_show_path_tutorial",
+            "PushButton_action_show_path_tutorial",
+        )
+        select_directory_button = self._first_module_widget(
+            "PushButton_select_directory",
+            "PushButton_action_action_select_game_directory",
+            "PushButton_action_select_game_directory",
+            "PushButton_action_on_select_directory_click",
+        )
+        game_directory_line_edit = self._first_module_widget("LineEdit_game_directory")
+        import_codes_button = self._first_module_widget(
+            "PrimaryPushButton_import_codes",
+            "PushButton_action_on_import_codes_click",
+        )
+        reset_codes_button = self._first_module_widget(
+            "PushButton_reset_codes",
+            "PushButton_action_on_reset_codes_click",
+        )
+        import_codes_text_edit = self._first_module_widget("TextEdit_import_codes")
+        auto_open_checkbox = self._first_module_widget("CheckBox_open_game_directly")
         tutorial_page = self.ui.get_periodic_page("task_login")
 
         self.ui.PushButton_start.clicked.connect(self.on_start_button_click)
-        tutorial_button.clicked.connect(
-            lambda: self.enter_game_actions.show_path_tutorial(
-                host=self,
-                anchor_widget=tutorial_button,
-                tutorial_page=tutorial_page,
-            ))
+        if tutorial_button is not None and hasattr(tutorial_button, "clicked"):
+            tutorial_button.clicked.connect(
+                lambda: self.enter_game_actions.show_path_tutorial(
+                    host=self,
+                    anchor_widget=tutorial_button,
+                    tutorial_page=tutorial_page,
+                ))
         self.ui.PushButton_select_all.clicked.connect(
             lambda: select_all(self.ui.SimpleCardWidget_option))
         self.ui.PushButton_no_select.clicked.connect(
             lambda: no_select(self.ui.SimpleCardWidget_option, self.primary_option_key))
-        select_directory_button.clicked.connect(
-            lambda: self.enter_game_actions.on_select_directory_click(
-                host=self,
-                line_edit=game_directory_line_edit,
-                settings_usecase=self.settings_usecase,
-            ))
-        import_codes_button.clicked.connect(
-            lambda: self.collect_supplies_actions.on_import_codes_click(
-                host=self,
-                text_edit=import_codes_text_edit,
-            ))
-        reset_codes_button.clicked.connect(
-            lambda: self.collect_supplies_actions.on_reset_codes_click(
-                host=self,
-                text_edit=import_codes_text_edit,
-            ))
+
+        if (
+            select_directory_button is not None
+            and game_directory_line_edit is not None
+            and hasattr(select_directory_button, "clicked")
+            and not self._is_auto_action_button(select_directory_button)
+        ):
+            select_directory_button.clicked.connect(
+                lambda: self.enter_game_actions.on_select_directory_click(
+                    host=self,
+                    line_edit=game_directory_line_edit,
+                    settings_usecase=self.settings_usecase,
+                ))
+        if (
+            import_codes_button is not None
+            and import_codes_text_edit is not None
+            and hasattr(import_codes_button, "clicked")
+            and not self._is_auto_action_button(import_codes_button)
+        ):
+            import_codes_button.clicked.connect(
+                lambda: self.collect_supplies_actions.on_import_codes_click(
+                    host=self,
+                    text_edit=import_codes_text_edit,
+                ))
+        if (
+            reset_codes_button is not None
+            and import_codes_text_edit is not None
+            and hasattr(reset_codes_button, "clicked")
+            and not self._is_auto_action_button(reset_codes_button)
+        ):
+            reset_codes_button.clicked.connect(
+                lambda: self.collect_supplies_actions.on_reset_codes_click(
+                    host=self,
+                    text_edit=import_codes_text_edit,
+                ))
 
         self.ui.shared_scheduling_panel.toggle_all_cycles.connect(
             self._on_toggle_all_cycles_clicked)
@@ -614,8 +664,9 @@ class PeriodicTasksPage(QFrame, BaseInterface):
             self._on_task_order_changed)
         self.ui.shared_scheduling_panel.config_changed.connect(
             self._on_shared_config_changed)
-        auto_open_checkbox.stateChanged.connect(
-            lambda state: self.enter_game_actions.on_auto_open_toggled(host=self, state=state))
+        if auto_open_checkbox is not None and hasattr(auto_open_checkbox, "stateChanged"):
+            auto_open_checkbox.stateChanged.connect(
+                lambda state: self.enter_game_actions.on_auto_open_toggled(host=self, state=state))
 
         self.ui.shared_scheduling_panel.copy_single_rule_clicked.connect(
             self._on_copy_single_rule_to_checked)
@@ -717,7 +768,9 @@ class PeriodicTasksPage(QFrame, BaseInterface):
     def save_changed(self, widget, *args):
         maybe_power_enabled = self.settings_usecase.persist_widget_change(widget)
         if maybe_power_enabled is not None:
-            self.ui.require_module_widget("ComboBox_power_day").setEnabled(bool(maybe_power_enabled))
+            combo_power_day = self.ui.get_module_widget("ComboBox_power_day")
+            if combo_power_day is not None:
+                combo_power_day.setEnabled(bool(maybe_power_enabled))
 
     def _load_presets(self):
         PeriodicPresetActions.load_presets(self)
@@ -741,6 +794,9 @@ class PeriodicTasksPage(QFrame, BaseInterface):
     def showEvent(self, event):
         super().showEvent(event)
         self._load_config()
+
+
+
 
 
 

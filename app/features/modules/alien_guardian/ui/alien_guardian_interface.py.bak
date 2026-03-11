@@ -1,0 +1,81 @@
+﻿from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QTextBrowser
+from qfluentwidgets import (BodyLabel, ComboBox, PushButton, SimpleCardWidget, TitleLabel)
+from app.framework.ui.views.periodic_base import ModulePageBase
+
+class AlienGuardianInterface(ModulePageBase):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName("page_alien_guardian")
+
+        self.main_layout = QHBoxLayout(self)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(8)
+
+        self.left_layout = QVBoxLayout()
+        self.left_layout.setSpacing(8)
+        self.right_layout = QVBoxLayout()
+        self.right_layout.setSpacing(8)
+
+        self.main_layout.addLayout(self.left_layout, 2)
+        self.main_layout.addLayout(self.right_layout, 1)
+
+        self._init_ui()
+        self.apply_i18n()
+
+    def _init_ui(self):
+        self.SimpleCardWidget_alien_guardian = SimpleCardWidget(self)
+        layout = QVBoxLayout(self.SimpleCardWidget_alien_guardian)
+
+        self.BodyLabel_25 = BodyLabel(self.SimpleCardWidget_alien_guardian)
+        self.BodyLabel_25.setObjectName("BodyLabel_25")
+        self.ComboBox_mode = ComboBox(self.SimpleCardWidget_alien_guardian)
+        self.ComboBox_mode.setObjectName("ComboBox_mode")
+
+        row = QHBoxLayout()
+        row.addWidget(self.BodyLabel_25, 1)
+        row.addWidget(self.ComboBox_mode, 2)
+        layout.addLayout(row)
+
+        self.BodyLabel_tip_alien = BodyLabel(self.SimpleCardWidget_alien_guardian)
+        self.BodyLabel_tip_alien.setObjectName("BodyLabel_tip_alien")
+        self.BodyLabel_tip_alien.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.BodyLabel_tip_alien.setWordWrap(True)
+        layout.addWidget(self.BodyLabel_tip_alien)
+        layout.addStretch(1)
+
+        self.PushButton_start_alien_guardian = PushButton(self)
+        self.PushButton_start_alien_guardian.setObjectName("PushButton_start_alien_guardian")
+
+        self.left_layout.addWidget(self.SimpleCardWidget_alien_guardian)
+        self.left_layout.addWidget(self.PushButton_start_alien_guardian)
+        self.left_layout.addStretch(1)
+
+        # Log card
+        self.SimpleCardWidget_log = SimpleCardWidget(self)
+        log_layout = QVBoxLayout(self.SimpleCardWidget_log)
+        self.TitleLabel_4 = TitleLabel(self.SimpleCardWidget_log)
+        self.TitleLabel_4.setObjectName("TitleLabel_4")
+        self.textBrowser_log_alien_guardian = QTextBrowser(self.SimpleCardWidget_log)
+        self.textBrowser_log_alien_guardian.setObjectName("textBrowser_log_alien_guardian")
+        self.textBrowser_log_alien_guardian.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        log_layout.addWidget(self.TitleLabel_4)
+        log_layout.addWidget(self.textBrowser_log_alien_guardian)
+        self.right_layout.addWidget(self.SimpleCardWidget_log)
+
+    def apply_i18n(self):
+        self.BodyLabel_tip_alien.setText(
+            _("### Tips\n* Click Start after battle begins\n* Recommended support pals: Steel Shot and Blazing Pitcher\n* Stage mode is semi-automatic: manual shooting and manual next-stage selection are required", msgid='tips_click_start_after_battle_begins_recommended_support_pals_steel_shot_and_bla')
+        )
+        self.BodyLabel_25.setText(_("Run mode", msgid='run_mode'))
+        self.TitleLabel_4.setText(_("Log", msgid='log'))
+        self.PushButton_start_alien_guardian.setText(_('Start Alien Guardian', msgid='start_alien_guardian'))
+
+        self.ComboBox_mode.clear()
+        self.ComboBox_mode.addItems(
+            [_("Endless Mode", msgid='endless_mode'),
+             _("Stage Mode", msgid='stage_mode')]
+        )
+
+
+
