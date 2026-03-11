@@ -4,10 +4,21 @@ from app.framework.i18n.runtime import _
 from app.features.utils.randoms import random_rectangle_point
 from app.framework.infra.automation.timer import Timer
 
-from app.framework.core.module_system import on_demand_module, periodic_module
+from app.framework.core.module_system import on_demand_module, periodic_module, Field
 
 
-@on_demand_module("Card Match")
+@on_demand_module(
+    "Card Match",
+    description="### Tips\n"
+                "* Automated card matching for drink rewards.\n"
+                "* Ensure you are in the tavern before starting.\n"
+                "* Supports multiple game modes and automatic repeats.",
+    fields={
+        "SpinBox_drink_times": Field(label="Repeat Times", group="Game Settings", layout="half"),
+        "ComboBox_card_mode": Field(label="Game Mode", group="Game Settings", layout="half"),
+        "CheckBox_is_speed_up": Field(label="Speed Up Mode", group="Performance", layout="full"),
+    }
+)
 class DrinkModule:
     def __init__(
         self,

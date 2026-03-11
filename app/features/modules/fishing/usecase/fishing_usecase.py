@@ -11,10 +11,26 @@ from app.framework.infra.events.signal_bus import signalBus
 from app.framework.infra.vision.vision import count_color_blocks
 from app.framework.infra.automation.timer import Timer
 
-from app.framework.core.module_system import on_demand_module
+from app.framework.core.module_system import on_demand_module, Field
 
 
-@on_demand_module("Fishing")
+@on_demand_module(
+    "Fishing",
+    description="### Tips\n"
+                "* Automated fishing with QTE support.\n"
+                "* **Visual Calibration**: Adjust HSV values if fish detection is unreliable.\n"
+                "* **Lure**: Ensure you have enough lures of the selected type.",
+    fields={
+        "SpinBox_fish_times": Field(label="Fishing Times", group="General", layout="half"),
+        "ComboBox_fishing_mode": Field(label="Fishing Mode", group="General", layout="half"),
+        "CheckBox_is_limit_time": Field(label="Enable Time Limit", group="General", layout="full"),
+        "LineEdit_fish_upper": Field(label="HSV Upper", group="Visual Calibration", layout="half"),
+        "LineEdit_fish_lower": Field(label="HSV Lower", group="Visual Calibration", layout="half"),
+        "LineEdit_fish_key": Field(label="Fishing Key", group="General", layout="half"),
+        "ComboBox_lure_type": Field(label="Lure Type", group="Lure Settings", layout="half"),
+        "CheckBox_is_save_fish": Field(label="Save Screenshot", group="General", layout="full"),
+    }
+)
 class FishingModule:
     def __init__(
         self,

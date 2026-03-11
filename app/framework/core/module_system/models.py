@@ -12,11 +12,15 @@ class ModuleHost(str, Enum):
 
 @dataclass(frozen=True, slots=True)
 class Field:
-    """Decorator-time field metadata for stable i18n field IDs."""
+    """Decorator-time field metadata for stable i18n field IDs and layout hints."""
 
     id: str | None = None
     label: str | None = None
     help: str | None = None
+    group: str | None = None
+    layout: Literal["full", "half", "row"] = "full"
+    icon: str | None = None
+    description_md: str | None = None
 
 
 @dataclass(slots=True)
@@ -30,6 +34,10 @@ class SchemaField:
     help_key: str
     label_default: str
     help_default: str | None = None
+    group: str | None = None
+    layout: Literal["full", "half", "row"] = "full"
+    icon: str | None = None
+    description_md: str | None = None
 
 
 @dataclass(slots=True)

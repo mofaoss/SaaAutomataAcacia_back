@@ -25,23 +25,35 @@ def _resolve_field_meta(
     module_id: str,
     param_name: str,
     field_decl: str | Field | None,
-) -> tuple[str, str, str | None]:
+) -> tuple[str, str, str | None, str, str, str | None, str, str | None, str | None]:
     if isinstance(field_decl, Field):
         field_id = field_decl.id or param_name
         label_default = field_decl.label or humanize_name(param_name)
         help_default = field_decl.help
+        group = field_decl.group
+        layout = field_decl.layout
+        icon = field_decl.icon
+        description_md = field_decl.description_md
     elif isinstance(field_decl, str):
         field_id = param_name
         label_default = field_decl
         help_default = None
+        group = None
+        layout = "full"
+        icon = None
+        description_md = None
     else:
         field_id = param_name
         label_default = humanize_name(param_name)
         help_default = None
+        group = None
+        layout = "full"
+        icon = None
+        description_md = None
 
     label_key = f"module.{module_id}.field.{field_id}.label"
     help_key = f"module.{module_id}.field.{field_id}.help"
-    return field_id, label_default, help_default if help_default else None, label_key, help_key
+    return field_id, label_default, help_default, label_key, help_key, group, layout, icon, description_md
 
 
 def build_config_schema(
@@ -57,7 +69,7 @@ def build_config_schema(
     for name, param in sig.parameters.items():
         if name in RUNTIME_PARAMS:
             continue
-        field_id, label_default, help_default, label_key, help_key = _resolve_field_meta(
+        field_id, label_default, help_default, label_key, help_key, group, layout, icon, description_md = _resolve_field_meta(
             module_id=module_id,
             param_name=name,
             field_decl=field_defs.get(name),
@@ -73,6 +85,10 @@ def build_config_schema(
                 help_key=help_key,
                 label_default=label_default,
                 help_default=help_default,
+                group=group,
+                layout=layout,
+                icon=icon,
+                description_md=description_md,
             )
         )
     return schema
