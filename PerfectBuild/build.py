@@ -126,7 +126,6 @@ class PerfectBuild:
             ("docs/help_en.md", "docs/help_en.md", "file"),
             ("update_data.txt", "update_data.txt", "file"),
             ("asset", "asset", "dir"),
-            ("app/features/modules", "app/features/modules", "dir"),
             ("app/framework/infra/vision/onnxocr/models/ppocrv5", "app/framework/infra/vision/onnxocr/models/ppocrv5", "dir"),
         ]
 
@@ -163,6 +162,22 @@ class PerfectBuild:
                     modules.add(module_name)
             return sorted(modules)
 
+        def _collect_module_data_mappings() -> list[tuple[str, str, str]]:
+            modules_root = Path(self.app_dir, "app", "features", "modules")
+            if not modules_root.exists():
+                return []
+            mappings: list[tuple[str, str, str]] = []
+            for module_dir in modules_root.iterdir():
+                if not module_dir.is_dir():
+                    continue
+                for data_dir_name in ("assets", "i18n"):
+                    src_path = module_dir / data_dir_name
+                    if not src_path.is_dir():
+                        continue
+                    rel_src = str(src_path.relative_to(self.app_dir)).replace("\\", "/")
+                    mappings.append((rel_src, rel_src, "dir"))
+            return mappings
+
         cmd_args = [
             "python",
             "-m",
@@ -181,6 +196,10 @@ class PerfectBuild:
             "--noinclude-qt-plugins=qml,webengine,network,multimedia,sql,test,sensorkit,position,location,bluetooth,nfc,serialport,websockets,printsupport,dbus,xml,pdf",
         ]
         for src, dst, kind in optional_data_mappings:
+            include = _include_arg(src, dst, kind)
+            if include:
+                cmd_args.append(include)
+        for src, dst, kind in _collect_module_data_mappings():
             include = _include_arg(src, dst, kind)
             if include:
                 cmd_args.append(include)
