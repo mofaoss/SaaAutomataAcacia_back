@@ -203,8 +203,6 @@ class PerfectBuild:
             include = _include_arg(src, dst, kind)
             if include:
                 cmd_args.append(include)
-        for module_name in _collect_dynamic_python_modules():
-            cmd_args.append(f"--include-module={module_name}")
         if platform.system() == "Windows":
             cmd_args.extend((f"--windows-icon-from-ico={self.app_icon}", "--msvc=latest"))
         # '--windows-console-mode=disable',
@@ -343,4 +341,3 @@ def main(args):
 
 if __name__ == "__main__":
     main(sys.argv)
-
