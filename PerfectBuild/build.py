@@ -18,6 +18,18 @@ from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 from perfect_build import Config
 import uuid
+try:
+    from prepare_build import (
+        cleanup_stage_dir,
+        merge_release_from_stage,
+        prepare_nuitka_stage,
+    )
+except ModuleNotFoundError:
+    from PerfectBuild.prepare_build import (
+        cleanup_stage_dir,
+        merge_release_from_stage,
+        prepare_nuitka_stage,
+    )
 
 # python .\PerfectBuild\build.py --n
 
@@ -313,6 +325,40 @@ class PerfectBuild:
         print("Creating portable package done.")
 
 
+def _run_nuitka_in_stage(app_id: str, mode: str) -> None:
+    project_root = Path(__file__).resolve().parent.parent
+    stage_dir = project_root / ".nuitka_stage"
+
+    cwd = Path.cwd()
+    original_app_dir = PerfectBuild.app_dir
+    try:
+        stage_result = prepare_nuitka_stage(
+            project_root=project_root,
+            stage_dir_name=".nuitka_stage",
+        )
+        stage_dir = stage_result.stage_dir
+        print(
+            "[build] nuitka stage ready: "
+            f"{stage_dir} "
+            f"(changed {stage_result.py_files_changed}/{stage_result.py_files_scanned} .py files)"
+        )
+
+        os.chdir(stage_dir)
+        PerfectBuild.app_dir = str(stage_dir)
+
+        pb = PerfectBuild(app_id, mode)
+        pb.nbuild()
+        pb.create_portable()
+        if pb.system == "Windows":
+            pb.create_setup()
+
+        merge_release_from_stage(project_root=project_root, stage_dir=stage_dir)
+    finally:
+        os.chdir(cwd)
+        PerfectBuild.app_dir = original_app_dir
+        cleanup_stage_dir(stage_dir)
+
+
 def main(args):
     """
     :param args:
@@ -328,12 +374,15 @@ def main(args):
         if mode == "--g":
             generate_new_id(True)
             return
+
     app_id = generate_new_id(False)
-    pb = PerfectBuild(app_id, mode)
+
     if mode == "--n":
-        pb.nbuild()
-    else:
-        pb.pbuild()
+        _run_nuitka_in_stage(app_id, mode)
+        return
+
+    pb = PerfectBuild(app_id, mode)
+    pb.pbuild()
     pb.create_portable()
     if pb.system == "Windows":
         pb.create_setup()

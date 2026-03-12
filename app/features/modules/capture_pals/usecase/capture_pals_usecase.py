@@ -40,10 +40,10 @@ class _SyncState:
                 "* Patrol: Exit and re-enter map after each capture",
 )
 class CapturePalsModule:
-    \"\"\"
+    """
     尘白抓帕鲁模块
     目标：保持功能与行为语义不变，但结构更清晰、稳定、易维护。
-    \"\"\"
+    """
 
     ENTER_WAIT_SEC = 6
     MAX_FAILED_F_ATTEMPTS = 10

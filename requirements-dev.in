@@ -1,4 +1,0 @@
-﻿# Development dependency input (constrained by production lock)
--c requirements-prod.txt
--r requirements-prod.in
-pytest==8.4.2

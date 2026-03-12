@@ -20,5 +20,7 @@ nuitka-crash-report.xml
 *.pyc
 saa.cmd
 
-# Local VS Code workspace settings
+.pytest_cache/
 .vscode/
+.nuitka_*
+.pytest_*

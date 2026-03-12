@@ -1,4 +1,0 @@
-﻿# Release validation dependency input (close to production lock)
--c requirements-prod.txt
--r requirements-prod.in
-pytest==8.4.2
