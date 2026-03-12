@@ -199,6 +199,25 @@ def test_dynamic_payload_value_is_auto_localized_when_catalog_has_mapping():
     assert rendered == "客户区尺寸：1920x1080（1.778:1），符合 16:9 标准比例"
 
 
+def test_log_context_can_render_from_translatable_string_payload():
+    runtime._CATALOGS["en"]["framework.log.task_queue_resolved"] = "Task queue resolved: {tasks}"
+    runtime._CATALOGS["zh_CN"]["framework.log.task_queue_resolved"] = "任务队列已解析：{tasks}"
+    runtime._resolve_lang = lambda: "zh_CN"  # type: ignore[assignment]
+
+    msg = runtime._(
+        "Task queue resolved: {tasks}",
+        msgid="task_queue_resolved",
+        __i18n_owner_scope__="framework",
+        __i18n_context_hint__="log",
+        tasks="自动登录, 精神拟境",
+    )
+
+    # Public API should still behave as str while retaining metadata.
+    assert isinstance(msg, str)
+    rendered = runtime.render_message(msg, context="log", levelno=logging.INFO)
+    assert rendered == "任务队列已解析：自动登录, 精神拟境"
+
+
 def test_owner_inference_prefers_module_name_when_filename_is_not_path():
     class _Code:
         co_filename = "<frozen app.features.modules.fishing.usecase.fishing_usecase>"

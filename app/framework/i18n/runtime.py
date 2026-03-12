@@ -339,8 +339,8 @@ def _looks_like_template_skeleton(text: str, fields: list[str]) -> bool:
 
 
 def _public_text(message: TranslatableMessage) -> str:
-    """Public boundary: always expose concrete translated text as plain str."""
-    return str(message)
+    """Expose a string value while preserving i18n metadata for log re-rendering."""
+    return TranslatableString(str(message), message)
 
 
 def _(
@@ -1226,6 +1226,8 @@ def _log_mode(levelno: int) -> str:
 
 def render_message(value: Any, *, context: str = "ui", levelno: int | None = None) -> str:
     try:
+        if isinstance(value, TranslatableString):
+            value = value.i18n_msg
         if not isinstance(value, TranslatableMessage):
             return str(value)
 
