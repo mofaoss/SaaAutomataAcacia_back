@@ -62,7 +62,7 @@ class PeriodicPresetActions:
         host.ui.ComboBox_presets.setCurrentIndex(host.ui.ComboBox_presets.findText(preset_name))
 
         InfoBar.success(
-            title=_('保存成功', msgid='saved'),
+            title=_('Saved', msgid='saved'),
             content=_(f"Preset '{preset_name}' saved", msgid='preset_preset_name_saved'),
             parent=host,
         )
@@ -75,8 +75,8 @@ class PeriodicPresetActions:
             return
         if not deleted and reason == "min_one_required":
             InfoBar.warning(
-                title=_('无法删除', msgid='cannot_delete'),
-                content=_('至少保留一个预设', msgid='at_least_one_preset_must_remain'),
+                title=_('Cannot Delete', msgid='cannot_delete'),
+                content=_('At least one preset must remain', msgid='at_least_one_preset_must_remain'),
                 parent=host,
             )
             return
@@ -87,7 +87,7 @@ class PeriodicPresetActions:
         host.ui.ComboBox_presets.setCurrentIndex(0)
 
         InfoBar.success(
-            title=_('删除成功', msgid='deleted'),
+            title=_('Deleted', msgid='deleted'),
             content=_(f"Preset '{preset_name}' deleted", msgid='preset_preset_name_deleted'),
             parent=host,
         )
@@ -111,8 +111,8 @@ class PeriodicRuleActions:
 
         if not checked_task_ids:
             InfoBar.warning(
-                title=_('无生效目标', msgid='no_target_selected'),
-                content=_('请先在左侧列表中勾选需要应用此规则的任务', msgid='please_check_tasks_in_the_left_list_first'),
+                title=_('No Target Selected', msgid='no_target_selected'),
+                content=_('Please check tasks in the left list first', msgid='please_check_tasks_in_the_left_list_first'),
                 orient=Qt.Orientation.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP_RIGHT,
@@ -138,7 +138,7 @@ class PeriodicRuleActions:
 
         host._auto_adjust_after_use_action()
         InfoBar.success(
-            title=_('规则下发成功', msgid='rule_copied_successfully'),
+            title=_('Rule Copied Successfully', msgid='rule_copied_successfully'),
             content=_(f'Rule added to {len(checked_task_ids)} checked tasks\nand enabled their scheduling', msgid='rule_added_to_value_checked_tasks_and_enabled_th'),
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
@@ -165,8 +165,8 @@ class PeriodicRuleActions:
 
         if not checked_task_ids:
             InfoBar.warning(
-                title=_('无生效目标', msgid='no_target_selected_2'),
-                content=_('请先在左侧列表中勾选需要应用此规则的任务', msgid='please_check_tasks_in_the_left_list_first_2'),
+                title=_('No Target Selected', msgid='no_target_selected_2'),
+                content=_('Please check tasks in the left list first', msgid='please_check_tasks_in_the_left_list_first_2'),
                 orient=Qt.Orientation.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP_RIGHT,
@@ -191,7 +191,7 @@ class PeriodicRuleActions:
 
         host._auto_adjust_after_use_action()
         InfoBar.success(
-            title=_('撤回成功', msgid='withdraw_successful'),
+            title=_('Withdraw Successful', msgid='withdraw_successful'),
             content=_(f'Removed trigger from {modified_count} tasks', msgid='removed_trigger_from_modified_count_tasks'),
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
@@ -336,13 +336,13 @@ class PeriodicRuntimeActions:
     @staticmethod
     def on_task_play_clicked(host, task_id: str):
         def _stop_local():
-            host.logger.info(_('已手动中止当前任务'))
+            host.logger.info(_('Current task has been manually aborted'))
             if host.is_launch_pending:
                 host._clear_launch_watch_state()
                 host._set_launch_pending_state(False)
 
             host.periodic_controller.stop_running_thread(
-                reason=_('用户点击了手动终止按钮')
+                reason=_('The user clicked the manual kill button')
             )
 
         def _start_local(selected_task_id: str):
@@ -383,7 +383,7 @@ class PeriodicRuntimeActions:
         )
 
         if not tasks_to_run:
-            host.logger.warning(_('⚠️ 下方没有已勾选的任务可执行！'))
+            host.logger.warning(_('There are no checked tasks below to perform!'))
             return
         host._initiate_task_run(tasks_to_run)
 
@@ -404,11 +404,11 @@ class PeriodicRuntimeActions:
                 host._clear_launch_watch_state()
                 host._set_launch_pending_state(False)
                 host.logger.warning(
-                    _('启动流程已中断：检测到游戏进程退出，已取消本次自动任务')
+                    _('The startup process has been interrupted: The game process has been detected to have exited, and this automatic task has been cancelled.')
                 )
                 InfoBar.warning(
-                    title=_('游戏启动已中断'),
-                    content=_('已停止后续任务'),
+                    title=_('Game startup interrupted'),
+                    content=_('Subsequent tasks have been stopped'),
                     orient=Qt.Orientation.Horizontal,
                     isClosable=True,
                     position=InfoBarPosition.TOP_RIGHT,
@@ -421,11 +421,11 @@ class PeriodicRuntimeActions:
                 host._clear_launch_watch_state()
                 host._set_launch_pending_state(False)
                 host.logger.warning(
-                    _('等待游戏窗口超时，已取消本次自动任务')
+                    _('The waiting game window has timed out and this automatic task has been cancelled.')
                 )
                 InfoBar.warning(
-                    title=_('等待超时'),
-                    content=_('已停止后续任务'),
+                    title=_('Wait timeout'),
+                    content=_('Subsequent tasks have been stopped'),
                     orient=Qt.Orientation.Horizontal,
                     isClosable=True,
                     position=InfoBarPosition.TOP_RIGHT,
@@ -462,8 +462,8 @@ class PeriodicRuntimeActions:
             return
 
         InfoBar.error(
-            title=_('无任务'),
-            content=_('未选择任务或不在生效周期'),
+            title=_('No tasks'),
+            content=_('No task selected or not in the effective period'),
             orient=Qt.Orientation.Horizontal,
             isClosable=False,
             position=InfoBarPosition.TOP_RIGHT,
@@ -497,10 +497,10 @@ class PeriodicRuntimeActions:
 
             host._stop_running_guard()
             host.logger.warning(
-                _('检测到游戏窗口已关闭，正在停止当前自动任务')
+                _('Detected that the game window has been closed, stopping the current automatic task')
             )
             host.periodic_controller.stop_running_thread(
-                reason=_('用户中断：游戏窗口已关闭')
+                reason=_('User Interrupt: Game window has been closed')
             )
         except Exception as e:
             host.logger.error(
@@ -531,7 +531,7 @@ class PeriodicRuntimeActions:
 
         InfoBar.error(
             title="队列为空",
-            content=_('请至少勾选一个任务进行立即执行'),
+            content=_('Please check at least one task for immediate execution'),
             parent=host,
         )
         host.logger.warning(_('No runnable task selected, execution cancelled'))
@@ -555,11 +555,11 @@ class PeriodicRuntimeActions:
             return
 
         PeriodicRuntimeActions.set_checkbox_enable(host, True)
-        host.ui.PushButton_start.setText(_('立即执行 (F8)'))
+        host.ui.PushButton_start.setText(_('Execute immediately (F8)'))
         pending_tasks = host.periodic_controller.consume_pending_queue_on_external_release()
         if pending_tasks:
             host.logger.info(
-                _('外部任务已结束，正在唤醒积压的日常排队任务...', msgid='external_task_finished_waking_up_queued_daily_ta')
+                _('External task finished, waking up queued daily tasks...', msgid='external_task_finished_waking_up_queued_daily_ta')
             )
             host.after_start_button_click(pending_tasks)
 
@@ -633,13 +633,13 @@ class PeriodicRuntimeActions:
     def after_finish(host):
         if getattr(host, "_is_running_solo_flag", False):
             host.logger.info(
-                _('单独重跑完毕，已返回空闲状态...')
+                _('The solo rerun is completed and has returned to the idle state...')
             )
             return
 
         host._auto_adjust_after_use_action()
         host.logger.info(
-            _('所有任务执行完毕，助手已进入挂机监控模式...')
+            _('All tasks have completed, and the assistant is now in idle monitoring mode...')
         )
 
     @staticmethod

@@ -116,6 +116,37 @@ class AutoPageBase(AutoPageActionsMixin, AutoPageI18nMixin, QWidget):
     def _allow_half_layout(self) -> bool:
         return True
 
+    def _half_layout_label_width_bounds(self) -> tuple[int, int]:
+        """Adaptive label width range for half layout: tight but aligned."""
+        return 64, 132
+
+    def _half_layout_label_width(self, labels: list[QWidget]) -> int:
+        lo, hi = self._half_layout_label_width_bounds()
+        measured = 0
+        for label in labels:
+            try:
+                measured = max(
+                    measured,
+                    int(label.minimumSizeHint().width()),
+                    int(label.sizeHint().width()),
+                )
+            except Exception:
+                continue
+        if measured <= 0:
+            return lo
+        return max(lo, min(hi, measured + 4))
+
+    def _collapsible_groups_enabled(self) -> bool:
+        return bool(getattr(self.module_meta, "auto_page_collapsible_groups", False))
+
+    def _groups_collapsed_by_default(self) -> bool:
+        return bool(getattr(self.module_meta, "auto_page_groups_collapsed_by_default", False))
+
+    @staticmethod
+    def _set_group_toggle_caption(button: PushButton, title: str, expanded: bool) -> None:
+        indicator = "[-]" if expanded else "[+]"
+        button.setText(f"{indicator} {title}")
+
     def _form_field_growth_policy(self) -> QFormLayout.FieldGrowthPolicy:
         return QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow
 
@@ -220,7 +251,9 @@ class AutoPageBase(AutoPageActionsMixin, AutoPageI18nMixin, QWidget):
 
     def _label_for(self, field: SchemaField) -> str:
         if bool(getattr(field, "label_declared", False)):
-            localized = self._first_translated_in_current_lang(self._field_label_candidates(field))
+            localized = self._first_translated_in_current_lang(
+                self._field_label_candidates(field, include_heuristic=False)
+            )
             if localized:
                 return localized
             return str(field.label_default)
@@ -985,9 +1018,20 @@ class AutoPageBase(AutoPageActionsMixin, AutoPageI18nMixin, QWidget):
         for group_name, fields in ordered_groups:
             display_name = self._group_label(group_name)
             self._rendered_group_keys.add(self._normalize_group_key(group_name))
-
-            header = StrongBodyLabel(display_name, self.settings_container)
-            self.settings_layout.addWidget(header)
+            collapsible = self._collapsible_groups_enabled()
+            group_expanded = True
+            group_toggle: PushButton | None = None
+            if collapsible:
+                group_toggle = PushButton(self.settings_container)
+                group_toggle.setCheckable(True)
+                group_toggle.setObjectName(f"GroupToggle_{self._snake_key(display_name, max_len=64)}")
+                group_expanded = not self._groups_collapsed_by_default()
+                group_toggle.setChecked(group_expanded)
+                self._set_group_toggle_caption(group_toggle, display_name, group_expanded)
+                self.settings_layout.addWidget(group_toggle)
+            else:
+                header = StrongBodyLabel(display_name, self.settings_container)
+                self.settings_layout.addWidget(header)
 
             group_card = SimpleCardWidget(self.settings_container)
             group_card.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
@@ -999,6 +1043,20 @@ class AutoPageBase(AutoPageActionsMixin, AutoPageI18nMixin, QWidget):
             form_layout.setFieldGrowthPolicy(self._form_field_growth_policy())
             form_layout.setLabelAlignment(Qt.AlignmentFlag.AlignLeft)
 
+            half_allowed = self._allow_half_layout()
+            prepared_rows: list[tuple[str, QWidget, QWidget]] = []
+            half_labels: list[QWidget] = []
+            for field in fields:
+                widget = self._widget_for_field(field, group_card)
+                widget.setObjectName(field.param_name)
+                self.field_widgets[field.param_name] = widget
+                label = self._field_header_widget(field, group_card)
+                field_layout = field.layout if half_allowed else "full"
+                prepared_rows.append((field_layout, label, widget))
+                if field_layout == "half":
+                    half_labels.append(label)
+
+            group_half_label_width = self._half_layout_label_width(half_labels)
             pending_half_fields: list[tuple[QWidget, QWidget]] = []
 
             def flush_half_fields() -> None:
@@ -1006,8 +1064,29 @@ class AutoPageBase(AutoPageActionsMixin, AutoPageI18nMixin, QWidget):
                 if not pending_half_fields:
                     return
                 if len(pending_half_fields) == 1:
+                    row_host = QWidget(group_card)
+                    row_layout = QHBoxLayout(row_host)
+                    row_layout.setContentsMargins(0, 0, 0, 0)
+                    row_layout.setSpacing(12)
+
                     label_w, field_w = pending_half_fields[0]
-                    form_layout.addRow(label_w, field_w)
+                    col_host = QWidget(row_host)
+                    col_layout = QHBoxLayout(col_host)
+                    col_layout.setContentsMargins(0, 0, 0, 0)
+                    col_layout.setSpacing(8)
+                    label_w.setMinimumWidth(group_half_label_width)
+                    label_w.setMaximumWidth(group_half_label_width)
+                    col_layout.addWidget(label_w, 0, Qt.AlignmentFlag.AlignVCenter)
+                    col_layout.addWidget(field_w, 1, Qt.AlignmentFlag.AlignVCenter)
+                    row_layout.addWidget(col_host, 1)
+
+                    empty_col = QWidget(row_host)
+                    empty_layout = QHBoxLayout(empty_col)
+                    empty_layout.setContentsMargins(0, 0, 0, 0)
+                    empty_layout.addStretch(1)
+                    row_layout.addWidget(empty_col, 1)
+
+                    form_layout.addRow(row_host)
                     pending_half_fields = []
                     return
 
@@ -1018,24 +1097,19 @@ class AutoPageBase(AutoPageActionsMixin, AutoPageI18nMixin, QWidget):
 
                 for label_w, field_w in pending_half_fields[:2]:
                     col_host = QWidget(row_host)
-                    col_layout = QVBoxLayout(col_host)
+                    col_layout = QHBoxLayout(col_host)
                     col_layout.setContentsMargins(0, 0, 0, 0)
-                    col_layout.setSpacing(6)
-                    col_layout.addWidget(label_w)
-                    col_layout.addWidget(field_w)
+                    col_layout.setSpacing(8)
+                    label_w.setMinimumWidth(group_half_label_width)
+                    label_w.setMaximumWidth(group_half_label_width)
+                    col_layout.addWidget(label_w, 0, Qt.AlignmentFlag.AlignVCenter)
+                    col_layout.addWidget(field_w, 1, Qt.AlignmentFlag.AlignVCenter)
                     row_layout.addWidget(col_host, 1)
 
                 form_layout.addRow(row_host)
                 pending_half_fields = []
 
-            half_allowed = self._allow_half_layout()
-            for field in fields:
-                widget = self._widget_for_field(field, group_card)
-                widget.setObjectName(field.param_name)
-                self.field_widgets[field.param_name] = widget
-                label = self._field_header_widget(field, group_card)
-
-                field_layout = field.layout if half_allowed else "full"
+            for field_layout, label, widget in prepared_rows:
                 if field_layout == "half":
                     pending_half_fields.append((label, widget))
                     if len(pending_half_fields) == 2:
@@ -1072,11 +1146,19 @@ class AutoPageBase(AutoPageActionsMixin, AutoPageI18nMixin, QWidget):
                 swatch.setFixedSize(88, 24)
                 preview_layout.addWidget(swatch)
                 preview_layout.addStretch(1)
-
                 preview_fallback = "Current Color" if getattr(self, "_is_non_chinese_ui", False) else "当前颜色"
                 preview_label = BodyLabel(tr("framework.ui.current_color", fallback=preview_fallback), group_card)
                 form_layout.addRow(preview_label, preview_host)
                 self._register_color_preview(swatch, source_name, mode)
+
+            group_card.setVisible(group_expanded)
+            if group_toggle is not None:
+                def _toggle_group(checked: bool, _button=group_toggle, _card=group_card, _title=display_name):
+                    expanded = bool(checked)
+                    _card.setVisible(expanded)
+                    self._set_group_toggle_caption(_button, _title, expanded)
+
+                group_toggle.toggled.connect(_toggle_group)
 
             self.settings_layout.addWidget(group_card)
             self.settings_layout.addSpacing(4)
@@ -1107,6 +1189,7 @@ class AutoPageBase(AutoPageActionsMixin, AutoPageI18nMixin, QWidget):
                 raw_value = self._get_widget_value(field, widget)
                 typed_value = self._coerce_value_for_config(field, raw_value)
                 config.set(cfg_item, typed_value)
+
 
 
 

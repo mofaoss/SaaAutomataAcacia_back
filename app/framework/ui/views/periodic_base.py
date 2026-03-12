@@ -1,4 +1,5 @@
 import logging
+import re
 
 from PySide6.QtWidgets import QSizePolicy, QVBoxLayout, QWidget
 
@@ -101,6 +102,74 @@ class ModulePageBase(QWidget, BaseInterface):
 
     def finalize(self):
         self.ensure_main_layout().addStretch(1)
+
+    def apply_declared_field_texts(self, module_id: str) -> None:
+        module_key = str(module_id or "").strip()
+        if not module_key:
+            return
+
+        try:
+            from app.framework.core.module_system.registry import get_module
+            from app.framework.i18n import tr
+        except Exception:
+            return
+
+        meta = get_module(module_key)
+        if meta is None:
+            return
+
+        owner_module = ""
+        module_path = str(getattr(self.__class__, "__module__", "") or "")
+        owner_match = re.search(r"app\.features\.modules\.([a-z0-9_]+)(?:\.|$)", module_path)
+        if owner_match:
+            owner_module = owner_match.group(1)
+
+        for field in list(getattr(meta, "config_schema", []) or []):
+            param_name = str(getattr(field, "param_name", "") or "").strip()
+            if not param_name:
+                continue
+            widget = self.findChild(QWidget, param_name)
+            if widget is None or not hasattr(widget, "setText"):
+                continue
+
+            field_id = str(getattr(field, "field_id", "") or param_name).strip() or param_name
+            fallback = str(getattr(field, "label_default", "") or param_name).strip() or param_name
+
+            candidate_keys: list[str] = []
+            if owner_module:
+                candidate_keys.extend(
+                    [
+                        f"module.{owner_module}.field.{param_name}.label",
+                        f"module.{owner_module}.field.{field_id}.label",
+                    ]
+                )
+            candidate_keys.extend(
+                [
+                    f"module.{module_key}.field.{param_name}.label",
+                    f"module.{module_key}.field.{field_id}.label",
+                ]
+            )
+
+            label_key = str(getattr(field, "label_key", "") or "").strip()
+            if label_key:
+                candidate_keys.append(label_key)
+
+            text = fallback
+            seen: set[str] = set()
+            for key in candidate_keys:
+                key = str(key or "").strip()
+                if not key or key in seen:
+                    continue
+                seen.add(key)
+                localized = tr(key, fallback=key)
+                if localized != key:
+                    text = localized
+                    break
+
+            try:
+                widget.setText(text)
+            except Exception:
+                continue
 
 
 class PeriodicPageBase(ModulePageBase):

@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 import re
@@ -34,6 +34,7 @@ _ENTER_GAME_FIELDS = {
 
 @periodic_module(
     "自动登录",
+    periodic_role="bootstrap",
     fields=_ENTER_GAME_FIELDS,
     description=(
         "### 提示\n"

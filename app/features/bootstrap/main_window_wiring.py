@@ -19,11 +19,9 @@ from app.features.modules.event_tips.usecase.event_tips_usecase import (
     EventTipsActions,
     EventTipsUseCase,
 )
-from app.features.modules.shopping.usecase.shopping_usecase import ShoppingSelectionUseCase
 from app.features.utils.home_navigation import back_to_home
 from app.features.utils.network import start_cloudflare_update
 from app.framework.application.tasks.periodic_task_profile import get_periodic_task_profile
-from app.framework.i18n import _
 
 
 class SnowbreakMainWindowBridge(MainWindowFeatureBridge):
@@ -34,17 +32,7 @@ class SnowbreakMainWindowBridge(MainWindowFeatureBridge):
         load_i18n_catalogs()
 
     def create_home_interface(self, window):
-        from app.framework.core.module_system.registry import get_module
-        from app.features.modules.shopping.ui.shop_periodic_page import ShopPage
-
         enter_game_service = EnterGameService(window._is_non_chinese_ui, app_config=config)
-
-        # 独立接入：在接线层将业务依赖注入到 UI 工厂中
-        shop_meta = get_module("task_shop")
-        if shop_meta:
-            selection_usecase = ShoppingSelectionUseCase(window._is_non_chinese_ui)
-            # 重写工厂方法，实现构造注入，解耦框架
-            shop_meta.ui_factory = lambda parent, _host, **_: ShopPage(parent, selection_usecase=selection_usecase)
 
         return PeriodicTasksPage(
             "Periodic Tasks",

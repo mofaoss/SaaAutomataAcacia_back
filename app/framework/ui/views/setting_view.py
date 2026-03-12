@@ -124,7 +124,7 @@ class AboutHeaderWidget(QWidget, BaseInterface):
         self.qqLink.setToolTip(_('Click to copy QQ group number'))
 
         self.githubPrefix = BodyLabel("GitHub:", self)
-        self.downloadLink = HyperlinkButton("", _('现在更新'), self)
+        self.downloadLink = HyperlinkButton("", _('Update now'), self)
 
         self.downloadLink.setMinimumHeight(24)
 
@@ -150,11 +150,11 @@ class AboutHeaderWidget(QWidget, BaseInterface):
         local_version = get_local_version() or "-"
         self.localVersionLabel = BodyLabel(_('Current version: {local_version}').format(local_version=local_version), self)
 
-        self.remoteVersionLabel = BodyLabel(_('最新版本：正在检查...'), self)
+        self.remoteVersionLabel = BodyLabel(_('Latest version: Checking...'), self)
 
-        self.checkUpdateBtn = PushButton(FIF.UPDATE, _('检查更新'), self)
+        self.checkUpdateBtn = PushButton(FIF.UPDATE, _('Check for updates'), self)
         self.checkUpdateBtn.setFixedHeight(28)
-        self.checkUpdateBtn.setToolTip(_('检查更新'))
+        self.checkUpdateBtn.setToolTip(_('Check for updates'))
         self.checkUpdateBtn.setCursor(Qt.CursorShape.PointingHandCursor)
 
         self.row3Layout.addWidget(self.localVersionLabel)
@@ -189,7 +189,7 @@ class SettingInterface(ScrollArea, BaseInterface):
         self._is_dialog_open = False
 
         self.app_name = "SaaAssistantAca"
-        self.startup_task_name = f"{self.app_name} {_('开机自启')}"
+        self.startup_task_name = f"{self.app_name} {_('Start automatically at boot')}"
         if getattr(sys, 'frozen', False):
             self.app_path = sys.executable
         else:
@@ -202,15 +202,15 @@ class SettingInterface(ScrollArea, BaseInterface):
 
         # core settings
         self.coreSettingsGroup = SettingCardGroup(
-            _('核心设置'), self.scrollWidget)
+            _('core settings'), self.scrollWidget)
 
         # personalization
         self.personalGroup = SettingCardGroup(
             self.tr('Personalization'), self.scrollWidget)
         self.minimizeToTrayCard = SwitchSettingCard(
             FIF.MINIMIZE,
-            _('关闭时缩小到托盘'),
-            _('开启后，点击关闭按钮会将程序隐藏到系统托盘，而不是退出程序'),
+            _('Shrink to tray on close'),
+            _('Once enabled, clicking the Close button will hide the program in the system tray instead of exiting the program.'),
             configItem=config.minimizeToTray,
             parent=self.personalGroup
         )
@@ -235,11 +235,11 @@ class SettingInterface(ScrollArea, BaseInterface):
         self.enterCard = ComboBoxSettingCard(
             config.enter_interface,
             FIF.HOME,
-            _('启动时进入'),
-            _('选择启动软件时直接进入哪个页面'),
+            _('Enter at startup'),
+            _('Choose which page to enter directly when starting the software'),
             texts=[
-                _('首页'), _('日常'),
-                _('工具')
+                _('front page'), _('daily'),
+                _('tool')
             ],
             parent=self.personalGroup
         )
@@ -265,18 +265,18 @@ class SettingInterface(ScrollArea, BaseInterface):
 
         # about software
         self.aboutSoftwareGroup = SettingCardGroup(
-            _('功能相关'), self.scrollWidget)
+            _('Function related'), self.scrollWidget)
         self.updateOnStartUpCard = SwitchSettingCard(
             FIF.UPDATE,
             self.tr('Check for updates when the application starts'),
-            _('如果开启，每次游戏版本更新会自动更新对应活动刷体力的坐标和安卡希雅更新提醒的链接'),
+            _('If turned on, each time the game version is updated, the coordinates corresponding to the physical activity and the link to the Ancathiya update reminder will be automatically updated.'),
             configItem=config.checkUpdateAtStartUp,
             parent=self.aboutSoftwareGroup
         )
         self.checkPrereleaseForStableCard = SwitchSettingCard(
             FIF.TAG,
-            _('检测测试版更新（正式版用户）'),
-            _('默认关闭。正式版用户开启后会同时检测正式版和测试版；测试版用户始终会同时检测两者'),
+            _('Detect beta version updates (official version users)'),
+            _('Off by default. After users of the official version turn it on, they will detect both the official version and the test version at the same time; users of the test version will always detect both at the same time.'),
             configItem=config.checkPrereleaseForStable,
             parent=self.aboutSoftwareGroup
         )
@@ -284,17 +284,17 @@ class SettingInterface(ScrollArea, BaseInterface):
         # Core Settings Cards
         self.stealthModeCard = SwitchSettingCard(
             FIF.HIDE,
-            _('隐身模式'),
-            _('游戏完全隐身后台'),
+            _('Stealth mode'),
+            _('The game is completely invisible in the background'),
             configItem=config.windowTrackingInput,
             parent=self.coreSettingsGroup
         )
         self.serverCard = ComboBoxSettingCard(
             config.server_interface,
             FIF.GAME,
-            _('游戏渠道选择'),
-            _('请选择你所在的区服'),
-            texts=[_('官服'), _('Bilibili'), _('国际服')],
+            _('Game channel selection'),
+            _('Please select your regional server'),
+            texts=[_('official uniform'), _('Bilibili'), _('International server')],
             parent=self.coreSettingsGroup
         )
         self.gameLanguageCard = ComboBoxSettingCard(
@@ -310,71 +310,71 @@ class SettingInterface(ScrollArea, BaseInterface):
         self.windowTrackingAlphaCard = SliderSettingCard(
             configItem=config.windowTrackingAlpha,
             icon=FIF.HIDE,
-            title=_('隐身模式可见度'),
-            content=_('数值越低越隐形：1=极度隐藏，255=正常显示，建议设置1'),
+            title=_('Incognito mode visibility'),
+            content=_('The lower the value, the more invisible it is: 1=extremely hidden, 255=normal display, it is recommended to set 1'),
             parent=self.aboutSoftwareGroup,
             min_value=1,
             max_value=255,
         )
         self.saveScaleCacheCard = SwitchSettingCard(
             FIF.SAVE,
-            _('保存缩放比例数据'),
-            _('如果你的游戏窗口固定使用，可以选择保存，这样运行会匹配得更快，如果窗口大小经常变化则取消勾选'),
+            _('Save scaling data'),
+            _('If your game window is used permanently, you can choose to save it, so that the running will match faster. If the window size changes frequently, uncheck it.'),
             configItem=config.saveScaleCache,
             parent=self.aboutSoftwareGroup
         )
         self.autoStartTask = SwitchSettingCard(
             FIF.PLAY,
-            _('自动开始任务'),
-            _('唤醒安卡希雅后自动开始运行日常，必须先勾选并配置好自动打开游戏'),
+            _('Start task automatically'),
+            _('After waking up Ancaxia, it will automatically start running the daily routine. You must first check and configure the automatic opening of the game.'),
             configItem=config.auto_start_task,
             parent=self.aboutSoftwareGroup
         )
         self.autoBootStartup = SwitchSettingCard(
             FIF.POWER_BUTTON,
-            _('开机自启'),
-            _('开机时自动唤醒安卡希雅'),
+            _('Start automatically at boot'),
+            _('Automatically wake up Ancasia when booting'),
             configItem=config.auto_boot_startup,
             parent=self.aboutSoftwareGroup
         )
         self.informMessage = SwitchSettingCard(
             FIF.HISTORY,
-            _('消息通知'),
-            _('是否打开体力恢复通知'),
+            _('Message notification'),
+            _('Whether to turn on physical recovery notifications'),
             configItem=config.inform_message,
             parent=self.aboutSoftwareGroup
         )
         self.proxyCard = TextEditCard(
             config.update_proxies,
             FIF.GLOBE,
-            _('代理端口'),
-            _('如‘7890’'),
-            _('如果选择开代理则需要填入代理端口，不开代理则置空'),
+            _('proxy port'),
+            _("Such as '7890'"),
+            _('If you choose to enable a proxy, you need to fill in the proxy port. If you do not enable a proxy, leave it blank.'),
             self.aboutSoftwareGroup
         )
 
         # Developer Options (开发者选项)
         self.developerOptionsGroup = SettingCardGroup(
-            _('开发者选项'), self.scrollWidget)
+            _('Developer options'), self.scrollWidget)
 
         self.isLogCard = SwitchSettingCard(
             FIF.DEVELOPER_TOOLS,
-            _('展示图像识别日志'),
+            _('Display image recognition log'),
             _('Show OCR results and OpenCV errors in logs for detailed diagnostics'),
             configItem=config.isLog,
             parent=self.developerOptionsGroup
         )
         self.showScreenshotCard = SwitchSettingCard(
             FIF.PHOTO,
-            _('展示运行时的窗口截图'),
+            _('Screenshot of window showing runtime'),
             _('Used for troubleshooting capture regions. Screenshots are saved in SaaAssistantAca/temp and should be deleted manually'),
             configItem=config.showScreenshot,
             parent=self.developerOptionsGroup
         )
         self.isInputLogCard = SwitchSettingCard(
             FIF.COMMAND_PROMPT,
-            _('展示模拟输入日志'),
-            _('打开将在日志中显示鼠标移动、点击、按键等模拟输入操作的详细信息'),
+            _('Display simulation input log'),
+            _('Opening will display detailed information on simulated input operations such as mouse movements, clicks, key presses, etc. in the log.'),
             configItem=config.isInputLog,
             parent=self.developerOptionsGroup
         )
@@ -463,6 +463,7 @@ class SettingInterface(ScrollArea, BaseInterface):
         """ connect signal to slot """
         config.appRestartSig.connect(self._showRestartTooltip)
         signalBus.windowTrackingStealthChanged.connect(self._sync_stealth_controls)
+        self.stealthModeCard.checkedChanged.connect(self._on_stealth_mode_toggled)
 
         # personalization
         config.themeChanged.connect(setTheme)
@@ -488,21 +489,21 @@ class SettingInterface(ScrollArea, BaseInterface):
     def _on_manual_check_finished(self, payload: dict):
         if hasattr(self, 'aboutHeaderWidget') and hasattr(self.aboutHeaderWidget, 'checkUpdateBtn'):
             self.aboutHeaderWidget.checkUpdateBtn.setEnabled(True)
-            self.aboutHeaderWidget.checkUpdateBtn.setText(_('检查更新'))
+            self.aboutHeaderWidget.checkUpdateBtn.setText(_('Check for updates'))
 
         self._on_about_header_version_checked(payload)
 
         download_url = str(payload.get("download_url") or "").strip()
         if download_url:
             InfoBar.warning(
-                _('检测到新版本'),
+                _('New version detected'),
                 _('Please click [Update now] or go to QQ group for update'),
                 duration=3000,
                 parent=self
             )
         else:
             InfoBar.success(
-                _('已是最新'),
+                _('Already the latest'),
                 "",
                 duration=3000,
                 parent=self
@@ -521,6 +522,11 @@ class SettingInterface(ScrollArea, BaseInterface):
         self.versionCheckThread = VersionCheckThread(self)
         self.versionCheckThread.finishedSignal.connect(self._on_about_header_version_checked)
         self.versionCheckThread.start()
+
+    def _on_stealth_mode_toggled(self, checked: bool):
+        alpha = 1 if checked else 255
+        config.set(config.windowTrackingAlpha, alpha)
+        signalBus.windowTrackingStealthChanged.emit(bool(checked), int(alpha))
 
     def _sync_stealth_controls(self, checked: bool, alpha: int):
         try:
@@ -557,24 +563,24 @@ class SettingInterface(ScrollArea, BaseInterface):
                            capture_output=True, text=True)
 
             InfoBar.success(
-                _('添加自启成功'),
-                _('已通过计划任务创建开机自启'),
+                _('Added self-start successfully'),
+                _('Auto-start has been created through a scheduled task'),
                 isClosable=True,
                 duration=2000,
                 parent=self
             )
         except subprocess.CalledProcessError as e:
             InfoBar.error(
-                _('添加自启失败'),
-                _('创建计划任务失败：') + f"{e.stderr}",
+                _('Adding auto-start failed'),
+                _('Failed to create scheduled task:') + f"{e.stderr}",
                 isClosable=True,
                 duration=2000,
                 parent=self
             )
         except Exception as e:
             InfoBar.error(
-                _('添加自启失败'),
-                _('创建启动文件失败：') + f"{e}",
+                _('Adding auto-start failed'),
+                _('Failed to create startup file:') + f"{e}",
                 isClosable=True,
                 duration=2000,
                 parent=self
@@ -591,8 +597,8 @@ class SettingInterface(ScrollArea, BaseInterface):
                 os.remove(cmd_file_path)
 
             InfoBar.success(
-                _('删除自启成功'),
-                _('已关闭开机自启'),
+                _('Deletion started successfully'),
+                _('Autostart is turned off'),
                 isClosable=True,
                 duration=2000,
                 parent=self
@@ -600,23 +606,23 @@ class SettingInterface(ScrollArea, BaseInterface):
         except subprocess.CalledProcessError as e:
             if "找不到系统指定的" in e.stderr or "cannot find" in e.stderr.lower():
                 InfoBar.warning(
-                    _('任务不存在'),
-                    _('计划任务可能已被删除'),
+                    _('Task does not exist'),
+                    _('The scheduled task may have been deleted'),
                     isClosable=True,
                     duration=2000,
                     parent=self
                 )
             else:
                 InfoBar.error(
-                    _('删除自启失败'),
-                    _('删除计划任务失败：') + f"{e.stderr}",
+                    _('Delete auto-start failed'),
+                    _('Failed to delete scheduled task:') + f"{e.stderr}",
                     isClosable=True,
                     duration=2000,
                     parent=self
                 )
         except Exception as e:
             InfoBar.error(
-                _('删除自启失败'),
+                _('Delete auto-start failed'),
                 f"{e}",
                 isClosable=True,
                 duration=2000,
@@ -634,11 +640,11 @@ class SettingInterface(ScrollArea, BaseInterface):
                     self.aboutHeaderWidget.downloadLink.clicked.disconnect()
                 except Exception:
                     pass
-                self.aboutHeaderWidget.downloadLink.setText(_('已是最新'))
+                self.aboutHeaderWidget.downloadLink.setText(_('Already the latest'))
                 self.aboutHeaderWidget.downloadLink.setUrl("")
                 self.aboutHeaderWidget.downloadLink.clicked.connect(
                     lambda: InfoBar.success(
-                        _('已是最新'),
+                        _('Already the latest'),
                         (""),
                         duration=2000,
                         parent=self
@@ -651,7 +657,7 @@ class SettingInterface(ScrollArea, BaseInterface):
                     self.aboutHeaderWidget.downloadLink.clicked.disconnect()
                 except Exception:
                     pass
-                self.aboutHeaderWidget.downloadLink.setText(_('现在更新'))
+                self.aboutHeaderWidget.downloadLink.setText(_('Update now'))
                 self.aboutHeaderWidget.downloadLink.clicked.connect(lambda: self.start_unified_download(download_url))
 
         if hasattr(self.aboutHeaderWidget, "localVersionLabel"):
@@ -695,7 +701,7 @@ class SettingInterface(ScrollArea, BaseInterface):
 
         is_exe = os.path.isfile(downloaded_path) and downloaded_path.lower().endswith('.exe')
 
-        title = _('更新准备就绪')
+        title = _('Update ready')
 
         if is_exe:
             content = _('New version of SaaAssistantAca has been downloaded.<br/><br/>Close app and run installer now?')
@@ -728,7 +734,7 @@ class SettingInterface(ScrollArea, BaseInterface):
 
             except Exception as e:
                 self.handle_download_fallback(
-                    _('应用更新失败'),
+                    _('Application update failed'),
                     f"覆盖脚本启动异常：{str(e)}",
                     REPO_URL
                 )

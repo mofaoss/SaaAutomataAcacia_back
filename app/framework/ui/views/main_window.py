@@ -161,20 +161,20 @@ class MainWindow(FluentWindow, BaseInterface):
         if icon.isNull():
             logger.warning(_("system tray icon is null; tray may be invisible"))
         self.tray_icon.setIcon(icon)
-        self.tray_icon.setToolTip(_('安卡小助手'))
+        self.tray_icon.setToolTip(_('Anka Assistant'))
 
         # 创建托盘菜单
         tray_menu = QMenu(self)
 
         # 显示主窗口动作
-        show_action = QAction(_('显示主窗口'), self)
+        show_action = QAction(_('Show main window'), self)
         show_action.triggered.connect(self.show_from_tray)
         tray_menu.addAction(show_action)
 
         tray_menu.addSeparator()
 
         # 彻底退出动作
-        quit_action = QAction(_('彻底退出'), self)
+        quit_action = QAction(_('Exit completely'), self)
         quit_action.triggered.connect(self.quit_app)
         tray_menu.addAction(quit_action)
 
@@ -222,7 +222,7 @@ class MainWindow(FluentWindow, BaseInterface):
         return "other"
 
     def _on_global_hotkey_pressed(self):
-        logger.info(_('热键已按下', msgid="hotkey_pressed"))
+        logger.info(_('Hotkey pressed', msgid="hotkey_pressed"))
         action = resolve_f8_action(
             global_is_running=self.global_is_running,
             context=self._resolve_hotkey_context(),
@@ -407,19 +407,19 @@ class MainWindow(FluentWindow, BaseInterface):
         if key == "display":
             if self.displayInterface is None:
                 self._create_display_interface()
-            self._register_nav_item("display", self.displayInterface, FIF.HOME, _('首页'))
+            self._register_nav_item("display", self.displayInterface, FIF.HOME, _('front page'))
             return
 
         if key == "home":
             if self.homeInterface is None:
                 self._create_home_interface()
-            self._register_nav_item("home", self.homeInterface, FIF.PLAY, _('日常'))
+            self._register_nav_item("home", self.homeInterface, FIF.PLAY, _('daily'))
             return
 
         if key == "additional":
             if self.additionalInterface is None:
                 self._create_additional_interface()
-            self._register_nav_item("additional", self.additionalInterface, FIF.DEVELOPER_TOOLS, _('工具'))
+            self._register_nav_item("additional", self.additionalInterface, FIF.DEVELOPER_TOOLS, _('tool'))
             return
 
         if key == "table":
@@ -429,7 +429,7 @@ class MainWindow(FluentWindow, BaseInterface):
                 "table",
                 self.tableInterface,
                 FIF.BOOK_SHELF,
-                _('词表'),
+                _('Vocabulary'),
                 position=NavigationItemPosition.BOTTOM,
             )
             return
@@ -441,7 +441,7 @@ class MainWindow(FluentWindow, BaseInterface):
                 "help",
                 self.helpInterface,
                 FIF.HELP,
-                _('帮助'),
+                _('help'),
                 position=NavigationItemPosition.BOTTOM,
             )
             return
@@ -493,7 +493,7 @@ class MainWindow(FluentWindow, BaseInterface):
 
         if not best:
             InfoBar.success(
-                title=_('已是最新'),
+                title=_('Already the latest'),
                 content="",
                 orient=Qt.Orientation.Horizontal,
                 isClosable=True,
@@ -504,11 +504,11 @@ class MainWindow(FluentWindow, BaseInterface):
             return
 
         download_url = str((best or {}).get("download_url") or "").strip()
-        download_link_text = _('现在更新')
+        download_link_text = _('Update now')
         content_html = _('<a href="#">{download_link_text}</a>').format(download_link_text=download_link_text)
         info_bar = InfoBar.warning(
             # title=self._ui_text("检测到新版本", "New version available"),
-            title=_('检测到新版本'),
+            title=_('New version detected'),
             content=content_html,
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
@@ -740,8 +740,8 @@ class MainWindow(FluentWindow, BaseInterface):
             # 显示一个气泡提示，告诉用户程序跑到托盘去了 (只提示一次避免烦人，可以根据需要保留)
             if not getattr(self, "_has_shown_tray_tip", False):
                 self.tray_icon.showMessage(
-                    _('已最小化'),
-                    _('安卡希雅已隐藏到系统托盘，后台计划依然生效哦！'),
+                    _('Minimized'),
+                    _('Ancasia has been hidden in the system tray, and the background plan is still in effect!'),
                     QSystemTrayIcon.MessageIcon.Information,
                     2000
                 )

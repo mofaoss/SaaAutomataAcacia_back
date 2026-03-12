@@ -96,37 +96,33 @@ class Automation:
         self._init_input()
 
     def _refresh_hwnds(self):
-        """刷新窗口句柄。保持与 main 分支一致：操作句柄与截图句柄解耦。"""
+        """刷新窗口句柄。严格按类名解析，避免隐身模式下抓取到同名的无效幽灵窗口。"""
         try:
-            # 1. 优先解析可操作句柄（按类名）
+            # 1. 核心解析：按标题+类名寻找目标操作句柄
             target_hwnd = get_hwnd(self.window_title, self.window_class)
+            
+            # 如果按类名没找到，尝试按标题找一次但必须进行类名和合法性校验
+            if not target_hwnd:
+                top_hwnd = win32gui.FindWindow(None, self.window_title)
+                if top_hwnd:
+                    try:
+                        if win32gui.GetClassName(top_hwnd) == self.window_class:
+                            rect = win32gui.GetWindowRect(top_hwnd)
+                            if (rect[2] - rect[0]) > 0 and (rect[3] - rect[1]) > 0:
+                                target_hwnd = top_hwnd
+                    except Exception:
+                        pass
 
-            # 2. 截图句柄优先使用顶层标题窗口；
-            #    仅在未找到时退回到可操作句柄，避免截图/输入共用错误句柄。
-            top_level_hwnd = win32gui.FindWindow(None, self.window_title)
             self.hwnd = target_hwnd
-            self.screenshot_hwnd = top_level_hwnd or target_hwnd
 
-            if self.screenshot_hwnd:
-                rect = win32gui.GetWindowRect(self.screenshot_hwnd)
-                if rect[2] - rect[0] <= 0 or rect[3] - rect[1] <= 0:
-                    # 如果当前句柄没尺寸，尝试重新枚举所有同名窗口寻找有尺寸的
-                    def callback(hwnd, results):
-                        if win32gui.GetWindowText(hwnd) == self.window_title:
-                            try:
-                                r = win32gui.GetWindowRect(hwnd)
-                                if r[2] - r[0] > 0 and r[3] - r[1] > 0:
-                                    results.append(hwnd)
-                            except Exception:
-                                pass
-                        return True
-                    valid_hwnds = []
-                    win32gui.EnumWindows(callback, valid_hwnds)
-                    if valid_hwnds:
-                        self.screenshot_hwnd = valid_hwnds[0]
-                        # 不覆盖 self.hwnd：输入句柄仍以类名解析结果为准（main 分支行为）。
-            if self.screenshot_hwnd is None:
-                self.screenshot_hwnd = self.hwnd
+            # 2. 解析截图句柄：必须与操作句柄保持在同一窗口树
+            if target_hwnd and win32gui.IsWindow(target_hwnd):
+                # 优先使用操作句柄的根窗口作为截图目标
+                self.screenshot_hwnd = win32gui.GetAncestor(target_hwnd, win32con.GA_ROOT) or target_hwnd
+            else:
+                # 如果主句柄都没了，说明窗口真关了，清空句柄防止无效重试
+                self.hwnd = None
+                self.screenshot_hwnd = None
 
             if hasattr(self, "input_handler") and self.input_handler:
                 self.input_handler.hwnd = self.hwnd
@@ -592,7 +588,7 @@ class Automation:
         if temp is None:
             self._log_error_throttled(
                 "find_image_without_screenshot",
-                _('当前没有可用截图，跳过图像匹配', msgid='no_available_screenshot_currently_skipping_image'),
+                _('No available screenshot currently, skipping image matching', msgid='no_available_screenshot_currently_skipping_image'),
             )
             return None, None, None
 
@@ -1073,7 +1069,7 @@ class Automation:
         if self.first_screenshot is None:
             self._log_error_throttled(
                 "read_text_no_screenshot",
-                _('当前没有截图，无法读取文本', msgid='no_screenshot_currently_unable_to_read_text'),
+                _('No screenshot currently, unable to read text', msgid='no_screenshot_currently_unable_to_read_text'),
                 level="warning",
             )
             self.ocr_result = []
@@ -1090,7 +1086,7 @@ class Automation:
             if target is None:
                 self._log_error_throttled(
                     "find_image_and_count_no_target",
-                    _('目标图像为空，跳过匹配计数', msgid='target_image_is_empty_skipping_match_counting'),
+                    _('Target image is empty, skipping match counting', msgid='target_image_is_empty_skipping_match_counting'),
                 )
                 return None
             temp = target
@@ -1140,7 +1136,7 @@ class Automation:
         try:
             ocr_result = self.read_text_from_crop(crop=(900 / 1920, 0, 1076 / 1920, 70 / 1080))
             if not ocr_result or not isinstance(ocr_result, list) or not isinstance(ocr_result[0], (list, tuple)):
-                self.logger.warning(_('无法从截图识别体力', msgid='unable_to_recognize_stamina_from_screenshot'))
+                self.logger.warning(_('Unable to recognize stamina from screenshot', msgid='unable_to_recognize_stamina_from_screenshot'))
                 return None
 
             text = str(ocr_result[0][0]) if ocr_result[0] else ""

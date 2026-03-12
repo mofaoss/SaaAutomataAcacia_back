@@ -125,19 +125,39 @@ class Screenshot:
                 return None
 
             # 获取窗口尺寸与客户区尺寸
-            left, top, right, bottom = win32gui.GetWindowRect(hwnd)
-
-            w = right - left
-            h = bottom - top
-            if w <= 0 or h <= 0:
-                self._log_error_throttled('invalid_window_size', f"截图失败：窗口尺寸无效 ({w}x{h})")
+            try:
+                left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+                w = right - left
+                h = bottom - top
+                
+                client_rect = win32gui.GetClientRect(hwnd)
+                client_width = client_rect[2] - client_rect[0]
+                client_height = client_rect[3] - client_rect[1]
+            except Exception as e:
+                self._log_error_throttled('rect_error', f"截图失败：无法获取窗口坐标 ({repr(e)})")
                 return None
 
-            client_rect = win32gui.GetClientRect(hwnd)
-            client_width = client_rect[2] - client_rect[0]
-            client_height = client_rect[3] - client_rect[1]
+            # 容错处理：处理 65535 (即 -1) 这种异常宽度或高度为 0 的情况
+            # 这种情况常见于窗口被 DWM 屏蔽或处于某些特殊的隐身/最小化状态
+            if w <= 0 or h <= 0 or w > 30000:
+                if client_width > 0 and client_height > 0:
+                    # 如果窗口外框尺寸异常但客户区尺寸正常，优先信任客户区尺寸
+                    # 这种情况下通常 left/top 也是无效的，我们需要修正它们
+                    w, h = client_width, client_height
+                    # 尝试通过 ClientToScreen 恢复相对于屏幕的坐标
+                    try:
+                        c_left, c_top = win32gui.ClientToScreen(hwnd, (0, 0))
+                        left, top = c_left, c_top
+                        right, bottom = left + w, top + h
+                    except Exception:
+                        pass 
+                else:
+                    self._log_error_throttled('invalid_window_size', f"截图失败：窗口尺寸无效 ({w}x{h})，客户区尺寸 ({client_width}x{client_height})")
+                    return None
+
             if client_width <= 0 or client_height <= 0:
-                self._log_error_throttled('invalid_client_size', f"截图失败：客户区尺寸无效 ({client_width}x{client_height})，等待下一帧重试")
+                # 这种情况下连客户区都没了，通常是窗口彻底不可见或被销毁中
+                self._log_error_throttled('invalid_client_size', f"截图失败：客户区尺寸无效 ({client_width}x{client_height})")
                 return None
             client_screen_x, client_screen_y = win32gui.ClientToScreen(hwnd, (0, 0))
             client_offset_x = client_screen_x - left

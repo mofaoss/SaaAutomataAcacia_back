@@ -4,6 +4,7 @@ from typing import Any, Mapping
 
 from app.framework.core.module_system.naming import humanize_name
 from app.framework.i18n import tr
+from app.framework.i18n.runtime import _resolve_lang, classify_source_language
 
 
 def _fallback_title(entity_id: str) -> str:
@@ -14,11 +15,42 @@ def _fallback_title(entity_id: str) -> str:
     return readable or str(entity_id or "")
 
 
+def _safe_source_lang(text: str) -> str:
+    raw = str(text or "").strip()
+    if not raw:
+        return ""
+    try:
+        return classify_source_language(raw)
+    except Exception:
+        return ""
+
+
+def _same_language_bucket(current_lang: str, source_lang: str) -> bool:
+    current = str(current_lang or "").strip()
+    source = str(source_lang or "").strip()
+    if not current or not source:
+        return False
+    if source == "zh_CN":
+        return current in {"zh_CN", "zh_HK"}
+    return current == source
+
+
 def resolve_display_name(*, name: str, name_msgid: str, fallback_id: str) -> str:
-    base_name = str(name or "").strip() or _fallback_title(fallback_id)
+    declared_name = str(name or "").strip()
+    base_name = declared_name or _fallback_title(fallback_id)
     key = str(name_msgid or "").strip()
     if key:
-        return tr(key, fallback=base_name)
+        current_lang = _resolve_lang()
+        source_lang = _safe_source_lang(declared_name)
+        same_lang = _same_language_bucket(current_lang, source_lang)
+
+        # Source-language UI should immediately reflect declaration changes,
+        # even before i18n extraction/sync updates stale JSON entries.
+        if declared_name and same_lang:
+            return declared_name
+
+        fallback = base_name if same_lang else _fallback_title(fallback_id)
+        return tr(key, fallback=fallback)
     return base_name
 
 

@@ -16,6 +16,7 @@ def _build_periodic_specs():
                 "ui_page_index": profile.get("ui_page_index"),
                 "option_key": profile.get("option_key"),
                 "requires_home_sync": profile.get("requires_home_sync", True),
+                "notify_on_completion": profile.get("notify_on_completion", True),
                 "is_mandatory": profile.get("mandatory", False),
                 "force_first": profile.get("force_first", False),
                 "default_activation_config": list(profile.get("default_activation_config", [])),
@@ -31,7 +32,7 @@ def _pick_primary_task_id(specs):
     for spec in specs:
         if bool(spec.get("is_mandatory", False)):
             return spec.get("id")
-    return specs[0].get("id") if specs else "task_login"
+    return specs[0].get("id") if specs else ""
 
 
 PERIODIC_TASK_SPECS = _build_periodic_specs()

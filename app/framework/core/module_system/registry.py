@@ -44,7 +44,7 @@ def get_modules_by_host(host: ModuleHost) -> list[ModuleMeta]:
     _ensure_discovered()
     return sorted(
         [m for m in _MODULE_REGISTRY.values() if m.host == host and m.enabled],
-        key=lambda x: x.order,
+        key=lambda x: (x.order, str(x.id or "")),
     )
 
 
@@ -63,7 +63,8 @@ def _first_default_activation_config(meta: ModuleMeta) -> list[dict[str, Any]]:
 
 def build_periodic_profiles():
     profiles = []
-    for m in get_modules_by_host(ModuleHost.PERIODIC):
+    periodic_modules = get_modules_by_host(ModuleHost.PERIODIC)
+    for page_index, m in enumerate(periodic_modules):
         profiles.append(
             {
                 "task_id": m.id,
@@ -74,9 +75,11 @@ def build_periodic_profiles():
                 "default_hour": m.periodic_default_hour,
                 "default_minute": m.periodic_default_minute,
                 "max_runs": m.periodic_max_runs,
-                "ui_page_index": m.periodic_ui_page_index,
+                # Keep page index deterministic and unique for the current sorted module list.
+                "ui_page_index": page_index,
                 "option_key": m.periodic_option_key,
                 "requires_home_sync": m.periodic_requires_home_sync,
+                "notify_on_completion": m.notify_on_completion,
                 "default_activation_config": _first_default_activation_config(m),
             }
         )

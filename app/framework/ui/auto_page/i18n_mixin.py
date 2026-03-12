@@ -3,9 +3,10 @@
 import re
 from functools import lru_cache
 
+from app.framework.application.modules.name_resolver import resolve_display_name
+from app.framework.core.module_system.models import SchemaField
 from app.framework.i18n import tr
 from app.framework.i18n.runtime import _resolve_lang, get_catalog
-from app.framework.core.module_system.models import SchemaField
 
 
 class AutoPageI18nMixin:
@@ -248,11 +249,24 @@ class AutoPageI18nMixin:
                     seen.add(key)
 
         return tuple(collected)
-    def _field_label_candidates(self, field: SchemaField) -> list[str]:
+    def _field_label_candidates(self, field: SchemaField, *, include_heuristic: bool = True) -> list[str]:
         stripped = self._strip_widget_prefix(field.param_name)
         ui_name = self._snake_key(stripped)
         full_ui_name = self._snake_key(field.param_name)
         candidates = [field.label_key]
+
+        # Bridge field protocol keys to legacy/existing UI msgid keys:
+        # module.<id>.field.<msgid>.label -> module.<id>.ui.<msgid>
+        label_key_match = re.match(
+            r"^module\.([a-zA-Z0-9_]+)\.field\.([a-zA-Z0-9_]+)\.label$",
+            str(field.label_key or ""),
+        )
+        if label_key_match:
+            module_token = label_key_match.group(1)
+            msgid_token = label_key_match.group(2)
+            candidates.append(f"module.{module_token}.ui.{msgid_token}")
+            for module_id in self._module_i18n_ids():
+                candidates.append(f"module.{module_id}.ui.{msgid_token}")
 
         for module_id in self._module_i18n_ids():
             candidates.extend([
@@ -274,9 +288,10 @@ class AutoPageI18nMixin:
             f"module.dummy.field.{field.field_id}.label",
         ])
 
-        heuristic_key = self._field_label_heuristic_key(field)
-        if heuristic_key:
-            candidates.append(heuristic_key)
+        if include_heuristic:
+            heuristic_key = self._field_label_heuristic_key(field)
+            if heuristic_key:
+                candidates.append(heuristic_key)
 
         # De-duplicate while preserving order.
         seen: set[str] = set()
@@ -289,11 +304,16 @@ class AutoPageI18nMixin:
 
     def _group_label(self, group_name: str | None) -> str:
         if not group_name:
-            title_keys = [f"module.{module_id}.title" for module_id in self._module_i18n_ids()]
-            translated_title = self._first_translated(title_keys)
-            if translated_title:
-                return translated_title
-            return tr(title_keys[0], fallback=getattr(self.module_meta, "name", ""))
+            module_id = str(getattr(self.module_meta, "id", "") or "")
+            module_name = str(getattr(self.module_meta, "name", "") or "")
+            name_msgid = str(getattr(self.module_meta, "name_msgid", "") or "").strip()
+            if not name_msgid and module_id:
+                name_msgid = f"module.{module_id}.title"
+            return resolve_display_name(
+                name=module_name,
+                name_msgid=name_msgid,
+                fallback_id=module_id or "module",
+            )
 
         group_key = self._snake_key(group_name, max_len=80)
         candidates: list[str] = []

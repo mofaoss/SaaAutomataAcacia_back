@@ -23,7 +23,7 @@ class PeriodicAutoPage(AutoPageBase):
         return "bottom"
 
     def _allow_half_layout(self) -> bool:
-        return False
+        return True
 
     def _non_ui_field_names(self) -> set[str]:
         return {"update_data", "task_name", "used_codes"}

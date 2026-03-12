@@ -135,7 +135,7 @@ class Input:
         if now - self._last_shell_guard_log_time >= self._shell_guard_log_interval:
             if config.isInputLog.value:
                 self.logger.info(
-                    _('检测到用户正在与桌面/任务栏等交互，窗口追踪保持隐藏并等待', msgid='detected_user_interacting_with_desktop_taskbar_k')
+                    _('Detected user interacting with desktop/taskbar, keeping tracking hidden and waiting', msgid='detected_user_interacting_with_desktop_taskbar_k')
                 )
             self._last_shell_guard_log_time = now
 
@@ -357,7 +357,7 @@ class Input:
 
             active_elapsed = time.time() - start_time - (deferred_time if self._window_tracking_enabled else 0.0)
             if active_elapsed > time_out:
-                raise RuntimeError(_('等待点击超时', msgid='click_timeout'))
+                raise RuntimeError(_('Click timeout', msgid='click_timeout'))
         except Exception as e:
             self.logger.error(
                 _(f'Error occurred while performing mouse move click ({x}, {y}): {repr(e)}', msgid='error_occurred_while_performing_mouse_move_click')

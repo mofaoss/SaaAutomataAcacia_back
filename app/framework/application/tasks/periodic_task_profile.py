@@ -57,6 +57,7 @@ def _build_task_registry() -> dict[str, dict]:
             "name": name,
             "name_msgid": name_msgid,
             "requires_home_sync": spec.get("requires_home_sync", True),
+            "notify_on_completion": spec.get("notify_on_completion", True),
             "is_mandatory": spec.get("is_mandatory", False),
             "force_first": spec.get("force_first", False),
         }
@@ -69,14 +70,19 @@ def get_periodic_task_profile() -> PeriodicTaskProfile:
         return _CACHED_PROFILE
 
     registry = _build_task_registry()
-    primary_task_id = PRIMARY_TASK_ID or "task_login"
+    primary_task_id = str(PRIMARY_TASK_ID or "").strip()
+    if not primary_task_id and registry:
+        primary_task_id = next(iter(registry.keys()))
     mandatory_task_ids = frozenset(
         task_id for task_id, meta in registry.items() if bool(meta.get("is_mandatory", False))
     )
     force_first_task_ids = frozenset(
         task_id for task_id, meta in registry.items() if bool(meta.get("force_first", False))
     )
-    primary_option_key = registry.get(primary_task_id, {}).get("option_key", "CheckBox_entry_1")
+    primary_option_key = str(registry.get(primary_task_id, {}).get("option_key", "") or "")
+    if not primary_option_key:
+        fallback_first = next(iter(registry.values()), {})
+        primary_option_key = str(fallback_first.get("option_key", "") or "")
 
     _CACHED_PROFILE = PeriodicTaskProfile(
         task_registry=registry,

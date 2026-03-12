@@ -228,6 +228,7 @@ class DisplayInterface(ScrollArea, BaseInterface):
         self._setup_ui()
         self.apply_i18n()
         self._load_samples()
+        signalBus.windowTrackingStealthChanged.connect(self._on_stealth_mode_changed)
 
     def _setup_ui(self):
         """专门负责创建控件、设置布局和样式（视图层职责）"""
@@ -333,6 +334,9 @@ class DisplayInterface(ScrollArea, BaseInterface):
         config.set(config.windowTrackingInput, checked)
         config.set(config.windowTrackingAlpha, alpha)
         signalBus.windowTrackingStealthChanged.emit(bool(checked), int(alpha))
+
+    def _on_stealth_mode_changed(self, checked: bool, alpha: int):
+        self._sync_window_tracking_quick_switch()
 
     def showEvent(self, event):
         """生命周期事件"""

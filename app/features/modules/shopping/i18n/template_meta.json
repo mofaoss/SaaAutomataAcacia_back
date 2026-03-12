@@ -1,1 +1,68 @@
-{}
+{
+  "module.shopping.log.var_0_not_found_in_shop": {
+    "kind": "dynamic_template",
+    "template_id": "var_0_not_found_in_shop",
+    "msgid": "var_0_not_found_in_shop",
+    "source_template": "{var_0} not found in shop",
+    "fields": [
+      "var_0"
+    ],
+    "field_details": {
+      "var_0": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "shopping",
+    "file_path": "app/features/modules/shopping/usecase/shopping_usecase.py",
+    "line": 234,
+    "col": 20,
+    "function_name": "buy",
+    "class_name": "ShoppingModule",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "180e5eb947544b862f576197e91c36e06835de19",
+    "callsite_key": "app/features/modules/shopping/usecase/shopping_usecase.py:234:20",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "module.shopping.log.var_0_not_found_retry_after_scrolling_var_1_var_2": {
+    "kind": "dynamic_template",
+    "template_id": "var_0_not_found_retry_after_scrolling_var_1_var_2",
+    "msgid": "var_0_not_found_retry_after_scrolling_var_1_var_2",
+    "source_template": "{var_0} not found, retry after scrolling ({var_1}/{var_2})",
+    "fields": [
+      "var_0",
+      "var_1",
+      "var_2"
+    ],
+    "field_details": {
+      "var_0": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "var_1": {
+        "format_spec": "",
+        "conversion": ""
+      },
+      "var_2": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "shopping",
+    "file_path": "app/features/modules/shopping/usecase/shopping_usecase.py",
+    "line": 325,
+    "col": 20,
+    "function_name": "try_select_item",
+    "class_name": "ShoppingModule",
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "8034844315719bd912b71a6c1651ab6db5bddf73",
+    "callsite_key": "app/features/modules/shopping/usecase/shopping_usecase.py:325:20",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  }
+}

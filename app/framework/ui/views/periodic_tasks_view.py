@@ -885,18 +885,18 @@ class PeriodicTasksView(ScrollArea):
 
     def _apply_ui_settings(self):
         self.BodyLabel_preset.setText(
-            _('任务勾选记录：'))
-        self.PushButton_add_preset.setToolTip(_('新建预设'))
-        self.PushButton_save_preset.setToolTip(_('保存当前勾选到预设'))
-        self.PushButton_delete_preset.setToolTip(_('删除当前预设'))
+            _('Task check record:'))
+        self.PushButton_add_preset.setToolTip(_('New preset'))
+        self.PushButton_save_preset.setToolTip(_('Save current check to preset'))
+        self.PushButton_delete_preset.setToolTip(_('Delete current preset'))
         self.PushButton_start.setText(_('Execute Now (F8)'))
         self.PushButton_start.setToolTip(
             _('Shortcut: F8'))
 
-        self.TitleLabel.setText(_('日志'))
-        self.PushButton_select_all.setText(_('全选'))
-        self.PushButton_no_select.setText(_('清空'))
-        self.hint_label.setText(_('拖动调整顺序'))
-        self.TitleLabel_3.setText(_('日程提醒'))
+        self.TitleLabel.setText(_('log'))
+        self.PushButton_select_all.setText(_('Select all'))
+        self.PushButton_no_select.setText(_('Clear'))
+        self.hint_label.setText(_('Drag to adjust order'))
+        self.TitleLabel_3.setText(_('Schedule reminder'))
 
 

@@ -79,7 +79,8 @@ class WindowTracker:
         return max(min_left, min(max_left, left)), max(min_top, min(max_top, top))
 
     def _get_offscreen_position(self):
-        _, _, vs_right, vs_bottom = self._get_virtual_screen_rect()
+        vs_left, vs_top, vs_right, vs_bottom = self._get_virtual_screen_rect()
+        # 移出到虚拟屏幕右下角之外
         return vs_right + self._offscreen_margin, vs_bottom + self._offscreen_margin
 
     @staticmethod
@@ -101,191 +102,112 @@ class WindowTracker:
         with self._per_monitor_dpi_context():
             root_hwnd = self._resolve_root_hwnd()
             if self._origin_rect is None and root_hwnd and win32gui.IsWindow(root_hwnd):
-                self._origin_rect = win32gui.GetWindowRect(root_hwnd)
-                self._last_good_rect = self._origin_rect
-                self._locked_width = max(1, self._origin_rect[2] - self._origin_rect[0])
-                self._locked_height = max(1, self._origin_rect[3] - self._origin_rect[1])
-                self._session_started = True
+                try:
+                    rect = win32gui.GetWindowRect(root_hwnd)
+                    w = rect[2] - rect[0]
+                    h = rect[3] - rect[1]
+                    if 0 < w < 30000 and 0 < h < 30000:
+                        self._origin_rect = rect
+                        self._last_good_rect = rect
+                        self._locked_width = w
+                        self._locked_height = h
+                        self._session_started = True
+                except Exception:
+                    pass
 
     def _recover_window(self, root_hwnd, fallback_rect=None):
+        """强制窗口物理可见并恢复预设尺寸。"""
         try:
+            if not root_hwnd or not win32gui.IsWindow(root_hwnd):
+                return False
+            
+            # 强制唤醒
             if win32gui.IsIconic(root_hwnd):
                 win32gui.ShowWindow(root_hwnd, win32con.SW_RESTORE)
+            else:
+                win32gui.ShowWindow(root_hwnd, win32con.SW_SHOWNOACTIVATE)
+            
             rect = fallback_rect or self._last_good_rect or self._origin_rect
-            if rect is None:
-                return False
-            width = self._locked_width if self._locked_width else max(1, rect[2] - rect[0])
-            height = self._locked_height if self._locked_height else max(1, rect[3] - rect[1])
+            if rect:
+                target_left, target_top = rect[0], rect[1]
+            else:
+                m_left, m_top, _, _ = self._get_primary_monitor_rect()
+                target_left, target_top = m_left + 100, m_top + 100
+
+            width = self._locked_width or self._restore_width
+            height = self._locked_height or self._restore_height
+
+            # 关键：显式设置尺寸，不使用 SWP_NOSIZE
             win32gui.SetWindowPos(
                 root_hwnd,
-                None,
-                rect[0],
-                rect[1],
+                win32con.HWND_NOTOPMOST,
+                target_left,
+                target_top,
                 width,
                 height,
-                win32con.SWP_NOZORDER | win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER,
+                win32con.SWP_NOACTIVATE | win32con.SWP_SHOWWINDOW,
             )
-            repaired_rect = win32gui.GetWindowRect(root_hwnd)
-            repaired_w = repaired_rect[2] - repaired_rect[0]
-            repaired_h = repaired_rect[3] - repaired_rect[1]
-            if repaired_w > 0 and repaired_h > 0:
-                self._last_good_rect = repaired_rect
-                return True
+            return True
         except Exception:
             return False
-        return False
-
-    def apply_tracking_visual_mode(self) -> bool:
-        if not self._is_hwnd_valid():
-            return False
-        try:
-            with self._per_monitor_dpi_context():
-                alpha = int(getattr(config, 'windowTrackingAlpha').value)
-                self._tracking_alpha = max(1, min(255, alpha))
-
-                root_hwnd = self._resolve_root_hwnd()
-                if not root_hwnd or not win32gui.IsWindow(root_hwnd):
-                    return False
-
-                exstyle = win32gui.GetWindowLong(root_hwnd, win32con.GWL_EXSTYLE)
-                if self._saved_exstyle is None:
-                    self._saved_exstyle = exstyle
-
-                target_exstyle = exstyle | win32con.WS_EX_LAYERED | win32con.WS_EX_TRANSPARENT
-                if target_exstyle != exstyle:
-                    win32gui.SetWindowLong(root_hwnd, win32con.GWL_EXSTYLE, target_exstyle)
-
-                win32gui.SetLayeredWindowAttributes(root_hwnd, 0, self._tracking_alpha, win32con.LWA_ALPHA)
-                self._tracking_visual_applied = True
-                return True
-        except Exception:
-            return False
-
-    def restore_tracking_visual_mode(self):
-        if not self._tracking_visual_applied:
-            return
-        try:
-            with self._per_monitor_dpi_context():
-                root_hwnd = self._resolve_root_hwnd()
-                if not root_hwnd or not win32gui.IsWindow(root_hwnd):
-                    return
-
-                if self._saved_exstyle is not None:
-                    win32gui.SetWindowLong(root_hwnd, win32con.GWL_EXSTYLE, self._saved_exstyle)
-                else:
-                    exstyle = win32gui.GetWindowLong(root_hwnd, win32con.GWL_EXSTYLE)
-                    if exstyle & win32con.WS_EX_LAYERED:
-                        win32gui.SetWindowLong(root_hwnd, win32con.GWL_EXSTYLE, exstyle & ~win32con.WS_EX_LAYERED)
-        except Exception:
-            pass
-        finally:
-            self._tracking_visual_applied = False
-            self._saved_exstyle = None
 
     def align_target_to_cursor(self, x: int, y: int) -> bool:
         if not self._is_hwnd_valid():
-            self.logger.error(_("Window tracking failed: invalid window handle"))
             return False
 
         try:
             with self._per_monitor_dpi_context():
                 root_hwnd = self._resolve_root_hwnd()
                 if not root_hwnd or not win32gui.IsWindow(root_hwnd):
-                    self.logger.error(_("Window tracking failed: unable to get root window handle"))
-                    # self.logger.error(_("窗口追踪失败：无法获取顶层窗口句柄"))
                     return False
 
                 self._ensure_origin_rect()
-                cursor_pos = win32api.GetCursorPos()
-                target_screen_pos = win32gui.ClientToScreen(self.hwnd, (x, y))
-                current_rect = win32gui.GetWindowRect(root_hwnd)
-                width = current_rect[2] - current_rect[0]
-                height = current_rect[3] - current_rect[1]
-                if width <= 0 or height <= 0:
-                    if not self._recover_window(root_hwnd):
-                        self.logger.warning(_("Window tracking failed: window size is abnormal, recovery failed, skipped this move"))
-                    return False
-                self._last_good_rect = current_rect
+                
+                # 显式获取尺寸，如果发现 0x0 立即原地恢复
+                try:
+                    current_rect = win32gui.GetWindowRect(root_hwnd)
+                    width = current_rect[2] - current_rect[0]
+                    height = current_rect[3] - current_rect[1]
+                except Exception:
+                    width = 0
+                    
+                if width <= 0 or height <= 0 or width > 30000:
+                    self._recover_window(root_hwnd)
+                    current_rect = win32gui.GetWindowRect(root_hwnd)
+                    width = current_rect[2] - current_rect[0]
+                    height = current_rect[3] - current_rect[1]
 
-                # 会话期间锁定窗口外框尺寸，避免跨屏 DPI 变更导致窗口被异常缩放
-                if self._locked_width and self._locked_height:
-                    if abs(width - self._locked_width) > 2 or abs(height - self._locked_height) > 2:
-                        win32gui.SetWindowPos(
-                            root_hwnd,
-                            None,
-                            current_rect[0],
-                            current_rect[1],
-                            self._locked_width,
-                            self._locked_height,
-                            win32con.SWP_NOZORDER | win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER,
-                        )
-                        current_rect = win32gui.GetWindowRect(root_hwnd)
-                        width = current_rect[2] - current_rect[0]
-                        height = current_rect[3] - current_rect[1]
-                        if width <= 0 or height <= 0:
-                            if not self._recover_window(root_hwnd):
-                                self.logger.warning(_("Window tracking failed: size correction still abnormal, recovery failed"))
-                            return False
-                        self._last_good_rect = current_rect
+                # 获取坐标映射
+                cursor_pos = win32api.GetCursorPos()
+                try:
+                    target_screen_pos = win32gui.ClientToScreen(self.hwnd, (x, y))
+                except Exception:
+                    return False
 
                 delta_x = cursor_pos[0] - target_screen_pos[0]
                 delta_y = cursor_pos[1] - target_screen_pos[1]
 
-                if abs(delta_x) <= self._align_deadzone_px and abs(delta_y) <= self._align_deadzone_px:
-                    win32gui.SetWindowPos(
-                        root_hwnd,
-                        win32con.HWND_BOTTOM,
-                        current_rect[0],
-                        current_rect[1],
-                        0,
-                        0,
-                        win32con.SWP_NOSIZE | win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER,
-                    )
-                    self._is_offscreen_hidden = False
-                    return True
-
                 new_left = current_rect[0] + delta_x
                 new_top = current_rect[1] + delta_y
-                new_left, new_top = self._clamp_root_position(new_left, new_top, width, height)
+                
+                # 限制位置，确保不会完全飞出虚拟桌面导致被系统强杀
+                width_final = self._locked_width or width
+                height_final = self._locked_height or height
+                new_left, new_top = self._clamp_root_position(new_left, new_top, width_final, height_final)
 
+                # 核心移动：绝对禁止使用 SWP_NOSIZE，每一帧都强制同步尺寸
+                # 移除 HWND_BOTTOM 以防止 DWM 遮蔽触发
                 win32gui.SetWindowPos(
                     root_hwnd,
-                    win32con.HWND_BOTTOM,
+                    None,
                     new_left,
                     new_top,
-                    0,
-                    0,
-                    win32con.SWP_NOSIZE | win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER,
+                    width_final,
+                    height_final,
+                    win32con.SWP_NOZORDER | win32con.SWP_NOACTIVATE | win32con.SWP_SHOWWINDOW,
                 )
 
-                moved_rect = win32gui.GetWindowRect(root_hwnd)
-                moved_width = moved_rect[2] - moved_rect[0]
-                moved_height = moved_rect[3] - moved_rect[1]
-                if moved_width <= 0 or moved_height <= 0:
-                    if not self._recover_window(root_hwnd):
-                        self.logger.warning(_("Window tracking detected abnormal window size, rollback failed"))
-                    return False
-
-                if self._locked_width and self._locked_height and (
-                        abs(moved_width - self._locked_width) > 2 or abs(moved_height - self._locked_height) > 2):
-                    win32gui.SetWindowPos(
-                        root_hwnd,
-                        None,
-                        moved_rect[0],
-                        moved_rect[1],
-                        self._locked_width,
-                        self._locked_height,
-                        win32con.SWP_NOZORDER | win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER,
-                    )
-                    moved_rect = win32gui.GetWindowRect(root_hwnd)
-                    moved_width = moved_rect[2] - moved_rect[0]
-                    moved_height = moved_rect[3] - moved_rect[1]
-                    if moved_width <= 0 or moved_height <= 0:
-                        if not self._recover_window(root_hwnd):
-                            self.logger.warning(_("Window tracking detected cross-screen zoom anomaly, repair failed"))
-                        return False
-
-                self._last_good_rect = moved_rect
+                self._last_good_rect = (new_left, new_top, new_left + width_final, new_top + height_final)
                 self._is_offscreen_hidden = False
             return True
         except Exception as e:
@@ -293,6 +215,7 @@ class WindowTracker:
             return False
 
     def hide_window_offscreen(self) -> bool:
+        """安全地将窗口推送到视线之外，同时保持其存活。"""
         if not self._is_hwnd_valid():
             return False
 
@@ -303,34 +226,23 @@ class WindowTracker:
                     return False
 
                 self._ensure_origin_rect()
-                if win32gui.IsIconic(root_hwnd):
-                    win32gui.ShowWindow(root_hwnd, win32con.SW_RESTORE)
-
-                current_rect = win32gui.GetWindowRect(root_hwnd)
-                width = current_rect[2] - current_rect[0]
-                height = current_rect[3] - current_rect[1]
-                if width <= 0 or height <= 0:
-                    if not self._recover_window(root_hwnd):
-                        return False
-                    current_rect = win32gui.GetWindowRect(root_hwnd)
-                    width = current_rect[2] - current_rect[0]
-                    height = current_rect[3] - current_rect[1]
-                    if width <= 0 or height <= 0:
-                        return False
-
-                if self._locked_width and self._locked_height:
-                    width = self._locked_width
-                    height = self._locked_height
+                
+                # 推送前最后一次同步尺寸
+                width = self._locked_width or self._restore_width
+                height = self._locked_height or self._restore_height
 
                 hidden_left, hidden_top = self._get_offscreen_position()
+                
+                # 关键修复：绝对不使用 HWND_BOTTOM 和 SWP_NOSIZE
+                # 使用普通层级（HWND_NOTOPMOST）移动到极远坐标，系统通常不会置零尺寸
                 win32gui.SetWindowPos(
                     root_hwnd,
-                    win32con.HWND_BOTTOM,
+                    win32con.HWND_NOTOPMOST,
                     hidden_left,
                     hidden_top,
                     width,
                     height,
-                    win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER,
+                    win32con.SWP_NOACTIVATE | win32con.SWP_SHOWWINDOW,
                 )
                 self._is_offscreen_hidden = True
             return True
@@ -343,30 +255,24 @@ class WindowTracker:
             with self._per_monitor_dpi_context():
                 root_hwnd = self._resolve_root_hwnd()
                 if root_hwnd and win32gui.IsWindow(root_hwnd):
-                    if win32gui.IsIconic(root_hwnd):
-                        win32gui.ShowWindow(root_hwnd, win32con.SW_RESTORE)
-
                     monitor_left, monitor_top, monitor_right, monitor_bottom = self._get_primary_monitor_rect()
-                    monitor_width = max(1, monitor_right - monitor_left)
-                    monitor_height = max(1, monitor_bottom - monitor_top)
+                    monitor_width = monitor_right - monitor_left
+                    monitor_height = monitor_bottom - monitor_top
 
-                    target_width = self._restore_width
-                    target_height = self._restore_height
+                    target_width = self._locked_width or self._restore_width
+                    target_height = self._locked_height or self._restore_height
                     target_left = monitor_left + (monitor_width - target_width) // 2
                     target_top = monitor_top + (monitor_height - target_height) // 2
 
                     win32gui.SetWindowPos(
                         root_hwnd,
-                        None,
+                        win32con.HWND_NOTOPMOST,
                         target_left,
                         target_top,
                         target_width,
                         target_height,
-                        win32con.SWP_NOZORDER | win32con.SWP_NOACTIVATE | win32con.SWP_NOOWNERZORDER,
+                        win32con.SWP_SHOWWINDOW,
                     )
-                    self._last_good_rect = win32gui.GetWindowRect(root_hwnd)
-                    self._locked_width = target_width
-                    self._locked_height = target_height
                 self.restore_tracking_visual_mode()
         except Exception as e:
             self.logger.warning(_(f"Window restoration failed: {repr(e)}"))

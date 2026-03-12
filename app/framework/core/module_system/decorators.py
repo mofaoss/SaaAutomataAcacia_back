@@ -15,110 +15,7 @@ DEFAULT_SOURCE_LANG = "en"
 SUPPORTED_LANGS = ["en", "zh_CN", "zh_HK"]
 
 _PENDING_PAGES: dict[str, type] = {}
-_DEFAULT_ORDER: dict[str, int] = {
-    # periodic
-    "task_login": 10,
-    "task_supplies": 20,
-    "task_shop": 30,
-    "task_stamina": 40,
-    "task_shards": 50,
-    "task_chasm": 60,
-    "task_reward": 70,
-    "task_operation": 80,
-    "task_weapon": 90,
-    "task_shard_exchange": 100,
-    "task_close_game": 110,
-    # on-demand
-    "trigger": 10,
-    "fishing": 20,
-    "action": 30,
-    "water_bomb": 40,
-    "alien_guardian": 50,
-    "maze": 60,
-    "drink": 70,
-    "capture_pals": 80,
-    "massaging": 90,
-}
-
-# Keep only true policy-level periodic overrides here. UI class discovery and UI bindings
-# are inferred from module location and naming conventions.
-_PERIODIC_POLICY_OVERRIDES: dict[str, dict] = {
-    "task_login": {
-        "periodic_mandatory": True,
-        "periodic_force_first": True,
-        "periodic_requires_home_sync": False,
-    },
-    "task_chasm": {
-        "periodic_default_activation_config": [{"type": "weekly", "day": 1, "time": "10:00", "max_runs": 1}],
-    },
-    "task_close_game": {
-        "periodic_requires_home_sync": False,
-    },
-}
-
-# Backed by existing config keys for periodic option persistence.
-_PERIODIC_OPTION_KEY_OVERRIDES: dict[str, str] = {
-    "task_login": "CheckBox_entry_1",
-    "task_supplies": "CheckBox_stamina_2",
-    "task_shop": "CheckBox_shop_3",
-    "task_stamina": "CheckBox_use_power_4",
-    "task_shards": "CheckBox_person_5",
-    "task_chasm": "CheckBox_chasm_6",
-    "task_reward": "CheckBox_reward_7",
-    "task_operation": "CheckBox_operation_8",
-    "task_weapon": "CheckBox_weapon_8",
-    "task_shard_exchange": "CheckBox_shard_exchange_9",
-    "task_close_game": "CheckBox_close_game_10",
-}
-
-_PERIODIC_PAGE_ATTR_ALIAS: dict[str, str] = {
-    "task_login": "enter",
-    "task_supplies": "collect",
-    "task_shop": "shop",
-    "task_stamina": "use_power",
-    "task_shards": "person",
-    "task_chasm": "chasm",
-    "task_reward": "reward",
-    "task_operation": "operation",
-    "task_weapon": "weapon",
-    "task_shard_exchange": "shard_exchange",
-    "task_close_game": "close_game",
-}
-
-_ON_DEMAND_PAGE_ALIAS: dict[str, str] = {
-    "drink": "card",
-}
-
-_ON_DEMAND_PASSIVE: dict[str, bool] = {
-}
-
-# Keep module ids stable while declarations stay minimal (no explicit module_id).
-# Keys are package folder names under app/features/modules.
-_PERIODIC_MODULE_ID_BY_PACKAGE: dict[str, str] = {
-    "enter_game": "task_login",
-    "collect_supplies": "task_supplies",
-    "shopping": "task_shop",
-    "use_power": "task_stamina",
-    "person": "task_shards",
-    "chasm": "task_chasm",
-    "get_reward": "task_reward",
-    "operation_action": "task_operation",
-    "upgrade": "task_weapon",
-    "jigsaw": "task_shard_exchange",
-    "close_game": "task_close_game",
-}
-
-_ON_DEMAND_MODULE_ID_BY_PACKAGE: dict[str, str] = {
-    "trigger": "trigger",
-    "fishing": "fishing",
-    "operation_action": "action",
-    "water_bomb": "water_bomb",
-    "alien_guardian": "alien_guardian",
-    "maze": "maze",
-    "drink": "drink",
-    "capture_pals": "capture_pals",
-    "massaging": "massaging",
-}
+_DEFAULT_ORDER = 100
 
 _MODULE_ID_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
@@ -344,16 +241,27 @@ def _infer_ui_bindings(
     host: ModuleHost,
     *,
     binding_id: str,
+    page_alias: str | None = None,
 ):
     from app.framework.application.modules.contracts import ModuleUiBindings
 
+    normalized_page_alias = _normalize_binding_token(page_alias or "")
+    module_token = _normalize_binding_token(module_name or "")
+    resolved_token = _normalize_binding_token(resolved_id)
+
     if host == ModuleHost.PERIODIC:
-        alias = _PERIODIC_PAGE_ATTR_ALIAS.get(resolved_id, module_name or resolved_id)
+        alias = normalized_page_alias or module_token
+        if not alias:
+            if resolved_id.startswith("task_"):
+                alias = _normalize_binding_token(resolved_id[len("task_"):])
+            else:
+                alias = resolved_token
+        alias = alias or "module"
         return ModuleUiBindings(page_attr=f"page_{alias}")
 
     # on-demand defaults
-    binding_token = str(binding_id or resolved_id).strip() or resolved_id
-    suffix = _ON_DEMAND_PAGE_ALIAS.get(binding_token, binding_token)
+    binding_token = _normalize_binding_token(binding_id or resolved_id) or "module"
+    suffix = normalized_page_alias or binding_token
     page_attr = f"page_{suffix}"
 
     return ModuleUiBindings(
@@ -364,9 +272,16 @@ def _infer_ui_bindings(
     )
 
 
-def _periodic_activation_defaults(resolved_id: str) -> list[dict]:
-    if resolved_id in _PERIODIC_POLICY_OVERRIDES and "periodic_default_activation_config" in _PERIODIC_POLICY_OVERRIDES[resolved_id]:
-        return list(_PERIODIC_POLICY_OVERRIDES[resolved_id]["periodic_default_activation_config"])
+def _periodic_activation_defaults(
+    periodic_default_activation_config: list[dict] | tuple[dict, ...] | None,
+) -> list[dict]:
+    if periodic_default_activation_config:
+        normalized: list[dict] = []
+        for item in periodic_default_activation_config:
+            if isinstance(item, dict):
+                normalized.append(dict(item))
+        if normalized:
+            return normalized
     return [{"type": "daily", "day": 0, "time": "00:00", "max_runs": 1}]
 
 
@@ -378,11 +293,23 @@ def _build_meta(
     fields: dict[str, Field] | None,
     actions: dict[str, str] | None,
     module_id: str | None,
+    binding_id: str | None = None,
+    page_alias: str | None = None,
     order: int | None = None,
     enabled: bool = True,
+    notify_on_completion: bool | None = None,
     passive: bool | None = None,
     on_demand_execution: str | None = None,
     on_demand_background_keys: tuple[str, ...] | list[str] | str | None = None,
+    auto_page_collapsible_groups: bool | None = None,
+    auto_page_groups_collapsed_by_default: bool | None = None,
+    periodic_enabled_by_default: bool | None = None,
+    periodic_role: str | None = None,
+    periodic_mandatory: bool | None = None,
+    periodic_force_first: bool | None = None,
+    periodic_requires_home_sync: bool | None = None,
+    periodic_option_key: str | None = None,
+    periodic_default_activation_config: list[dict] | tuple[dict, ...] | None = None,
     description: str = "",
 ) -> ModuleMeta:
     _validate_module_name(name)
@@ -391,28 +318,38 @@ def _build_meta(
 
     module_name = _module_name_from_target(target)
     inferred_id = infer_module_id(target)
-    if host == ModuleHost.PERIODIC and module_name in _PERIODIC_MODULE_ID_BY_PACKAGE:
-        inferred_id = _PERIODIC_MODULE_ID_BY_PACKAGE[module_name]
-    elif host == ModuleHost.ON_DEMAND and module_name in _ON_DEMAND_MODULE_ID_BY_PACKAGE:
-        inferred_id = _ON_DEMAND_MODULE_ID_BY_PACKAGE[module_name]
-    elif host == ModuleHost.PERIODIC and not inferred_id.startswith("task_"):
+    if host == ModuleHost.PERIODIC and not inferred_id.startswith("task_"):
         inferred_id = f"task_{inferred_id}"
     if module_id is not None:
         _validate_module_id(module_id)
     resolved_id = str(module_id or inferred_id).strip()
-    binding_id = _infer_binding_id(target, resolved_id, name)
+    declared_binding_id = str(binding_id or "").strip()
+    if declared_binding_id:
+        resolved_binding_id = _normalize_binding_token(declared_binding_id)
+        if not resolved_binding_id:
+            raise ValueError(f"binding_id must be a non-empty identifier, got: {binding_id!r}")
+    else:
+        resolved_binding_id = _infer_binding_id(target, resolved_id, name)
+
     name_msgid = _default_name_msgid(target, module_id, resolved_id)
-    resolved_order = int(_DEFAULT_ORDER.get(resolved_id, 100) if order is None else order)
+    resolved_order = int(_DEFAULT_ORDER if order is None else order)
     resolved_page_class_path = _infer_page_class_path(target, host)
     resolved_ui_bindings = _infer_ui_bindings(
         resolved_id,
         module_name,
         host,
-        binding_id=binding_id,
+        binding_id=resolved_binding_id,
+        page_alias=page_alias,
     )
-    resolved_passive = bool(_ON_DEMAND_PASSIVE.get(resolved_id, False) if passive is None else passive)
+    resolved_passive = bool(False if passive is None else passive)
+    resolved_notify_on_completion = True if notify_on_completion is None else bool(notify_on_completion)
     resolved_on_demand_execution = "exclusive"
     resolved_background_keys: tuple[str, ...] = ()
+    resolved_auto_page_collapsible_groups = bool(auto_page_collapsible_groups) if auto_page_collapsible_groups is not None else False
+    if auto_page_groups_collapsed_by_default is None:
+        resolved_auto_page_groups_collapsed_by_default = False
+    else:
+        resolved_auto_page_groups_collapsed_by_default = bool(auto_page_groups_collapsed_by_default)
     if host == ModuleHost.ON_DEMAND:
         requested_execution = "exclusive" if on_demand_execution is None else on_demand_execution
         resolved_on_demand_execution = str(requested_execution).strip().lower()
@@ -423,14 +360,28 @@ def _build_meta(
             )
         resolved_background_keys = _normalize_background_keys(on_demand_background_keys)
 
-    periodic_overrides = _PERIODIC_POLICY_OVERRIDES.get(resolved_id, {})
-    resolved_periodic_enabled_by_default = bool(periodic_overrides.get("periodic_enabled_by_default", False))
-    resolved_periodic_mandatory = bool(periodic_overrides.get("periodic_mandatory", False))
-    resolved_periodic_force_first = bool(periodic_overrides.get("periodic_force_first", False))
-    resolved_periodic_requires_home_sync = bool(periodic_overrides.get("periodic_requires_home_sync", True))
+    normalized_periodic_role = str(periodic_role or "").strip().lower()
+    if normalized_periodic_role and normalized_periodic_role not in {"bootstrap"}:
+        raise ValueError(
+            "periodic_role must be one of: 'bootstrap'. "
+            f"got: {periodic_role!r}"
+        )
+    is_bootstrap_role = normalized_periodic_role == "bootstrap"
+
+    resolved_periodic_enabled_by_default = bool(periodic_enabled_by_default) if periodic_enabled_by_default is not None else False
+    resolved_periodic_mandatory = bool(periodic_mandatory) if periodic_mandatory is not None else is_bootstrap_role
+    resolved_periodic_force_first = bool(periodic_force_first) if periodic_force_first is not None else is_bootstrap_role
+    if periodic_requires_home_sync is None:
+        resolved_periodic_requires_home_sync = not is_bootstrap_role
+    else:
+        resolved_periodic_requires_home_sync = bool(periodic_requires_home_sync)
     resolved_periodic_ui_page_index = _infer_periodic_index(resolved_order) if host == ModuleHost.PERIODIC else None
-    resolved_periodic_option_key = _PERIODIC_OPTION_KEY_OVERRIDES.get(resolved_id)
-    resolved_activation_config = _periodic_activation_defaults(resolved_id) if host == ModuleHost.PERIODIC else []
+    if host == ModuleHost.PERIODIC:
+        default_option_key = f"CheckBox_{_normalize_binding_token(resolved_id)}"
+        resolved_periodic_option_key = str(periodic_option_key or "").strip() or default_option_key
+    else:
+        resolved_periodic_option_key = None
+    resolved_activation_config = _periodic_activation_defaults(periodic_default_activation_config) if host == ModuleHost.PERIODIC else []
 
     module_class = target if isinstance(target, type) else None
     schema_target = target
@@ -447,15 +398,18 @@ def _build_meta(
         id=resolved_id,
         name=name,
         name_msgid=name_msgid,
-        binding_id=binding_id,
+        binding_id=resolved_binding_id,
         host=host,
         runner=runner,
         order=resolved_order,
         description=description,
         enabled=enabled,
+        notify_on_completion=resolved_notify_on_completion,
         passive=resolved_passive,
         on_demand_execution=resolved_on_demand_execution,
         on_demand_background_keys=resolved_background_keys,
+        auto_page_collapsible_groups=resolved_auto_page_collapsible_groups,
+        auto_page_groups_collapsed_by_default=resolved_auto_page_groups_collapsed_by_default,
         module_class=module_class,
         periodic_enabled_by_default=resolved_periodic_enabled_by_default,
         periodic_mandatory=resolved_periodic_mandatory,
@@ -494,11 +448,23 @@ def _register_with_host(
     fields: dict[str, Field] | None = None,
     actions: dict[str, str] | None = None,
     module_id: str | None = None,
+    binding_id: str | None = None,
+    page_alias: str | None = None,
     order: int | None = None,
     enabled: bool = True,
+    notify_on_completion: bool | None = None,
     passive: bool | None = None,
     on_demand_execution: str | None = None,
     on_demand_background_keys: tuple[str, ...] | list[str] | str | None = None,
+    auto_page_collapsible_groups: bool | None = None,
+    auto_page_groups_collapsed_by_default: bool | None = None,
+    periodic_enabled_by_default: bool | None = None,
+    periodic_role: str | None = None,
+    periodic_mandatory: bool | None = None,
+    periodic_force_first: bool | None = None,
+    periodic_requires_home_sync: bool | None = None,
+    periodic_option_key: str | None = None,
+    periodic_default_activation_config: list[dict] | tuple[dict, ...] | None = None,
     description: str = "",
 ):
     def decorator(target):
@@ -509,11 +475,23 @@ def _register_with_host(
             fields=fields,
             actions=actions,
             module_id=module_id,
+            binding_id=binding_id,
+            page_alias=page_alias,
             order=order,
             enabled=enabled,
+            notify_on_completion=notify_on_completion,
             passive=passive,
             on_demand_execution=on_demand_execution,
             on_demand_background_keys=on_demand_background_keys,
+            auto_page_collapsible_groups=auto_page_collapsible_groups,
+            auto_page_groups_collapsed_by_default=auto_page_groups_collapsed_by_default,
+            periodic_enabled_by_default=periodic_enabled_by_default,
+            periodic_role=periodic_role,
+            periodic_mandatory=periodic_mandatory,
+            periodic_force_first=periodic_force_first,
+            periodic_requires_home_sync=periodic_requires_home_sync,
+            periodic_option_key=periodic_option_key,
+            periodic_default_activation_config=periodic_default_activation_config,
             description=description,
         )
         register_module(meta)
@@ -528,8 +506,15 @@ def on_demand_module(
     fields: dict[str, Field] | None = None,
     actions: dict[str, str] | None = None,
     module_id: str | None = None,
+    binding_id: str | None = None,
+    page_alias: str | None = None,
+    order: int | None = None,
+    notify_on_completion: bool | None = None,
+    passive: bool | None = None,
     execution: str | None = None,
     background_keys: tuple[str, ...] | list[str] | str | None = None,
+    auto_page_collapsible_groups: bool | None = None,
+    auto_page_groups_collapsed_by_default: bool | None = None,
     description: str = "",
 ):
     return _register_with_host(
@@ -538,8 +523,15 @@ def on_demand_module(
         fields=fields,
         actions=actions,
         module_id=module_id,
+        binding_id=binding_id,
+        page_alias=page_alias,
+        order=order,
+        notify_on_completion=notify_on_completion,
+        passive=passive,
         on_demand_execution=execution,
         on_demand_background_keys=background_keys,
+        auto_page_collapsible_groups=auto_page_collapsible_groups,
+        auto_page_groups_collapsed_by_default=auto_page_groups_collapsed_by_default,
         description=description,
     )
 
@@ -550,6 +542,19 @@ def periodic_module(
     fields: dict[str, Field] | None = None,
     actions: dict[str, str] | None = None,
     module_id: str | None = None,
+    binding_id: str | None = None,
+    page_alias: str | None = None,
+    order: int | None = None,
+    notify_on_completion: bool | None = None,
+    periodic_enabled_by_default: bool | None = None,
+    periodic_role: str | None = None,
+    periodic_mandatory: bool | None = None,
+    periodic_force_first: bool | None = None,
+    periodic_requires_home_sync: bool | None = None,
+    periodic_option_key: str | None = None,
+    periodic_default_activation_config: list[dict] | tuple[dict, ...] | None = None,
+    auto_page_collapsible_groups: bool | None = None,
+    auto_page_groups_collapsed_by_default: bool | None = None,
     description: str = "",
 ):
     return _register_with_host(
@@ -558,6 +563,19 @@ def periodic_module(
         fields=fields,
         actions=actions,
         module_id=module_id,
+        binding_id=binding_id,
+        page_alias=page_alias,
+        order=order,
+        notify_on_completion=notify_on_completion,
+        periodic_enabled_by_default=periodic_enabled_by_default,
+        periodic_role=periodic_role,
+        periodic_mandatory=periodic_mandatory,
+        periodic_force_first=periodic_force_first,
+        periodic_requires_home_sync=periodic_requires_home_sync,
+        periodic_option_key=periodic_option_key,
+        periodic_default_activation_config=periodic_default_activation_config,
+        auto_page_collapsible_groups=auto_page_collapsible_groups,
+        auto_page_groups_collapsed_by_default=auto_page_groups_collapsed_by_default,
         description=description,
     )
 

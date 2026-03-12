@@ -101,13 +101,17 @@ def _owner_dirs() -> dict[str, Path]:
 def _module_id_to_owner() -> dict[str, str]:
     mapping: dict[str, str] = {}
     try:
-        from app.framework.core.module_system.decorators import (
-            _ON_DEMAND_MODULE_ID_BY_PACKAGE,
-            _PERIODIC_MODULE_ID_BY_PACKAGE,
-        )
+        from app.framework.core.module_system import discover_modules
+        from app.framework.core.module_system.registry import get_all_modules
 
-        for pkg, module_id in {**_PERIODIC_MODULE_ID_BY_PACKAGE, **_ON_DEMAND_MODULE_ID_BY_PACKAGE}.items():
-            mapping[module_id] = pkg
+        discover_modules("app.features.modules")
+        for meta in get_all_modules():
+            module_cls = getattr(meta, "module_class", None)
+            module_path = str(getattr(module_cls, "__module__", "") or "")
+            match = re.search(r"app\.features\.modules\.([a-z0-9_]+)(?:\.|$)", module_path)
+            if not match:
+                continue
+            mapping[str(meta.id)] = match.group(1)
     except Exception:
         pass
     return mapping

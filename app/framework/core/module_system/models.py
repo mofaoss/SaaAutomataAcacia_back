@@ -65,9 +65,12 @@ class ModuleMeta:
     description: str = ""
     enabled: bool = True
     passive: bool = False
+    notify_on_completion: bool = True
 
     on_demand_execution: Literal["exclusive", "background"] = "exclusive"
     on_demand_background_keys: tuple[str, ...] = ()
+    auto_page_collapsible_groups: bool = False
+    auto_page_groups_collapsed_by_default: bool = False
 
     periodic_enabled_by_default: bool = False
     periodic_mandatory: bool = False

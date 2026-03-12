@@ -241,12 +241,12 @@ class TaskQueueThread(QThread):
         normal_stop_flag = True
         try:
             if not self.tasks_to_run:
-                self.logger.warning(_('任务队列为空，跳过执行', msgid='no_tasks_queued_skipping_execution'))
+                self.logger.warning(_('No tasks queued; skipping execution', msgid='no_tasks_queued_skipping_execution'))
                 normal_stop_flag = False
                 return
 
             if not self.session.prepare():
-                self.logger.error(_('运行时自动化会话初始化失败，任务已跳过', msgid='runtime_automation_session_initialization_failed'))
+                self.logger.error(_('Runtime automation session initialization failed; tasks skipped', msgid='runtime_automation_session_initialization_failed'))
                 normal_stop_flag = False
                 return
 
@@ -263,7 +263,7 @@ class TaskQueueThread(QThread):
             for task_id in self.tasks_to_run:
                 if not self._is_running:
                     normal_stop_flag = False
-                    self.logger.debug(_('任务启动前执行被中断', msgid='execution_interrupted_before_task_start'))
+                    self.logger.debug(_('Execution interrupted before task start', msgid='execution_interrupted_before_task_start'))
                     break
 
                 meta = self.task_registry.get(task_id)
@@ -337,7 +337,8 @@ class TaskQueueThread(QThread):
                     normal_stop_flag = False
                     break
 
-                if (config.inform_message.value or '--toast-only' in sys.argv) and task_id != 'task_close_game':
+                notify_on_completion = bool(meta.get("notify_on_completion", True))
+                if (config.inform_message.value or '--toast-only' in sys.argv) and notify_on_completion:
                     try:
                         full_time = auto.calculate_power_time() if auto is not None else None
                         content = f'体力将在 {full_time} 完全恢复' if full_time else '体力计算出错'
