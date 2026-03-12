@@ -19,7 +19,7 @@ _WATER_BOMB_FIELDS = {
 @on_demand_module(
     "水弹",
     fields=_WATER_BOMB_FIELDS,
-    description="### 提示\n* 自动游玩心动水弹（Buckshot Roulette）小游戏。\n* 使用策略决策以提高胜率。\n* 可配置识别阈值与目标胜场数。",
+    description="### 提示\n* 自动游玩心动水弹小游戏。\n* 使用策略决策以提高胜率。\n* 可配置识别阈值与目标胜场数。",
 )
 class WaterBombModule:
     def __init__(
@@ -682,7 +682,3 @@ class WaterBombModule:
         # print(status_dict)
         win_prob, strategy = self.round_fight.optimal_strategy(status)
         return win_prob, strategy
-
-
-
-

@@ -10,11 +10,11 @@ from app.framework.core.module_system import Field, on_demand_module, periodic_m
 
 
 _PERSON_FIELDS = {
-    "CheckBox_is_use_chip": Field(),
-    "LineEdit_c1": Field(),
-    "LineEdit_c2": Field(),
-    "LineEdit_c3": Field(),
-    "LineEdit_c4": Field(),
+    "CheckBox_is_use_chip": Field("当嵌片不足时自动使用2片"),
+    "LineEdit_c1": Field("角色1"),
+    "LineEdit_c2": Field("角色2"),
+    "LineEdit_c3": Field("角色3"),
+    "LineEdit_c4": Field("角色4"),
 }
 
 @periodic_module(
@@ -299,5 +299,3 @@ class PersonModule:
             return int(times)
         else:
             return None
-
-

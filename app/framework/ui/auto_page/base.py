@@ -1073,7 +1073,8 @@ class AutoPageBase(AutoPageActionsMixin, AutoPageI18nMixin, QWidget):
                 preview_layout.addWidget(swatch)
                 preview_layout.addStretch(1)
 
-                preview_label = BodyLabel(tr("framework.ui.current_color", fallback="Current Color"), group_card)
+                preview_fallback = "Current Color" if getattr(self, "_is_non_chinese_ui", False) else "当前颜色"
+                preview_label = BodyLabel(tr("framework.ui.current_color", fallback=preview_fallback), group_card)
                 form_layout.addRow(preview_label, preview_host)
                 self._register_color_preview(swatch, source_name, mode)
 

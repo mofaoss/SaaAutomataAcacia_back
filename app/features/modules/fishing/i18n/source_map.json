@@ -1,6 +1,6 @@
 {
-  "module.fishing.action.action_calibrate_color.label": "en",
-  "module.fishing.action.action_reset_color.label": "en",
+  "module.fishing.action.action_calibrate_color.label": "zh_CN",
+  "module.fishing.action.action_reset_color.label": "zh_CN",
   "module.fishing.log.init_automation_failed_unable_to_open_color_calibration": "zh_CN",
   "module.fishing.log.opened_color_calibration": "en",
   "module.fishing.log.reset_hsv_values_to_defaults": "en",

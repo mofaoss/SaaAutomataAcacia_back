@@ -15,7 +15,5 @@
   "module.enter_game.ui.failed_to_resolve_launch_arguments": "en",
   "module.enter_game.ui.failed_to_spawn_process_exc": "en",
   "module.enter_game.ui.game_executable_not_found_under_start_path": "en",
-  "module.enter_game.ui.不管你是哪个渠道服玩家_第一步都应该先去设置里选服_国际服可选择类似_e_steamlibrary_steamapps_common_snowbreak_的目录_2": "zh_CN",
-  "module.enter_game.ui.教程_2": "zh_CN",
-  "module.enter_game.ui.浏览_2": "zh_CN"
+  "module.enter_game.ui.不管你是哪个渠道服玩家_第一步都应该先去设置里选服_国际服可选择类似_e_steamlibrary_steamapps_common_snowbreak_的目录_2": "zh_CN"
 }

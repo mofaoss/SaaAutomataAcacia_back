@@ -8,7 +8,8 @@ from app.framework.core.module_system import Field, on_demand_module
 
 _ALIEN_FIELDS = {
     "ComboBox_mode": Field(
-        options=((0, "Endless Mode"), (1, "Stage Mode")),
+        name="关卡模式",
+        options=((0, _("无尽模式")), (1, _("闯关模式"))),
     ),
 }
 
@@ -139,4 +140,3 @@ class AlienGuardianModule:
             if timeout.reached():
                 self.logger.error(_("异星守护战斗超时"))
                 break
-

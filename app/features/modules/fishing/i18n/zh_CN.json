@@ -1,4 +1,6 @@
 {
+  "module.fishing.action.action_calibrate_color.label": "颜色校准",
+  "module.fishing.action.action_reset_color.label": "重置颜色",
   "module.fishing.log.init_automation_failed_unable_to_open_color_calibration": "初始化自动化失败，无法打开颜色校准",
   "module.fishing.log.出了条大的_截图已保存至_file_path_2": "出了条大的！截图已保存至：{file_path}",
   "module.fishing.log.到点_收杆_2": "到点，收杆!",

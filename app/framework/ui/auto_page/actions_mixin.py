@@ -252,6 +252,22 @@ class AutoPageActionsMixin:
         if browser is not None:
             browser.append(message)
 
+    def _resolve_action_host_widget(self) -> QWidget:
+        """Resolve action host to page-level container instead of inner AutoPage column."""
+        cursor: QWidget | None = self if isinstance(self, QWidget) else None
+        while cursor is not None:
+            class_name = type(cursor).__name__
+            if class_name in {"PeriodicTasksPage", "OnDemandTasksPage"}:
+                return cursor
+            if hasattr(cursor, "task_coordinator") and hasattr(cursor, "ui"):
+                return cursor
+            cursor = cursor.parentWidget()
+
+        window = self.window() if isinstance(self, QWidget) else None
+        if isinstance(window, QWidget):
+            return window
+        return self.parent() if isinstance(self.parent(), QWidget) else self
+
     def _invoke_action(self, method_name: str, button: PushButton | None = None) -> None:
         module_class = getattr(self.module_meta, "module_class", None)
         if module_class is None:
@@ -276,7 +292,7 @@ class AutoPageActionsMixin:
 
         context_kwargs = {
             "page": self,
-            "host": self.parent(),
+            "host": self._resolve_action_host_widget(),
             "module_meta": self.module_meta,
             "config": config,
             "logger": logging.getLogger(f"auto_page.action.{getattr(self.module_meta, 'id', 'module')}"),

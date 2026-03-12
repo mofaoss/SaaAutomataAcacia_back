@@ -1,7 +1,7 @@
 {
-  "module.fishing.action.action_calibrate_color.label": "Calibrate Color",
-  "module.fishing.action.action_reset_color.label": "Reset",
   "module.fishing.log.opened_color_calibration": "Opened color calibration",
   "module.fishing.log.reset_hsv_values_to_defaults": "Reset HSV values to defaults",
+  "module.fishing.action.action_calibrate_color.label": "Calibrate Color",
+  "module.fishing.action.action_reset_color.label": "Reset",
   "module.fishing.title": "Fishing"
 }

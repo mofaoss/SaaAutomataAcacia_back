@@ -15,9 +15,9 @@ _MAZE_FIELDS = {
 }
 
 @on_demand_module(
-    "迷宫",
+    "验证战场",
     fields=_MAZE_FIELDS,
-    description="### 提示\n* 自动执行悖论迷宫战斗。\n* 支持单次与重复刷取两种模式。\n* 请从迷宫入口或难度选择界面开始。",
+    description="### 提示\n* 自动刷悖论迷宫验证战场。\n* 支持单次与重复刷取两种模式。\n* 请从迷宫入口或难度选择界面开始。",
 )
 class MazeModule:
     def __init__(self, auto, logger, isLog: bool = False, ComboBox_mode_maze: int = 0):

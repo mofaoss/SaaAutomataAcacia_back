@@ -14,20 +14,22 @@ from app.framework.core.module_system import Field, on_demand_module, periodic_m
 
 
 _USE_POWER_FIELDS = {
-    "CheckBox_is_use_power": Field(),
+    "CheckBox_is_use_power": Field("自动使用体力药"),
     "ComboBox_power_day": Field(
+        name="体力剩余天数",
         options=(
-            (-1, "No Potion"),
-            (0, "Day 1"),
-            (1, "Day 2"),
-            (2, "Day 3"),
-            (3, "Day 4"),
-            (4, "Day 5"),
-            (5, "Day 6"),
+            (-1, "不使用"),
+            (0, "第1天"),
+            (1, "第2天"),
+            (2, "第3天"),
+            (3, "第4天"),
+            (4, "第5天"),
+            (5, "第6天"),
         ),
     ),
     "ComboBox_power_usage": Field(
-        options=((0, "Event Stages"), (1, "Operation Logistics")),
+        name="体力使用方式",
+        options=((0, "活动关卡"), (1, "浴火之战（常规后勤）")),
     ),
 }
 
@@ -661,7 +663,3 @@ class UsePowerModule:
             return True, False
 
         return False, False
-
-
-
-

@@ -20,7 +20,6 @@ _COLLECT_SUPPLIES_FIELDS = {
     "CheckBox_fish_bait": Field("鱼饵奖励", group="补给领取"),
     "CheckBox_dormitory": Field("宿舍碎片", group="补给领取"),
     "CheckBox_redeem_code": Field("自动兑换码", group="补给领取"),
-    "TextEdit_import_codes": Field("导入兑换码列表", group="兑换码设置"),
 }
 
 
@@ -30,12 +29,11 @@ _COLLECT_SUPPLIES_FIELDS = {
     description="""### 提示
         * 默认会领取补给站体力和好友体力。
         * 启用兑换码后可自动获取并兑换网络兑换码。
-        * 在线兑换码由开发者维护，可能存在更新延迟。
-        * 支持导入 txt 批量兑换（每行一个兑换码）""",
+        * 在线兑换码由开发者维护，可能存在更新延迟。""",
     actions={
         "导入兑换码": "on_import_codes_click",
         "重置兑换码": "on_reset_codes_click",
-    }
+    },
 )
 class CollectSuppliesModule:
     def __init__(
