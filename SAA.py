@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 from PySide6.QtCore import Qt, QTranslator, QSize, QObject, QThread, QTimer, Signal, QPoint, QtMsgType, qInstallMessageHandler
-from PySide6.QtGui import QMovie, QPixmap, QFont
+from PySide6.QtGui import QPixmap, QFont
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
 
 from app.framework.infra.config.app_config import config, resolve_configured_locale
@@ -16,6 +16,7 @@ LOGO_ASSETS_DIR = Path(getattr(sys, "_MEIPASS", PROJECT_ROOT)) / "resources" / "
 
 class EarlySplash(QWidget):
     MAX_ANIMATION_SIZE = 220
+    SAFETY_TIMEOUT_MS = 30000  # 30 seconds safety timeout
 
     def __init__(self):
         super().__init__(None, Qt.WindowType.FramelessWindowHint | Qt.WindowType.SplashScreen | Qt.WindowType.WindowStaysOnTopHint)
@@ -35,6 +36,12 @@ class EarlySplash(QWidget):
         self.resize(220, 220)
         self._setup_media()
 
+        # Safety timer to ensure splash screen closes even if app crashes or hangs
+        self.safety_timer = QTimer(self)
+        self.safety_timer.setSingleShot(True)
+        self.safety_timer.timeout.connect(self.close_with_cleanup)
+        self.safety_timer.start(self.SAFETY_TIMEOUT_MS)
+
     @staticmethod
     def _fit_size(size: QSize, max_edge: int) -> QSize:
         if size.width() <= 0 or size.height() <= 0:
@@ -49,41 +56,20 @@ class EarlySplash(QWidget):
         return QSize(w, h)
 
     def _setup_media(self):
-        gif_candidates = [
-            LOGO_ASSETS_DIR / 'logo_loading.gif',
-            LOGO_ASSETS_DIR / 'loading.gif',
-        ]
-
-        gif_path = next((str(path) for path in gif_candidates if path.exists()), None)
-        if gif_path:
-            movie = QMovie(gif_path)
-            if movie.isValid():
-                movie.setCacheMode(QMovie.CacheMode.CacheAll)
-                first_frame = movie.currentPixmap()
-                if not first_frame.isNull():
-                    display_size = self._fit_size(first_frame.size(), self.MAX_ANIMATION_SIZE)
-                    movie.setScaledSize(display_size)
-                    self.resize(display_size)
-                    self.label.setFixedSize(display_size)
-                else:
-                    fallback_size = QSize(self.MAX_ANIMATION_SIZE, self.MAX_ANIMATION_SIZE)
-                    movie.setScaledSize(fallback_size)
-                    self.label.setFixedSize(fallback_size)
-                self.movie = movie
-                self.label.setMovie(self.movie)
-                self.movie.start()
-                return
-
         logo_candidates = [
+            LOGO_ASSETS_DIR / 'sun.png',
             LOGO_ASSETS_DIR / 'logo.png',
         ]
         logo_path = next((str(path) for path in logo_candidates if path.exists()), None)
         if logo_path:
             pixmap = QPixmap(logo_path)
-            display = pixmap.scaled(180, 180, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            self.label.setPixmap(display)
-            self.resize(display.size())
-            self.label.setFixedSize(display.size())
+            if not pixmap.isNull():
+                display_size = self._fit_size(pixmap.size(), self.MAX_ANIMATION_SIZE)
+                display = pixmap.scaled(display_size, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+                self.label.setPixmap(display)
+                self.resize(display.size())
+                self.label.setFixedSize(display.size())
+                return
 
     def show_centered(self, app: QApplication):
         target_screen = app.primaryScreen()
@@ -103,6 +89,8 @@ class EarlySplash(QWidget):
         app.processEvents()
 
     def close_with_cleanup(self):
+        if hasattr(self, 'safety_timer') and self.safety_timer.isActive():
+            self.safety_timer.stop()
         if self.movie is not None:
             self.movie.stop()
             self.movie = None

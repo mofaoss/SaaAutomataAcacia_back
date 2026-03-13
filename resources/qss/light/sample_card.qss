@@ -1,12 +1,5 @@
 #titleLabel {
-    color: black;
-    font: 11pt 'Segoe UI', 'Microsoft YaHei', 'PingFang SC';
     font-weight: bold;
-}
-
-#contentLabel {
-    color: rgb(118, 118, 118);
-    font: 9pt 'Segoe UI', 'Microsoft YaHei', 'PingFang SC';
 }
 
 #viewTitleLabel {

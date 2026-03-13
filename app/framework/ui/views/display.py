@@ -302,7 +302,7 @@ class DisplayInterface(ScrollArea, BaseInterface):
             # icon=os.path.join(self.icondir, "play.svg"),
             icon=os.path.join(self.icondir, "daily.png"),
             title="Start Daily" if self._is_non_chinese_ui else "开始日常",
-            content="Acacia, Let's go!" if self._is_non_chinese_ui else self.tr("安卡希雅，Let's go!"),
+            content="Acacia, Let's go!" if self._is_non_chinese_ui else self.tr("助手安卡，Let's go!"),
             routeKey="Home-Start-Now",
             index=0,
         )

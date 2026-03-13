@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout, QGraphicsOpacityEffect
 
-from qfluentwidgets import IconWidget, TextWrap, FlowLayout, CardWidget, FluentIcon, SwitchButton
+from qfluentwidgets import IconWidget, TextWrap, FlowLayout, CardWidget, FluentIcon, SwitchButton, BodyLabel, CaptionLabel
 from app.framework.infra.events.signal_bus import signalBus
 from app.framework.ui.shared.style_sheet import StyleSheet
 
@@ -21,16 +21,11 @@ class SampleCard(CardWidget):
         self.iconOpacityEffect.setOpacity(0.8)
         self.iconWidget.setGraphicsEffect(self.iconOpacityEffect)
 
-        self.titleLabel = QLabel(title, self)
-        self.titleLabel.setStyleSheet("font-size: 16px; font-weight: 500;")
-        self.titleOpacityEffect = QGraphicsOpacityEffect(self.titleLabel)
-        self.titleOpacityEffect.setOpacity(0.8)
-        self.titleLabel.setGraphicsEffect(self.titleOpacityEffect)
+        self.titleLabel = BodyLabel(title, self)
+        self.titleLabel.setObjectName('titleLabel')
 
-        self.contentLabel = QLabel(TextWrap.wrap(content, 45, False)[0], self)
-        self.contentOpacityEffect = QGraphicsOpacityEffect(self.contentLabel)
-        self.contentOpacityEffect.setOpacity(0.8)
-        self.contentLabel.setGraphicsEffect(self.contentOpacityEffect)
+        self.contentLabel = CaptionLabel(TextWrap.wrap(content, 45, False)[0], self)
+        self.contentLabel.setObjectName('contentLabel')
 
         self.hBoxLayout = QHBoxLayout(self)
         self.vBoxLayout = QVBoxLayout()
@@ -52,27 +47,18 @@ class SampleCard(CardWidget):
         self.vBoxLayout.addWidget(self.contentLabel)
         self.vBoxLayout.addStretch(1)
 
-        self.titleLabel.setObjectName('titleLabel')
-        self.contentLabel.setObjectName('contentLabel')
-
     def mouseReleaseEvent(self, e):
         super().mouseReleaseEvent(e)
         signalBus.switchToSampleCard.emit(self.routekey, self.index)
 
     def enterEvent(self, event):
         super().enterEvent(event)
-
         self.iconOpacityEffect.setEnabled(False)
-        self.titleOpacityEffect.setEnabled(False)
-        self.contentOpacityEffect.setEnabled(False)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def leaveEvent(self, event):
         super().leaveEvent(event)
-
         self.iconOpacityEffect.setEnabled(True)
-        self.titleOpacityEffect.setEnabled(True)
-        self.contentOpacityEffect.setEnabled(True)
         self.setCursor(Qt.CursorShape.ArrowCursor)
 
 
@@ -88,16 +74,11 @@ class SampleCard_URL(CardWidget):
         self.iconOpacityEffect.setOpacity(0.8)
         self.iconWidget.setGraphicsEffect(self.iconOpacityEffect)
 
-        self.titleLabel = QLabel(title, self)
-        self.titleLabel.setStyleSheet("font-size: 16px; font-weight: 500;")
-        self.titleOpacityEffect = QGraphicsOpacityEffect(self.titleLabel)
-        self.titleOpacityEffect.setOpacity(0.8)
-        self.titleLabel.setGraphicsEffect(self.titleOpacityEffect)
+        self.titleLabel = BodyLabel(title, self)
+        self.titleLabel.setObjectName('titleLabel')
 
-        self.contentLabel = QLabel(TextWrap.wrap(content, 45, False)[0], self)
-        self.contentOpacityEffect = QGraphicsOpacityEffect(self.contentLabel)
-        self.contentOpacityEffect.setOpacity(0.8)
-        self.contentLabel.setGraphicsEffect(self.contentOpacityEffect)
+        self.contentLabel = CaptionLabel(TextWrap.wrap(content, 45, False)[0], self)
+        self.contentLabel.setObjectName('contentLabel')
 
         self.urlWidget = IconWidget(FluentIcon.LINK, self)
         self.urlWidget.setFixedSize(16, 16)
@@ -128,9 +109,6 @@ class SampleCard_URL(CardWidget):
         self.vBoxLayout.addWidget(self.contentLabel)
         self.vBoxLayout.addStretch(1)
 
-        self.titleLabel.setObjectName('titleLabel')
-        self.contentLabel.setObjectName('contentLabel')
-
     def mouseReleaseEvent(self, e):
         super().mouseReleaseEvent(e)
         QDesktopServices.openUrl(self.url)
@@ -138,16 +116,12 @@ class SampleCard_URL(CardWidget):
     def enterEvent(self, event):
         super().enterEvent(event)
         self.iconOpacityEffect.setEnabled(False)
-        self.titleOpacityEffect.setEnabled(False)
-        self.contentOpacityEffect.setEnabled(False)
         self.urlOpacityEffect.setEnabled(False)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def leaveEvent(self, event):
         super().leaveEvent(event)
         self.iconOpacityEffect.setEnabled(True)
-        self.titleOpacityEffect.setEnabled(True)
-        self.contentOpacityEffect.setEnabled(True)
         self.urlOpacityEffect.setEnabled(True)
         self.setCursor(Qt.CursorShape.ArrowCursor)
 
@@ -164,16 +138,11 @@ class SampleCard_Switch(CardWidget):
         self.iconOpacityEffect.setOpacity(0.8)
         self.iconWidget.setGraphicsEffect(self.iconOpacityEffect)
 
-        self.titleLabel = QLabel(title, self)
-        self.titleLabel.setStyleSheet("font-size: 16px; font-weight: 500;")
-        self.titleOpacityEffect = QGraphicsOpacityEffect(self.titleLabel)
-        self.titleOpacityEffect.setOpacity(0.8)
-        self.titleLabel.setGraphicsEffect(self.titleOpacityEffect)
+        self.titleLabel = BodyLabel(title, self)
+        self.titleLabel.setObjectName('titleLabel')
 
-        self.contentLabel = QLabel(TextWrap.wrap(content, 45, False)[0], self)
-        self.contentOpacityEffect = QGraphicsOpacityEffect(self.contentLabel)
-        self.contentOpacityEffect.setOpacity(0.8)
-        self.contentLabel.setGraphicsEffect(self.contentOpacityEffect)
+        self.contentLabel = CaptionLabel(TextWrap.wrap(content, 45, False)[0], self)
+        self.contentLabel.setObjectName('contentLabel')
 
         self.switchButton = SwitchButton(self)
         self.switchButton.setChecked(bool(checked))
@@ -201,9 +170,6 @@ class SampleCard_Switch(CardWidget):
         self.vBoxLayout.addWidget(self.contentLabel)
         self.vBoxLayout.addStretch(1)
 
-        self.titleLabel.setObjectName('titleLabel')
-        self.contentLabel.setObjectName('contentLabel')
-
     def _on_checked_changed(self, checked):
         if self.on_toggle:
             self.on_toggle(bool(checked))
@@ -223,16 +189,13 @@ class SampleCard_Switch(CardWidget):
     def enterEvent(self, event):
         super().enterEvent(event)
         self.iconOpacityEffect.setEnabled(False)
-        self.titleOpacityEffect.setEnabled(False)
-        self.contentOpacityEffect.setEnabled(False)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def leaveEvent(self, event):
         super().leaveEvent(event)
         self.iconOpacityEffect.setEnabled(True)
-        self.titleOpacityEffect.setEnabled(True)
-        self.contentOpacityEffect.setEnabled(True)
         self.setCursor(Qt.CursorShape.ArrowCursor)
+
 
 
 class SampleCardView(QWidget):

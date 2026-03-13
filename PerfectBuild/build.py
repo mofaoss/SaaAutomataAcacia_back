@@ -213,6 +213,9 @@ class PerfectBuild:
             "--noinclude-dlls=cv2/opencv_video*.dll",
             "--noinclude-data-files=cv2/opencv_videoio_ffmpeg*.dll",
             "--noinclude-data-files=cv2/opencv_video*.dll",
+
+            # 排除加载动画相关的 GIF 文件
+            "--noinclude-data-files=resources/logo/*.gif",
             ]
 
 
