@@ -1,5 +1,10 @@
 {
   "module.close_game.title": "执行退出",
+  "module.task_close_game.description": "### 提示\n* 关闭助手后，计划任务将不会继续执行",
+  "module.close_game.description": "### 提示\n* 关闭助手后，计划任务将不会继续执行",
+  "module.task_close_game.field.CheckBox_close_game.label": "退出游戏",
+  "module.task_close_game.field.CheckBox_shutdown.label": "关机",
+  "module.task_close_game.field.CheckBox_close_proxy.label": "退出助手",
   "module.close_game.log.exiting_application": "正在退出应用...",
   "module.close_game.log.exiting_game": "正在退出游戏...",
   "module.close_game.log.system_will_shut_down_in_60s": "系统将在 60 秒后关机..."

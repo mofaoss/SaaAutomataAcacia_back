@@ -1,7 +1,11 @@
 {
-  "module.maze.log.今日的迷宫次数已经一滴都不剩了_2": "今日的迷宫次数已经一滴都不剩了",
-  "module.maze.log.迷宫超时_2": "迷宫超时",
-  "module.maze.title": "验证战场",
+  "module.maze.ui.single_run": "单次",
   "module.maze.ui.repeat_run": "重复",
-  "module.maze.ui.single_run": "单次"
+  "module.maze.log.今日的迷宫次数已经一滴都不剩了": "今日的迷宫次数已经一滴都不剩了",
+  "module.maze.log.迷宫超时": "迷宫超时",
+  "module.maze.title": "验证战场",
+  "module.maze.description": "### 提示\n* 自动刷悖论迷宫验证战场。\n* 支持单次与重复刷取两种模式。\n* 请从迷宫入口或难度选择界面开始。提示\n* 运行模式中单次运行适合打前3关，重复运行则是一直刷最后一关\n* 进配队界面选好增益后再让安卡希雅的开始迷宫\n* 增益推荐配技能-爆电和护盾-夺取\n* 配队必须要有辰星-琼弦，且把角色放在中间位",
+  "module.maze.field.ComboBox_mode_maze.label": "模式",
+  "module.maze.field.ComboBox_mode_maze.option.0": "单次",
+  "module.maze.field.ComboBox_mode_maze.option.1": "重复"
 }

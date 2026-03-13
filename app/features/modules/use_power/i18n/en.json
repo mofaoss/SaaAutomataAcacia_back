@@ -1,1 +1,6 @@
-{}
+{
+  "module.task_use_power.group.general": "General",
+  "module.task_use_power.group.General": "General",
+  "module.use_power.group.general": "General",
+  "module.use_power.group.General": "General"
+}

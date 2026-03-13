@@ -1,5 +1,7 @@
 {
   "module.capture_pals.log.msg_sec_1f_s": "{msg}：{sec:.1f}s",
   "module.capture_pals.log.position_correction_before_exit_in_fixed_mode_a_0_33s_wait_0_2s_s_0_033s": "Position correction before exit in fixed mode: A(0.33s) -> Wait(0.2s) -> S(0.033s)",
+  "module.capture_pals.group.general": "General",
+  "module.capture_pals.group.General": "General",
   "module.capture_pals.title": "Capture Pals"
 }

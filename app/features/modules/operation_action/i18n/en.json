@@ -1,1 +1,6 @@
-{}
+{
+  "module.task_operation.group.general": "General",
+  "module.task_operation.group.General": "General",
+  "module.operation.group.general": "General",
+  "module.operation.group.General": "General"
+}

@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import re
 from functools import lru_cache
@@ -320,6 +320,7 @@ class AutoPageI18nMixin:
         for module_id in self._module_i18n_ids():
             candidates.extend([
                 f"module.{module_id}.group.{group_key}",
+                f"module.{module_id}.group.{group_name}",
                 f"module.{module_id}.ui.group_{group_key}",
                 f"module.{module_id}.ui.{group_key}",
             ])
@@ -409,3 +410,4 @@ class AutoPageI18nMixin:
             if len(token) >= 5:
                 tokens.add(token[:5])
         return tokens
+

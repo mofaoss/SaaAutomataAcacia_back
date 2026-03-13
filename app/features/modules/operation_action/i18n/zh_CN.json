@@ -1,8 +1,18 @@
 {
+  "module.operation_action.ui.切换疾跑": "切换疾跑",
+  "module.operation_action.ui.按住疾跑": "按住疾跑",
+  "module.operation_action.log.执行常规训练超时": "执行常规训练超时",
+  "module.operation_action.log.进入常规行动超时": "进入常规行动超时",
+  "module.operation_action.log.进入常规行动时连续滚轮无进展_已停止以避免后台卡死": "进入常规行动时连续滚轮无进展，已停止以避免后台卡死",
   "module.operation.title": "常规训练",
-  "module.operation_action.log.执行常规训练超时_2": "执行常规训练超时",
-  "module.operation_action.log.进入常规行动时连续滚轮无进展_已停止以避免后台卡死_2": "进入常规行动时连续滚轮无进展，已停止以避免后台卡死",
-  "module.operation_action.log.进入常规行动超时_2": "进入常规行动超时",
-  "module.operation_action.ui.切换疾跑_2": "切换疾跑",
-  "module.operation_action.ui.按住疾跑_2": "按住疾跑"
+  "module.task_operation.description": "### 提示\n* 重复刷指定次数无需体力的实战训练第一关\n* 用于完成凭证20次常规行动周常任务\n* 请从主页或常规作战选择界面开始",
+  "module.operation.description": "### 提示\n* 重复刷指定次数无需体力的实战训练第一关\n* 用于完成凭证20次常规行动周常任务\n* 请从主页或常规作战选择界面开始",
+  "module.task_operation.field.SpinBox_action_times.label": "行动次数",
+  "module.task_operation.field.ComboBox_run.label": "疾跑模式",
+  "module.task_operation.field.ComboBox_run.option.0": "切换疾跑",
+  "module.operation.field.ComboBox_run.option.0": "切换疾跑",
+  "module.task_operation.field.ComboBox_run.option.1": "按住疾跑",
+  "module.operation.field.ComboBox_run.option.1": "按住疾跑",
+  "module.operation.field.SpinBox_action_times.label": "行动次数",
+  "module.operation.field.ComboBox_run.label": "疾跑模式"
 }

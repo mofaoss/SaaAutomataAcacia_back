@@ -1,9 +1,15 @@
 {
-  "module.close_game.field.CheckBox_close_game.label": "en",
-  "module.close_game.field.CheckBox_close_proxy.label": "en",
-  "module.close_game.field.CheckBox_shutdown.label": "en",
+  "module.close_game.description": "zh_CN",
+  "module.close_game.group.General": "en",
+  "module.close_game.group.general": "en",
   "module.close_game.log.exiting_application": "en",
   "module.close_game.log.exiting_game": "en",
   "module.close_game.log.system_will_shut_down_in_60s": "en",
-  "module.close_game.title": "zh_CN"
+  "module.close_game.title": "zh_CN",
+  "module.task_close_game.description": "zh_CN",
+  "module.task_close_game.field.CheckBox_close_game.label": "zh_CN",
+  "module.task_close_game.field.CheckBox_close_proxy.label": "zh_CN",
+  "module.task_close_game.field.CheckBox_shutdown.label": "zh_CN",
+  "module.task_close_game.group.General": "en",
+  "module.task_close_game.group.general": "en"
 }

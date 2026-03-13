@@ -1,5 +1,5 @@
 {
-  "module.person.log.ocr结果为空或结构异常_result_2": {
+  "module.person.log.ocr结果为空或结构异常_result": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -27,7 +27,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.person.log.找到对应的_速战_pos_min_distance_2": {
+  "module.person.log.找到对应的_速战_pos_min_distance": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -60,7 +60,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.person.log.更新嵌片次数失败_e_2": {
+  "module.person.log.更新嵌片次数失败_e": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -88,7 +88,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.person.log.未找到对应速战_检查是否已刷取或是否解锁_person_name_的速战_2": {
+  "module.person.log.未找到对应速战_检查是否已刷取或是否解锁_person_name_的速战": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -116,7 +116,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.person.log.记忆嵌片更新失败_norm_2": {
+  "module.person.log.记忆嵌片更新失败_norm": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -144,7 +144,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.person.log.记忆嵌片更新成功_times_2": {
+  "module.person.log.记忆嵌片更新成功_times": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -172,7 +172,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.person.log.速战_距离大于_value_1_pos_min_distance_不是_person_name_的速战_2": {
+  "module.person.log.速战_距离大于_value_1_pos_min_distance_不是_person_name_的速战": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,

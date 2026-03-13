@@ -1,3 +1,11 @@
 {
-  "module.drink.title": "Card Match"
+  "module.drink.group.general": "General",
+  "module.drink.group.General": "General",
+  "module.drink.log.已完成_value_1_次猜心对局": "Completed {value_1} Guessing Game(s)",
+  "module.drink.log.开始第_count_次猜心对局": "Starting the {count}th Guessing Game",
+  "module.drink.log.猜心对局对局超时": "Guessing Game timeout",
+  "module.drink.log.玩法未解锁": "Game mode not unlocked",
+  "module.drink.log.进入猜心对局超时": "Timeout entering Guessing Game",
+  "module.drink.log.重进对局超时": "Timeout re-entering game",
+  "module.drink.title": "Guessing Card"
 }

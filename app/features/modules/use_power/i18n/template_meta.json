@@ -1,5 +1,5 @@
 {
-  "module.use_power.log.第_attempt_次未找到活动任务入口_准备重试_2": {
+  "module.use_power.log.第_attempt_次未找到活动任务入口_准备重试": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -27,7 +27,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.use_power.log.第_attempt_次活动奖励页面未打开_准备重试_2": {
+  "module.use_power.log.第_attempt_次活动奖励页面未打开_准备重试": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -55,7 +55,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.use_power.log.第_attempt_次进入活动页面失败_准备重试_2": {
+  "module.use_power.log.第_attempt_次进入活动页面失败_准备重试": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,

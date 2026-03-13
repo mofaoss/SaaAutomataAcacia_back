@@ -1,9 +1,15 @@
 {
-  "module.drink.log.已完成_value_1_次猜心对局_2": "已完成{value_1}次猜心对局",
-  "module.drink.log.开始第_count_次猜心对局_2": "开始第{count}次猜心对局",
-  "module.drink.log.猜心对局对局超时_2": "猜心对局对局超时",
-  "module.drink.log.玩法未解锁_2": "玩法未解锁",
-  "module.drink.log.进入猜心对局超时_2": "进入猜心对局超时",
-  "module.drink.log.重进对局超时_2": "重进对局超时",
-  "module.drink.title": "猜心对局"
+  "module.drink.log.已完成_value_1_次猜心对局": "已完成{value_1}次猜心对局",
+  "module.drink.log.玩法未解锁": "玩法未解锁",
+  "module.drink.log.进入猜心对局超时": "进入猜心对局超时",
+  "module.drink.log.猜心对局对局超时": "猜心对局对局超时",
+  "module.drink.log.重进对局超时": "重进对局超时",
+  "module.drink.log.开始第_count_次猜心对局": "开始第{count}次猜心对局",
+  "module.drink.title": "猜心对局",
+  "module.drink.description": "### 提示\n* 站在猜心对局入口位置后再点开始。\n* 自动执行猜心对局领取猜心对局奖励。\n* 两种模式均无策略。",
+  "module.drink.field.SpinBox_drink_times.label": "对局次数(-1无限)",
+  "module.drink.field.ComboBox_card_mode.label": "对局模式",
+  "module.drink.field.ComboBox_card_mode.option.0": "模式一",
+  "module.drink.field.ComboBox_card_mode.option.1": "模式二",
+  "module.drink.field.CheckBox_is_speed_up.label": "是否已手动开启倍速"
 }

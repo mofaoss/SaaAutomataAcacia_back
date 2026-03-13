@@ -12,7 +12,6 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFileDialog
 from qfluentwidgets import Flyout, FlyoutView, InfoBar, InfoBarPosition
 
-from app.framework.core.interfaces.game_environment import IGameEnvironment
 from app.framework.infra.automation.timer import Timer
 from app.framework.infra.system.windows import get_hwnd
 from app.framework.infra.config.app_config import config
@@ -390,7 +389,7 @@ def launch_game_with_guard(
         }
 
 
-class EnterGameService(IGameEnvironment):
+class EnterGameService:
     """Unified enter-game service for game environment, launch, and UI actions."""
 
     def __init__(self, is_non_chinese_ui: bool, app_config=None):
@@ -440,13 +439,11 @@ class EnterGameService(IGameEnvironment):
 
     @staticmethod
     def on_auto_open_toggled(*, host, state: int) -> None:
-        status = "已开启" if state == 2 else "已关闭"
-        action = "已开启" if state == 2 else "已关闭"
-        action = _("将") if state == 2 else _("不会")
+        status = _(f"已开启", msgid='auto_open_toggled_on') if state == 2 else _(f"已关闭", msgid='auto_open_toggled_off')
         InfoBar.success(
             title=status,
             content=str(
-                _(f"点击开始将{action}自启游戏", msgid='clicking_the_start_button_will_action_automatica')
+                _(f"自启游戏", msgid='clicking_the_start_button_will_action_automatica')
             ),
             orient=Qt.Orientation.Horizontal,
             isClosable=True,

@@ -36,6 +36,7 @@ PERCENT_TOKEN_RE = re.compile(
     r"(?P<spec>[#0\- +]?(?:\d+|\*)?(?:\.\d+)?[hlL]?[diouxXeEfFgGcrs%])"
 )
 HASHLIKE_SUFFIX_RE = re.compile(r"^(?:[0-9a-f]{8,}|h[0-9a-f]{6,}|txt_[0-9a-f]{8,}|tmpl_[0-9a-f]{8,})$")
+LABEL_KEY_RE = re.compile(r"^module\.([A-Za-z0-9_]+)\.field\.([A-Za-z0-9_]+)\.label$")
 
 
 def _canonicalize_template_ignoring_spec(template: str) -> str:
@@ -223,6 +224,229 @@ def _extract_actions(actions_node: ast.AST) -> list[tuple[str, str]]:
             continue
         result.append((label.strip(), method_name))
     return result
+
+
+def _module_owner_from_i18n_dir(owner_dir: str) -> tuple[str, str | None]:
+    normalized = str(owner_dir or "").replace("\\", "/")
+    parts = [p for p in normalized.split("/") if p]
+    if len(parts) >= 4 and parts[0] == "app" and parts[1] == "features" and parts[2] == "modules":
+        return "module", parts[3]
+    if len(parts) >= 3 and parts[0] == "app" and parts[1] == "features" and parts[2] == "utils":
+        return "module", "utils"
+    return "framework", None
+
+
+def _module_i18n_tokens(meta: Any) -> list[str]:
+    out: list[str] = []
+
+    def _add(value: str | None) -> None:
+        token = str(value or "").strip()
+        if token and token not in out:
+            out.append(token)
+
+    raw_id = str(getattr(meta, "id", "") or "").strip()
+    _add(raw_id)
+    if raw_id.startswith("task_"):
+        _add(raw_id[5:])
+
+    name_msgid = str(getattr(meta, "name_msgid", "") or "").strip()
+    m = re.fullmatch(r"module\.([A-Za-z0-9_]+)\.title", name_msgid)
+    if m:
+        _add(m.group(1))
+
+    if not out:
+        _add("module")
+    return out
+
+
+def _ascii_key(text: str, *, default: str = "group", max_len: int = 80) -> str:
+    normalized = re.sub(r"[^A-Za-z0-9]+", "_", str(text or "").strip().lower())
+    normalized = re.sub(r"_+", "_", normalized).strip("_")
+    if max_len > 0:
+        normalized = normalized[:max_len].rstrip("_")
+    return normalized or default
+
+
+def _field_tokens(field: Any) -> list[str]:
+    out: list[str] = []
+
+    def _add(value: str | None) -> None:
+        token = str(value or "").strip()
+        if token and token not in out:
+            out.append(token)
+
+    _add(str(getattr(field, "field_id", "") or ""))
+    _add(str(getattr(field, "param_name", "") or ""))
+
+    label_key = str(getattr(field, "label_key", "") or "")
+    m = LABEL_KEY_RE.fullmatch(label_key)
+    if m:
+        _add(m.group(2))
+
+    return out
+
+
+def _normalize_option(option: Any) -> tuple[Any, str | None]:
+    if isinstance(option, dict):
+        if "value" in option:
+            value = option.get("value")
+            label = option.get("label")
+            return value, str(label) if label is not None else None
+        if len(option) == 1:
+            value, label = next(iter(option.items()))
+            return value, str(label)
+
+    if isinstance(option, (tuple, list)) and len(option) == 2:
+        first, second = option
+        if isinstance(first, str) and not isinstance(second, str):
+            return second, first
+        if isinstance(second, str):
+            return first, second
+        return first, None
+
+    return option, None
+
+
+def _extract_option_labels(options: Any) -> list[tuple[str, str]]:
+    if options is None:
+        return []
+
+    if isinstance(options, (list, tuple, set)):
+        raw_items = list(options)
+    else:
+        raw_items = [options]
+
+    out: list[tuple[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+    for item in raw_items:
+        value, label = _normalize_option(item)
+        if not isinstance(label, str) or not label.strip():
+            continue
+        value_token = str(value)
+        rec = (value_token, label.strip())
+        if rec in seen:
+            continue
+        seen.add(rec)
+        out.append(rec)
+    return out
+
+
+def _extract_action_specs(actions: Any) -> list[tuple[str, str]]:
+    out: list[tuple[str, str]] = []
+    if not isinstance(actions, dict):
+        return out
+
+    for raw_label, raw_spec in actions.items():
+        label = str(raw_label or "").strip()
+        if not label:
+            continue
+
+        method = ""
+        if isinstance(raw_spec, str):
+            method = raw_spec.strip()
+        elif isinstance(raw_spec, dict):
+            method = str(raw_spec.get("method") or raw_spec.get("name") or "").strip()
+
+        if not method or re.fullmatch(r"^[A-Za-z_][A-Za-z0-9_]*$", method) is None:
+            continue
+        out.append((label, method))
+    return out
+
+
+def _extract_declarations_from_registry() -> list[tuple[str, str | None, str, str, str]]:
+    try:
+        from app.framework.core.module_system.registry import get_all_modules
+    except Exception:
+        return []
+
+    try:
+        metas = list(get_all_modules())
+    except Exception:
+        return []
+
+    out: list[tuple[str, str | None, str, str, str]] = []
+    seen: set[tuple[str, str | None, str, str, str]] = set()
+
+    def _add(owner_scope: str, owner_module: str | None, key: str, text: str) -> None:
+        value = str(text or "").strip()
+        if not key or not value:
+            return
+        source_lang = _safe_source_lang(value, default="en")
+        rec = (owner_scope, owner_module, key, value, source_lang)
+        if rec in seen:
+            return
+        seen.add(rec)
+        out.append(rec)
+
+    for meta in metas:
+        owner_scope, owner_module = _module_owner_from_i18n_dir(str(getattr(meta, "i18n_owner_dir", "") or ""))
+        module_tokens = _module_i18n_tokens(meta)
+
+        title_key = str(getattr(meta, "name_msgid", "") or "").strip()
+        if not title_key:
+            title_key = f"module.{module_tokens[0]}.title"
+        _add(owner_scope, owner_module, title_key, str(getattr(meta, "name", "") or ""))
+
+        description = str(getattr(meta, "description", "") or "").strip()
+        if description:
+            for token in module_tokens:
+                _add(owner_scope, owner_module, f"module.{token}.description", description)
+
+        schema = list(getattr(meta, "config_schema", []) or [])
+        for field in schema:
+            field_keys = _field_tokens(field)
+            label_key = str(getattr(field, "label_key", "") or "").strip()
+            if not label_key:
+                label_key = f"module.{module_tokens[0]}.field.{str(getattr(field, 'field_id', '') or '')}.label"
+            label_default = str(getattr(field, "label_default", "") or "").strip()
+            if label_default:
+                _add(owner_scope, owner_module, label_key, label_default)
+
+            help_key = str(getattr(field, "help_key", "") or "").strip()
+            help_default = str(getattr(field, "help_default", "") or "").strip()
+            if help_key and help_default:
+                _add(owner_scope, owner_module, help_key, help_default)
+
+            description_md = str(getattr(field, "description_md", "") or "").strip()
+            if description_md:
+                for token in module_tokens:
+                    for field_token in field_keys:
+                        _add(
+                            owner_scope,
+                            owner_module,
+                            f"module.{token}.field.{field_token}.description",
+                            description_md,
+                        )
+
+            group_name = str(getattr(field, "group", "") or "").strip()
+            if group_name:
+                group_key = _ascii_key(group_name, default="group", max_len=80)
+                for token in module_tokens:
+                    _add(owner_scope, owner_module, f"module.{token}.group.{group_key}", group_name)
+                    # raw-text alias keeps non-Latin group labels stable for i18n lookup.
+                    _add(owner_scope, owner_module, f"module.{token}.group.{group_name}", group_name)
+
+            option_entries = _extract_option_labels(getattr(field, "options", None))
+            for option_value, option_label in option_entries:
+                for token in module_tokens:
+                    for field_token in field_keys:
+                        _add(
+                            owner_scope,
+                            owner_module,
+                            f"module.{token}.field.{field_token}.option.{option_value}",
+                            option_label,
+                        )
+
+        for action_label, method_name in _extract_action_specs(getattr(meta, "actions", None)):
+            for token in module_tokens:
+                _add(
+                    owner_scope,
+                    owner_module,
+                    f"module.{token}.action.{method_name}.label",
+                    action_label,
+                )
+
+    return out
 
 
 def _declaration_title_key(node: ast.AST, module_id: str) -> str:
@@ -786,6 +1010,24 @@ def _replace_lang_payload(
     extracted_for_lang: dict[str, str],
     target_keys: set[str],
 ) -> dict[str, str]:
+    def _canonical_drop_numeric_tail(key: str) -> str:
+        if "." not in key:
+            return key
+        prefix, suffix = key.rsplit(".", 1)
+        normalized = re.sub(r"_\d+$", "", suffix)
+        if normalized == suffix:
+            return key
+        return f"{prefix}.{normalized}"
+
+    alias_candidates: dict[str, list[str]] = {}
+    for cur_key in current.keys():
+        if not isinstance(cur_key, str):
+            continue
+        alias_key = _canonical_drop_numeric_tail(cur_key)
+        if alias_key == cur_key:
+            continue
+        alias_candidates.setdefault(alias_key, []).append(cur_key)
+
     replacement: dict[str, str] = {}
     for key, value in extracted_for_lang.items():
         replacement[str(key)] = str(value)
@@ -795,6 +1037,14 @@ def _replace_lang_payload(
         cur_val = current.get(key)
         if isinstance(cur_val, str):
             replacement[key] = cur_val
+            continue
+        # Backward-compat migration: preserve old numbered-tail keys such as
+        # "...timeout_2" when extractor now emits "...timeout".
+        aliases = alias_candidates.get(key, [])
+        if len(aliases) == 1:
+            alias_val = current.get(aliases[0])
+            if isinstance(alias_val, str):
+                replacement[key] = alias_val
     return replacement
 
 
@@ -838,6 +1088,8 @@ def main() -> int:
     owner_source_map: dict[tuple[str, str | None], dict[str, str]] = {}
     owner_dynamic_meta: dict[tuple[str, str | None], dict[str, dict[str, Any]]] = {}
     owner_callsite_meta: dict[tuple[str, str | None], dict[str, dict[str, Any]]] = {}
+    declaration_entries = _extract_declarations_from_registry()
+    use_registry_declarations = bool(declaration_entries)
 
     py_files = sorted(APP_ROOT.rglob("*.py"))
     for py in py_files:
@@ -847,7 +1099,8 @@ def main() -> int:
             continue
 
         entries = []
-        entries.extend(_extract_declarations_from_file(py, tree))
+        if not use_registry_declarations:
+            entries.extend(_extract_declarations_from_file(py, tree))
         extracted_entries, dynamic_meta, callsite_meta = _extract_marked_strings_from_file(py, tree)
         entries.extend(extracted_entries)
 
@@ -871,6 +1124,22 @@ def main() -> int:
                     f"Conflicting source language for key {key}: {prev} vs {source_lang}"
                 )
             owner_source_map[owner][key] = source_lang
+
+    for owner_scope, owner_module, key, value, source_lang in declaration_entries:
+        if source_lang not in SUPPORTED_SOURCE_LANGS:
+            continue
+        owner = (owner_scope, owner_module)
+        owner_lang_entries.setdefault(owner, {})
+        owner_lang_entries[owner].setdefault(source_lang, {})
+        owner_lang_entries[owner][source_lang][key] = value
+
+        owner_source_map.setdefault(owner, {})
+        prev = owner_source_map[owner].get(key)
+        if prev and prev != source_lang:
+            raise ValueError(
+                f"Conflicting source language for key {key}: {prev} vs {source_lang}"
+            )
+        owner_source_map[owner][key] = source_lang
 
     # Deduplicate dynamic templates that only differ by dropped format spec/conversion.
     for owner, records in list(owner_dynamic_meta.items()):

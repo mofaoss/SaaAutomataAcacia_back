@@ -7,12 +7,12 @@
   "module.utils.log.error_occurred_while_parsing_api_response_data_v": "解析 API 响应数据时发生错误：{value_1}",
   "module.utils.log.error_occurred_while_processing_cloudflare_data": "处理 Cloudflare 数据时发生错误：{value_1}",
   "module.utils.log.error_occurred_while_updating_through_cloudflare": "通过 Cloudflare 更新时发生错误：返回的数据格式不正确",
-  "module.utils.log.error_occurred_while_updating_through_cloudflare_2": "通过 Cloudflare 更新时发生错误：updateData 缺少必需字段 {field}",
   "module.utils.log.failed_to_remove_existing_update_package_s": "删除已有更新包失败：%s",
   "module.utils.log.falling_back_to_expired_config_cache_due_to_api_failure": "API 失败，回退到过期的配置缓存。",
   "module.utils.log.github_api_connection_error_e": "GitHub API 连接错误：{e}",
   "module.utils.log.github_api_error_response_status_code_response_text": "GitHub API 错误 {response_status_code}：{response_text}",
   "module.utils.log.github_api_response_status_code_rate_limit_hit_using_fallback": "GitHub API {response_status_code} 触发速率限制！已使用备用方案。",
+  "module.utils.log.missing_occurred_while_updating_through_cloudflare": "通过 Cloudflare 更新时发生错误：updateData 缺少必需字段 {field}",
   "module.utils.log.obtained_update_information_online_data": "获取到更新信息：{online_data}",
   "module.utils.log.through_cloudflare_online_update_error": "通过 Cloudflare 在线更新时出错：{error_msg}",
   "module.utils.ui.new_content_detected": "检测到新内容：{content}"

@@ -3,7 +3,7 @@
   "module.utils.log.error_occurred_while_updating_through_cloudflare": "Error occurred while updating through Cloudflare: Incorrect data format returned",
   "module.utils.log.error_occurred_while_processing_cloudflare_data": "Error occurred while processing Cloudflare data: {value_1}",
   "module.utils.log.obtained_update_information_online_data": "Obtained update information: {online_data}",
-  "module.utils.log.error_occurred_while_updating_through_cloudflare_2": "Error occurred while updating through Cloudflare: Missing required field {field} in updateData",
+  "module.utils.log.missing_occurred_while_updating_through_cloudflare": "Error occurred while updating through Cloudflare: Missing required field {field} in updateData",
   "module.utils.log.error_occurred_while_parsing_api_response_data_v": "Error occurred while parsing API response data: {value_1}",
   "module.utils.ui.new_content_detected": "New {content} detected",
   "module.utils.log.falling_back_to_expired_config_cache_due_to_api_failure": "Falling back to expired config cache due to API failure.",

@@ -1,8 +1,11 @@
 {
+  "module.trigger.description": "zh_CN",
   "module.trigger.field.CheckBox_trigger_auto_e.help": "zh_CN",
-  "module.trigger.field.CheckBox_trigger_auto_e.label": "en",
+  "module.trigger.field.CheckBox_trigger_auto_e.label": "zh_CN",
   "module.trigger.field.CheckBox_trigger_auto_f.help": "zh_CN",
-  "module.trigger.field.CheckBox_trigger_auto_f.label": "en",
+  "module.trigger.field.CheckBox_trigger_auto_f.label": "zh_CN",
+  "module.trigger.group.General": "en",
+  "module.trigger.group.general": "en",
   "module.trigger.log.trigger_skipped_all_options_disabled": "en",
   "module.trigger.log.trigger_started_in_background_mode": "en",
   "module.trigger.title": "zh_CN"

@@ -1,5 +1,8 @@
 {
   "module.trigger.title": "自动辅助",
+  "module.trigger.description": "### 提示\n* 自动辅助以后台模式运行，不会阻塞其他即时任务。\n* 开启 Auto F 后会自动拾取提示目标。\n* 开启妮塔 Auto E 后会在 QTE 阶段自动辅助按键。",
+  "module.trigger.field.CheckBox_trigger_auto_f.label": "自动采集或劝降F",
   "module.trigger.field.CheckBox_trigger_auto_f.help": "出现可采集或可劝降的图标时，自动按下 F 键进行交互",
+  "module.trigger.field.CheckBox_trigger_auto_e.label": "妮塔悸响Qte辅助E",
   "module.trigger.field.CheckBox_trigger_auto_e.help": "QTE 辅助按下 E 键"
 }

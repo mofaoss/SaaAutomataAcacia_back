@@ -1,3 +1,5 @@
 {
+  "module.maze.group.general": "General",
+  "module.maze.group.General": "General",
   "module.maze.title": "Maze"
 }

@@ -1,10 +1,17 @@
 {
-  "module.enter_game.log.detected_that_the_game_process_started_by_the_pr": "Detected that the game process started by the program is still running, skipping duplicate startup",
+  "module.enter_game.action.select_game_directory.label": "Browse",
+  "module.enter_game.action.show_path_tutorial.label": "Tutorial",
+  "module.enter_game.log.detected_that_the_game_process_started_by_the_pr": "Detected that the game process started by the program is still running, skipping duplicate launch",
   "module.enter_game.log.failed_to_resolve_launch_arguments_start_path_st": "Failed to resolve launch arguments, start_path: {start_path}, game_channel: {game_channel}",
   "module.enter_game.log.game_window_already_exists": "Game window already exists",
   "module.enter_game.log.starting_exe_path_launch_args": "Starting {exe_path} {launch_args}",
   "module.enter_game.title": "Auto Login",
-  "module.enter_game.ui.clicking_the_start_button_will_action_automatica": "Clicking the 'Start' button will {action}automatically launch the game",
+  "module.enter_game.ui.auto_open_toggled_off": "Off",
+  "module.enter_game.ui.auto_open_toggled_on": "On",
+  "module.enter_game.ui.clicking_the_start_button_will_action_automatica": "Auto start game",
   "module.enter_game.ui.failed_to_resolve_launch_arguments": "Failed to resolve launch arguments",
-  "module.enter_game.ui.failed_to_spawn_process_exc": "Failed to spawn process: {exc}"
+  "module.enter_game.ui.failed_to_spawn_process_exc": "Failed to start process: {exc}",
+  "module.enter_game.ui.game_exe_not_found_please_check_the_path_start_p": "Game.exe not found, please check the path: {start_path}",
+  "module.enter_game.ui.game_window_already_exists": "Game window already exists",
+  "module.enter_game.ui.launch_cooldown_in_effect_retry_after_remain_s": "Launch cooldown in effect, retry after {remain}s"
 }

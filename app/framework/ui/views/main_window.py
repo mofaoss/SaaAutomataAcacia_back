@@ -8,6 +8,7 @@ import logging
 import threading
 import time
 from pathlib import Path
+from typing import Protocol
 from PySide6.QtCore import QSize, QTimer, QThread, Qt, QPoint
 from PySide6.QtGui import QIcon, QImage, QPixmap, QAction
 from PySide6.QtWidgets import QApplication, QFrame, QSystemTrayIcon, QMenu
@@ -24,7 +25,6 @@ from app.framework.infra.runtime.paths import LOG_DIR, TEMP_DIR, APPDATA_DIR, en
 from app.framework.infra.events.signal_bus import signalBus
 from app.framework.core.event_bus.global_task_bus import global_task_bus
 from app.framework.core.observability import AppErrorCode, capture_exception
-from app.framework.core.interfaces.main_window_bridge import MainWindowFeatureBridge
 from app.framework.core.task_engine.hotkey_poller import GlobalHotkeyPoller
 from app.framework.application.hotkey.routing import resolve_f8_action, HotkeyAction
 from app.framework.application.startup.interface_plan import (
@@ -44,6 +44,20 @@ from app.framework.i18n import _
 logger = logging.getLogger(__name__)
 SIDEBAR_EXPAND_THRESHOLD = 60 # 侧边栏展开判定的阈值像素
 task_coordinator = global_task_bus
+
+
+class MainWindowFeatureBridge(Protocol):
+    def configure_module_registry(self) -> None:
+        ...
+
+    def create_home_interface(self, window):
+        ...
+
+    def create_additional_interface(self, window):
+        ...
+
+    def initialize_ocr_module(self):
+        ...
 
 
 class InstallOcr(QThread):

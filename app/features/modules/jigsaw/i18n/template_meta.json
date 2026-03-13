@@ -1,5 +1,5 @@
 {
-  "module.jigsaw.log.寻找到最大碎片数量为_max_val_准备点击选中该碎片_2": {
+  "module.jigsaw.log.寻找到最大碎片数量为_max_val_准备点击选中该碎片": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -27,7 +27,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.jigsaw.log.开始扫描碎片数量_每种至少保留_min_retain_个_2": {
+  "module.jigsaw.log.开始扫描碎片数量_每种至少保留_min_retain_个": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -55,7 +55,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.jigsaw.log.当前信源碎片数量总计_puzzle_counts_2": {
+  "module.jigsaw.log.当前信源碎片数量总计_puzzle_counts": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -83,7 +83,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.jigsaw.log.成功找到第_value_1_个方案_2": {
+  "module.jigsaw.log.成功找到第_value_1_个方案": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -111,7 +111,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.jigsaw.log.方案_value_1_得分_value_2_2": {
+  "module.jigsaw.log.方案_value_1_得分_value_2": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -144,7 +144,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.jigsaw.log.最优方案为_方案_value_1_2": {
+  "module.jigsaw.log.最优方案为_方案_value_1": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -172,7 +172,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.jigsaw.log.计算完毕_待回收碎片数量分布_recycle_amounts_2": {
+  "module.jigsaw.log.计算完毕_待回收碎片数量分布_recycle_amounts": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -200,7 +200,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.jigsaw.log.选中碎片类型_value_1_准备回收_count_个_2": {
+  "module.jigsaw.log.选中碎片类型_value_1_准备回收_count_个": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,

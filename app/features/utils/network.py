@@ -259,7 +259,7 @@ def handle_cloudflare_success(data, parent):
         for field in required_fields:
             if field not in online_data:
                 parent.logger.error(
-                    _(f'Error occurred while updating through Cloudflare: Missing required field {field} in updateData', msgid='error_occurred_while_updating_through_cloudflare_2')
+                    _(f'Error occurred while updating through Cloudflare: Missing required field {field} in updateData', msgid='missing_occurred_while_updating_through_cloudflare')
                 )
                 _refresh_tips(parent)
                 return
@@ -268,7 +268,7 @@ def handle_cloudflare_success(data, parent):
             for field in update_data_fields:
                 if field not in online_data['updateData']:
                     parent.logger.error(
-                        _(f'Error occurred while updating through Cloudflare: Missing required field {field} in updateData', msgid='error_occurred_while_updating_through_cloudflare_3')
+                        _(f'Error occurred while updating through Cloudflare: Missing required field {field} in updateData', msgid='missing_occurred_while_updating_through_cloudflare')
                     )
                     _refresh_tips(parent)
                     return

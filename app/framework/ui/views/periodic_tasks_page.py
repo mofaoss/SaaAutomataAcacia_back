@@ -1,5 +1,5 @@
 import logging
-from typing import Callable, Dict, List
+from typing import Any, Callable, Dict, List
 
 from PySide6.QtCore import QEasingCurve, QParallelAnimationGroup, QPropertyAnimation, QTimer, QPoint
 from PySide6.QtWidgets import QFrame, QWidget, QVBoxLayout
@@ -9,13 +9,6 @@ from app.framework.infra.config.app_config import is_non_chinese_ui_language
 from app.framework.ui.shared.style_sheet import StyleSheet
 
 from app.framework.core.task_engine.scheduler import Scheduler
-from app.framework.core.interfaces.game_environment import IGameEnvironment
-from app.framework.core.interfaces.periodic_ports import (
-    CollectSuppliesActionsFactory,
-    EnterGameActionsFactory,
-    EventTipsActionsFactory,
-    TaskProfileProvider,
-)
 from app.framework.infra.logging.gui_logger import setup_ui_logger
 from app.framework.ui.shared.log_startup_logo import insert_startup_logo
 from app.framework.application.periodic.periodic_controller import PeriodicController
@@ -62,12 +55,12 @@ class PeriodicTasksPage(QFrame, BaseInterface):
         text: str,
         parent=None,
         *,
-        game_environment: IGameEnvironment | None = None,
+        game_environment: Any | None = None,
         home_sync=None,
-        task_profile_provider: TaskProfileProvider | None = None,
-        create_enter_game_actions: EnterGameActionsFactory | None = None,
-        create_collect_supplies_actions: CollectSuppliesActionsFactory | None = None,
-        create_event_tips_actions: EventTipsActionsFactory | None = None,
+        task_profile_provider: Callable[[], Any] | None = None,
+        create_enter_game_actions: Callable[[Any], Any] | None = None,
+        create_collect_supplies_actions: Callable[[Any], Any] | None = None,
+        create_event_tips_actions: Callable[[Any, bool, Callable[[str, str], str]], Any] | None = None,
         startup_update_hook: Callable[[object], None] | None = None,
     ):
         super().__init__(parent)

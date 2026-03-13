@@ -1,5 +1,5 @@
 {
-  "module.water_bomb.log.person_超时_2": {
+  "module.water_bomb.log.person_超时": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -27,7 +27,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.water_bomb.log.使用道具_item_name_超时_2": {
+  "module.water_bomb.log.使用道具_item_name_超时": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -55,7 +55,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.water_bomb.log.对战失败_连胜中断_2": {
+  "module.water_bomb.log.对战失败_连胜中断": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -76,7 +76,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": false
   },
-  "module.water_bomb.log.对战胜利_当前连胜为_self_current_win_2": {
+  "module.water_bomb.log.对战胜利_当前连胜为_self_current_win": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -104,7 +104,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.water_bomb.log.对方道具_self_enemy_items_2": {
+  "module.water_bomb.log.对方道具_self_enemy_items": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -132,7 +132,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.water_bomb.log.已达成_self_end_win_连胜_2": {
+  "module.water_bomb.log.已达成_self_end_win_连胜": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -160,7 +160,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.water_bomb.log.当前最佳操作为_current_strategy_胜率为_win_prob_2": {
+  "module.water_bomb.log.当前最佳操作为_current_strategy_胜率为_win_prob": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -193,7 +193,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.water_bomb.log.当前水弹数量_self_remaining_live_bullet_空弹数量_self_remaining_blank_bullet_2": {
+  "module.water_bomb.log.当前水弹数量_self_remaining_live_bullet_空弹数量_self_remaining_blank_bullet": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -226,7 +226,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.water_bomb.log.当前玩家血量_self_current_player_hp_对方血量_self_current_enemy_hp_2": {
+  "module.water_bomb.log.当前玩家血量_self_current_player_hp_对方血量_self_current_enemy_hp": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -259,7 +259,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.water_bomb.log.当前血量上限_self_max_hp_2": {
+  "module.water_bomb.log.当前血量上限_self_max_hp": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -287,7 +287,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.water_bomb.log.玩家道具_self_player_items_2": {
+  "module.water_bomb.log.玩家道具_self_player_items": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,

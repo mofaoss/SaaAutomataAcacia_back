@@ -1,3 +1,7 @@
 {
-  "module.person.log.plus_button_missed_item_details_opened_press_esc_and_retry": "Plus button missed (item details opened). Press ESC and retry."
+  "module.person.log.plus_button_missed_item_details_opened_press_esc_and_retry": "Plus button missed (item details opened). Press ESC and retry.",
+  "module.task_person.group.general": "General",
+  "module.task_person.group.General": "General",
+  "module.person.group.general": "General",
+  "module.person.group.General": "General"
 }

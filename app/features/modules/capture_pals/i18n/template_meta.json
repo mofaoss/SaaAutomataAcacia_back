@@ -1,5 +1,5 @@
 {
-  "module.capture_pals.log.island_name_f提示消失后又重新出现_疑似达到每日抓帕鲁上限_2": {
+  "module.capture_pals.log.island_name_f提示消失后又重新出现_疑似达到每日抓帕鲁上限": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -27,7 +27,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_已进入地图_2": {
+  "module.capture_pals.log.island_name_已进入地图": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -55,7 +55,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_已进入地图_任务图标已出现_2": {
+  "module.capture_pals.log.island_name_已进入地图_任务图标已出现": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -83,7 +83,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_成功抓到帕鲁_2": {
+  "module.capture_pals.log.island_name_成功抓到帕鲁": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -111,7 +111,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_按f后图标未消失_尝试_self_max_failed_f_attempts_次_疑似到上限或交互失败_2": {
+  "module.capture_pals.log.island_name_按f后图标未消失_尝试_self_max_failed_f_attempts_次_疑似到上限或交互失败": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -144,7 +144,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_本轮未找到f抓帕鲁提示_可能在等待刷新_连续次数_no_collect_streak_self_fixed_no_collect_max_2": {
+  "module.capture_pals.log.island_name_本轮未找到f抓帕鲁提示_可能在等待刷新_连续次数_no_collect_streak_self_fixed_no_collect_max": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -182,7 +182,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_本轮未找到f抓帕鲁提示_连续次数_no_collect_streak_self_patrol_no_collect_max_2": {
+  "module.capture_pals.log.island_name_本轮未找到f抓帕鲁提示_连续次数_no_collect_streak_self_patrol_no_collect_max": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -220,7 +220,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_检测到每日抓帕鲁上限_停止该岛定点抓帕鲁_2": {
+  "module.capture_pals.log.island_name_检测到每日抓帕鲁上限_停止该岛定点抓帕鲁": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -248,7 +248,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_检测到每日抓帕鲁上限_停止该岛巡逻抓帕鲁_2": {
+  "module.capture_pals.log.island_name_检测到每日抓帕鲁上限_停止该岛巡逻抓帕鲁": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -276,7 +276,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_进入地图失败_终止该岛巡逻抓帕鲁_2": {
+  "module.capture_pals.log.island_name_进入地图失败_终止该岛巡逻抓帕鲁": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -304,7 +304,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_进入地图失败_终止该岛抓帕鲁_2": {
+  "module.capture_pals.log.island_name_进入地图失败_终止该岛抓帕鲁": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -332,7 +332,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_进入地图超时_检查_岛按钮_crop_开始按钮_crop_任务图标_crop_threshold_以及是否确实处于选岛界面_2": {
+  "module.capture_pals.log.island_name_进入地图超时_检查_岛按钮_crop_开始按钮_crop_任务图标_crop_threshold_以及是否确实处于选岛界面": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -360,7 +360,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_连续多个刷新周期都未出现f提示_可能站位_点位不正确_请调整位置后重试_停止定点模式_2": {
+  "module.capture_pals.log.island_name_连续多个刷新周期都未出现f提示_可能站位_点位不正确_请调整位置后重试_停止定点模式": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -388,7 +388,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_连续多轮找不到抓帕鲁提示_可能站位_路线不对_停止该模式_2": {
+  "module.capture_pals.log.island_name_连续多轮找不到抓帕鲁提示_可能站位_路线不对_停止该模式": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -416,7 +416,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.island_name_退出地图失败_停止_2": {
+  "module.capture_pals.log.island_name_退出地图失败_停止": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -477,7 +477,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": false
   },
-  "module.capture_pals.log.st_profile_name_插入任务后退出失败_2": {
+  "module.capture_pals.log.st_profile_name_插入任务后退出失败": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -505,7 +505,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.st_profile_name_未找到f抓帕鲁提示_连续次数_st_no_collect_streak_limit_2": {
+  "module.capture_pals.log.st_profile_name_未找到f抓帕鲁提示_连续次数_st_no_collect_streak_limit": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -543,7 +543,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.st_profile_name_检测到每日抓帕鲁上限_同步模式将不再前往该岛_2": {
+  "module.capture_pals.log.st_profile_name_检测到每日抓帕鲁上限_同步模式将不再前往该岛": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -571,7 +571,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.st_profile_name_连续多轮未出现f提示_标记异常_2": {
+  "module.capture_pals.log.st_profile_name_连续多轮未出现f提示_标记异常": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -599,7 +599,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.同步周期到达_插入_other_profile_name_2": {
+  "module.capture_pals.log.同步周期到达_插入_other_profile_name": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -627,7 +627,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.同步抓帕鲁_自动同步周期_sync_every_sec_sync_every_sec_0f_s_partner_value_2_0f_s_adventure_v_2": {
+  "module.capture_pals.log.同步抓帕鲁_自动同步周期_sync_every_sec_sync_every_sec_0f_s_partner_value_2_0f_s_adventure_v": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -665,7 +665,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.同步抓帕鲁_进入_st_profile_name_失败_2": {
+  "module.capture_pals.log.同步抓帕鲁_进入_st_profile_name_失败": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -693,7 +693,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.启动策略_优先处理长周期_long_st_profile_name_然后常驻_short_st_profile_name_2": {
+  "module.capture_pals.log.启动策略_优先处理长周期_long_st_profile_name_然后常驻_short_st_profile_name": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -726,7 +726,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.开始_island_name_定点抓帕鲁_间隔_island_fixed_interval_sec_1f_s_2": {
+  "module.capture_pals.log.开始_island_name_定点抓帕鲁_间隔_island_fixed_interval_sec_1f_s": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -759,7 +759,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.capture_pals.log.开始_island_name_巡逻抓帕鲁_刷新间隔_island_patrol_refresh_interval_sec_1f_s_2": {
+  "module.capture_pals.log.开始_island_name_巡逻抓帕鲁_刷新间隔_island_patrol_refresh_interval_sec_1f_s": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,

@@ -55,34 +55,6 @@
     "is_runtime_visible": true,
     "mixed_source_template": false
   },
-  "module.utils.log.error_occurred_while_updating_through_cloudflare_2": {
-    "kind": "dynamic_template",
-    "template_id": "error_occurred_while_updating_through_cloudflare_2",
-    "msgid": "error_occurred_while_updating_through_cloudflare_2",
-    "source_template": "Error occurred while updating through Cloudflare: Missing required field {field} in updateData",
-    "fields": [
-      "field"
-    ],
-    "field_details": {
-      "field": {
-        "format_spec": "",
-        "conversion": ""
-      }
-    },
-    "owner_scope": "module",
-    "owner_module": "utils",
-    "file_path": "app/features/utils/network.py",
-    "line": 262,
-    "col": 20,
-    "function_name": "handle_cloudflare_success",
-    "class_name": null,
-    "context": "log",
-    "source_language": "en",
-    "template_hash": "9ea650563ceb7a640f75dddf4374e7ef058e8e30",
-    "callsite_key": "app/features/utils/network.py:262:20",
-    "is_runtime_visible": true,
-    "mixed_source_template": false
-  },
   "module.utils.log.github_api_connection_error_e": {
     "kind": "dynamic_template",
     "template_id": null,
@@ -169,6 +141,34 @@
     "source_language": "en",
     "template_hash": "c70bac70518ebc17bb171f443817b4c32074be54",
     "callsite_key": "app/features/utils/updater.py:205:29",
+    "is_runtime_visible": true,
+    "mixed_source_template": false
+  },
+  "module.utils.log.missing_occurred_while_updating_through_cloudflare": {
+    "kind": "dynamic_template",
+    "template_id": "missing_occurred_while_updating_through_cloudflare",
+    "msgid": "missing_occurred_while_updating_through_cloudflare",
+    "source_template": "Error occurred while updating through Cloudflare: Missing required field {field} in updateData",
+    "fields": [
+      "field"
+    ],
+    "field_details": {
+      "field": {
+        "format_spec": "",
+        "conversion": ""
+      }
+    },
+    "owner_scope": "module",
+    "owner_module": "utils",
+    "file_path": "app/features/utils/network.py",
+    "line": 271,
+    "col": 24,
+    "function_name": "handle_cloudflare_success",
+    "class_name": null,
+    "context": "log",
+    "source_language": "en",
+    "template_hash": "9ea650563ceb7a640f75dddf4374e7ef058e8e30",
+    "callsite_key": "app/features/utils/network.py:271:24",
     "is_runtime_visible": true,
     "mixed_source_template": false
   },

@@ -1,3 +1,5 @@
 {
+  "module.alien_guardian.group.general": "General",
+  "module.alien_guardian.group.General": "General",
   "module.alien_guardian.title": "Alien Guardian"
 }

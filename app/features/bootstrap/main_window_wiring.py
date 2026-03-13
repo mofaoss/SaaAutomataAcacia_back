@@ -2,12 +2,12 @@
 from __future__ import annotations
 
 from app.framework.core.module_system import discover_modules
-from app.framework.core.interfaces.main_window_bridge import MainWindowFeatureBridge
 from app.framework.core.task_engine.threads import ModuleTaskThread
 from app.framework.i18n import load_i18n_catalogs
 from app.framework.infra.config.app_config import config
 from app.framework.ui.views.on_demand_tasks_page import OnDemandTasksPage
 from app.framework.ui.views.periodic_tasks_page import PeriodicTasksPage
+from app.features.bootstrap.contracts import MainWindowFeatureBridge
 
 from app.features.modules.collect_supplies.usecase.collect_supplies_usecase import (
     CollectSuppliesModule,

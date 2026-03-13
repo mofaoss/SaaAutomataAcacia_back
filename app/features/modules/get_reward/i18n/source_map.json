@@ -1,5 +1,7 @@
 {
-  "module.get_reward.log.领取任务奖励超时_2": "zh_CN",
-  "module.get_reward.log.领取凭证奖励超时_2": "zh_CN",
-  "module.get_reward.title": "zh_CN"
+  "module.get_reward.description": "zh_CN",
+  "module.get_reward.log.领取任务奖励超时": "zh_CN",
+  "module.get_reward.log.领取凭证奖励超时": "zh_CN",
+  "module.get_reward.title": "zh_CN",
+  "module.task_get_reward.description": "zh_CN"
 }

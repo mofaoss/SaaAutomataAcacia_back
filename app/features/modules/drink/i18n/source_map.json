@@ -1,9 +1,17 @@
 {
-  "module.drink.log.已完成_value_1_次猜心对局_2": "zh_CN",
-  "module.drink.log.开始第_count_次猜心对局_2": "zh_CN",
-  "module.drink.log.猜心对局对局超时_2": "zh_CN",
-  "module.drink.log.玩法未解锁_2": "zh_CN",
-  "module.drink.log.进入猜心对局超时_2": "zh_CN",
-  "module.drink.log.重进对局超时_2": "zh_CN",
+  "module.drink.description": "zh_CN",
+  "module.drink.field.CheckBox_is_speed_up.label": "zh_CN",
+  "module.drink.field.ComboBox_card_mode.label": "zh_CN",
+  "module.drink.field.ComboBox_card_mode.option.0": "zh_CN",
+  "module.drink.field.ComboBox_card_mode.option.1": "zh_CN",
+  "module.drink.field.SpinBox_drink_times.label": "zh_CN",
+  "module.drink.group.General": "en",
+  "module.drink.group.general": "en",
+  "module.drink.log.已完成_value_1_次猜心对局": "zh_CN",
+  "module.drink.log.开始第_count_次猜心对局": "zh_CN",
+  "module.drink.log.猜心对局对局超时": "zh_CN",
+  "module.drink.log.玩法未解锁": "zh_CN",
+  "module.drink.log.进入猜心对局超时": "zh_CN",
+  "module.drink.log.重进对局超时": "zh_CN",
   "module.drink.title": "zh_CN"
 }

@@ -1,5 +1,5 @@
 {
-  "module.drink.log.已完成_value_1_次猜心对局_2": {
+  "module.drink.log.已完成_value_1_次猜心对局": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -27,7 +27,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.drink.log.开始第_count_次猜心对局_2": {
+  "module.drink.log.开始第_count_次猜心对局": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,

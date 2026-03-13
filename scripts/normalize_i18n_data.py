@@ -21,6 +21,9 @@ NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
 HASHLIKE_SUFFIX_RE = re.compile(r"^(?:[0-9a-f]{8,}|h[0-9a-f]{6,}|txt_[0-9a-f]{8,}|tmpl_[0-9a-f]{8,})$")
 SYNTHETIC_CN_SUFFIX_RE = re.compile(r"^cn_text_\d+(?:_\d+)?$")
 LEGACY_TIPS_KEY_RE = re.compile(r"^module\.([a-z0-9_]+)\.ui\.tips_[a-z0-9_]+$")
+# Keep Chinese suffix keys stable by default. Renaming keys based on translated
+# text causes churn between extract/normalize passes and can drop translations.
+RENAME_CHINESE_KEY_SUFFIXES = False
 
 
 def _load_json(path: Path) -> dict:
@@ -364,29 +367,30 @@ def _normalize_owner_keys(owner: str, maps: dict[str, dict[str, str]], source_ma
             stats["dynamic_template_spec_loss_duplicate_count"] += 1
 
     # 1) normalize Chinese natural-language key suffixes.
-    rename_pairs: dict[str, str] = {}
-    used_suffixes = {k.rsplit(".", 1)[-1] for k in all_keys}
-    seq = 1
-    for key in sorted(all_keys):
-        if not _key_has_chinese_suffix(key):
-            continue
-        prefix = key.rsplit(".", 1)[0]
-        new_suffix, seq = _semantic_suffix(key, maps, used_suffixes, seq)
-        new_key = f"{prefix}.{new_suffix}"
-        while new_key in all_keys or new_key in rename_pairs.values():
+    if RENAME_CHINESE_KEY_SUFFIXES:
+        rename_pairs: dict[str, str] = {}
+        used_suffixes = {k.rsplit(".", 1)[-1] for k in all_keys}
+        seq = 1
+        for key in sorted(all_keys):
+            if not _key_has_chinese_suffix(key):
+                continue
+            prefix = key.rsplit(".", 1)[0]
             new_suffix, seq = _semantic_suffix(key, maps, used_suffixes, seq)
             new_key = f"{prefix}.{new_suffix}"
-        rename_pairs[key] = new_key
+            while new_key in all_keys or new_key in rename_pairs.values():
+                new_suffix, seq = _semantic_suffix(key, maps, used_suffixes, seq)
+                new_key = f"{prefix}.{new_suffix}"
+            rename_pairs[key] = new_key
 
-    for old_key, new_key in rename_pairs.items():
-        for lang in LANGS:
-            if old_key in maps[lang]:
-                maps[lang][new_key] = maps[lang].pop(old_key)
-        if old_key in source_map:
-            source_map[new_key] = source_map.pop(old_key)
-        if old_key in template_meta:
-            template_meta[new_key] = template_meta.pop(old_key)
-        stats["normalized_keys"] += 1
+        for old_key, new_key in rename_pairs.items():
+            for lang in LANGS:
+                if old_key in maps[lang]:
+                    maps[lang][new_key] = maps[lang].pop(old_key)
+            if old_key in source_map:
+                source_map[new_key] = source_map.pop(old_key)
+            if old_key in template_meta:
+                template_meta[new_key] = template_meta.pop(old_key)
+            stats["normalized_keys"] += 1
 
     all_keys = set(source_map.keys())
     for lang in LANGS:

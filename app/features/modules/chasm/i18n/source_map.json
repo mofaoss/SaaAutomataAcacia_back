@@ -1,6 +1,8 @@
 {
-  "module.chasm.log.当前未开放拟境_2": "zh_CN",
-  "module.chasm.log.精神拟境超时_2": "zh_CN",
-  "module.chasm.log.领取拟境奖励超时_2": "zh_CN",
-  "module.chasm.title": "zh_CN"
+  "module.chasm.description": "zh_CN",
+  "module.chasm.log.当前未开放拟境": "zh_CN",
+  "module.chasm.log.精神拟境超时": "zh_CN",
+  "module.chasm.log.领取拟境奖励超时": "zh_CN",
+  "module.chasm.title": "zh_CN",
+  "module.task_chasm.description": "zh_CN"
 }

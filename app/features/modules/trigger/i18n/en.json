@@ -1,7 +1,9 @@
 {
-  "module.trigger.field.CheckBox_trigger_auto_f.label": "Trigger Auto F",
-  "module.trigger.field.CheckBox_trigger_auto_e.label": "Trigger Auto E",
   "module.trigger.log.trigger_started_in_background_mode": "Trigger started in background mode",
   "module.trigger.log.trigger_skipped_all_options_disabled": "Trigger skipped: all options are disabled",
+  "module.trigger.group.general": "General",
+  "module.trigger.group.General": "General",
+  "module.trigger.field.CheckBox_trigger_auto_e.label": "Trigger Auto E",
+  "module.trigger.field.CheckBox_trigger_auto_f.label": "Trigger Auto F",
   "module.trigger.title": "Trigger"
 }

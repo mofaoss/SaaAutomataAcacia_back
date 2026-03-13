@@ -1,5 +1,5 @@
 {
-  "module.fishing.log.出了条大的_截图已保存至_file_path_2": {
+  "module.fishing.log.出了条大的_截图已保存至_file_path": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -27,7 +27,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.fishing.log.开始第_value_1_次钓鱼_2": {
+  "module.fishing.log.开始第_value_1_次钓鱼": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -55,7 +55,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.fishing.log.未识别出按键文字_请手动设置_e_2": {
+  "module.fishing.log.未识别出按键文字_请手动设置_e": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -83,7 +83,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.fishing.log.选定的hsv值_hsv_2": {
+  "module.fishing.log.选定的hsv值_hsv": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,
@@ -111,7 +111,7 @@
     "is_runtime_visible": true,
     "mixed_source_template": true
   },
-  "module.fishing.log.钓鱼按键识别最佳匹配为_best_match_2": {
+  "module.fishing.log.钓鱼按键识别最佳匹配为_best_match": {
     "kind": "dynamic_template",
     "template_id": null,
     "msgid": null,

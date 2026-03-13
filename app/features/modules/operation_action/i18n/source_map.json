@@ -1,8 +1,22 @@
 {
+  "module.operation.description": "zh_CN",
+  "module.operation.field.ComboBox_run.label": "zh_CN",
+  "module.operation.field.ComboBox_run.option.0": "zh_CN",
+  "module.operation.field.ComboBox_run.option.1": "zh_CN",
+  "module.operation.field.SpinBox_action_times.label": "zh_CN",
+  "module.operation.group.General": "en",
+  "module.operation.group.general": "en",
   "module.operation.title": "zh_CN",
-  "module.operation_action.log.执行常规训练超时_2": "zh_CN",
-  "module.operation_action.log.进入常规行动时连续滚轮无进展_已停止以避免后台卡死_2": "zh_CN",
-  "module.operation_action.log.进入常规行动超时_2": "zh_CN",
-  "module.operation_action.ui.切换疾跑_2": "zh_CN",
-  "module.operation_action.ui.按住疾跑_2": "zh_CN"
+  "module.operation_action.log.执行常规训练超时": "zh_CN",
+  "module.operation_action.log.进入常规行动时连续滚轮无进展_已停止以避免后台卡死": "zh_CN",
+  "module.operation_action.log.进入常规行动超时": "zh_CN",
+  "module.operation_action.ui.切换疾跑": "zh_CN",
+  "module.operation_action.ui.按住疾跑": "zh_CN",
+  "module.task_operation.description": "zh_CN",
+  "module.task_operation.field.ComboBox_run.label": "zh_CN",
+  "module.task_operation.field.ComboBox_run.option.0": "zh_CN",
+  "module.task_operation.field.ComboBox_run.option.1": "zh_CN",
+  "module.task_operation.field.SpinBox_action_times.label": "zh_CN",
+  "module.task_operation.group.General": "en",
+  "module.task_operation.group.general": "en"
 }

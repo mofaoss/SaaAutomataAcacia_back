@@ -1,9 +1,10 @@
 {
-  "module.close_game.field.CheckBox_close_game.label": "Close Game",
-  "module.close_game.field.CheckBox_shutdown.label": "Shutdown",
-  "module.close_game.field.CheckBox_close_proxy.label": "Close Proxy",
   "module.close_game.log.exiting_game": "Exiting game...",
   "module.close_game.log.system_will_shut_down_in_60s": "System will shut down in 60s...",
   "module.close_game.log.exiting_application": "Exiting Application...",
+  "module.task_close_game.group.general": "General",
+  "module.task_close_game.group.General": "General",
+  "module.close_game.group.general": "General",
+  "module.close_game.group.General": "General",
   "module.close_game.title": "Execute Exit"
 }

@@ -1,6 +1,12 @@
 {
-  "module.alien_guardian.log.异星守护战斗超时_2": "zh_CN",
+  "module.alien_guardian.description": "zh_CN",
+  "module.alien_guardian.field.ComboBox_mode.label": "zh_CN",
+  "module.alien_guardian.field.ComboBox_mode.option.0": "zh_CN",
+  "module.alien_guardian.field.ComboBox_mode.option.1": "zh_CN",
+  "module.alien_guardian.group.General": "en",
+  "module.alien_guardian.group.general": "en",
+  "module.alien_guardian.log.异星守护战斗超时": "zh_CN",
   "module.alien_guardian.title": "zh_CN",
-  "module.alien_guardian.ui.无尽模式_2": "zh_CN",
-  "module.alien_guardian.ui.闯关模式_2": "zh_CN"
+  "module.alien_guardian.ui.无尽模式": "zh_CN",
+  "module.alien_guardian.ui.闯关模式": "zh_CN"
 }
