@@ -36,7 +36,7 @@ class SampleCard(CardWidget):
         self.vBoxLayout = QVBoxLayout()
 
         self.setFixedSize(360, 90)
-        self.iconWidget.setFixedSize(48, 48)
+        self.iconWidget.setFixedSize(82, 82)
 
         self.hBoxLayout.setSpacing(28)
         self.hBoxLayout.setContentsMargins(20, 0, 0, 0)
@@ -109,7 +109,7 @@ class SampleCard_URL(CardWidget):
         self.vBoxLayout = QVBoxLayout()
 
         self.setFixedSize(360, 90)
-        self.iconWidget.setFixedSize(48, 48)
+        self.iconWidget.setFixedSize(82, 82)
 
         self.hBoxLayout.setSpacing(28)
         self.hBoxLayout.setContentsMargins(20, 0, 0, 0)
@@ -183,7 +183,7 @@ class SampleCard_Switch(CardWidget):
         self.vBoxLayout = QVBoxLayout()
 
         self.setFixedSize(360, 90)
-        self.iconWidget.setFixedSize(48, 48)
+        self.iconWidget.setFixedSize(82, 82)
 
         self.hBoxLayout.setSpacing(28)
         self.hBoxLayout.setContentsMargins(20, 0, 14, 0)
@@ -271,4 +271,3 @@ class SampleCardView(QWidget):
         card = SampleCard_Switch(icon, title, content, checked, on_toggle, self)
         self.flowLayout.addWidget(card)
         return card
-

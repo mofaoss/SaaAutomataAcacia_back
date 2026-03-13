@@ -3,13 +3,14 @@ import random
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QRectF
+from PySide6.QtCore import Qt, QRectF, QSize
 from PySide6.QtGui import QPixmap, QPainter, QPainterPath, QBrush
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QLabel,
     QGraphicsDropShadowEffect,
+    QSizePolicy,
 )
 from qfluentwidgets import ScrollArea, CardWidget
 
@@ -127,7 +128,9 @@ class BannerWidget(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        self.setFixedHeight(350)
+        self.setMinimumHeight(350)
+        # 完全 Expanding，由布局管理器分配空间
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.vBoxLayout = QVBoxLayout(self)
         self.galleryLabel = QLabel(
@@ -149,7 +152,7 @@ class BannerWidget(QWidget):
         self.galleryLabel.setObjectName("galleryLabel")
 
         self.vBoxLayout.setSpacing(0)
-        self.vBoxLayout.setContentsMargins(0, 20, 0, 0)
+        self.vBoxLayout.setContentsMargins(24, 24, 24, 0)
         self.vBoxLayout.addWidget(self.galleryLabel)
         self.vBoxLayout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
@@ -187,27 +190,31 @@ class BannerWidget(QWidget):
             )
             painter.setPen(Qt.PenStyle.NoPen)
 
+            w, target_h = self.width(), self.height()
+
             path = QPainterPath()
             path.setFillRule(Qt.FillRule.WindingFill)
-            w, h = self.width(), 200
-            path.addRoundedRect(QRectF(0, 0, w, h), 10, 10)
-            path.addRect(QRectF(0, h - 50, 50, 50))
-            path.addRect(QRectF(w - 50, 0, 50, 50))
-            path.addRect(QRectF(w - 50, h - 50, 50, 50))
-            path = path.simplified()
+            path.addRoundedRect(QRectF(0, 0, w, target_h), 10, 10)
 
-            pixmap = QPixmap()
             if not self.banner.isNull() and self.banner.width() > 0:
-                image_height = self.width() * self.banner.height() // self.banner.width()
                 pixmap = self.banner.scaled(
-                    self.width(),
-                    image_height,
-                    Qt.AspectRatioMode.KeepAspectRatio,
+                    w,
+                    target_h,
+                    Qt.AspectRatioMode.KeepAspectRatioByExpanding,
                     Qt.TransformationMode.SmoothTransformation,
                 )
 
-            path.addRect(QRectF(0, h, w, self.height() - h))
-            painter.fillPath(path, QBrush(pixmap))
+                offset_x = (w - pixmap.width()) // 2
+                # 垂直偏移：优先显示顶部
+                if pixmap.height() > target_h:
+                    offset_y = int((target_h - pixmap.height()) * 0.3)
+                else:
+                    offset_y = (target_h - pixmap.height()) // 2
+
+                painter.setClipPath(path)
+                painter.drawPixmap(offset_x, offset_y, pixmap)
+            else:
+                painter.fillPath(path, QBrush(Qt.GlobalColor.darkGray))
         finally:
             painter.end()
 
@@ -231,7 +238,7 @@ class DisplayInterface(ScrollArea, BaseInterface):
         signalBus.windowTrackingStealthChanged.connect(self._on_stealth_mode_changed)
 
     def _setup_ui(self):
-        """专门负责创建控件、设置布局和样式（视图层职责）"""
+        """专门负责创建控件、设置布局和样式"""
         self.setObjectName("displayInterface")
         StyleSheet.DISPLAY_INTERFACE.apply(self)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -244,12 +251,12 @@ class DisplayInterface(ScrollArea, BaseInterface):
         self.vBoxLayout = QVBoxLayout(self.view)
         self.vBoxLayout.setContentsMargins(0, 0, 0, 36)
         self.vBoxLayout.setSpacing(40)
-        self.vBoxLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        self.banner = BannerWidget(self)
-        self.vBoxLayout.addWidget(self.banner)
+        # 核心：将 Banner 的拉伸因子设为 1
+        self.banner = BannerWidget(self.view)
+        self.vBoxLayout.addWidget(self.banner, 1)
 
-        # 语言提示卡片初始化
+        # 语言提示卡片 (不占用拉伸空间)
         self.gameLanguageNoticeCard = CardWidget(self.view)
         self.gameLanguageNoticeCard.setFixedHeight(45)
         self.gameLanguageNoticeLayout = QVBoxLayout(self.gameLanguageNoticeCard)
@@ -266,12 +273,11 @@ class DisplayInterface(ScrollArea, BaseInterface):
         self.gameLanguageNoticeLayout.addWidget(self.gameLanguageNoticeTitle)
         self.gameLanguageNoticeLayout.addWidget(self.gameLanguageNoticeLabel)
 
-        # 仅在非中文环境下显示提示卡片
         self.gameLanguageNoticeCard.setVisible(self._is_non_chinese_ui)
-        self.vBoxLayout.addWidget(self.gameLanguageNoticeCard)
+        self.vBoxLayout.addWidget(self.gameLanguageNoticeCard, 0)
 
     def apply_i18n(self):
-        """专门负责文本和多语言翻译（视图层职责）"""
+        """多语言翻译"""
         self.gameLanguageNoticeLabel.setText(
             "Note: Game language for automation supports only Simplified/Traditional Chinese."
             if self._is_non_chinese_ui
@@ -279,57 +285,56 @@ class DisplayInterface(ScrollArea, BaseInterface):
         )
 
     def _load_samples(self):
-        """负责组装快速跳转卡片及绑定业务逻辑（控制层职责）"""
+        """负责组装快速跳转卡片及绑定业务逻辑"""
         jump_title = "Quick Access" if self._is_non_chinese_ui else self.tr("快捷跳转")
         quick_jump = SampleCardView(jump_title, self.view)
 
-        # 1. 设置卡片
         quick_jump.addSampleCard(
-            icon=os.path.join(self.icondir, "setting.svg"),
+            # icon=os.path.join(self.icondir, "setting.svg"),
+            icon=os.path.join(self.icondir, "setting.png"),
             title="Settings" if self._is_non_chinese_ui else "核心设置",
             content="Please confirm the settings when you first download" if self._is_non_chinese_ui else self.tr("首次下载，请先确认"),
             routeKey="settingInterface",
             index=0,
         )
 
-        # 2. 日常卡片
         quick_jump.addSampleCard(
-            icon=os.path.join(self.icondir, "play.svg"),
+            # icon=os.path.join(self.icondir, "play.svg"),
+            icon=os.path.join(self.icondir, "daily.png"),
             title="Start Daily" if self._is_non_chinese_ui else "开始日常",
             content="Acacia, Let's go!" if self._is_non_chinese_ui else self.tr("安卡希雅，Let's go!"),
             routeKey="Home-Start-Now",
             index=0,
         )
 
-        # 3. 教程卡片
         quick_jump.addSampleCard(
-            icon=os.path.join(self.icondir, "explain.svg"),
+            # icon=os.path.join(self.icondir, "explain.svg"),
+            icon=os.path.join(self.icondir, "tutorial.png"),
             title="Tutorial" if self._is_non_chinese_ui else "使用教程",
             content="Read the guide to get started quickly" if self._is_non_chinese_ui else self.tr("查看教程，答疑解惑"),
             routeKey="Help-Interface",
             index=0,
         )
 
-        # 4. 隐身模式开关卡片
         stealth_on = bool(config.windowTrackingInput.value)
         self.windowTrackingQuickSwitchCard = quick_jump.addSampleCard_Switch(
-            icon=os.path.join(self.icondir, "electronics.svg"),
+            # icon=os.path.join(self.icondir, "electronics.svg"),
+            icon=os.path.join(self.icondir, "stealth.png"),
             title="Stealth Mode" if self._is_non_chinese_ui else "隐身模式",
             content="Make the game completely invisible in the background" if self._is_non_chinese_ui else self.tr("游戏隐身，完全后台"),
             checked=stealth_on,
             on_toggle=self._toggle_stealth_mode,
         )
 
-        self.vBoxLayout.addWidget(quick_jump)
+        # 核心：将下方控件区域的拉伸因子也设为 1，实现与 Banner 均分
+        self.vBoxLayout.addWidget(quick_jump, 1)
 
     def _sync_window_tracking_quick_switch(self):
-        """业务状态同步逻辑"""
         if self.windowTrackingQuickSwitchCard is not None:
             stealth_on = bool(config.windowTrackingInput.value)
             self.windowTrackingQuickSwitchCard.setChecked(stealth_on, emit=False)
 
     def _toggle_stealth_mode(self, checked: bool):
-        """业务执行逻辑"""
         alpha = 1 if checked else 255
         config.set(config.windowTrackingInput, checked)
         config.set(config.windowTrackingAlpha, alpha)
@@ -339,8 +344,5 @@ class DisplayInterface(ScrollArea, BaseInterface):
         self._sync_window_tracking_quick_switch()
 
     def showEvent(self, event):
-        """生命周期事件"""
         super().showEvent(event)
         self._sync_window_tracking_quick_switch()
-
-
