@@ -13,7 +13,8 @@ from app.framework.i18n import _
 @periodic_module(
     "执行退出",
     notify_on_completion=False,
-    description="### 提示\n* 全部任务执行完后，可选择关闭游戏、关闭代理或关机。",
+    periodic_requires_home_sync=False,
+    description="### 提示\n* 关闭助手后，计划任务将不会继续执行",
     fields={
         "CheckBox_close_game": Field("退出游戏"),
         "CheckBox_shutdown": Field("关机"),
