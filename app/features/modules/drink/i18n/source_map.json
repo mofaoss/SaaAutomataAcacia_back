@@ -1,9 +1,9 @@
 {
   "module.drink.log.已完成_value_1_次猜心对局_2": "zh_CN",
   "module.drink.log.开始第_count_次猜心对局_2": "zh_CN",
+  "module.drink.log.猜心对局对局超时_2": "zh_CN",
   "module.drink.log.玩法未解锁_2": "zh_CN",
-  "module.drink.log.进入酒馆超时_2": "zh_CN",
-  "module.drink.log.酒馆对局超时_2": "zh_CN",
+  "module.drink.log.进入猜心对局超时_2": "zh_CN",
   "module.drink.log.重进对局超时_2": "zh_CN",
   "module.drink.title": "zh_CN"
 }

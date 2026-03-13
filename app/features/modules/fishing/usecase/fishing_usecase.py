@@ -28,10 +28,9 @@ _FISHING_FIELDS = {
             (4, "重量级"),
             (5, "巨型"),
             (6, "重量级"),
-            (7, "巨型"),
         ),
     ),
-    "ComboBox_fishing_mode": Field("判定模式", group="基础设置", options=((0, "颜色检测"), (1, "时间判定"))),
+    "ComboBox_fishing_mode": Field("判定模式", group="基础设置", options=((0, "颜色检测 (高精度推荐)"), (1, "时间判定"))),
     "CheckBox_is_limit_time": Field("启用时间兜底", group="基础设置"),
     "CheckBox_is_save_fish": Field("保存截图", group="基础设置"),
     "LineEdit_fish_key": Field("收杆按键", group="颜色与按键"),
@@ -47,7 +46,7 @@ _FISHING_FIELDS = {
         "颜色校准": "action_calibrate_color",
         "重置颜色": "action_reset_color",
     },
-    description="### 提示\n* 自动钓鱼并支持 QTE。\n* 颜色校准：识别不稳定时请调节 HSV 参数。\n* 鱼饵：请确保所选鱼饵数量充足。",
+    description="### \n* 钓鱼角色选择分析员，否则无法正常工作\n* 根据游戏右下角手动设置好抛竿按键、钓鱼次数和鱼饵类型后再点开始\n* 珍奇钓点系统上限25次/天； 稀有钓点上限50次/天； 普通钓点无限制\n* 一个钓点钓完后需手动移动下一个钓鱼点再启动脚本\n* 当收杆出错，日志说黄色块大于2时请校准颜色HSV，钓鱼出现圆环时点`校准颜色`，再点黄色区域\n",
 )
 class FishingModule:
     def __init__(
@@ -162,7 +161,7 @@ class FishingModule:
         timeout = Timer(15).start()
         enter_flag = False
         lure_type_index = self.lure_type_index
-        lure_type_list = ['万能', '普通', '豪华', '至尊', '重量级', '巨型', '重量级', '巨型']
+        lure_type_list = ['万能', '普通', '豪华', '至尊', '重量级', '巨型', '重量级']
         while True:
             self.auto.take_screenshot()
 
@@ -379,7 +378,3 @@ class FishingModule:
             self.logger.error(_(f"未识别出按键文字，请手动设置{e}"))
             return False
         return True
-
-
-
-

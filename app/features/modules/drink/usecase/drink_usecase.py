@@ -17,7 +17,7 @@ _DRINK_FIELDS = {
 @on_demand_module(
     "猜心对局",
     fields=_DRINK_FIELDS,
-    description="### 提示\n* 自动执行猜心对局领取酒馆奖励。\n* 开始前请确保已进入酒馆界面。\n* 支持多种模式与自动重复执行。",
+    description="### 提示\n* 站在猜心对局入口位置后再点开始。\n* 自动执行猜心对局领取猜心对局奖励。\n* 两种模式均无策略。",
 )
 class DrinkModule:
     def __init__(
@@ -141,7 +141,7 @@ class DrinkModule:
                 continue
 
             if timeout.reached():
-                self.logger.error(_("进入酒馆超时"))
+                self.logger.error(_("进入猜心对局超时"))
                 break
 
     def play_mode1(self):
@@ -173,7 +173,7 @@ class DrinkModule:
                     continue
 
             if timeout.reached():
-                self.logger.error(_("酒馆对局超时"))
+                self.logger.error(_("猜心对局对局超时"))
                 break
 
     def play_mode2(self):
@@ -251,7 +251,7 @@ class DrinkModule:
                     continue
 
             if timeout.reached():
-                self.logger.error(_("酒馆对局超时"))
+                self.logger.error(_("猜心对局对局超时"))
                 break
 
     def again(self):
@@ -275,4 +275,3 @@ class DrinkModule:
             if timeout.reached():
                 self.logger.error(_("重进对局超时"))
                 break
-

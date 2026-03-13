@@ -272,7 +272,7 @@ class Config(QConfig):
     CheckBox_trigger_auto_f = ConfigItem("add_trigger", "CheckBox_trigger_auto_f", True, BoolValidator())
     CheckBox_trigger_auto_e = ConfigItem("add_trigger", "CheckBox_trigger_auto_e", True, BoolValidator())
 
-    # --- 异星守护 / 迷宫 / 按摩 / 酒馆 ---
+    # --- 异星守护 / 迷宫 / 按摩 / 猜心对局 ---
     ComboBox_mode        = OptionsConfigItem("add_alien", "ComboBox_mode", 0, OptionsValidator([0, 1]))
     ComboBox_mode_maze   = OptionsConfigItem("add_maze", "ComboBox_mode_maze", 0, OptionsValidator([0, 1]))
     ComboBox_wife        = OptionsConfigItem("add_massaging", "ComboBox_wife", 0, OptionsValidator([0, 1, 2, 3, 4]))

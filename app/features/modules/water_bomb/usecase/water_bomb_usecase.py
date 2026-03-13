@@ -19,7 +19,7 @@ _WATER_BOMB_FIELDS = {
 @on_demand_module(
     "心动水弹",
     fields=_WATER_BOMB_FIELDS,
-    description="### 提示\n* 自动游玩心动水弹小游戏。\n* 使用策略决策以提高胜率。\n* 可配置识别阈值与目标胜场数。",
+    description="### 提示\n* 站在心动水弹入口位置后再点开始\n* 当无法识别道具或者生命时，适当调低上面两个置信度参数。",
 )
 class WaterBombModule:
     def __init__(

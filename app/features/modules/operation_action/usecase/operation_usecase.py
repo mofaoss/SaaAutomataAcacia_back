@@ -15,12 +15,12 @@ _OPERATION_FIELDS = {
 @on_demand_module(
     "常规训练",
     fields=_OPERATION_FIELDS,
-    description="### 提示\n* 自动执行常规作战关卡。\n* 可配置运行次数和疾跑模式。\n* 请从主页或常规作战选择界面开始。",
+    description="### 提示\n* 重复刷指定次数无需体力的实战训练第一关\n* 用于完成凭证20次常规行动周常任务\n* 请从主页或常规作战选择界面开始",
 )
 @periodic_module(
     "常规训练",
     fields=_OPERATION_FIELDS,
-    description="### 提示\n* 自动执行常规作战关卡。\n* 可配置运行次数和疾跑模式。\n* 请从主页或常规作战选择界面开始。",)
+    description="### 提示\n* 重复刷指定次数无需体力的实战训练第一关\n* 用于完成凭证20次常规行动周常任务\n* 请从主页或常规作战选择界面开始",)
 class OperationModule:
     def __init__(self, auto, logger, isLog: bool = False, SpinBox_action_times: int = 1, ComboBox_run: int = 0):
         self.auto = auto

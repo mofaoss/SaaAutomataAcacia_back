@@ -17,7 +17,7 @@ _MAZE_FIELDS = {
 @on_demand_module(
     "验证战场",
     fields=_MAZE_FIELDS,
-    description="### 提示\n* 自动刷悖论迷宫验证战场。\n* 支持单次与重复刷取两种模式。\n* 请从迷宫入口或难度选择界面开始。",
+    description="### 提示\n* 自动刷悖论迷宫验证战场。\n* 支持单次与重复刷取两种模式。\n* 请从迷宫入口或难度选择界面开始。提示\n* 运行模式中单次运行适合打前3关，重复运行则是一直刷最后一关\n* 进配队界面选好增益后再让安卡希雅的开始迷宫\n* 增益推荐配技能-爆电和护盾-夺取\n* 配队必须要有辰星-琼弦，且把角色放在中间位",
 )
 class MazeModule:
     def __init__(self, auto, logger, isLog: bool = False, ComboBox_mode_maze: int = 0):
