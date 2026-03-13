@@ -80,7 +80,7 @@ def build_field_declarations() -> dict[str, Field]:
             name=item.label,
             msgid=item.msgid,
             group=_("材料道具", msgid="shop_group"),
-            layout="full",
+            layout="half",
         )
     for item in PERSON_ITEMS:
         fields[item.key] = Field(
@@ -94,7 +94,7 @@ def build_field_declarations() -> dict[str, Field]:
             name=item.label,
             msgid=item.msgid,
             group=_("武器", msgid="weapon_group"),
-            layout="full",
+            layout="half",
         )
     return fields
 
