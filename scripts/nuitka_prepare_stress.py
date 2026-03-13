@@ -48,6 +48,7 @@ CASE_IDS = [
     "T18",
     "T19",
     "T20",
+    "T21",
 ]
 
 SAMPLE_SOURCE = """from __future__ import annotations
@@ -97,6 +98,8 @@ def run_cases() -> None:
     event_code = "E42"
     task_id = "T-7"
     detail = "retry=3,mode=safe"
+    current_time_str = "00:58"
+    scheduled_task_ids = ["task_get_reward"]
     w = 640
     h = 360
     new_w = 960
@@ -184,6 +187,13 @@ def run_cases() -> None:
     logger.warning(
         _(f"Periodic diagnostic: event={event} ({event_code}) task_id={task.id} task_name={task_name} detail={detail}", msgid="periodic_diagnostic_event_event_code_task_id_task_name_detail"),
         extra={"cid": "T20"},
+    )
+    logger.warning(
+        _("\\u23f0 Scheduled task triggered at {current_time_str}, executing tasks: {task_ids}").format(
+            current_time_str=current_time_str,
+            task_ids=scheduled_task_ids,
+        ),
+        extra={"cid": "T21"},
     )
 
 
@@ -299,6 +309,8 @@ def _expected_outputs() -> tuple[list[str], list[str]]:
     event_code = "E42"
     task_id = "T-7"
     detail = "retry=3,mode=safe"
+    current_time_str = "00:58"
+    scheduled_task_ids = ["task_get_reward"]
     w = 640
     h = 360
     new_w = 960
@@ -396,6 +408,12 @@ def _expected_outputs() -> tuple[list[str], list[str]]:
             task_name=task_name,
             detail=detail,
         ),
+        "T21": _fmt(
+            zh,
+            "framework.ui.scheduled_task_triggered_at_current_time_str_executing_tasks_task_ids",
+            current_time_str=current_time_str,
+            task_ids=scheduled_task_ids,
+        ),
     }
 
     raw = dict(stage)
@@ -458,6 +476,7 @@ def _assert_stage_transform(stage_entry: Path) -> None:
     flags = {
         "explicit_percent": False,
         "explicit_dotformat": False,
+        "scheduled_dotformat_no_msgid": False,
         "auto_percent": False,
         "auto_dotformat": False,
     }
@@ -494,6 +513,13 @@ def _assert_stage_transform(stage_entry: Path) -> None:
             base = first_arg.func.value
             if isinstance(base, ast.Call) and isinstance(base.func, ast.Name) and base.func.id == "_":
                 rewritten_count += 1
+                if base.args and isinstance(base.args[0], ast.Constant) and isinstance(base.args[0].value, str):
+                    base_text = base.args[0].value
+                    if (
+                        "Scheduled task triggered at {current_time_str}, executing tasks: {task_ids}" in base_text
+                        and _call_msgid(base) is None
+                    ):
+                        flags["scheduled_dotformat_no_msgid"] = True
 
     missing = [name for name, ok in flags.items() if not ok]
     if missing:

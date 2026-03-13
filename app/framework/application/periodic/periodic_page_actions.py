@@ -396,7 +396,7 @@ class PeriodicRuntimeActions:
             if launch_state == "detected":
                 host._clear_launch_watch_state()
                 host._set_launch_pending_state(False)
-                host.logger.info('Game window detected')
+                host.logger.info(_('Game window detected', msgid='game_window_detected'))
                 host.after_start_button_click(getattr(host, "tasks_to_run", []))
                 return
 

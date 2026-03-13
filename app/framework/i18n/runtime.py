@@ -667,6 +667,10 @@ def _recover_static_message_without_msgid(
     owner_context_key = _owner_context_key_for_message(message, context=context)
     bucket = _SOURCE_TEXT_KEY_BY_OWNER_CONTEXT.get(owner_context_key, {})
     recovered_key = bucket.get(message.source_text)
+    # Generic fallback: if current owner-context misses, use the global unique
+    # source-text index (already ambiguity-safe: duplicates are stored as None).
+    if not recovered_key:
+        recovered_key = _SOURCE_TEXT_KEY_GLOBAL.get(message.source_text)
     if not recovered_key:
         return None
 

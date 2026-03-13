@@ -1,77 +1,63 @@
 import ctypes
 import logging
-import time
 import threading
-from app.framework.i18n.runtime import _
+import time
 
 import cv2
 import numpy as np
+import win32con
 import win32gui
 import win32ui
-import win32con
 
-from app.framework.infra.vision.image import ImageUtils
+from app.framework.i18n.runtime import _
 from app.framework.infra.automation.timer import Timer
+from app.framework.infra.vision.image import ImageUtils
 
 logger = logging.getLogger(__name__)
 
-# ====== 全局截图锁，防止多线程同时抢占窗口 DC 导致崩溃 ======
+# Prevent concurrent GDI/DC captures from corrupting each other.
 SCREENSHOT_LOCK = threading.Lock()
-# =========================================================
 
 
 def auto_crop_image(img):
-    """裁切四周的黑边"""
-    # 如果是全图都是黑的
+    """Crop black borders around an image."""
     if np.mean(img) < 50:
         return img
-    # 转换为灰度图
+
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     h, w = gray.shape
 
-    # =============== 垂直方向裁剪（左右黑边） ===============
-    col_sum = np.sum(gray, axis=0) / 255  # 每列像素强度总和
-
-    # 动态阈值（取最大值的3%作为黑边判断基准）
+    col_sum = np.sum(gray, axis=0) / 255
     col_threshold = np.max(col_sum) * 0.03
 
-    # 左边界检测（第一个非黑列）
     left = 0
     for i in range(w):
         if col_sum[i] > col_threshold:
-            left = i + 1  # 直接使用检测到的索引
+            left = i + 1
             break
 
-    # 右边界检测（最后一个非黑列）
     right = w - 1
     for i in range(w - 1, -1, -1):
         if col_sum[i] > col_threshold:
             right = i - 1
             break
 
-    # =============== 水平方向裁剪（顶部标题+底部黑边） ===============
     row_sum = np.sum(gray, axis=1) / 255
-
-    # 动态阈值（取最大值的3%作为内容判断基准）
     row_threshold = np.max(row_sum) * 0.03
 
-    # 顶部边界检测
     top = 0
     for i in range(h):
         if row_sum[i] > row_threshold:
             top = i
             break
 
-    # 底部边界检测
     bottom = h - 1
     for i in range(h - 1, -1, -1):
         if row_sum[i] > row_threshold:
             bottom = i
             break
 
-    # =============== 执行精确裁剪 ===============
-    cropped = img[top:bottom + 1, left:right + 1]  # Python切片含头不含尾
-    return cropped
+    return img[top : bottom + 1, left : right + 1]
 
 
 class Screenshot:
@@ -82,144 +68,226 @@ class Screenshot:
         self.base_height = 1080
         self.logger = logger
         self._last_error_log = {}
-        # 排除缩放干扰
         ctypes.windll.user32.SetProcessDPIAware()
 
-    def _log_error_throttled(self, key, message, interval=2.0):
+    def _log_error_throttled(self, key, message=None, interval=2.0):
         now = time.time()
         last = self._last_error_log.get(key, 0)
-        if now - last >= interval:
-            self.logger.error(message)
-            self._last_error_log[key] = now
+        if now - last < interval:
+            return
+
+        text = message or key
+        active_logger = self.logger or logger
+        try:
+            active_logger.error(text)
+        except Exception:
+            logger.error(text)
+        self._last_error_log[key] = now
+
+    @staticmethod
+    def _is_reasonable_size(width: int, height: int) -> bool:
+        return 0 < int(width) < 30000 and 0 < int(height) < 30000
 
     def get_window(self, title):
-        hwnd = win32gui.FindWindow(None, title)  # 获取窗口句柄
+        hwnd = win32gui.FindWindow(None, title)
         if hwnd:
-            # logger.info(f"找到窗口‘{title}’的句柄为：{hwnd}")
             return hwnd
-        else:
-            self._log_error_throttled('window_not_found')
+        self._log_error_throttled("window_not_found", f"Window not found: {title}")
+        return None
+
+    def _query_window_metrics(self, hwnd):
+        left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+        w = int(right - left)
+        h = int(bottom - top)
+
+        client_rect = win32gui.GetClientRect(hwnd)
+        client_width = int(client_rect[2] - client_rect[0])
+        client_height = int(client_rect[3] - client_rect[1])
+
+        return {
+            "left": int(left),
+            "top": int(top),
+            "right": int(right),
+            "bottom": int(bottom),
+            "w": w,
+            "h": h,
+            "client_width": client_width,
+            "client_height": client_height,
+        }
+
+    def _resolve_metrics(self, hwnd, metrics):
+        left = metrics["left"]
+        top = metrics["top"]
+        w = metrics["w"]
+        h = metrics["h"]
+        client_width = metrics["client_width"]
+        client_height = metrics["client_height"]
+
+        if not self._is_reasonable_size(w, h):
+            if self._is_reasonable_size(client_width, client_height):
+                w, h = client_width, client_height
+                try:
+                    c_left, c_top = win32gui.ClientToScreen(hwnd, (0, 0))
+                    left, top = int(c_left), int(c_top)
+                except Exception:
+                    pass
+            else:
+                return None
+
+        if not self._is_reasonable_size(client_width, client_height):
             return None
 
-    def screenshot(self, hwnd, crop=(0, 0, 1, 1), is_starter=True, is_interval=True):
-        """
-        截取特定区域
-        :param is_interval: 是否间隔
-        :param is_starter: 是否是启动器
-        :param hwnd: 需要截图的窗口句柄
-        :param crop: 截取区域, 格式为 (crop_left, crop_top, crop_right, crop_bottom)，范围是0到1之间，表示相对于窗口的比例
-        :return:
-        """
+        try:
+            client_screen_x, client_screen_y = win32gui.ClientToScreen(hwnd, (0, 0))
+        except Exception:
+            client_screen_x, client_screen_y = left, top
 
+        client_offset_x = int(client_screen_x - left)
+        client_offset_y = int(client_screen_y - top)
+
+        return {
+            "left": left,
+            "top": top,
+            "w": int(w),
+            "h": int(h),
+            "client_width": int(client_width),
+            "client_height": int(client_height),
+            "client_offset_x": client_offset_x,
+            "client_offset_y": client_offset_y,
+        }
+
+    def _capture_bgra(self, hwnd, width: int, height: int):
+        if not self._is_reasonable_size(width, height):
+            return None
+
+        with SCREENSHOT_LOCK:
+            hwnd_dc = win32gui.GetWindowDC(hwnd)
+            if not hwnd_dc:
+                return None
+
+            mfc_dc = win32ui.CreateDCFromHandle(hwnd_dc)
+            save_dc = None
+            bitmap = None
+            try:
+                save_dc = mfc_dc.CreateCompatibleDC()
+                bitmap = win32ui.CreateBitmap()
+                bitmap.CreateCompatibleBitmap(mfc_dc, width, height)
+                save_dc.SelectObject(bitmap)
+
+                user32 = ctypes.windll.user32
+                print_ok = False
+                try:
+                    print_ok = bool(user32.PrintWindow(hwnd, save_dc.GetSafeHdc(), 2))
+                except Exception:
+                    print_ok = False
+
+                if not print_ok:
+                    save_dc.BitBlt((0, 0), (width, height), mfc_dc, (0, 0), win32con.SRCCOPY)
+
+                bmpinfo = bitmap.GetInfo()
+                bmpstr = bitmap.GetBitmapBits(True)
+                if not bmpstr:
+                    return None
+
+                return (
+                    np.frombuffer(bmpstr, dtype=np.uint8)
+                    .reshape((bmpinfo["bmHeight"], bmpinfo["bmWidth"], 4))
+                    .copy()
+                )
+            finally:
+                if bitmap is not None:
+                    win32gui.DeleteObject(bitmap.GetHandle())
+                if save_dc is not None:
+                    save_dc.DeleteDC()
+                if mfc_dc is not None:
+                    mfc_dc.DeleteDC()
+                if hwnd_dc:
+                    win32gui.ReleaseDC(hwnd, hwnd_dc)
+
+    def screenshot(self, hwnd, crop=(0, 0, 1, 1), is_starter=True, is_interval=True):
         try:
             if is_interval:
                 self._screenshot_interval.wait()
             self._screenshot_interval.reset()
 
             if not hwnd or not win32gui.IsWindow(hwnd):
-                self._log_error_throttled('invalid_hwnd', "截图失败：无效的窗口句柄，窗口可能已关闭")
+                self._log_error_throttled("invalid_hwnd", "Screenshot failed: invalid window handle")
                 return None
 
             if win32gui.IsIconic(hwnd):
-                self._log_error_throttled('window_minimized', "截图失败：窗口已最小化，无法截取内容")
+                self._log_error_throttled("window_minimized", "Screenshot failed: window is minimized")
                 return None
 
-            # 获取窗口尺寸与客户区尺寸
-            try:
-                left, top, right, bottom = win32gui.GetWindowRect(hwnd)
-                w = right - left
-                h = bottom - top
-                
-                client_rect = win32gui.GetClientRect(hwnd)
-                client_width = client_rect[2] - client_rect[0]
-                client_height = client_rect[3] - client_rect[1]
-            except Exception as e:
-                self._log_error_throttled('rect_error', f"截图失败：无法获取窗口坐标 ({repr(e)})")
-                return None
-
-            # 容错处理：处理 65535 (即 -1) 这种异常宽度或高度为 0 的情况
-            # 这种情况常见于窗口被 DWM 屏蔽或处于某些特殊的隐身/最小化状态
-            if w <= 0 or h <= 0 or w > 30000:
-                if client_width > 0 and client_height > 0:
-                    # 如果窗口外框尺寸异常但客户区尺寸正常，优先信任客户区尺寸
-                    # 这种情况下通常 left/top 也是无效的，我们需要修正它们
-                    w, h = client_width, client_height
-                    # 尝试通过 ClientToScreen 恢复相对于屏幕的坐标
-                    try:
-                        c_left, c_top = win32gui.ClientToScreen(hwnd, (0, 0))
-                        left, top = c_left, c_top
-                        right, bottom = left + w, top + h
-                    except Exception:
-                        pass 
-                else:
-                    self._log_error_throttled('invalid_window_size', f"截图失败：窗口尺寸无效 ({w}x{h})，客户区尺寸 ({client_width}x{client_height})")
-                    return None
-
-            if client_width <= 0 or client_height <= 0:
-                # 这种情况下连客户区都没了，通常是窗口彻底不可见或被销毁中
-                self._log_error_throttled('invalid_client_size', f"截图失败：客户区尺寸无效 ({client_width}x{client_height})")
-                return None
-            client_screen_x, client_screen_y = win32gui.ClientToScreen(hwnd, (0, 0))
-            client_offset_x = client_screen_x - left
-            client_offset_y = client_screen_y - top
-
-            # ====== 核心修复区：加锁并确保安全释放资源 ======
-            with SCREENSHOT_LOCK:
-                hwnd_dc = win32gui.GetWindowDC(hwnd)
-                mfc_dc = win32ui.CreateDCFromHandle(hwnd_dc)
-                save_dc = None
-                bitmap = None
-
+            resolved = None
+            last_metrics = None
+            for retry in range(3):
                 try:
-                    save_dc = mfc_dc.CreateCompatibleDC()
-                    bitmap = win32ui.CreateBitmap()
-                    bitmap.CreateCompatibleBitmap(mfc_dc, w, h)
-                    save_dc.SelectObject(bitmap)
+                    metrics = self._query_window_metrics(hwnd)
+                    last_metrics = metrics
+                    resolved = self._resolve_metrics(hwnd, metrics)
+                    if resolved is not None:
+                        break
+                except Exception as e:
+                    self._log_error_throttled("rect_error", f"Screenshot failed: unable to read window rect ({repr(e)})")
 
-                    # 进行截图
-                    user32 = ctypes.windll.user32
-                    user32.PrintWindow(hwnd, save_dc.GetSafeHdc(), 2)  # PW_RENDERFULLCONTENT=2
+                if retry < 2:
+                    time.sleep(0.01 * (retry + 1))
 
-                    # 转换为 numpy 数组
-                    bmpinfo = bitmap.GetInfo()
-                    bmpstr = bitmap.GetBitmapBits(True)
+            if resolved is None:
+                if last_metrics:
+                    self._log_error_throttled(
+                        "invalid_window_size",
+                        (
+                            f"Screenshot failed: invalid window size ({last_metrics['w']}x{last_metrics['h']}), "
+                            f"client size ({last_metrics['client_width']}x{last_metrics['client_height']})"
+                        ),
+                    )
+                else:
+                    self._log_error_throttled("invalid_window_size", "Screenshot failed: invalid window/client size")
+                return None
 
-                    # 为了安全起见，加上 .copy() 脱离底层内存绑定
-                    img = np.frombuffer(bmpstr, dtype=np.uint8).reshape((bmpinfo['bmHeight'], bmpinfo['bmWidth'], 4)).copy()
-                finally:
-                    # 无论截图成功与否，严谨释放 GDI 资源，防止内存溢出和电脑卡顿
-                    if bitmap is not None:
-                        win32gui.DeleteObject(bitmap.GetHandle())
-                    if save_dc is not None:
-                        save_dc.DeleteDC()
-                    if mfc_dc is not None:
-                        mfc_dc.DeleteDC()
-                    if hwnd_dc is not None and hwnd_dc != 0:
-                        win32gui.ReleaseDC(hwnd, hwnd_dc)
-            # ================================================
+            w = resolved["w"]
+            h = resolved["h"]
+            client_width = resolved["client_width"]
+            client_height = resolved["client_height"]
 
-            # OpenCV 处理
+            img = self._capture_bgra(hwnd, w, h)
+            if img is None:
+                self._log_error_throttled("capture_failed", "Screenshot failed: both PrintWindow and BitBlt failed")
+                return None
+
             img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-            # 始终依据真实客户区偏移裁切，避免固定边框裁切在不同分辨率/主题下失准
-            x1 = max(0, min(w, client_offset_x))
-            y1 = max(0, min(h, client_offset_y))
+
+            x1 = max(0, min(w, resolved["client_offset_x"]))
+            y1 = max(0, min(h, resolved["client_offset_y"]))
             x2 = max(x1, min(w, x1 + client_width))
             y2 = max(y1, min(h, y1 + client_height))
             img = img[y1:y2, x1:x2, :]
+
+            if img is None or img.size == 0:
+                self._log_error_throttled(
+                    "empty_client_capture",
+                    (
+                        f"Screenshot failed: empty client crop, source size {w}x{h}, "
+                        f"client size {client_width}x{client_height}"
+                    ),
+                )
+                return None
+
             img_crop, relative_pos = ImageUtils.crop_image(img, crop, hwnd)
 
-            # 缩放图像以自适应分辨率图像识别
             if is_starter:
                 scale_x = 1
                 scale_y = 1
             else:
-                # 需要除以用户区域（无标题）才是正确的比例
                 scale_x = self.base_width / max(1, client_width)
                 scale_y = self.base_height / max(1, client_height)
 
             return img_crop, scale_x, scale_y, relative_pos
 
         except Exception as e:
-            # print(traceback.format_exc())
-            self._log_error_throttled('screenshot_failed', f"截图失败：{repr(e)},窗口可以不置顶但不能最小化")
+            self._log_error_throttled(
+                "screenshot_failed",
+                f"Screenshot failed: {repr(e)}; window can be backgrounded but not minimized",
+            )
             return None

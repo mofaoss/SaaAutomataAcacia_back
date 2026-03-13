@@ -509,14 +509,39 @@ class Automation:
         else:
             raise ValueError(_(f'Handle for {self.window_title} not found', msgid='handle_for_value_not_found'))
     def take_screenshot(self, crop=(0, 0, 1, 1), is_interval=True):
-        """
-        捕获游戏窗口的截图。
-        :param is_interval:
-        :param crop: 截图的裁剪区域，格式为(x1, y1, width, height)，默认为全屏。
-        :return: 成功时返回截图及其位置和缩放因子，失败时抛出异常。
-        """
+        """Capture a screenshot and keep stealth/tracking mode stable."""
+
+        def _apply_capture_result(result_obj):
+            self.first_screenshot, self.scale_x, self.scale_y, self.relative_pos = result_obj
+            if crop != (0, 0, 1, 1):
+                self.current_screenshot, self.relative_pos = ImageUtils.crop_image(self.first_screenshot, crop, self.hwnd)
+            else:
+                self.current_screenshot = self.first_screenshot
+
+            tracker_obj = getattr(getattr(self, "input_handler", None), "window_tracker", None)
+            if tracker_obj and self.first_screenshot is not None:
+                try:
+                    h, w = self.first_screenshot.shape[:2]
+                    tracker_obj.set_locked_client_size(w, h)
+                except Exception:
+                    pass
+            return result_obj
+
+        tracker = getattr(getattr(self, "input_handler", None), "window_tracker", None)
+        should_rehide_after_capture = False
+
         try:
-            # 如果句柄无效或尺寸为0，尝试刷新一次
+            if not self._ensure_input_hwnd():
+                self.current_screenshot = None
+                return None
+
+            if bool(config.windowTrackingInput.value) and tracker:
+                try:
+                    tracker.update_hwnd(self.hwnd)
+                    should_rehide_after_capture = bool(tracker.prepare_for_capture())
+                except Exception:
+                    should_rehide_after_capture = False
+
             need_refresh = False
             if not self.screenshot_hwnd or not win32gui.IsWindow(self.screenshot_hwnd):
                 need_refresh = True
@@ -530,39 +555,52 @@ class Automation:
 
             if need_refresh:
                 self._refresh_hwnds()
+                if bool(config.windowTrackingInput.value) and tracker:
+                    try:
+                        tracker.update_hwnd(self.hwnd)
+                        should_rehide_after_capture = bool(tracker.prepare_for_capture())
+                    except Exception:
+                        pass
 
-            result = self.screenshot.screenshot(self.screenshot_hwnd, (0, 0, 1, 1), self.is_starter,
-                                                is_interval=is_interval)
+            result = self.screenshot.screenshot(
+                self.screenshot_hwnd,
+                (0, 0, 1, 1),
+                self.is_starter,
+                is_interval=is_interval,
+            )
             if result:
-                self.first_screenshot, self.scale_x, self.scale_y, self.relative_pos = result
-                if crop != (0, 0, 1, 1):
-                    self.current_screenshot, self.relative_pos = ImageUtils.crop_image(self.first_screenshot, crop,
-                                                                                       self.hwnd)
-                else:
-                    self.current_screenshot = self.first_screenshot
-                return result
-            else:
-                # 再次尝试刷新句柄并重试一次
-                self._refresh_hwnds()
-                # 失败后强制等待，防止外部循环过快导致主线程/日志系统卡死
-                time.sleep(0.1)
-                result = self.screenshot.screenshot(self.screenshot_hwnd, (0, 0, 1, 1), self.is_starter,
-                                                    is_interval=is_interval)
-                if result:
-                    self.first_screenshot, self.scale_x, self.scale_y, self.relative_pos = result
-                    if crop != (0, 0, 1, 1):
-                        self.current_screenshot, self.relative_pos = ImageUtils.crop_image(self.first_screenshot, crop,
-                                                                                           self.hwnd)
-                    else:
-                        self.current_screenshot = self.first_screenshot
-                    return result
+                return _apply_capture_result(result)
 
-                self.current_screenshot = None
-                return None
+            self._refresh_hwnds()
+            if bool(config.windowTrackingInput.value) and tracker:
+                try:
+                    tracker.update_hwnd(self.hwnd)
+                    should_rehide_after_capture = bool(tracker.prepare_for_capture()) or should_rehide_after_capture
+                except Exception:
+                    pass
+
+            time.sleep(0.1)
+            result = self.screenshot.screenshot(
+                self.screenshot_hwnd,
+                (0, 0, 1, 1),
+                self.is_starter,
+                is_interval=is_interval,
+            )
+            if result:
+                return _apply_capture_result(result)
+
+            self.current_screenshot = None
+            return None
         except Exception as e:
             self._log_error_throttled("take_screenshot_failed", _(f'Screenshot failed: {e}', msgid='screenshot_failed_e'))
-            time.sleep(0.2) # 严重错误时增加等待
+            time.sleep(0.2)
             return None
+        finally:
+            if bool(config.windowTrackingInput.value) and tracker and should_rehide_after_capture:
+                try:
+                    tracker.hide_window_offscreen()
+                except Exception:
+                    pass
 
     def calculate_positions(self, max_loc):
         """
