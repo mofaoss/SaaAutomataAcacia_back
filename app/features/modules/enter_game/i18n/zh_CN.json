@@ -9,5 +9,6 @@
   "module.enter_game.log.需要更新_2": "需要更新",
   "module.enter_game.title": "自动登录",
   "module.enter_game.ui.failed_to_resolve_launch_arguments": "无法解析启动参数",
+  "module.enter_game.ui.clicking_the_start_button_will_action_automatica": "点击“开始”按钮将{action}自动启动游戏",
   "module.enter_game.ui.不管你是哪个渠道服玩家_第一步都应该先去设置里选服_国际服可选择类似_e_steamlibrary_steamapps_common_snowbreak_的目录_2": "不管你是哪个渠道服玩家，第一步都应该先去设置里选服。\n国际服可选择类似 \"E:\\SteamLibrary\\steamapps\\common\\SNOWBREAK\" 的目录。\n官服和 B 服请先打开尘白启动器，在启动器设置中查看游戏安装目录。\n然后在下方路径中选择该目录即可。"
 }

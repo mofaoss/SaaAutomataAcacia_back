@@ -322,7 +322,7 @@ def launch_game_with_guard(
         if _last_game_process is not None and _last_game_process.poll() is None:
             if logger:
                 logger.info(
-                    _('Detected that the game process started by the program is still running, skipping duplicate startup', msgid='detected_that_the_game_process_started_by_the_pr')
+                    _('检测到程序启动的游戏进程仍在运行，跳过重复启动', msgid='detected_that_the_game_process_started_by_the_pr')
                 )
             return {
                 "ok": True,
@@ -335,15 +335,15 @@ def launch_game_with_guard(
         now = time.time()
         if cooldown_seconds > 0 and now - _last_launch_ts < cooldown_seconds:
             remain = round(cooldown_seconds - (now - _last_launch_ts), 1)
-            return {"ok": False, "error": f"launch cooldown in effect, retry after {remain}s"}
+            return {"ok": False, "error": _(f"启动冷却中，{remain}s后重试", msgid='launch_cooldown_in_effect_retry_after_remain_s')}
 
         if is_game_running():
             if logger:
-                logger.info(_('Game window already exists', msgid='game_window_already_exists'))
+                logger.info(_('游戏窗口已存在', msgid='game_window_already_exists'))
             return {
                 "ok": True,
                 "already_running": True,
-                "message": "game window already exists",
+                "message": _('游戏窗口已存在', msgid='game_window_already_exists'),
                 "process": None,
             }
 
@@ -351,29 +351,32 @@ def launch_game_with_guard(
         if not exe_path or not os.path.exists(exe_path):
             if logger:
                 logger.error(
-                    _(f'Game.exe not found, please check the path: {start_path}', msgid='game_exe_not_found_please_check_the_path_start_p')
+                    # _(f'Game.exe not found, please check the path: {start_path}', msgid='game_exe_not_found_please_check_the_path_start_p')
+                    _(f'Game.exe 游戏可执行文件未找到，请检查路径: {start_path}', msgid='game_exe_not_found_please_check_the_path_start_p')
                 )
             return {
                 "ok": False,
-                "error": _(f'Game executable not found under: {start_path}', msgid='game_executable_not_found_under_start_path'),
+                "error": _(f'Game.exe 游戏可执行文件未找到，请检查路径: {start_path}', msgid='game_exe_not_found_please_check_the_path_start_p'),
             }
 
         launch_args = get_start_arguments(start_path, game_channel, exe_path=exe_path)
         if launch_args is None:
             if logger:
                 logger.error(
-                    _(f'Failed to resolve launch arguments, start_path: {start_path}, game_channel: {game_channel}', msgid='failed_to_resolve_launch_arguments_start_path_st')
+                    # _(f'Failed to resolve launch arguments, start_path: {start_path}, game_channel: {game_channel}', msgid='failed_to_resolve_launch_arguments_start_path_st')
+                    _(f'无法解析启动参数，start_path: {start_path}, game_channel: {game_channel}', msgid='failed_to_resolve_launch_arguments_start_path_st')
+
                 )
-            return {"ok": False, "error": _('Failed to resolve launch arguments', msgid='failed_to_resolve_launch_arguments')}
+            return {"ok": False, "error": _('无法解析启动参数', msgid='failed_to_resolve_launch_arguments')}
 
         if logger:
-            logger.debug(_(f'Starting {exe_path} {launch_args}', msgid='starting_exe_path_launch_args'))
+            logger.debug(_(f'正在启动 {exe_path} {launch_args}', msgid='starting_exe_path_launch_args'))
         try:
             process = subprocess.Popen([exe_path] + launch_args)
         except Exception as exc:
             if logger:
-                logger.error(_(f'Failed to spawn process: {exc}', msgid='failed_to_spawn_process_exc_2'))
-            return {"ok": False, "error": _(f'Failed to spawn process: {exc}', msgid='failed_to_spawn_process_exc')}
+                logger.error(_(f'无法启动进程: {exc}', msgid='failed_to_spawn_process_exc'))
+            return {"ok": False, "error": _(f'无法启动进程: {exc}', msgid='failed_to_spawn_process_exc')}
 
         _last_game_process = process
         _last_launch_ts = time.time()
@@ -438,11 +441,12 @@ class EnterGameService(IGameEnvironment):
     @staticmethod
     def on_auto_open_toggled(*, host, state: int) -> None:
         status = "已开启" if state == 2 else "已关闭"
-        action = "将" if state == 2 else "不会"
+        action = "已开启" if state == 2 else "已关闭"
+        action = _("将") if state == 2 else _("不会")
         InfoBar.success(
             title=status,
             content=str(
-                _(f"Clicking the 'Start' button will {action}automatically launch the game", msgid='clicking_the_start_button_will_action_automatica')
+                _(f"点击开始将{action}自启游戏", msgid='clicking_the_start_button_will_action_automatica')
             ),
             orient=Qt.Orientation.Horizontal,
             isClosable=True,
