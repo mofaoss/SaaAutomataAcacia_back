@@ -244,22 +244,27 @@ class PerfectBuild:
             "--noinclude-dlls=*qwbmp*.dll",               # 古董手机 WAP 网页图片格式
 
             # === 5. 清理无用的 Win32gui 底层 API ===
-            "--nofollow-import-to=win32print",            # 打印机 API
-            "--nofollow-import-to=win32ras",              # 拨号上网 API
-            "--nofollow-import-to=win32inet",             # IE 浏览器网络 API
-            "--nofollow-import-to=win32help",             # 早期 WinHelp 帮助文件 API
-            "--nofollow-import-to=win32ts",               # 终端服务 API
-            "--nofollow-import-to=win32wnet",             # Windows 局域网 API
-            "--nofollow-import-to=win32security",         # 安全与权限底层 API
-            "--nofollow-import-to=win32pdh",              # 性能数据助手 API
-            "--nofollow-import-to=win32lz",               # 古董 Lempel-Ziv 压缩 API
-            "--nofollow-import-to=win32job",              # 任务对象 API
-            "--nofollow-import-to=win32net",              # 网络管理 API
-            "--nofollow-import-to=win32pipe",             # 命名管道 API
-            "--nofollow-import-to=win32profile",          # 用户配置文件 API
-            "--nofollow-import-to=win32transaction",      # 事务管理器 API
-            "--nofollow-import-to=win32uiole",            # OLE 对象界面 API
-            "--nofollow-import-to=win32trace",            # 调试跟踪 API
+            "--nofollow-import-to=win32print",            # 打印机 API (控制和调用物理打印机)
+            "--nofollow-import-to=win32ras",              # 拨号上网 API (老式调制解调器拨号连接)
+            "--nofollow-import-to=win32inet",             # IE 浏览器网络 API (古董级 HTTP/FTP 封装)
+            "--nofollow-import-to=win32help",             # 早期 WinHelp 帮助文件 API (调用 .chm/.hlp 文件)
+            "--nofollow-import-to=win32ts",               # 终端服务 API (远程桌面会话管理)
+            "--nofollow-import-to=win32wnet",             # Windows 局域网 API (共享文件夹/网络驱动器映射)
+            "--nofollow-import-to=win32security",         # 安全与权限底层 API (系统底层 ACL/Token 权限验证)
+            "--nofollow-import-to=win32pdh",              # 性能数据助手 API (系统级 CPU/内存等性能监控)
+            "--nofollow-import-to=win32lz",               # 古董 Lempel-Ziv 压缩 API (极其古老的微软压缩算法)
+            "--nofollow-import-to=win32job",              # 任务对象 API (管理 Windows 进程组/Job Objects)
+            "--nofollow-import-to=win32net",              # 网络管理 API (管理本地或远程计算机的网络用户/群组)
+            "--nofollow-import-to=win32pipe",             # 命名管道 API (进程间极其底层的本地通信)
+            "--nofollow-import-to=win32profile",          # 用户配置文件 API (加载/卸载 Windows 账户配置文件)
+            "--nofollow-import-to=win32transaction",      # 事务管理器 API (内核级文件/注册表事务回滚)
+            "--nofollow-import-to=win32uiole",            # OLE 对象界面 API (早期的微软对象链接与嵌入技术)
+            "--nofollow-import-to=win32trace",            # 调试跟踪 API (Windows 内核和服务的底层日志抓取)
+            "--nofollow-import-to=win32crypt",            # Windows 底层加密与证书 API (DPAPI 数据保护等)
+            "--nofollow-import-to=win32cred",             # Windows 凭据管理器 API (存取控制面板里的系统凭据)
+            "--nofollow-import-to=win32service",          # Windows 后台服务 API (编写/控制无界面的系统自启服务)
+            "--nofollow-import-to=servicemanager",        # Windows 服务管理器模块 (配合 win32service 使用)
+            "--nofollow-import-to=win32evtlog",           # Windows 事件日志 API (向系统自带的事件查看器写日志)
 
             # === 6. 清理 Pillow 的 Tkinter 废料 ===
             "--nofollow-import-to=tkinter",
