@@ -165,8 +165,8 @@ class PeriodicRuleActions:
 
         if not checked_task_ids:
             InfoBar.warning(
-                title=_('No Target Selected', msgid='no_target_selected_2'),
-                content=_('Please check tasks in the left list first', msgid='please_check_tasks_in_the_left_list_first_2'),
+                title=_('No Target Selected', msgid='no_target_selected'),
+                content=_('Please check tasks in the left list first', msgid='please_check_tasks_in_the_left_list_first'),
                 orient=Qt.Orientation.Horizontal,
                 isClosable=True,
                 position=InfoBarPosition.TOP_RIGHT,

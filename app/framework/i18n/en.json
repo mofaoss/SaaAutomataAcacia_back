@@ -33,8 +33,6 @@
   "framework.ui.at_least_one_preset_must_remain": "At least one preset must remain",
   "framework.ui.no_target_selected": "No Target Selected",
   "framework.ui.please_check_tasks_in_the_left_list_first": "Please check tasks in the left list first",
-  "framework.ui.no_target_selected_2": "No Target Selected",
-  "framework.ui.please_check_tasks_in_the_left_list_first_2": "Please check tasks in the left list first",
   "framework.ui.final_queued_tasks_var_0": "Final queued tasks: {var_0}",
   "framework.ui.daily_tasks": "Daily Tasks",
   "framework.ui.the_user_clicked_the_manual_kill_button": "The user clicked the manual kill button",

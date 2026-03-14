@@ -377,7 +377,7 @@ class Input:
                 self.logger.info(_(f'Mouse move and click ({x}, {y})', msgid='mouse_move_and_click_x_y'))
         except Exception as e:
             self.logger.error(
-                _(f'Error occurred while performing mouse move click ({x}, {y}): {repr(e)}', msgid='error_occurred_while_performing_mouse_move_click_2')
+                _(f'Error occurred while performing mouse move click ({x}, {y}): {repr(e)}', msgid='error_occurred_while_performing_mouse_move_click')
             )
 
     def move_to(self, x: int, y: int):
@@ -638,6 +638,3 @@ if __name__ == '__main__':
     x_1 = click_dict[title][0]
     y_1 = click_dict[title][1]
     time.sleep(2)
-
-
-

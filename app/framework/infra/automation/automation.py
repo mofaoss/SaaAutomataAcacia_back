@@ -100,7 +100,7 @@ class Automation:
         try:
             # 1. 核心解析：按标题+类名寻找目标操作句柄
             target_hwnd = get_hwnd(self.window_title, self.window_class)
-            
+
             # 如果按类名没找到，尝试按标题找一次但必须进行类名和合法性校验
             if not target_hwnd:
                 top_hwnd = win32gui.FindWindow(None, self.window_title)
@@ -1145,7 +1145,7 @@ class Automation:
                 if len(matches) > 0:
                     for i in range(len(matches)):
                         x, y, w, h, conf = matches[i]
-                        self.logger.debug(_(f'Target image: {template_name} Similarity: {conf:.2f}', msgid='target_image_template_name_similarity_conf_2'))
+                        self.logger.debug(_(f'Target image: {template_name} Similarity: {conf:.2f}', msgid='target_image_template_name_similarity_conf'))
                 self.logger.debug(_(f'Count of image {template_name} is {len(matches)}', msgid='count_of_image_template_name_is_value'))
             if is_show:
                 for idx, (x, y, w, h, conf) in enumerate(matches):
