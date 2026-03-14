@@ -209,6 +209,7 @@ class PerfectBuild:
             "--noinclude-qt-plugins=webengine,multimedia,sql,test,sensorkit,position,location,bluetooth,nfc,serialport,printsupport,dbus,pdf",
             # 无用且极其臃肿的 Qt 底层 DLL
             "--noinclude-dlls=*qt6pdf*.dll",
+            "--noinclude-dlls=*qpdf*.dll",
 
             # 精简 OpenCV / onnxruntime 相关 DLL
             "--noinclude-dlls=cv2/opencv_videoio_ffmpeg*.dll",
