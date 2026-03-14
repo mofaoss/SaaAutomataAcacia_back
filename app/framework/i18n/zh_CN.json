@@ -274,7 +274,7 @@
   "framework.ui.such_as_7890": "如‘7890’",
   "framework.ui.system_crash_protection": "系统崩溃保护",
   "framework.ui.target_image_is_empty_skipping_match_counting": "目标图像为空，跳过匹配计数",
-  "framework.ui.task_check_record": "任务勾选记录：",
+  "framework.ui.task_check_record": "任务勾选配置：",
   "framework.ui.task_completed": "✨ 任务 [{task_name}] 已完成！",
   "framework.ui.task_name_finished_returning_to_home": "{task_name} 完成，返回首页……",
   "framework.ui.task_skipped": "⚠️ 任务 [{task_name}] 已跳过！",
