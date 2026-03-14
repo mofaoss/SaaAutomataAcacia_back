@@ -292,7 +292,7 @@ class DisplayInterface(ScrollArea, BaseInterface):
         quick_jump.addSampleCard(
             # icon=os.path.join(self.icondir, "setting.svg"),
             icon=os.path.join(self.icondir, "setting.png"),
-            title="Settings" if self._is_non_chinese_ui else "核心设置",
+            title="Core Settings" if self._is_non_chinese_ui else "核心设置",
             content="Please confirm the settings when you first download" if self._is_non_chinese_ui else self.tr("首次下载，请先确认"),
             routeKey="settingInterface",
             index=0,
@@ -302,7 +302,7 @@ class DisplayInterface(ScrollArea, BaseInterface):
             # icon=os.path.join(self.icondir, "play.svg"),
             icon=os.path.join(self.icondir, "daily.png"),
             title="Start Daily" if self._is_non_chinese_ui else "开始日常",
-            content="Acacia, Let's go!" if self._is_non_chinese_ui else self.tr("助手安卡，Let's go!"),
+            content="Acacia, Let's go!" if self._is_non_chinese_ui else self.tr("助手安卡，来开一局！"),
             routeKey="Home-Start-Now",
             index=0,
         )
