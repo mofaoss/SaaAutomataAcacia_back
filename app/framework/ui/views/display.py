@@ -290,7 +290,6 @@ class DisplayInterface(ScrollArea, BaseInterface):
         quick_jump = SampleCardView(jump_title, self.view)
 
         quick_jump.addSampleCard(
-            # icon=os.path.join(self.icondir, "setting.svg"),
             icon=os.path.join(self.icondir, "setting.png"),
             title=_("Core Settings", msgid="core_settings_display_title"), # if self._is_non_chinese_ui else "核心设置",
             content=_("Please confirm the settings when you first download"),  # if self._is_non_chinese_ui else self.tr("首次下载，请先确认"),
@@ -299,7 +298,6 @@ class DisplayInterface(ScrollArea, BaseInterface):
         )
 
         quick_jump.addSampleCard(
-            # icon=os.path.join(self.icondir, "play.svg"),
             icon=os.path.join(self.icondir, "daily.png"),
             title=_("Start Daily"), # if self._is_non_chinese_ui else "开始日常",
             content=_("Acacia, Let's go!"), # if self._is_non_chinese_ui else self.tr("助手安卡，来开一局！"),
@@ -308,7 +306,6 @@ class DisplayInterface(ScrollArea, BaseInterface):
         )
 
         quick_jump.addSampleCard(
-            # icon=os.path.join(self.icondir, "explain.svg"),
             icon=os.path.join(self.icondir, "tutorial.png"),
             title=_("Tutorial"), # if self._is_non_chinese_ui else "使用教程",
             content=_("Read the guide to get started quickly"), # if self._is_non_chinese_ui else self.tr("查看教程，答疑解惑"),
@@ -318,7 +315,6 @@ class DisplayInterface(ScrollArea, BaseInterface):
 
         stealth_on = bool(config.windowTrackingInput.value)
         self.windowTrackingQuickSwitchCard = quick_jump.addSampleCard_Switch(
-            # icon=os.path.join(self.icondir, "electronics.svg"),
             icon=os.path.join(self.icondir, "stealth.png"),
             title=_("Stealth Mode", msgid="stealth_mode_display_title"), #if self._is_non_chinese_ui else "隐身模式",
             content=_("Make the game completely invisible in the background"),  #if self._is_non_chinese_ui else self.tr("游戏隐身，完全后台"),
