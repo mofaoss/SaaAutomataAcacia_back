@@ -205,13 +205,65 @@ class PerfectBuild:
             "--windows-console-mode=disable",
             "--include-package=app.features.modules",
 
-            # 精简 Qt 插件
-            "--noinclude-qt-plugins=qml,webengine,network,multimedia,sql,test,sensorkit,position,location,bluetooth,nfc,serialport,websockets,printsupport,dbus,xml,pdf",
-            # 无用且极其臃肿的 Qt 底层 DLL
+            # === 1. 精简 Qt 插件 (精准剔除废料，保留 xml 确保 SVG 图标正常) ===
+            "--noinclude-qt-plugins=qml,webengine,network,multimedia,sql,test,sensorkit,position,location,bluetooth,nfc,serialport,websockets,printsupport,dbus,pdf,tls",
+
+            # === 2. 核心模块的 Python 层拦截 (斩断没用的巨兽) ===
+            "--nofollow-import-to=PySide6.QtNetwork",
+            "--nofollow-import-to=PySide6.QtPdf",
+            "--nofollow-import-to=PySide6.QtPdfWidgets",
+            "--nofollow-import-to=PySide6.QtWebEngine",
+            "--nofollow-import-to=PySide6.QtWebEngineCore",
+            "--nofollow-import-to=PySide6.QtWebEngineWidgets",
+            "--nofollow-import-to=PySide6.QtQml",
+            "--nofollow-import-to=PySide6.QtQuick",
+            "--nofollow-import-to=PySide6.Qt3DCore",
+            # 同步补齐多媒体和数据库的 Python 层拦截
+            "--nofollow-import-to=PySide6.QtMultimedia",
+            "--nofollow-import-to=PySide6.QtMultimediaWidgets",
+            "--nofollow-import-to=PySide6.QtSql",
+            "--nofollow-import-to=PySide6.QtTest",
+
+            # === 3. 底层 DLL (与 Python 层拦截一一对应) ===
+            "--noinclude-dlls=*mfc140*.dll",              # 微软老古董界面库
             "--noinclude-dlls=*qt6network*.dll",
             "--noinclude-dlls=*qt6pdf*.dll",
-            "--noinclude-dlls=*qt6webengine*.dll",
             "--noinclude-dlls=*qpdf*.dll",
+            "--noinclude-dlls=*qt6webengine*.dll",
+            "--noinclude-dlls=*qt6qml*.dll",
+            "--noinclude-dlls=*qt6quick*.dll",
+            "--noinclude-dlls=*qt63dcore*.dll",
+            "--noinclude-dlls=*qt6multimedia*.dll",       # 多媒体底层
+            "--noinclude-dlls=*qt6sql*.dll",              # 数据库底层
+            "--noinclude-dlls=*qt6test*.dll",             # 测试模块底层
+
+            # === 4. 仅拦截没人用的奇葩图片格式，坚决保留 WebP/JPEG/PNG/SVG/GIF/ICO ===
+            "--noinclude-dlls=*qicns*.dll",               # 苹果 Mac 图标格式
+            "--noinclude-dlls=*qtiff*.dll",               # TIFF 传真格式
+            "--noinclude-dlls=*qtga*.dll",                # TGA 格式
+            "--noinclude-dlls=*qwbmp*.dll",               # 古董手机 WAP 网页图片格式
+
+            # === 5. 清理无用的 Windows 底层 API (PyWin32 里的废料) ===
+            "--noinclude-dlls=win32print.pyd",            # 打印机 API
+            "--noinclude-dlls=win32ras.pyd",              # 拨号上网 API
+            "--noinclude-dlls=win32inet.pyd",             # IE 浏览器网络 API
+            "--noinclude-dlls=win32help.pyd",             # 早期 WinHelp 帮助文件 API
+            "--noinclude-dlls=win32ts.pyd",               # 终端服务 API
+            "--noinclude-dlls=win32wnet.pyd",             # Windows 局域网 API
+            "--noinclude-dlls=win32security.pyd",         # 安全与权限底层 API
+            "--noinclude-dlls=win32pdh.pyd",              # 性能数据助手 API
+            "--noinclude-dlls=win32lz.pyd",               # 古董 Lempel-Ziv 压缩 API
+            "--noinclude-dlls=win32job.pyd",              # 任务对象 API
+            "--noinclude-dlls=win32net.pyd",              # 网络管理 API
+            "--noinclude-dlls=win32pipe.pyd",             # 命名管道 API
+            "--noinclude-dlls=win32profile.pyd",          # 用户配置文件 API
+            "--noinclude-dlls=win32transaction.pyd",      # 事务管理器 API
+            "--noinclude-dlls=win32uiole.pyd",            # OLE 对象界面 API
+            "--noinclude-dlls=win32trace.pyd",            # 调试跟踪 API
+
+            # === 6. 清理 Pillow 的 Tkinter 废料 ===
+            "--nofollow-import-to=tkinter",
+            "--noinclude-dlls=_imagingtk.pyd",
 
             # 精简 OpenCV / onnxruntime 相关 DLL
             "--noinclude-dlls=cv2/opencv_videoio_ffmpeg*.dll",
