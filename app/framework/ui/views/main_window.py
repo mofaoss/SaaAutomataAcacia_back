@@ -489,19 +489,19 @@ class MainWindow(FluentWindow, BaseInterface):
         if key == "display":
             if self.displayInterface is None:
                 self._create_display_interface()
-            self._register_nav_item("display", self.displayInterface, FIF.HOME, _('front page'))
+            self._register_nav_item("display", self.displayInterface, FIF.HOME, _('Home', msgid="home"))
             return
 
         if key == "home":
             if self.homeInterface is None:
                 self._create_home_interface()
-            self._register_nav_item("home", self.homeInterface, FIF.PLAY, _('daily'))
+            self._register_nav_item("home", self.homeInterface, FIF.PLAY, _('Daily', msgid="daily"))
             return
 
         if key == "additional":
             if self.additionalInterface is None:
                 self._create_additional_interface()
-            self._register_nav_item("additional", self.additionalInterface, FIF.APPLICATION, _('APPs'))
+            self._register_nav_item("additional", self.additionalInterface, FIF.APPLICATION, _('APPs', msgid="apps"))
             return
 
         if key == "table":
@@ -511,7 +511,7 @@ class MainWindow(FluentWindow, BaseInterface):
                 "table",
                 self.tableInterface,
                 FIF.BOOK_SHELF,
-                _('Vocabulary'),
+                _('OCR', msgid="ocr_table"),
                 position=NavigationItemPosition.BOTTOM,
             )
             return
@@ -523,7 +523,7 @@ class MainWindow(FluentWindow, BaseInterface):
                 "help",
                 self.helpInterface,
                 FIF.HELP,
-                _('help'),
+                _('Help', msgid="help"),
                 position=NavigationItemPosition.BOTTOM,
             )
             return

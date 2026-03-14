@@ -243,8 +243,8 @@ class SettingInterface(ScrollArea, BaseInterface):
             _('Enter at startup'),
             _('Choose which page to enter directly when starting the software'),
             texts=[
-                _('front page'), _('daily'),
-                _('tool')
+                _('Home', msgid="home"), _('Daily', msgid="daily"),
+                _('APPs', msgid="apps")
             ],
             parent=self.personalGroup
         )
