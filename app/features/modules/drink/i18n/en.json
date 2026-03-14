@@ -1,11 +1,17 @@
 {
   "module.drink.group.general": "General",
   "module.drink.group.General": "General",
-  "module.drink.log.已完成_value_1_次猜心对局": "Completed {value_1} Guessing Game(s)",
-  "module.drink.log.开始第_count_次猜心对局": "Starting the {count}th Guessing Game",
-  "module.drink.log.猜心对局对局超时": "Guessing Game timeout",
-  "module.drink.log.玩法未解锁": "Game mode not unlocked",
-  "module.drink.log.进入猜心对局超时": "Timeout entering Guessing Game",
-  "module.drink.log.重进对局超时": "Timeout re-entering game",
-  "module.drink.title": "Guessing Card"
+  "module.drink.description": "### Tips\n* Stand at the Mind Game entrance before clicking Start.\n* Automatically plays Mind Game matches to claim rewards.\n* Both modes run automatically without strategy.",
+  "module.drink.field.CheckBox_is_speed_up.label": "Speed Mode Enabled",
+  "module.drink.field.ComboBox_card_mode.label": "Game Mode",
+  "module.drink.field.ComboBox_card_mode.option.0": "Standard Mode (Fast EXP Farming)",
+  "module.drink.field.ComboBox_card_mode.option.1": "Mystery Box Raid (EXP Achievement Farming)",
+  "module.drink.field.SpinBox_drink_times.label": "Number of Matches (-1 for infinite)",
+  "module.drink.log.已完成_value_1_次猜心对局": "Completed {value_1} Mind Game matches",
+  "module.drink.log.开始第_count_次猜心对局": "Starting Mind Game match #{count}",
+  "module.drink.log.猜心对局对局超时": "Mind Game match timed out",
+  "module.drink.log.玩法未解锁": "Mode not unlocked",
+  "module.drink.log.进入猜心对局超时": "Timed out while entering Mind Game",
+  "module.drink.log.重进对局超时": "Timed out while re-entering match",
+  "module.drink.title": "Mind Game"
 }

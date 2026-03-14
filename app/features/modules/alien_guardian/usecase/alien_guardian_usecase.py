@@ -16,7 +16,7 @@ _ALIEN_FIELDS = {
 @on_demand_module(
     "异星守护",
     fields=_ALIEN_FIELDS,
-    description="### 提示\n* 请在战斗开始后点击开始。\n* 推荐支援角色：钢铁射手、炽焰投手。\n* 关卡模式为半自动：需要手动射击与手动选择下一关。",
+    description="### 提示\n* 请在战斗开始后点击开始。\n* 关卡模式为半自动：需要手动射击与手动选择下一关。",
 )
 class AlienGuardianModule:
     def __init__(self, auto, logger, ComboBox_mode: int = 0):

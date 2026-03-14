@@ -279,21 +279,21 @@ class DisplayInterface(ScrollArea, BaseInterface):
     def apply_i18n(self):
         """多语言翻译"""
         self.gameLanguageNoticeLabel.setText(
-            "Note: Game language for automation supports only Simplified/Traditional Chinese."
-            if self._is_non_chinese_ui
-            else self.tr("注意：自动化识别的游戏语言目前仅支持简体中文与繁体中文。")
+            _("Note: Game language for automation supports only Simplified/Traditional Chinese.", msgid="language_notice_non_chinese_ui")
+            # if self._is_non_chinese_ui
+            # else self.tr("注意：自动化识别的游戏语言目前仅支持简体中文与繁体中文。")
         )
 
     def _load_samples(self):
         """负责组装快速跳转卡片及绑定业务逻辑"""
-        jump_title = "Quick Access" if self._is_non_chinese_ui else self.tr("快捷跳转")
+        jump_title = _("Quick Access") # if self._is_non_chinese_ui else self.tr("快捷跳转")
         quick_jump = SampleCardView(jump_title, self.view)
 
         quick_jump.addSampleCard(
             # icon=os.path.join(self.icondir, "setting.svg"),
             icon=os.path.join(self.icondir, "setting.png"),
-            title="Core Settings" if self._is_non_chinese_ui else "核心设置",
-            content="Please confirm the settings when you first download" if self._is_non_chinese_ui else self.tr("首次下载，请先确认"),
+            title=_("Core Settings", msgid="core_settings_display_title"), # if self._is_non_chinese_ui else "核心设置",
+            content=_("Please confirm the settings when you first download"),  # if self._is_non_chinese_ui else self.tr("首次下载，请先确认"),
             routeKey="settingInterface",
             index=0,
         )
@@ -301,8 +301,8 @@ class DisplayInterface(ScrollArea, BaseInterface):
         quick_jump.addSampleCard(
             # icon=os.path.join(self.icondir, "play.svg"),
             icon=os.path.join(self.icondir, "daily.png"),
-            title="Start Daily" if self._is_non_chinese_ui else "开始日常",
-            content="Acacia, Let's go!" if self._is_non_chinese_ui else self.tr("助手安卡，来开一局！"),
+            title=_("Start Daily"), # if self._is_non_chinese_ui else "开始日常",
+            content=_("Acacia, Let's go!"), # if self._is_non_chinese_ui else self.tr("助手安卡，来开一局！"),
             routeKey="Home-Start-Now",
             index=0,
         )
@@ -310,8 +310,8 @@ class DisplayInterface(ScrollArea, BaseInterface):
         quick_jump.addSampleCard(
             # icon=os.path.join(self.icondir, "explain.svg"),
             icon=os.path.join(self.icondir, "tutorial.png"),
-            title="Tutorial" if self._is_non_chinese_ui else "使用教程",
-            content="Read the guide to get started quickly" if self._is_non_chinese_ui else self.tr("查看教程，答疑解惑"),
+            title=_("Tutorial"), # if self._is_non_chinese_ui else "使用教程",
+            content=_("Read the guide to get started quickly"), # if self._is_non_chinese_ui else self.tr("查看教程，答疑解惑"),
             routeKey="Help-Interface",
             index=0,
         )
@@ -320,8 +320,8 @@ class DisplayInterface(ScrollArea, BaseInterface):
         self.windowTrackingQuickSwitchCard = quick_jump.addSampleCard_Switch(
             # icon=os.path.join(self.icondir, "electronics.svg"),
             icon=os.path.join(self.icondir, "stealth.png"),
-            title="Stealth Mode" if self._is_non_chinese_ui else "隐身模式",
-            content="Make the game completely invisible in the background" if self._is_non_chinese_ui else self.tr("游戏隐身，完全后台"),
+            title=_("Stealth Mode", msgid="stealth_mode_display_title"), #if self._is_non_chinese_ui else "隐身模式",
+            content=_("Make the game completely invisible in the background"),  #if self._is_non_chinese_ui else self.tr("游戏隐身，完全后台"),
             checked=stealth_on,
             on_toggle=self._toggle_stealth_mode,
         )

@@ -1,1 +1,8 @@
-{}
+{
+  "module.chasm.description": "### Tips\n* Neural Simulation opens every Tuesday at 10:00.\n* The program will automatically run the quick evaluation and claim rewards.",
+  "module.chasm.log.当前未开放拟境": "Neural Simulation is currently unavailable",
+  "module.chasm.log.精神拟境超时": "Neural Simulation timed out",
+  "module.chasm.log.领取拟境奖励超时": "Timed out while claiming Neural Simulation rewards",
+  "module.chasm.title": "Neural Sim",
+  "module.task_chasm.description": "### Tips\n* Neural Simulation opens every Tuesday at 10:00.\n* The program will automatically run the quick evaluation and claim rewards."
+}

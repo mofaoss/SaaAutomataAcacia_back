@@ -1,3 +1,15 @@
 {
+  "module.task_weapon_upgrade.description": "### Tips\n            * Automatically upgrade weapons in the inventory.\n            * Weapons will be sorted by level, prioritizing those that can be upgraded.\n            * Ensure sufficient upgrade materials are available.",
+  "module.upgrade.log.发现空的强化槽_点击_号打开材料选择面板": "Empty upgrade slot detected, clicking [+] to open material selection panel...",
+  "module.upgrade.log.开始武器强化流程": "Starting weapon upgrade process...",
+  "module.upgrade.log.成功进入枪械培养界面": "Successfully entered weapon upgrade screen",
+  "module.upgrade.log.未找到背包按钮_中止": "Inventory button not found, aborting",
+  "module.upgrade.log.正在打开背包并筛选武器": "Opening inventory and filtering weapons...",
+  "module.upgrade.log.武器升级流程达到最长执行时间_超时": "Weapon upgrade process reached maximum execution time (timeout)",
+  "module.upgrade.log.武器等级已满_停止升级流程": "Weapon level already maxed, stopping upgrade process",
+  "module.upgrade.log.经验不足_持续添加强化材料": "EXP insufficient, continuing to add upgrade materials...",
+  "module.upgrade.log.经验值已足够_点击_升级_按钮": "EXP sufficient, clicking [Upgrade] button",
+  "module.upgrade.log.触发_等级提升_点击空白处关闭弹窗": "Level Up triggered, clicking blank area to close popup...",
+  "module.weapon_upgrade.description": "### Tips\n            * Automatically upgrade weapons in the inventory.\n            * Weapons will be sorted by level, prioritizing those that can be upgraded.\n            * Ensure sufficient upgrade materials are available.",
   "module.weapon_upgrade.title": "Weapon Upgrade"
 }

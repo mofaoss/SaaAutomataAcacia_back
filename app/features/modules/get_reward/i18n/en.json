@@ -1,1 +1,7 @@
-{}
+{
+  "module.get_reward.description": "### Tips\n* Automatically claim Daily, Weekly, and Pass rewards.",
+  "module.get_reward.log.领取任务奖励超时": "Timed out while claiming task rewards",
+  "module.get_reward.log.领取凭证奖励超时": "Timed out while claiming pass rewards",
+  "module.get_reward.title": "Claim Rewards",
+  "module.task_get_reward.description": "### Tips\n* Automatically claim Daily, Weekly, and Pass rewards."
+}

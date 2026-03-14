@@ -9,7 +9,7 @@
   "module.drink.description": "### 提示\n* 站在猜心对局入口位置后再点开始。\n* 自动执行猜心对局领取猜心对局奖励。\n* 两种模式均无策略。",
   "module.drink.field.SpinBox_drink_times.label": "对局次数(-1无限)",
   "module.drink.field.ComboBox_card_mode.label": "对局模式",
-  "module.drink.field.ComboBox_card_mode.option.0": "模式一",
-  "module.drink.field.ComboBox_card_mode.option.1": "模式二",
+  "module.drink.field.ComboBox_card_mode.option.0": "标准模式（速刷经验）",
+  "module.drink.field.ComboBox_card_mode.option.1": "秘盒奇袭（刷经验成就）",
   "module.drink.field.CheckBox_is_speed_up.label": "是否已手动开启倍速"
 }

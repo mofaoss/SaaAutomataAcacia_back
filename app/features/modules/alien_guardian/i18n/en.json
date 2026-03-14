@@ -1,5 +1,12 @@
 {
   "module.alien_guardian.group.general": "General",
   "module.alien_guardian.group.General": "General",
-  "module.alien_guardian.title": "Alien Guardian"
+  "module.alien_guardian.description": "### Tips\n* Click Start after the battle begins.\n* Stage Mode is semi-automatic: manual shooting and manual stage selection are required.",
+  "module.alien_guardian.field.ComboBox_mode.label": "Game Mode",
+  "module.alien_guardian.field.ComboBox_mode.option.0": "Endless Mode",
+  "module.alien_guardian.field.ComboBox_mode.option.1": "Stage Mode",
+  "module.alien_guardian.log.异星守护战斗超时": "Alien Guardian battle timed out",
+  "module.alien_guardian.title": "Alien Guardian",
+  "module.alien_guardian.ui.无尽模式": "Endless Mode",
+  "module.alien_guardian.ui.闯关模式": "Stage Mode"
 }

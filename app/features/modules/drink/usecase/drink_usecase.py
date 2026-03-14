@@ -9,7 +9,7 @@ from app.framework.core.module_system import Field, on_demand_module
 
 _DRINK_FIELDS = {
     "SpinBox_drink_times": Field("对局次数(-1无限)"),
-    "ComboBox_card_mode": Field("对局模式", options=((0, "模式一"), (1, "模式二"))),
+    "ComboBox_card_mode": Field("对局模式", options=((0, "标准模式（速刷经验）"), (1, "秘盒奇袭（刷经验成就）"))),
     "CheckBox_is_speed_up": Field("是否已手动开启倍速"),
 }
 

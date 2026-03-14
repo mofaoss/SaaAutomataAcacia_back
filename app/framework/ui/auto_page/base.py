@@ -18,13 +18,13 @@ from PySide6.QtWidgets import (
     QPlainTextEdit,
 )
 from qfluentwidgets import (
-    BodyLabel, 
-    ComboBox, 
-    DoubleSpinBox, 
+    BodyLabel,
+    ComboBox,
+    DoubleSpinBox,
     PrimaryPushButton,
     PushButton,
-    SimpleCardWidget, 
-    SpinBox, 
+    SimpleCardWidget,
+    SpinBox,
     StrongBodyLabel,
     ScrollArea,
     Slider,
@@ -527,13 +527,21 @@ class AutoPageBase(AutoPageActionsMixin, AutoPageI18nMixin, QWidget):
                 continue
             seen.add(dedupe_key)
             if explicit_label is not None and explicit_label.strip():
-                explicit_key = self._snake_key(explicit_label, max_len=80)
-                explicit_candidates = [explicit_label]
-                for module_id in self._module_i18n_ids():
-                    explicit_candidates.append(f"module.{module_id}.ui.{explicit_key}")
-                label = self._first_translated(explicit_candidates)
-                if not label:
-                    label = tr(explicit_label, fallback=explicit_label)
+                # Keep option i18n lookup consistent with other declarative fields:
+                # module.<id>.field.<field>.option.<value> should be the first path.
+                label = self._option_label(field, value)
+                if (
+                    not label
+                    or label == str(value)
+                    or self._is_unusable_translated_text(label)
+                ):
+                    explicit_key = self._snake_key(explicit_label, max_len=80)
+                    explicit_candidates = [explicit_label]
+                    for module_id in self._module_i18n_ids():
+                        explicit_candidates.append(f"module.{module_id}.ui.{explicit_key}")
+                    label = self._first_translated(explicit_candidates)
+                    if not label:
+                        label = tr(explicit_label, fallback=explicit_label)
             else:
                 label = self._option_label(field, value)
             combo_items.append((value, label))
@@ -1146,7 +1154,7 @@ class AutoPageBase(AutoPageActionsMixin, AutoPageI18nMixin, QWidget):
                 swatch.setFixedSize(88, 24)
                 preview_layout.addWidget(swatch)
                 preview_layout.addStretch(1)
-                preview_fallback = "Current Color" if getattr(self, "_is_non_chinese_ui", False) else "当前颜色"
+                preview_fallback = _("Current Color")
                 preview_label = BodyLabel(tr("framework.ui.current_color", fallback=preview_fallback), group_card)
                 form_layout.addRow(preview_label, preview_host)
                 self._register_color_preview(swatch, source_name, mode)
@@ -1189,20 +1197,3 @@ class AutoPageBase(AutoPageActionsMixin, AutoPageI18nMixin, QWidget):
                 raw_value = self._get_widget_value(field, widget)
                 typed_value = self._coerce_value_for_config(field, raw_value)
                 config.set(cfg_item, typed_value)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

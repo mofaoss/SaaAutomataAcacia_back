@@ -6,5 +6,10 @@
   "module.task_close_game.group.General": "General",
   "module.close_game.group.general": "General",
   "module.close_game.group.General": "General",
-  "module.close_game.title": "Execute Exit"
+  "module.close_game.description": "### Tips\n* Scheduled tasks will stop running after the assistant is closed",
+  "module.close_game.title": "Exit Actions",
+  "module.task_close_game.description": "### Tips\n* Scheduled tasks will stop running after the assistant is closed",
+  "module.task_close_game.field.CheckBox_close_game.label": "Exit Game",
+  "module.task_close_game.field.CheckBox_close_proxy.label": "Exit Assistant",
+  "module.task_close_game.field.CheckBox_shutdown.label": "Shut Down System"
 }

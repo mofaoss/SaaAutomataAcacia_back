@@ -3,7 +3,7 @@
   "module.alien_guardian.ui.闯关模式": "闯关模式",
   "module.alien_guardian.log.异星守护战斗超时": "异星守护战斗超时",
   "module.alien_guardian.title": "异星守护",
-  "module.alien_guardian.description": "### 提示\n* 请在战斗开始后点击开始。\n* 推荐支援角色：钢铁射手、炽焰投手。\n* 关卡模式为半自动：需要手动射击与手动选择下一关。",
+  "module.alien_guardian.description": "### 提示\n* 请在战斗开始后点击开始。\n* 关卡模式为半自动：需要手动射击与手动选择下一关。",
   "module.alien_guardian.field.ComboBox_mode.label": "关卡模式",
   "module.alien_guardian.field.ComboBox_mode.option.0": "无尽模式",
   "module.alien_guardian.field.ComboBox_mode.option.1": "闯关模式"

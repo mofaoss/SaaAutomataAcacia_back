@@ -1,5 +1,13 @@
 {
   "module.maze.group.general": "General",
   "module.maze.group.General": "General",
-  "module.maze.title": "Maze"
+  "module.maze.description": "### Tips\n* Automatically farm the Paradox Maze – Verification Battlefield.\n* Supports both Single Run and Repeat Run modes.\n* Start from the maze entrance or the difficulty selection screen.\n* Single Run mode is suitable for clearing the first three stages, while Repeat Run continuously farms the final stage.\n* On the team setup screen, select buffs before starting the maze with Ankhasiya.\n* Recommended buffs: Skill – Explosive Lightning, Shield – Seize.\n* The team must include Chenxing – Qiongxian, placed in the center slot.",
+  "module.maze.field.ComboBox_mode_maze.label": "Mode",
+  "module.maze.field.ComboBox_mode_maze.option.0": "Single Run",
+  "module.maze.field.ComboBox_mode_maze.option.1": "Repeat Run",
+  "module.maze.log.今日的迷宫次数已经一滴都不剩了": "No maze attempts remaining today",
+  "module.maze.log.迷宫超时": "Maze run timed out",
+  "module.maze.title": "Verification Battlefield",
+  "module.maze.ui.repeat_run": "Repeat Run",
+  "module.maze.ui.single_run": "Single Run"
 }

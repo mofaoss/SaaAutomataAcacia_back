@@ -2,5 +2,21 @@
   "module.task_operation.group.general": "General",
   "module.task_operation.group.General": "General",
   "module.operation.group.general": "General",
-  "module.operation.group.General": "General"
+  "module.operation.group.General": "General",
+  "module.operation.description": "### Tips\n* Repeatedly farm the first stage of Practical Training, which requires no stamina.\n* Used to complete the Weekly Pass mission: complete Standard Operations 20 times.\n* Start from the main menu or the Standard Operations selection screen.",
+  "module.operation.field.ComboBox_run.label": "Sprint Mode",
+  "module.operation.field.ComboBox_run.option.0": "Toggle Sprint",
+  "module.operation.field.ComboBox_run.option.1": "Hold Sprint",
+  "module.operation.field.SpinBox_action_times.label": "Run Count",
+  "module.operation.title": "Standard Operations",
+  "module.operation_action.log.执行常规训练超时": "Standard Operations run timed out",
+  "module.operation_action.log.进入常规行动时连续滚轮无进展_已停止以避免后台卡死": "No progress detected while scrolling during Standard Operations entry. Stopped to prevent background freeze",
+  "module.operation_action.log.进入常规行动超时": "Timed out while entering Standard Operations",
+  "module.operation_action.ui.切换疾跑": "Toggle Sprint",
+  "module.operation_action.ui.按住疾跑": "Hold Sprint",
+  "module.task_operation.description": "### Tips\n* Repeatedly farm the first stage of Practical Training, which requires no stamina.\n* Used to complete the Weekly Pass mission: complete Standard Operations 20 times.\n* Start from the main menu or the Standard Operations selection screen.",
+  "module.task_operation.field.ComboBox_run.label": "Sprint Mode",
+  "module.task_operation.field.ComboBox_run.option.0": "Toggle Sprint",
+  "module.task_operation.field.ComboBox_run.option.1": "Hold Sprint",
+  "module.task_operation.field.SpinBox_action_times.label": "Run Count"
 }
