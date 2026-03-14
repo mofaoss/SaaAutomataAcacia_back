@@ -176,6 +176,9 @@ class TranslatableMessage:
 
 
 def _telemetry_warn(event: str, detail: str) -> None:
+    from app.framework.infra.config.app_config import config
+    if not config.showI18nWarnings.value:
+        return
     token = f"{event}:{detail}"
     if token in _TELEMETRY_SEEN:
         return

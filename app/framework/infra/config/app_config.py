@@ -142,6 +142,7 @@ class Config(QConfig):
     auto_start_task       = ConfigItem("setting_personal", "auto_start_task", False, BoolValidator())
     auto_boot_startup     = ConfigItem("setting_personal", "auto_boot_startup", False, BoolValidator())
     inform_message        = ConfigItem("setting_personal", "inform_message", True, BoolValidator())
+    showI18nWarnings      = ConfigItem("setting_personal", "showI18nWarnings", False, BoolValidator())
 
     checkUpdateAtStartUp     = ConfigItem("Update", "CheckUpdateAtStartUp", True, BoolValidator())
     checkPrereleaseForStable = ConfigItem("Update", "CheckPrereleaseForStable", False, BoolValidator())

@@ -1,6 +1,7 @@
 import json
 import os
 
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFrame, QTableWidgetItem
 from qfluentwidgets import InfoBar, InfoBarPosition
@@ -8,6 +9,7 @@ from qfluentwidgets import InfoBar, InfoBarPosition
 from app.framework.infra.config.app_config import is_non_chinese_ui_language
 from app.framework.ui.shared.style_sheet import StyleSheet
 from app.framework.infra.runtime.paths import APPDATA_DIR, ensure_runtime_dirs
+from app.framework.infra.vision.ocr_runtime import load_ocr_replacements
 from .periodic_base import BaseInterface
 from app.framework.ui.views.ocr_replacement_table_view import OcrReplacementTableView
 from app.framework.i18n import _
@@ -95,7 +97,7 @@ class OcrReplacementTable(QFrame, BaseInterface):
                 return
             if not (self.old_type and self.old_key and self.old_value):
                 return
-            data = self.load_json()
+            data = load_ocr_replacements()
             if col == 0:
                 print(item.text())
                 if item.text() not in ["直接替换", "条件替换", "Direct Replace", "Conditional Replace"]:
@@ -166,7 +168,7 @@ class OcrReplacementTable(QFrame, BaseInterface):
                 return
 
             # 读取现有 JSON 文件
-            data = self.load_json()
+            data = load_ocr_replacements()
             # 添加新规则
             data[replace_type][original_text] = replacement_text
             # 写回 JSON 文件
@@ -188,18 +190,6 @@ class OcrReplacementTable(QFrame, BaseInterface):
             # self.TableWidget_ocr_table.cellChanged.connect(self.change_row)
             self.TableWidget_ocr_table.blockSignals(False)
 
-    def load_json(self):
-        # 确保文件存在
-        if not os.path.exists(self.json_path):
-            with open(self.json_path, 'w', encoding='utf-8') as f:
-                json.dump({'direct': {}, 'conditional': {}}, f, indent=4)
-
-        try:
-            with open(self.json_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except Exception as e:
-            print(f"Error loading JSON: {str(e)}, path:{self.json_path}")
-            return {'direct': {}, 'conditional': {}}
 
     def save_data(self, data):
         try:
@@ -234,7 +224,7 @@ class OcrReplacementTable(QFrame, BaseInterface):
                 key_type = 'direct' if self.TableWidget_ocr_table.item(select_row,
                                                                        0).text() in ['直接替换', 'Direct Replace'] else 'conditional'
                 key_to_delete = self.TableWidget_ocr_table.item(select_row, 1).text()
-                data = self.load_json()
+                data = load_ocr_replacements()
                 if key_type not in data:
                     InfoBar.error(
                         title=_('Delete failed'),
@@ -287,7 +277,7 @@ class OcrReplacementTable(QFrame, BaseInterface):
             self.TableWidget_ocr_table.blockSignals(False)
 
     def load_table(self):
-        replacements = self.load_json()
+        replacements = load_ocr_replacements()
         direct_dic = replacements['direct']
         conditional_dic = replacements['conditional']
         total_rows = len(direct_dic) + len(conditional_dic)

@@ -5,10 +5,11 @@ import math
 from PIL import Image, ImageDraw, ImageFont
 from pathlib import Path
 
+from app.framework.infra.runtime.paths import PROJECT_ROOT
+
 # 获取当前文件所在目录和项目根目录
 module_dir = Path(__file__).resolve().parent
-project_root = module_dir.parent.parent.parent.parent.parent.parent
-models_dir = project_root / "resources" / "models" / "ppocrv5"
+models_dir = PROJECT_ROOT / "resources" / "models" / "ppocrv5"
 
 
 def get_rotate_crop_image(img, points):

@@ -1,18 +1,19 @@
 import gc
 import json
 import logging
-import os
+import shutil
 import time
 
 import cv2
 import numpy as np
 
 from app.framework.infra.config.app_config import config
-from app.framework.infra.vision.image import ImageUtils
+from app.framework.infra.config.app_config import is_non_chinese_ui_language
 from app.features.utils.text_normalizer import normalize_chinese_text
 from app.framework.infra.system.cpu import cpu_support_avx2
-from app.framework.infra.runtime.paths import APPDATA_DIR, ensure_runtime_dirs
 from app.framework.infra.vision.onnxocr.onnx_paddleocr import ONNXPaddleOcr
+from app.framework.infra.vision.image import ImageUtils
+from app.framework.infra.runtime.paths import APPDATA_DIR, PROJECT_ROOT, ensure_runtime_dirs
 from app.framework.i18n import _
 
 
@@ -37,8 +38,6 @@ class OCR:
         self._small_crop_min_side = 140
         self._small_crop_max_area = 140 * 140
 
-        # 【新增】：缓存多语言状态，避免每次查询 config
-        from app.framework.infra.config.app_config import is_non_chinese_ui_language
         self._is_non_chinese = is_non_chinese_ui_language()
 
     def _ui_text(self, zh_text: str, en_text: str) -> str:
@@ -377,35 +376,41 @@ class OCR:
         # 强制释放图像残余占用空间
         gc.collect()
 
-logger = logging.getLogger(__name__)
-
-
-def _load_replacements() -> dict:
+def load_ocr_replacements():
+    """
+    加载 OCR 替换表。
+    如果用户的个人表不存在，则从资源模板复制。
+    返回替换数据字典。
+    """
     ensure_runtime_dirs()
-    json_path = APPDATA_DIR / "ocr_replacements.json"
-    os.makedirs(json_path.parent, exist_ok=True)
+    user_json_path = APPDATA_DIR / "ocr_replacements.json"
 
-    if not json_path.exists():
-        json_path.write_text(
-            json.dumps({"direct": {}, "conditional": {}}, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
+    if not user_json_path.exists():
+        template_path = PROJECT_ROOT / "resources" / "ocr_table" / "ocr_replacements.json"
+        if template_path.exists():
+            shutil.copy(template_path, user_json_path)
+        else:
+            # Fallback if template is missing
+            with open(user_json_path, 'w', encoding='utf-8') as f:
+                json.dump({'direct': {}, 'conditional': {}}, f, indent=4)
 
     try:
-        data = json.loads(json_path.read_text(encoding="utf-8-sig"))
+        # Use utf-8-sig to handle potential BOM
+        data = json.loads(user_json_path.read_text(encoding="utf-8-sig"))
     except Exception:
         data = {"direct": {}, "conditional": {}}
 
+    # Validate data structure
     if not isinstance(data, dict):
         data = {"direct": {}, "conditional": {}}
-
-    if not isinstance(data.get("direct"), dict):
+    if "direct" not in data or not isinstance(data["direct"], dict):
         data["direct"] = {}
-    if not isinstance(data.get("conditional"), dict):
+    if "conditional" not in data or not isinstance(data["conditional"], dict):
         data["conditional"] = {}
 
     return data
 
+logger = logging.getLogger(__name__)
 
-ocr = OCR(logger, _load_replacements())
 
+ocr = OCR(logger, load_ocr_replacements())
