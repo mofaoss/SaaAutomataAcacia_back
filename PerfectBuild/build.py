@@ -243,27 +243,27 @@ class PerfectBuild:
             "--noinclude-dlls=*qtga*.dll",                # TGA 格式
             "--noinclude-dlls=*qwbmp*.dll",               # 古董手机 WAP 网页图片格式
 
-            # === 5. 清理无用的 Windows 底层 API (PyWin32 里的废料) ===
-            "--noinclude-dlls=win32print.pyd",            # 打印机 API
-            "--noinclude-dlls=win32ras.pyd",              # 拨号上网 API
-            "--noinclude-dlls=win32inet.pyd",             # IE 浏览器网络 API
-            "--noinclude-dlls=win32help.pyd",             # 早期 WinHelp 帮助文件 API
-            "--noinclude-dlls=win32ts.pyd",               # 终端服务 API
-            "--noinclude-dlls=win32wnet.pyd",             # Windows 局域网 API
-            "--noinclude-dlls=win32security.pyd",         # 安全与权限底层 API
-            "--noinclude-dlls=win32pdh.pyd",              # 性能数据助手 API
-            "--noinclude-dlls=win32lz.pyd",               # 古董 Lempel-Ziv 压缩 API
-            "--noinclude-dlls=win32job.pyd",              # 任务对象 API
-            "--noinclude-dlls=win32net.pyd",              # 网络管理 API
-            "--noinclude-dlls=win32pipe.pyd",             # 命名管道 API
-            "--noinclude-dlls=win32profile.pyd",          # 用户配置文件 API
-            "--noinclude-dlls=win32transaction.pyd",      # 事务管理器 API
-            "--noinclude-dlls=win32uiole.pyd",            # OLE 对象界面 API
-            "--noinclude-dlls=win32trace.pyd",            # 调试跟踪 API
+            # === 5. 清理无用的 Win32gui 底层 API ===
+            "--nofollow-import-to=win32print",            # 打印机 API
+            "--nofollow-import-to=win32ras",              # 拨号上网 API
+            "--nofollow-import-to=win32inet",             # IE 浏览器网络 API
+            "--nofollow-import-to=win32help",             # 早期 WinHelp 帮助文件 API
+            "--nofollow-import-to=win32ts",               # 终端服务 API
+            "--nofollow-import-to=win32wnet",             # Windows 局域网 API
+            "--nofollow-import-to=win32security",         # 安全与权限底层 API
+            "--nofollow-import-to=win32pdh",              # 性能数据助手 API
+            "--nofollow-import-to=win32lz",               # 古董 Lempel-Ziv 压缩 API
+            "--nofollow-import-to=win32job",              # 任务对象 API
+            "--nofollow-import-to=win32net",              # 网络管理 API
+            "--nofollow-import-to=win32pipe",             # 命名管道 API
+            "--nofollow-import-to=win32profile",          # 用户配置文件 API
+            "--nofollow-import-to=win32transaction",      # 事务管理器 API
+            "--nofollow-import-to=win32uiole",            # OLE 对象界面 API
+            "--nofollow-import-to=win32trace",            # 调试跟踪 API
 
             # === 6. 清理 Pillow 的 Tkinter 废料 ===
             "--nofollow-import-to=tkinter",
-            "--noinclude-dlls=_imagingtk.pyd",
+            "--nofollow-import-to=PIL._imagingtk",
 
             # 精简 OpenCV / onnxruntime 相关 DLL
             "--noinclude-dlls=cv2/opencv_videoio_ffmpeg*.dll",

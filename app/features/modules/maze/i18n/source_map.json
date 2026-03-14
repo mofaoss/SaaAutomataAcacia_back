@@ -1,8 +1,8 @@
 {
   "module.maze.description": "zh_CN",
   "module.maze.field.ComboBox_mode_maze.label": "zh_CN",
-  "module.maze.field.ComboBox_mode_maze.option.0": "en",
-  "module.maze.field.ComboBox_mode_maze.option.1": "en",
+  "module.maze.field.ComboBox_mode_maze.option.0": "zh_CN",
+  "module.maze.field.ComboBox_mode_maze.option.1": "zh_CN",
   "module.maze.group.General": "en",
   "module.maze.group.general": "en",
   "module.maze.log.今日的迷宫次数已经一滴都不剩了": "zh_CN",
