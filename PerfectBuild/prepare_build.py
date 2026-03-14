@@ -49,6 +49,7 @@ IGNORED_FILE_PATTERNS = [
     "*.tmp",
     "*.swp",
     "*.swo",
+    "*.bak",
 ]
 
 
