@@ -1,6 +1,6 @@
 # coding: utf-8
 from pathlib import Path
-from app.framework.infra.runtime.paths import APPDATA_DIR, ensure_runtime_dirs
+from app.framework.infra.runtime.paths import APPDATA_DIR, ensure_runtime_dirs, APPDATA_OLD_DIR
 
 # change DEBUG to False if you want to compile the code to exe
 DEBUG = "__compiled__" not in globals()
@@ -32,4 +32,4 @@ ACTIVITY = [
 ensure_runtime_dirs()
 CONFIG_FOLDER = APPDATA_DIR
 CONFIG_FILE = CONFIG_FOLDER / "config.json"
-
+CONFIG_FILE_OLD = APPDATA_OLD_DIR / "config.json"  # 旧版本的配置文件路径，兼容迁移

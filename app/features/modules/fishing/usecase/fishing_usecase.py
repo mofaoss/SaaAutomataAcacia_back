@@ -29,11 +29,12 @@ _FISHING_FIELDS = {
             (4, "重量级鱼类虫饵"),
             (5, "巨型鱼类虫饵"),
             (6, "重量级鱼类夜钓虫饵"),
+            (7, "巨型鱼类夜钓虫饵")
         ),
     ),
     "ComboBox_fishing_mode": Field("判定模式", group="基础设置", options=((0, "颜色检测 (高精度推荐)"), (1, "时间判定"))),
-    "CheckBox_is_limit_time": Field("启用时间兜底", group="基础设置"),
-    "CheckBox_is_save_fish": Field("保存截图", group="基础设置"),
+    "CheckBox_is_limit_time": Field("限制收杆时间上限", group="基础设置"),
+    "CheckBox_is_save_fish": Field("新纪录暂停保存截图", group="基础设置"),
     "LineEdit_fish_key": Field("收杆按键", group="颜色与按键"),
     "LineEdit_fish_upper": Field("黄色上限(H,S,V)", group="颜色与按键"),
     "LineEdit_fish_lower": Field("黄色下限(H,S,V)", group="颜色与按键"),
@@ -162,7 +163,7 @@ class FishingModule:
         timeout = Timer(15).start()
         enter_flag = False
         lure_type_index = self.lure_type_index
-        lure_type_list = ['万能鱼饵', '普通鱼饵', '豪华鱼饵', '至尊鱼饵', '重量级鱼类虫饵', '巨型鱼类虫饵', '重量级鱼类夜钓虫饵']
+        lure_type_list = ['万能鱼饵', '普通鱼饵', '豪华鱼饵', '至尊鱼饵', '重量级鱼类虫饵', '巨型鱼类虫饵', '重量级鱼类夜钓虫饵', '巨型鱼类夜钓虫饵']
         while True:
             self.auto.take_screenshot()
 
@@ -215,7 +216,7 @@ class FishingModule:
 
     def select_lure(self):
         open_lure = False
-        lure_type_list = ['万能', '普通', '豪华', '至尊', '重量级', '巨型', '重量级']
+        lure_type_list = ['万能', '普通', '豪华', '至尊', '重量级', '巨型', '重量级', '巨型']
         lure_type_index = self.lure_type_index
         timeout = Timer(20).start()
         while True:

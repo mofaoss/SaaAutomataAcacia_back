@@ -9,7 +9,8 @@ from qfluentwidgets import (qconfig, QConfig, ConfigItem, OptionsConfigItem, Boo
                             OptionsValidator, Theme, ConfigSerializer, RangeConfigItem, RangeValidator)
 
 from app.framework.infra.config.sequence_serializer import TaskSequenceSerializer
-from .setting import CONFIG_FILE
+from app.framework.infra.runtime.paths import copy_user_data
+from .setting import CONFIG_FILE, CONFIG_FILE_OLD
 
 
 class Language(Enum):
@@ -319,4 +320,8 @@ class Config(QConfig):
 
 config = Config()
 config.themeMode.value = Theme.AUTO
+if CONFIG_FILE_OLD.exists() and not CONFIG_FILE.exists():
+    # 兼容旧版本配置迁移
+    copy_user_data(user_file_path=CONFIG_FILE_OLD, backup_dir=CONFIG_FILE.parent)
+
 qconfig.load(str(CONFIG_FILE.absolute()), config)

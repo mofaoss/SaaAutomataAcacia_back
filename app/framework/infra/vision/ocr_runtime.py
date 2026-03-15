@@ -13,7 +13,7 @@ from app.features.utils.text_normalizer import normalize_chinese_text
 from app.framework.infra.system.cpu import cpu_support_avx2
 from app.framework.infra.vision.onnxocr.onnx_paddleocr import ONNXPaddleOcr
 from app.framework.infra.vision.image import ImageUtils
-from app.framework.infra.runtime.paths import APPDATA_DIR, PROJECT_ROOT, copy_user_data, ensure_runtime_dirs
+from app.framework.infra.runtime.paths import APPDATA_DIR, APPDATA_OLD_DIR, PROJECT_ROOT, copy_user_data, ensure_runtime_dirs
 from app.framework.i18n import _
 
 
@@ -386,32 +386,31 @@ def load_ocr_replacements():
     """
     ensure_runtime_dirs()
     user_json_path = APPDATA_DIR / "ocr_replacements.json"
+    user_json_old_path = APPDATA_OLD_DIR / "ocr_replacements.json"
 
+    # 1. 确保文件存在（优先级：原文件 > 旧版迁移 > 默认模板 > 空初始化）
     if not user_json_path.exists():
         template_path = PROJECT_ROOT / "resources" / "ocr_table" / "ocr_replacements.json"
 
-        if template_path.exists():
-            copy_user_data(template_path)
+        if user_json_old_path.exists():
+            copy_user_data(source_path=user_json_old_path, target_path=user_json_path)
+        elif template_path.exists():
+            copy_user_data(source_path=template_path, target_path=user_json_path)
         else:
-            # Fallback if template is missing
-            with open(user_json_path, 'w', encoding='utf-8') as f:
-                json.dump({'direct': {}, 'conditional': {}}, f, indent=4)
+            user_json_path.write_text(json.dumps({'direct': {}, 'conditional': {}}, indent=4), encoding='utf-8')
 
+    # 2. 读取并验证数据结构
     try:
-        # Use utf-8-sig to handle potential BOM
         data = json.loads(user_json_path.read_text(encoding="utf-8-sig"))
+        if not isinstance(data, dict):
+            data = {}
     except Exception:
-        data = {"direct": {}, "conditional": {}}
+        data = {}
 
-    # Validate data structure
-    if not isinstance(data, dict):
-        data = {"direct": {}, "conditional": {}}
-    if "direct" not in data or not isinstance(data["direct"], dict):
-        data["direct"] = {}
-    if "conditional" not in data or not isinstance(data["conditional"], dict):
-        data["conditional"] = {}
-
-    return data
+    return {
+        "direct": data.get("direct") if isinstance(data.get("direct"), dict) else {},
+        "conditional": data.get("conditional") if isinstance(data.get("conditional"), dict) else {}
+    }
 
 logger = logging.getLogger(__name__)
 
