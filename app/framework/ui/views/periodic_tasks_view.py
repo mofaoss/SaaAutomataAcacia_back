@@ -21,6 +21,7 @@ from qfluentwidgets import (
     ListWidget,
     PopUpAniStackedWidget,
     PushButton,
+    PrimaryPushButton,
     ScrollArea,
     SimpleCardWidget,
     StrongBodyLabel,
@@ -441,7 +442,7 @@ class SharedSchedulingPanel(QWidget):
 
         self.btn_enable_all = PushButton("All On" if is_non_chinese_ui else "全部启用", self)
         self.btn_disable_all = PushButton("All Off" if is_non_chinese_ui else "全部关闭", self)
-        self.btn_view_schedule = PushButton("Schedule" if is_non_chinese_ui else "日程表", self)
+        self.btn_view_schedule = PrimaryPushButton("Schedule" if is_non_chinese_ui else "日程表", self)
 
         self.btn_enable_all.setFixedHeight(28)
         self.btn_disable_all.setFixedHeight(28)
@@ -742,7 +743,7 @@ class PeriodicTasksView(ScrollArea):
         preset_row.addWidget(self.PushButton_add_preset)
         preset_row.addWidget(self.PushButton_delete_preset)
 
-        self.PushButton_start = PushButton(self.SimpleCardWidget_3)
+        self.PushButton_start = PrimaryPushButton(self.SimpleCardWidget_3)
         self.PushButton_start.setObjectName("PushButton_start")
         self.PushButton_start.setMinimumSize(QSize(0, 60))
 
