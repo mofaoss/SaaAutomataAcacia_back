@@ -119,6 +119,28 @@ class I18nFStringTransformer(ast.NodeTransformer):
         state = _TemplateState()
         idx_container = [1]  # Shared index counter for current call
 
+        # Handle existing .format() call if expr is a Call node to "format"
+        if self._is_str_format_call(expr):
+            # Extract the template and existing kwargs
+            template_node = expr.func.value
+            if not isinstance(template_node, ast.Constant) or not isinstance(template_node.value, str):
+                return call_node
+            
+            # Use original template, but we might need to handle msgid if present in call_node
+            template = template_node.value
+            
+            # Combine original keywords from the format() call
+            kwargs = list(expr.keywords)
+            # Combine original args from the format() call (convert them to value_N if they are positional)
+            for i, arg in enumerate(expr.args):
+                kwargs.append(ast.keyword(arg=f"value_{i+1}", value=arg))
+            
+            return ast.Call(
+                func=call_node.func,
+                args=[ast.Constant(value=template), *call_node.args[1:]],
+                keywords=call_node.keywords + kwargs,
+            )
+
         parsed = self._expr_to_template(expr, state, idx_container)
         if parsed is None:
             return call_node
@@ -126,23 +148,15 @@ class I18nFStringTransformer(ast.NodeTransformer):
         if not has_dynamic:
             return call_node
 
-        new_i18n_call = ast.Call(
-            func=call_node.func,
-            args=[ast.Constant(value=template), *call_node.args[1:]],
-            keywords=call_node.keywords,
-        )
-
-        if not state.key_to_expr:
-            return new_i18n_call
-
         kwargs = [
             ast.keyword(arg=key, value=expr)
             for key, expr in state.key_to_expr.items()
         ]
+
         return ast.Call(
-            func=ast.Attribute(value=new_i18n_call, attr="format", ctx=ast.Load()),
-            args=[],
-            keywords=kwargs,
+            func=call_node.func,
+            args=[ast.Constant(value=template), *call_node.args[1:]],
+            keywords=call_node.keywords + kwargs,
         )
 
     def _expr_to_template(self, expr: ast.AST, state: _TemplateState, idx: list[int]) -> tuple[str, bool] | None:

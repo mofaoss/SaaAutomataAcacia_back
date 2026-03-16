@@ -44,7 +44,6 @@ class PeriodicDispatcher:
                 mark_waiting_for_external_finish(True)
             return
 
-        # 立即执行的情况，补充被误删的触发提醒日志
         self.logger.info(
             _(f'⏰ Scheduled task triggered at {current_time_str}, executing tasks: {task_ids}')
         )
